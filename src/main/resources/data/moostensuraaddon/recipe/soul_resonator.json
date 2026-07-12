@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "CMC",
+    "MSM",
+    "CMC"
+  ],
+  "key": {
+    "C": {
+      "item": "tensura:medium_quality_magic_crystal"
+    },
+    "M": {
+      "item": "tensura:magic_stone"
+    },
+    "S": {
+      "item": "minecraft:compass"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "moostensuraaddon:soul_resonator"
+  }
+}

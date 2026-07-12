@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:sages_first_step",
+  "display": {
+    "icon": {
+      "id": "moostensuraaddon:great_crystal_altar"
+    },
+    "title": {
+      "text": "Great Crystal Resonance"
+    },
+    "description": {
+      "text": "Fulfill the conditions and let Sage answer the hum of a Great Crystal Altar."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

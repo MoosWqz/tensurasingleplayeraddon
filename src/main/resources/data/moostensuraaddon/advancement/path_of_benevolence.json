@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:granter_mastered",
+  "display": {
+    "icon": {
+      "id": "minecraft:golden_apple"
+    },
+    "title": {
+      "text": "Path of Benevolence"
+    },
+    "description": {
+      "text": "Evolve Granter through the path of protection and support."
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

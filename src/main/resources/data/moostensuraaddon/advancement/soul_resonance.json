@@ -1,0 +1,28 @@
+{
+  "parent": "moostensuraaddon:sages_first_step",
+  "display": {
+    "icon": {
+      "id": "moostensuraaddon:soul_resonator"
+    },
+    "title": {
+      "translate": "advancement.moostensuraaddon.soul_resonance.title"
+    },
+    "description": {
+      "translate": "advancement.moostensuraaddon.soul_resonance.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "resonated": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "resonated"
+    ]
+  ]
+}

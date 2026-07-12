@@ -1,0 +1,22 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 248693157,
+    "separation": 10,
+    "spacing": 28
+  },
+  "structures": [
+    {
+      "structure": "moostensuraaddon:great_crystal_shrine_temperate",
+      "weight": 1
+    },
+    {
+      "structure": "moostensuraaddon:great_crystal_shrine_hot",
+      "weight": 1
+    },
+    {
+      "structure": "moostensuraaddon:great_crystal_shrine_cold",
+      "weight": 1
+    }
+  ]
+}

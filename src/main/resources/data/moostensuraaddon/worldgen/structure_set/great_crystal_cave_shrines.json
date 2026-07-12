@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 724193861,
+    "separation": 12,
+    "spacing": 32
+  },
+  "structures": [
+    {
+      "structure": "moostensuraaddon:great_crystal_shrine_cave",
+      "weight": 1
+    }
+  ]
+}

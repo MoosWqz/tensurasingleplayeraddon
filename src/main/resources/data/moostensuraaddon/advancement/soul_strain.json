@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:seized_authority",
+  "display": {
+    "icon": {
+      "id": "minecraft:soul_lantern"
+    },
+    "title": {
+      "text": "Soul Strain"
+    },
+    "description": {
+      "text": "Push a subordinate's soul near its breaking point."
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

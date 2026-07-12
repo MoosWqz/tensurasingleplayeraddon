@@ -1,0 +1,22 @@
+{
+  "display": {
+    "icon": {
+      "id": "moostensuraaddon:moostensura"
+    },
+    "title": {
+      "text": "Singleplayer Tensura Addon"
+    },
+    "description": {
+      "text": "Begin a path of authority, wisdom, and granted power."
+    },
+    "background": "minecraft:textures/block/deepslate_tiles.png",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

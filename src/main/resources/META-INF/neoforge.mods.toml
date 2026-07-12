@@ -1,0 +1,75 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All rights reserved"
+
+[[mods]]
+modId="moostensuraaddon"
+version="1.3.1"
+displayName="Moos Tensura Addon"
+
+description='''
+A small companion addon for Tensura: Reincarnated that adds quality-of-life features for singleplayer progression. It introduces the Unique Skill Granter, allowing players to grant mastered skills to their subordinates, take them back, and inspect subordinate skills. The addon also adds survival-friendly commands to evolve Sage into Great Sage and perform a self-endowment ritual without needing another player.
+'''
+
+[[dependencies.moostensuraaddon]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.moostensuraaddon]]
+modId = "tensura"
+type = "required"
+versionRange = "[2.0.1.0,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.moostensuraaddon]]
+modId = "manascore"
+type = "required"
+versionRange = "[4.0.0.2,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.moostensuraaddon]]
+modId = "manascore_skill"
+type = "required"
+versionRange = "[4.0.0.2,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.moostensuraaddon]]
+modId = "manascore_storage"
+type = "required"
+versionRange = "[4.0.0.2,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.moostensuraaddon]]
+modId = "manascore_network"
+type = "required"
+versionRange = "[4.0.0.2,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.moostensuraaddon]]
+modId = "architectury"
+type = "required"
+versionRange = "[13.0.8,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.moostensuraaddon]]
+modId = "geckolib"
+type = "required"
+versionRange = "[4.9.2,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.moostensuraaddon]]
+modId = "smartbrainlib"
+type = "required"
+versionRange = "[1.16.11,)"
+ordering = "AFTER"
+side = "BOTH"

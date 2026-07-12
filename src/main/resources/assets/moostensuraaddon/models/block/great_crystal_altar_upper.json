@@ -1,0 +1,72 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:translucent",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "minecraft:block/amethyst_block",
+    "glass": "minecraft:block/magenta_stained_glass",
+    "core": "minecraft:block/amethyst_block"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": {
+          "texture": "#glass",
+          "uv": [0, 0, 16, 16]
+        },
+        "up": {
+          "texture": "#glass",
+          "uv": [0, 0, 16, 16]
+        },
+        "north": {
+          "texture": "#glass",
+          "uv": [0, 0, 16, 16]
+        },
+        "south": {
+          "texture": "#glass",
+          "uv": [0, 0, 16, 16]
+        },
+        "west": {
+          "texture": "#glass",
+          "uv": [0, 0, 16, 16]
+        },
+        "east": {
+          "texture": "#glass",
+          "uv": [0, 0, 16, 16]
+        }
+      }
+    },
+    {
+      "from": [3, 3, 3],
+      "to": [13, 13, 13],
+      "faces": {
+        "down": {
+          "texture": "#core",
+          "uv": [3, 3, 13, 13]
+        },
+        "up": {
+          "texture": "#core",
+          "uv": [3, 3, 13, 13]
+        },
+        "north": {
+          "texture": "#core",
+          "uv": [3, 3, 13, 13]
+        },
+        "south": {
+          "texture": "#core",
+          "uv": [3, 3, 13, 13]
+        },
+        "west": {
+          "texture": "#core",
+          "uv": [3, 3, 13, 13]
+        },
+        "east": {
+          "texture": "#core",
+          "uv": [3, 3, 13, 13]
+        }
+      }
+    }
+  ]
+}

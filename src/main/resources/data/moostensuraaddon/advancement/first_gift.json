@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:authority_to_bestow",
+  "display": {
+    "icon": {
+      "id": "minecraft:bundle"
+    },
+    "title": {
+      "text": "First Gift"
+    },
+    "description": {
+      "text": "Grant a mastered skill to a subordinate."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

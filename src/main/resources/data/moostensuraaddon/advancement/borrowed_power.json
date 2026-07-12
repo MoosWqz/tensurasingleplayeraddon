@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:path_of_benevolence",
+  "display": {
+    "icon": {
+      "id": "minecraft:amethyst_shard"
+    },
+    "title": {
+      "text": "Borrowed Power"
+    },
+    "description": {
+      "text": "Borrow a subordinate's skill without taking it away."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

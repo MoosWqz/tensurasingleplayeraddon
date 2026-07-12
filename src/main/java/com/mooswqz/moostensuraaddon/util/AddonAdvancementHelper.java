@@ -1,0 +1,330 @@
+package com.mooswqz.moostensuraaddon.util;
+
+import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+import com.mooswqz.moostensuraaddon.attachment.BorrowedSkillData;
+import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
+import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
+import io.github.manasmods.manascore.skill.api.ManasSkillInstance;
+import io.github.manasmods.manascore.skill.api.SkillAPI;
+import io.github.manasmods.tensura.storage.TensuraStorages;
+import io.github.manasmods.tensura.storage.ep.IExistence;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerAdvancements;
+import net.minecraft.server.level.ServerPlayer;
+
+import java.util.Map;
+import java.util.Optional;
+
+public final class AddonAdvancementHelper {
+    public static final ResourceLocation ROOT = id("root");
+    public static final ResourceLocation A_NAME_TO_ANCHOR_THE_SOUL = id("a_name_to_anchor_the_soul");
+    public static final ResourceLocation SAGES_FIRST_STEP = id("sages_first_step");
+    public static final ResourceLocation GREAT_CRYSTAL_RESONANCE = id("great_crystal_resonance");
+    public static final ResourceLocation THE_GREAT_SAGE_AWAKENS = id("the_great_sage_awakens");
+    public static final ResourceLocation AUTHORITY_TO_BESTOW = id("authority_to_bestow");
+    public static final ResourceLocation FIRST_GIFT = id("first_gift");
+    public static final ResourceLocation WHAT_WAS_GIVEN_CAN_RETURN = id("what_was_given_can_return");
+    public static final ResourceLocation GRANTER_MASTERED = id("granter_mastered");
+    public static final ResourceLocation PATH_OF_BENEVOLENCE = id("path_of_benevolence");
+    public static final ResourceLocation BORROWED_POWER = id("borrowed_power");
+    public static final ResourceLocation A_POWER_MADE_PERMANENT = id("a_power_made_permanent");
+    public static final ResourceLocation PATH_OF_GOVERNANCE = id("path_of_governance");
+    public static final ResourceLocation SEIZED_AUTHORITY = id("seized_authority");
+    public static final ResourceLocation SOUL_STRAIN = id("soul_strain");
+    public static final ResourceLocation THE_PRICE_OF_POWER = id("the_price_of_power");
+
+    private AddonAdvancementHelper() {
+    }
+
+    private static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MoosTensuraAddon.MODID, path);
+    }
+
+    public static void award(ServerPlayer player, ResourceLocation advancementId) {
+        if (player == null || advancementId == null) {
+            return;
+        }
+
+        MinecraftServer server = player.getServer();
+
+        if (server == null) {
+            return;
+        }
+
+        AdvancementHolder advancement = server.getAdvancements().get(advancementId);
+
+        if (advancement == null) {
+            return;
+        }
+
+        PlayerAdvancements playerAdvancements = player.getAdvancements();
+        AdvancementProgress progress = playerAdvancements.getOrStartProgress(advancement);
+
+        if (progress.isDone()) {
+            return;
+        }
+
+        for (String criterion : progress.getRemainingCriteria()) {
+            playerAdvancements.award(advancement, criterion);
+        }
+    }
+
+    public static void awardRoot(ServerPlayer player) {
+        award(player, ROOT);
+    }
+
+    public static void awardNameAnchor(ServerPlayer player) {
+        awardRoot(player);
+        award(player, A_NAME_TO_ANCHOR_THE_SOUL);
+    }
+
+    public static void awardSageFirstStep(ServerPlayer player) {
+        awardRoot(player);
+        award(player, SAGES_FIRST_STEP);
+    }
+
+    public static void awardGreatCrystalResonance(ServerPlayer player) {
+        awardSageFirstStep(player);
+        award(player, GREAT_CRYSTAL_RESONANCE);
+    }
+
+    public static void awardGreatSageAwakens(ServerPlayer player) {
+        awardSageFirstStep(player);
+        award(player, THE_GREAT_SAGE_AWAKENS);
+    }
+
+    public static void awardAuthorityToBestow(ServerPlayer player) {
+        awardGreatSageAwakens(player);
+        award(player, AUTHORITY_TO_BESTOW);
+    }
+
+    public static void awardFirstGift(ServerPlayer player) {
+        awardAuthorityToBestow(player);
+        award(player, FIRST_GIFT);
+    }
+
+    public static void awardWhatWasGivenCanReturn(ServerPlayer player) {
+        awardFirstGift(player);
+        award(player, WHAT_WAS_GIVEN_CAN_RETURN);
+    }
+
+    public static void awardGranterMastered(ServerPlayer player) {
+        awardAuthorityToBestow(player);
+        award(player, GRANTER_MASTERED);
+    }
+
+    public static void awardPathOfBenevolence(ServerPlayer player) {
+        awardGranterMastered(player);
+        award(player, PATH_OF_BENEVOLENCE);
+    }
+
+    public static void awardBorrowedPower(ServerPlayer player) {
+        awardPathOfBenevolence(player);
+        award(player, BORROWED_POWER);
+    }
+
+    public static void awardPowerMadePermanent(ServerPlayer player) {
+        awardBorrowedPower(player);
+        award(player, A_POWER_MADE_PERMANENT);
+    }
+
+    public static void awardPathOfGovernance(ServerPlayer player) {
+        awardGranterMastered(player);
+        award(player, PATH_OF_GOVERNANCE);
+    }
+
+    public static void awardSeizedAuthority(ServerPlayer player) {
+        awardPathOfGovernance(player);
+        award(player, SEIZED_AUTHORITY);
+    }
+
+    public static void awardSoulStrain(ServerPlayer player) {
+        awardSeizedAuthority(player);
+        award(player, SOUL_STRAIN);
+    }
+
+    public static void awardPriceOfPower(ServerPlayer player) {
+        awardSoulStrain(player);
+        award(player, THE_PRICE_OF_POWER);
+    }
+
+    public static void awardStateBasedAdvancements(ServerPlayer player) {
+        if (player == null || player.level().isClientSide()) {
+            return;
+        }
+
+        awardRoot(player);
+
+        boolean isNamedOrEndowed = isNamedOrEndowed(player);
+        boolean hasSage = hasExactSkill(player, "tensura:sage", "Sage");
+        boolean hasGreatSage = GranterActions.hasGreatSage(player);
+        boolean hasGranter = hasSkill(player, SkillRegistry.GRANTER.get().getRegistryName());
+        boolean hasBenevolent = hasSkill(player, SkillRegistry.BENEVOLENT_EMPOWERMENT.get().getRegistryName());
+        boolean hasAbsolute = hasSkill(player, SkillRegistry.ABSOLUTE_GOVERNANCE.get().getRegistryName());
+
+        if (isNamedOrEndowed) {
+            awardNameAnchor(player);
+        }
+
+        if (hasSage) {
+            awardSageFirstStep(player);
+        }
+
+        /*
+         * Structure-ready:
+         * Later, when Great Sage comes from a structure/ritual, this still works.
+         * It only checks whether the player currently has Great Sage.
+         *
+         * If a player somehow starts with Great Sage, this awards:
+         * - root
+         * - Sage's First Step
+         * - The Great Sage Awakens
+         *
+         * It does NOT award A Name to Anchor the Soul unless the player is actually named/endowed.
+         * It also does NOT award Great Crystal Resonance unless the player actually interacts with an altar while carrying Sage.
+         */
+        if (hasGreatSage) {
+            awardGreatSageAwakens(player);
+        }
+
+        if (hasGranter) {
+            awardAuthorityToBestow(player);
+        }
+
+        if (hasBenevolent) {
+            awardPathOfBenevolence(player);
+        }
+
+        if (hasAbsolute) {
+            awardPathOfGovernance(player);
+        }
+
+        awardGranterProgressAdvancements(player);
+        awardBorrowProgressAdvancements(player);
+        awardMasteryAdvancements(player);
+    }
+
+    private static void awardGranterProgressAdvancements(ServerPlayer player) {
+        GranterProgressData progressData = player.getData(AttachmentRegistry.GRANTER_PROGRESS_DATA);
+
+        if (progressData.getSuccessfulGrants() > 0) {
+            awardFirstGift(player);
+        }
+
+        if (progressData.getSuccessfulTakeBacks() > 0) {
+            awardWhatWasGivenCanReturn(player);
+        }
+    }
+
+    private static void awardBorrowProgressAdvancements(ServerPlayer player) {
+        BorrowedSkillData borrowedSkillData = player.getData(AttachmentRegistry.BORROWED_SKILL_DATA);
+
+        if (!borrowedSkillData.getBorrowHistory().isEmpty()) {
+            awardBorrowedPower(player);
+        }
+
+        for (Map.Entry<String, Integer> entry : borrowedSkillData.getBorrowHistory().entrySet()) {
+            if (entry == null || entry.getKey() == null || entry.getKey().isBlank()) {
+                continue;
+            }
+
+            String skillId = entry.getKey();
+
+            if (borrowedSkillData.isBorrowedSkill(skillId)) {
+                continue;
+            }
+
+            if (playerHasSkill(player, skillId)) {
+                awardPowerMadePermanent(player);
+                return;
+            }
+        }
+    }
+
+    private static void awardMasteryAdvancements(ServerPlayer player) {
+        Optional<ManasSkillInstance> granterOptional = SkillAPI.getSkillsFrom(player)
+                .getSkill(SkillRegistry.GRANTER.get().getRegistryName());
+
+        if (granterOptional.isPresent() && granterOptional.get().isMastered(player)) {
+            awardGranterMastered(player);
+            return;
+        }
+
+        if (hasSkill(player, SkillRegistry.BENEVOLENT_EMPOWERMENT.get().getRegistryName())) {
+            awardGranterMastered(player);
+            return;
+        }
+
+        if (hasSkill(player, SkillRegistry.ABSOLUTE_GOVERNANCE.get().getRegistryName())) {
+            awardGranterMastered(player);
+        }
+    }
+
+    public static boolean isNamedOrEndowed(ServerPlayer player) {
+        if (player == null) {
+            return false;
+        }
+
+        IExistence existence = TensuraStorages.getExistenceFrom(player);
+
+        if (existence == null) {
+            return false;
+        }
+
+        String name = existence.getName();
+
+        return name != null && !name.isBlank();
+    }
+
+    private static boolean hasSkill(ServerPlayer player, ResourceLocation skillId) {
+        if (player == null || skillId == null) {
+            return false;
+        }
+
+        return SkillAPI.getSkillsFrom(player).getSkill(skillId).isPresent();
+    }
+
+    private static boolean playerHasSkill(ServerPlayer player, String rawSkillId) {
+        ResourceLocation skillId = ResourceLocation.tryParse(rawSkillId);
+
+        if (skillId == null) {
+            return false;
+        }
+
+        return hasSkill(player, skillId);
+    }
+
+    private static boolean hasExactSkill(ServerPlayer player, String rawSkillId, String displayName) {
+        if (player == null) {
+            return false;
+        }
+
+        for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(player).getLearnedSkills()) {
+            if (instance == null) {
+                continue;
+            }
+
+            ResourceLocation skillId = instance.getSkillId();
+
+            if (skillId != null && rawSkillId.equals(skillId.toString())) {
+                return true;
+            }
+
+            String name = instance.getDisplayName().getString();
+
+            if (name.equalsIgnoreCase(displayName)) {
+                return true;
+            }
+
+            if (name.equalsIgnoreCase("The " + displayName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}

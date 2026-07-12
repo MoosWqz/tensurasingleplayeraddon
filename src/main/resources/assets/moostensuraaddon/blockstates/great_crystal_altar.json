@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "moostensuraaddon:block/great_crystal_altar_lower"
+    },
+    "half=upper": {
+      "model": "moostensuraaddon:block/great_crystal_altar_upper"
+    }
+  }
+}

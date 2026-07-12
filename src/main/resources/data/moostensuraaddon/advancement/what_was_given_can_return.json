@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:first_gift",
+  "display": {
+    "icon": {
+      "id": "minecraft:ender_pearl"
+    },
+    "title": {
+      "text": "What Was Given Can Return"
+    },
+    "description": {
+      "text": "Reclaim a skill you once bestowed."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

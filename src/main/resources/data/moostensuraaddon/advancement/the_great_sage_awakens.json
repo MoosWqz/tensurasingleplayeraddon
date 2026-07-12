@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:sages_first_step",
+  "display": {
+    "icon": {
+      "id": "minecraft:knowledge_book"
+    },
+    "title": {
+      "text": "The Great Sage Awakens"
+    },
+    "description": {
+      "text": "At a place of crystal, silence, and thought, or through another valid path, Sage may evolve into Great Sage."
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

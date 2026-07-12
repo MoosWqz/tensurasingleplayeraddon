@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:granter_mastered",
+  "display": {
+    "icon": {
+      "id": "minecraft:wither_skeleton_skull"
+    },
+    "title": {
+      "text": "Path of Governance"
+    },
+    "description": {
+      "text": "Evolve Granter through the path of domination and control."
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

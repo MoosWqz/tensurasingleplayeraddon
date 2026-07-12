@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:borrowed_power",
+  "display": {
+    "icon": {
+      "id": "minecraft:totem_of_undying"
+    },
+    "title": {
+      "text": "A Power Made Permanent"
+    },
+    "description": {
+      "text": "Borrow a skill so often that it becomes part of you."
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

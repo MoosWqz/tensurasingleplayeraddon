@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:book"
+    },
+    "title": {
+      "text": "Sage's First Step"
+    },
+    "description": {
+      "text": "Obtain Sage and begin walking the path of analysis and wisdom. Some ancient crystals may answer this inner voice."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

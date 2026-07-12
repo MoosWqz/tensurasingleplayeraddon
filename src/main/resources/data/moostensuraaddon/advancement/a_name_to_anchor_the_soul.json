@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:name_tag"
+    },
+    "title": {
+      "text": "A Name to Anchor the Soul"
+    },
+    "description": {
+      "text": "Become named or endowed, giving your soul a stronger anchor."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "moostensuraaddon:great_crystal_shrine_temperate",
+    "moostensuraaddon:great_crystal_shrine_hot",
+    "moostensuraaddon:great_crystal_shrine_cold",
+    "moostensuraaddon:great_crystal_shrine_cave"
+  ]
+}

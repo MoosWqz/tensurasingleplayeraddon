@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:authority_to_bestow",
+  "display": {
+    "icon": {
+      "id": "minecraft:nether_star"
+    },
+    "title": {
+      "text": "Granter Mastered"
+    },
+    "description": {
+      "text": "Master the authority to grant and reclaim power."
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "block": "moostensuraaddon:great_crystal_altar",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "half": "lower"
+              }
+            }
+          ],
+          "name": "moostensuraaddon:great_crystal_altar"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "moostensuraaddon:blocks/great_crystal_altar"
+}

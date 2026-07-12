@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:path_of_governance",
+  "display": {
+    "icon": {
+      "id": "minecraft:iron_sword"
+    },
+    "title": {
+      "text": "Seized Authority"
+    },
+    "description": {
+      "text": "Take a subordinate's skill by force."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

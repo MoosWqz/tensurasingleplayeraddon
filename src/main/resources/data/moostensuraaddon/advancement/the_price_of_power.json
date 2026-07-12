@@ -1,0 +1,23 @@
+{
+  "parent": "moostensuraaddon:soul_strain",
+  "display": {
+    "icon": {
+      "id": "minecraft:echo_shard"
+    },
+    "title": {
+      "text": "The Price of Power"
+    },
+    "description": {
+      "text": "Shatter a soul through forced extraction."
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

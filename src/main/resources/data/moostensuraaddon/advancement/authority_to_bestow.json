@@ -1,0 +1,22 @@
+{
+  "parent": "moostensuraaddon:the_great_sage_awakens",
+  "display": {
+    "icon": {
+      "id": "minecraft:emerald"
+    },
+    "title": {
+      "text": "Authority to Bestow"
+    },
+    "description": {
+      "text": "Awaken the Unique Skill Granter."
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "manual": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}
