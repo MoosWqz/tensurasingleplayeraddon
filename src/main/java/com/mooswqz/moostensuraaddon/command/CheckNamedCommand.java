@@ -1,8 +1,11 @@
 package com.mooswqz.moostensuraaddon.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
 import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
+import com.mooswqz.moostensuraaddon.debug.DebugModeService;
 import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
 import com.mooswqz.moostensuraaddon.util.GranterActions;
 import com.mooswqz.moostensuraaddon.util.TensuraPlayerStateHelper;
@@ -27,104 +30,388 @@ public class CheckNamedCommand {
     private static final double REQUIRED_GRANTER_EP = 200_000.0D;
     private static final double SUBORDINATE_SCAN_RADIUS = 32.0D;
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("checknamed")
-                .requires(source -> source.hasPermission(2))
-                .executes(context -> {
-                    ServerPlayer player = context.getSource().getPlayerOrException();
-                    IExistence existence = TensuraStorages.getExistenceFrom(player);
-
-                    if (existence == null) {
-                        player.sendSystemMessage(Component.translatable("moostensuraaddon.command.checknamed.failed")
-                                .withStyle(ChatFormatting.RED));
-                        return 0;
-                    }
-
-                    GranterProgressData progress = player.getData(AttachmentRegistry.GRANTER_PROGRESS_DATA);
-
-                    String storedName = TensuraPlayerStateHelper.getStoredTensuraName(player).orElse(null);
-                    boolean named = TensuraPlayerStateHelper.isNamedOrEndowed(player);
-
-                    boolean hasGranter = hasGranter(player);
-                    boolean hasBenevolentEmpowerment = hasBenevolentEmpowerment(player);
-                    boolean hasAbsoluteGovernance = hasAbsoluteGovernance(player);
-                    boolean hasAnyEvolvedGranterSkill = hasBenevolentEmpowerment || hasAbsoluteGovernance;
-
-                    boolean hasGreatSage = GranterActions.hasGreatSage(player);
-
-                    int masteredSkillCount = getMasteredSkillCount(player);
-                    double ep = existence.getEP();
-                    double magicules = existence.getMagicule();
-
-                    List<LivingEntity> nearbyLivingEntities = getNearbyLivingEntities(player);
-                    List<LivingEntity> nearbySubordinates = getNearbySubordinates(player);
-
-                    int nearbyLivingCount = nearbyLivingEntities.size();
-                    int nearbySubordinateCount = nearbySubordinates.size();
-                    int recognizedSubordinateCount = progress.getRecognizedSubordinateCount();
-
-                    boolean epOk = ep >= REQUIRED_GRANTER_EP;
-                    boolean masteredSkillsOk = masteredSkillCount >= REQUIRED_GRANTER_MASTERED_SKILLS;
-                    boolean nearbySubordinatesOk = nearbySubordinateCount >= REQUIRED_GRANTER_SUBORDINATES;
-                    boolean recognizedSubordinatesOk = recognizedSubordinateCount >= REQUIRED_GRANTER_SUBORDINATES;
-                    boolean subordinateRequirementOk = nearbySubordinatesOk || recognizedSubordinatesOk;
-
-                    boolean canNaturallyAwakenGranter =
-                            !hasGranter
-                                    && !hasAnyEvolvedGranterSkill
-                                    && !progress.hasAwakenedGranterNaturally()
-                                    && named
-                                    && hasGreatSage
-                                    && masteredSkillsOk
-                                    && subordinateRequirementOk
-                                    && epOk;
-
-                    player.sendSystemMessage(Component.translatable("moostensuraaddon.command.checknamed.header")
-                            .withStyle(ChatFormatting.GOLD));
-
-                    player.sendSystemMessage(Component.literal("Identity / Existence")
-                            .withStyle(ChatFormatting.YELLOW));
-
-                    sendBooleanLine(player, "Named/endowed", named);
-                    sendInfoLine(player, "Stored Tensura name", safeName(storedName));
-                    sendInfoLine(player, "Minecraft name", player.getGameProfile().getName());
-                    sendInfoLine(player, "Display name", player.getDisplayName().getString());
-                    sendInfoLine(player, "Custom name", getCustomName(player));
-                    sendInfoLine(player, "EP", formatNumber(ep));
-                    sendInfoLine(player, "Magicules", formatNumber(magicules));
-                    sendInfoLine(player, "Level", String.valueOf(player.experienceLevel));
-                    sendInfoLine(player, "Raw XP", String.valueOf(XpUtils.getTotalXp(player)));
-                    sendInfoLine(player, "Mastered skills", String.valueOf(masteredSkillCount));
-
-                    player.sendSystemMessage(Component.literal("Granter Awakening Debug")
-                            .withStyle(ChatFormatting.LIGHT_PURPLE));
-
-                    sendBooleanLine(player, "Has Granter", hasGranter);
-                    sendBooleanLine(player, "Has Benevolent Empowerment", hasBenevolentEmpowerment);
-                    sendBooleanLine(player, "Has Absolute Governance", hasAbsoluteGovernance);
-                    sendBooleanLine(player, "Already awakened Granter naturally", progress.hasAwakenedGranterNaturally());
-
-                    sendRequirementLine(player, "Named/endowed", named, "required");
-                    sendRequirementLine(player, "Great Sage", hasGreatSage, "required");
-                    sendRequirementLine(player, "EP", epOk, formatNumber(ep) + " / " + formatNumber(REQUIRED_GRANTER_EP));
-                    sendRequirementLine(player, "Mastered skills", masteredSkillsOk, masteredSkillCount + " / " + REQUIRED_GRANTER_MASTERED_SKILLS);
-                    sendRequirementLine(player, "Nearby subordinates", nearbySubordinatesOk, nearbySubordinateCount + " / " + REQUIRED_GRANTER_SUBORDINATES);
-                    sendRequirementLine(player, "Recognized subordinates", recognizedSubordinatesOk, recognizedSubordinateCount + " / " + REQUIRED_GRANTER_SUBORDINATES);
-                    sendRequirementLine(player, "Subordinate requirement", subordinateRequirementOk, "nearby OR recognized");
-
-                    sendInfoLine(player, "Nearby living entities in " + formatNumber(SUBORDINATE_SCAN_RADIUS) + " blocks", String.valueOf(nearbyLivingCount));
-                    sendInfoLine(player, "Detected subordinate names", getEntityNamePreview(nearbySubordinates));
-
-                    sendBooleanLine(player, "Can naturally awaken Granter now", canNaturallyAwakenGranter);
-
-                    if (!canNaturallyAwakenGranter) {
-                        player.sendSystemMessage(Component.literal("If nearby living entities is high but nearby subordinates is 0, SubordinateHelper is probably not recognizing your named mobs as subordinates.")
-                                .withStyle(ChatFormatting.GRAY));
-                    }
-
-                    return 1;
-                })
+    /**
+     * Creates the canonical nested debug branch:
+     *
+     * /moostensura debug named
+     */
+    public static LiteralArgumentBuilder<CommandSourceStack>
+    createDebugNode() {
+        return createNamedNode(
+                "named"
         );
+    }
+
+    /**
+     * Temporary compatibility alias for /checknamed.
+     */
+    public static void registerLegacyAlias(
+            CommandDispatcher<CommandSourceStack> dispatcher
+    ) {
+        dispatcher.register(
+                createNamedNode(
+                        "checknamed"
+                )
+        );
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack>
+    createNamedNode(
+            String literal
+    ) {
+        return Commands.literal(literal)
+                .requires(
+                        DebugModeService
+                                ::canUseDebugTools
+                )
+                .executes(context -> inspectNamedState(
+                        context.getSource()
+                ));
+    }
+
+    private static int inspectNamedState(
+            CommandSourceStack source
+    ) throws CommandSyntaxException {
+        ServerPlayer player =
+                source.getPlayerOrException();
+
+        IExistence existence =
+                TensuraStorages.getExistenceFrom(
+                        player
+                );
+
+        if (existence == null) {
+            player.sendSystemMessage(
+                    Component.translatable(
+                                    "moostensuraaddon.command.checknamed.failed"
+                            )
+                            .withStyle(
+                                    ChatFormatting.RED
+                            )
+            );
+
+            return 0;
+        }
+
+        GranterProgressData progress =
+                player.getData(
+                        AttachmentRegistry
+                                .GRANTER_PROGRESS_DATA
+                );
+
+        String storedName =
+                TensuraPlayerStateHelper
+                        .getStoredTensuraName(
+                                player
+                        )
+                        .orElse(null);
+
+        boolean named =
+                TensuraPlayerStateHelper
+                        .isNamedOrEndowed(
+                                player
+                        );
+
+        boolean hasGranter =
+                hasGranter(player);
+
+        boolean hasBenevolentEmpowerment =
+                hasBenevolentEmpowerment(
+                        player
+                );
+
+        boolean hasAbsoluteGovernance =
+                hasAbsoluteGovernance(
+                        player
+                );
+
+        boolean hasAnyEvolvedGranterSkill =
+                hasBenevolentEmpowerment
+                        || hasAbsoluteGovernance;
+
+        boolean hasGreatSage =
+                GranterActions.hasGreatSage(
+                        player
+                );
+
+        int masteredSkillCount =
+                getMasteredSkillCount(
+                        player
+                );
+
+        double ep =
+                existence.getEP();
+
+        double magicules =
+                existence.getMagicule();
+
+        List<LivingEntity> nearbyLivingEntities =
+                getNearbyLivingEntities(
+                        player
+                );
+
+        List<LivingEntity> nearbySubordinates =
+                getNearbySubordinates(
+                        player
+                );
+
+        int nearbyLivingCount =
+                nearbyLivingEntities.size();
+
+        int nearbySubordinateCount =
+                nearbySubordinates.size();
+
+        int recognizedSubordinateCount =
+                progress.getRecognizedSubordinateCount();
+
+        boolean epOk =
+                ep >= REQUIRED_GRANTER_EP;
+
+        boolean masteredSkillsOk =
+                masteredSkillCount
+                        >= REQUIRED_GRANTER_MASTERED_SKILLS;
+
+        boolean nearbySubordinatesOk =
+                nearbySubordinateCount
+                        >= REQUIRED_GRANTER_SUBORDINATES;
+
+        boolean recognizedSubordinatesOk =
+                recognizedSubordinateCount
+                        >= REQUIRED_GRANTER_SUBORDINATES;
+
+        boolean subordinateRequirementOk =
+                nearbySubordinatesOk
+                        || recognizedSubordinatesOk;
+
+        boolean canNaturallyAwakenGranter =
+                !hasGranter
+                        && !hasAnyEvolvedGranterSkill
+                        && !progress
+                        .hasAwakenedGranterNaturally()
+                        && named
+                        && hasGreatSage
+                        && masteredSkillsOk
+                        && subordinateRequirementOk
+                        && epOk;
+
+        player.sendSystemMessage(
+                Component.translatable(
+                                "moostensuraaddon.command.checknamed.header"
+                        )
+                        .withStyle(
+                                ChatFormatting.GOLD
+                        )
+        );
+
+        player.sendSystemMessage(
+                Component.literal(
+                                "Identity / Existence"
+                        )
+                        .withStyle(
+                                ChatFormatting.YELLOW
+                        )
+        );
+
+        sendBooleanLine(
+                player,
+                "Named/endowed",
+                named
+        );
+
+        sendInfoLine(
+                player,
+                "Stored Tensura name",
+                safeName(storedName)
+        );
+
+        sendInfoLine(
+                player,
+                "Minecraft name",
+                player.getGameProfile()
+                        .getName()
+        );
+
+        sendInfoLine(
+                player,
+                "Display name",
+                player.getDisplayName()
+                        .getString()
+        );
+
+        sendInfoLine(
+                player,
+                "Custom name",
+                getCustomName(player)
+        );
+
+        sendInfoLine(
+                player,
+                "EP",
+                formatNumber(ep)
+        );
+
+        sendInfoLine(
+                player,
+                "Magicules",
+                formatNumber(magicules)
+        );
+
+        sendInfoLine(
+                player,
+                "Level",
+                String.valueOf(
+                        player.experienceLevel
+                )
+        );
+
+        sendInfoLine(
+                player,
+                "Raw XP",
+                String.valueOf(
+                        XpUtils.getTotalXp(
+                                player
+                        )
+                )
+        );
+
+        sendInfoLine(
+                player,
+                "Mastered skills",
+                String.valueOf(
+                        masteredSkillCount
+                )
+        );
+
+        player.sendSystemMessage(
+                Component.literal(
+                                "Granter Awakening Debug"
+                        )
+                        .withStyle(
+                                ChatFormatting.LIGHT_PURPLE
+                        )
+        );
+
+        sendBooleanLine(
+                player,
+                "Has Granter",
+                hasGranter
+        );
+
+        sendBooleanLine(
+                player,
+                "Has Benevolent Empowerment",
+                hasBenevolentEmpowerment
+        );
+
+        sendBooleanLine(
+                player,
+                "Has Absolute Governance",
+                hasAbsoluteGovernance
+        );
+
+        sendBooleanLine(
+                player,
+                "Already awakened Granter naturally",
+                progress.hasAwakenedGranterNaturally()
+        );
+
+        sendRequirementLine(
+                player,
+                "Named/endowed",
+                named,
+                "required"
+        );
+
+        sendRequirementLine(
+                player,
+                "Great Sage",
+                hasGreatSage,
+                "required"
+        );
+
+        sendRequirementLine(
+                player,
+                "EP",
+                epOk,
+                formatNumber(ep)
+                        + " / "
+                        + formatNumber(
+                        REQUIRED_GRANTER_EP
+                )
+        );
+
+        sendRequirementLine(
+                player,
+                "Mastered skills",
+                masteredSkillsOk,
+                masteredSkillCount
+                        + " / "
+                        + REQUIRED_GRANTER_MASTERED_SKILLS
+        );
+
+        sendRequirementLine(
+                player,
+                "Nearby subordinates",
+                nearbySubordinatesOk,
+                nearbySubordinateCount
+                        + " / "
+                        + REQUIRED_GRANTER_SUBORDINATES
+        );
+
+        sendRequirementLine(
+                player,
+                "Recognized subordinates",
+                recognizedSubordinatesOk,
+                recognizedSubordinateCount
+                        + " / "
+                        + REQUIRED_GRANTER_SUBORDINATES
+        );
+
+        sendRequirementLine(
+                player,
+                "Subordinate requirement",
+                subordinateRequirementOk,
+                "nearby OR recognized"
+        );
+
+        sendInfoLine(
+                player,
+                "Nearby living entities in "
+                        + formatNumber(
+                        SUBORDINATE_SCAN_RADIUS
+                )
+                        + " blocks",
+                String.valueOf(
+                        nearbyLivingCount
+                )
+        );
+
+        sendInfoLine(
+                player,
+                "Detected subordinate names",
+                getEntityNamePreview(
+                        nearbySubordinates
+                )
+        );
+
+        sendBooleanLine(
+                player,
+                "Can naturally awaken Granter now",
+                canNaturallyAwakenGranter
+        );
+
+        if (!canNaturallyAwakenGranter) {
+            player.sendSystemMessage(
+                    Component.literal(
+                                    "If nearby living entities is high but nearby subordinates is 0, SubordinateHelper is probably not recognizing your named mobs as subordinates."
+                            )
+                            .withStyle(
+                                    ChatFormatting.GRAY
+                            )
+            );
+        }
+
+        return 1;
     }
 
     private static boolean hasGranter(ServerPlayer player) {

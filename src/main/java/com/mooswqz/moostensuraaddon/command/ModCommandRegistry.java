@@ -6,13 +6,57 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 @EventBusSubscriber(modid = MoosTensuraAddon.MODID)
-public class ModCommandRegistry {
-    @SubscribeEvent
-    public static void onRegisterCommands(RegisterCommandsEvent event) {
-        MoosTensuraCommand.register(event.getDispatcher());
+public final class ModCommandRegistry {
 
-        UpgradeSageCommand.register(event.getDispatcher());
-        GetNamedCommand.register(event.getDispatcher());
-        CheckNamedCommand.register(event.getDispatcher());
+    private ModCommandRegistry() {
+    }
+
+    @SubscribeEvent
+    public static void onRegisterCommands(
+            RegisterCommandsEvent event
+    ) {
+        /*
+         * Register the canonical /moostensura root first.
+         */
+        MoosTensuraCommand.register(
+                event.getDispatcher()
+        );
+
+        /*
+         * Attach /moostensura debug directly to the root that was just
+         * registered.
+         *
+         * Registering a second independent /moostensura literal proved
+         * unreliable in the current command layout.
+         */
+        DebugCommand.attachToMoosTensuraRoot(
+                event.getDispatcher()
+        );
+
+        /*
+         * Keep the old development roots as temporary compatibility aliases.
+         * Their own requirements make them invisible and unusable whenever
+         * debug mode is disabled.
+         */
+        UpgradeSageCommand.registerLegacyAlias(
+                event.getDispatcher()
+        );
+
+        CheckNamedCommand.registerLegacyAlias(
+                event.getDispatcher()
+        );
+
+        RecognitionDebugCommand.registerLegacyAlias(
+                event.getDispatcher()
+        );
+
+        /*
+         * /getnamed remains a normal player-facing legacy progression command.
+         * It is controlled by its existing server config and requirements, not
+         * by developer debug mode.
+         */
+        GetNamedCommand.register(
+                event.getDispatcher()
+        );
     }
 }

@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "selection": {
+    "established_threshold": 35.0,
+    "pure_threshold": 70.0,
+    "dominance_ratio": 2.0,
+    "raw_pure_threshold": 35.0,
+    "raw_dominance_ratio": 1.6,
+    "minimum_directional_morality_evidence": 6.0
+  },
+  "identity_distribution": {
+    "universal_share": 0.15,
+    "focused_share": 0.60,
+    "minimum_focus_affinity": 12.0,
+    "secondary_focus_ratio": 0.60
+  },
+  "identity_strength": {
+    "maximum": 40.0,
+    "mastery_weight": 0.65,
+    "discovery_weight": 0.35,
+    "major_enemy_types": {
+      "points_per_entry": 1.5,
+      "maximum": 10.0
+    }
+  },
+  "good": {
+    "true_hero_modifier": 15.0,
+    "raid_victories": {
+      "points_per_entry": 8.0,
+      "maximum": 24.0
+    },
+    "villagers_cured": {
+      "points_per_entry": 3.0,
+      "maximum": 18.0
+    },
+    "civilians_defended": {
+      "points_per_entry": 3.0,
+      "maximum": 24.0
+    },
+    "malevolent_boss_types_defeated": {
+      "points_per_entry": 6.0,
+      "maximum": 30.0
+    }
+  },
+  "evil": {
+    "true_demon_lord_modifier": 15.0,
+    "civilian_kills": {
+      "points_per_entry": 6.0,
+      "maximum": 30.0
+    },
+    "passive_baby_kills": {
+      "points_per_entry": 1.0,
+      "maximum": 12.0
+    },
+    "owned_companion_kills": {
+      "points_per_entry": 6.0,
+      "maximum": 24.0
+    },
+    "owned_subordinate_kills": {
+      "points_per_entry": 10.0,
+      "maximum": 30.0
+    },
+    "benevolent_boss_types_killed": {
+      "points_per_entry": 8.0,
+      "maximum": 32.0
+    }
+  },
+  "order": {
+    "subordinate_roster_primary": {
+      "points_per_entry": 2.0,
+      "maximum": 20.0
+    },
+    "subordinate_roster_established": {
+      "points_per_entry": 0.5,
+      "maximum": 10.0
+    },
+    "subordinate_assisted_major_victories": {
+      "points_per_entry": 4.0,
+      "maximum": 20.0
+    },
+    "unique_subordinates_empowered": {
+      "points_per_entry": 1.0,
+      "maximum": 10.0
+    },
+    "mass_grants_performed": {
+      "points_per_entry": 0.5,
+      "maximum": 5.0
+    },
+    "global_take_backs_performed": {
+      "points_per_entry": 0.5,
+      "maximum": 5.0
+    }
+  },
+  "freedom": {
+    "solo_major_enemy_types_defeated": {
+      "points_per_entry": 5.0,
+      "maximum": 30.0
+    },
+    "discovery_milestones": {
+      "points_per_entry": 2.0,
+      "maximum": 12.0
+    }
+  },
+  "mastery": {
+    "skill_tiers": [
+      {
+        "entries": 5,
+        "points_per_entry": 2.0
+      },
+      {
+        "entries": 3,
+        "points_per_entry": 3.0
+      },
+      {
+        "entries": 4,
+        "points_per_entry": 2.0
+      },
+      {
+        "entries": 8,
+        "points_per_entry": 1.0
+      },
+      {
+        "entries": 20,
+        "points_per_entry": 0.25
+      }
+    ],
+    "skill_maximum": 40.0,
+    "mastered_skill_categories": {
+      "points_per_entry": 4.0,
+      "maximum": 16.0
+    },
+    "highest_ep": {
+      "ep_per_unit": 100000.0,
+      "points_per_unit": 2.5,
+      "maximum": 20.0
+    },
+    "major_enemy_types_defeated": {
+      "points_per_entry": 2.0,
+      "maximum": 20.0
+    }
+  },
+  "discovery": {
+    "milestones": {
+      "points_per_entry": 5.0,
+      "maximum": 30.0
+    }
+  },
+  "neutrality": {
+    "morality": {
+      "balance_weight": 0.90,
+      "discovery_weight": 0.75,
+      "moral_volume_divisor": 20.0,
+      "maximum": 40.0
+    },
+    "behaviour": {
+      "balance_weight": 0.90,
+      "posture_base": 12.0,
+      "behaviour_volume_divisor": 18.0,
+      "maximum": 40.0
+    }
+  },
+  "raw_paths": {
+    "moral_weight": 0.90,
+    "temperament_weight": 0.90,
+    "overlap_weight": 0.50,
+    "contradiction_factor": 0.25,
+    "contradiction_maximum": 10.0,
+    "true_neutral_discovery_factor": 0.25,
+    "true_neutral_discovery_maximum": 12.0,
+    "chaotic_neutral_discovery_factor": 0.35,
+    "chaotic_neutral_discovery_maximum": 12.0
+  }
+}

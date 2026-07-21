@@ -5,6 +5,7 @@ import com.mooswqz.moostensuraaddon.attachment.BorrowedSkillData;
 import com.mooswqz.moostensuraaddon.attachment.GrantedSkillData;
 import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
 import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionAuthorityProgress;
 import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload;
 import com.mooswqz.moostensuraaddon.network.OpenUltimateConfirmationScreenPayload;
 import com.mooswqz.moostensuraaddon.network.OpenUltimateSubordinateSkillScreenPayload;
@@ -240,6 +241,11 @@ public class UltimateSkillActions {
             if (learned) {
                 granted++;
                 recognizeSubordinate(player, target);
+
+                RecognitionAuthorityProgress.recordEmpoweredSubordinate(
+                        player,
+                        target
+                );
             }
         }
 
@@ -248,6 +254,11 @@ public class UltimateSkillActions {
                     .withStyle(ChatFormatting.RED));
             return;
         }
+
+        RecognitionAuthorityProgress.recordMassGrant(
+                player,
+                granted
+        );
 
         double realCost = costPerTarget * granted;
         consumeMagicules(player, realCost);
@@ -310,6 +321,12 @@ public class UltimateSkillActions {
                     .withStyle(ChatFormatting.YELLOW));
             return;
         }
+
+        RecognitionAuthorityProgress.recordGlobalTakeBack(
+                player,
+                takenBack,
+                benevolent
+        );
 
         addUltimateMastery(player, ultimateInstance, takenBack * MASTERY_RANGED_TAKE_BACK_PER_TARGET);
 
@@ -473,6 +490,11 @@ public class UltimateSkillActions {
         addUltimateMastery(player, seize, successful * (seize ? MASTERY_SEIZE_PER_SKILL : MASTERY_BORROW_PER_SKILL));
 
         if (seize) {
+            RecognitionAuthorityProgress.recordSkillsSeized(
+                    player,
+                    successful
+            );
+
             double deathChance = getSeizeDeathChance(successful);
             boolean killedBySeize = rollSeizeDeath(player, target, deathChance);
 
@@ -587,6 +609,11 @@ public class UltimateSkillActions {
 
         consumeMagicules(player, cost);
         recognizeSubordinate(player, target);
+
+        RecognitionAuthorityProgress.recordEmpoweredSubordinate(
+                player,
+                target
+        );
 
         addUltimateMastery(player, ultimateInstance, benevolent
                 ? BENEVOLENT_MASTERY_GRANT_WITHOUT_MASTERY
@@ -913,13 +940,26 @@ public class UltimateSkillActions {
                 .isPresent();
     }
 
-    private static void recognizeSubordinate(ServerPlayer player, LivingEntity target) {
-        GranterProgressData progress = player.getData(AttachmentRegistry.GRANTER_PROGRESS_DATA);
-        boolean changed = progress.recognizeSubordinate(target.getUUID());
+    private static void recognizeSubordinate(
+            ServerPlayer player,
+            LivingEntity target
+    ) {
+        GranterProgressData progress = player.getData(
+                AttachmentRegistry.GRANTER_PROGRESS_DATA
+        );
+
+        boolean changed = progress.recognizeSubordinate(
+                target.getUUID()
+        );
 
         if (changed) {
-            player.setData(AttachmentRegistry.GRANTER_PROGRESS_DATA, progress);
+            player.setData(
+                    AttachmentRegistry.GRANTER_PROGRESS_DATA,
+                    progress
+            );
         }
+
+        RecognitionAuthorityProgress.synchronize(player);
     }
 
     private static boolean hasMagicules(ServerPlayer player, double amount) {

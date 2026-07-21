@@ -4,6 +4,7 @@ import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
 import com.mooswqz.moostensuraaddon.attachment.GrantedSkillData;
 import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
 import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionAuthorityProgress;
 import com.mooswqz.moostensuraaddon.network.OpenGranterScreenPayload;
 import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload;
 import com.mooswqz.moostensuraaddon.skill.GranterMode;
@@ -497,6 +498,11 @@ public class GranterActions {
 
         player.setData(AttachmentRegistry.GRANTER_PROGRESS_DATA, progress);
 
+        RecognitionAuthorityProgress.recordEmpoweredSubordinate(
+                player,
+                target
+        );
+
         sendMasteryProgressMessage(
                 player,
                 masteryGain,
@@ -521,6 +527,8 @@ public class GranterActions {
 
         player.setData(AttachmentRegistry.GRANTER_PROGRESS_DATA, progress);
 
+        RecognitionAuthorityProgress.synchronize(player);
+
         sendMasteryProgressMessage(
                 player,
                 MASTERY_SUCCESSFUL_TAKE_BACK,
@@ -530,13 +538,26 @@ public class GranterActions {
         );
     }
 
-    private static void recognizeSubordinate(ServerPlayer player, LivingEntity target) {
-        GranterProgressData progress = player.getData(AttachmentRegistry.GRANTER_PROGRESS_DATA);
-        boolean changed = progress.recognizeSubordinate(target.getUUID());
+    private static void recognizeSubordinate(
+            ServerPlayer player,
+            LivingEntity target
+    ) {
+        GranterProgressData progress = player.getData(
+                AttachmentRegistry.GRANTER_PROGRESS_DATA
+        );
+
+        boolean changed = progress.recognizeSubordinate(
+                target.getUUID()
+        );
 
         if (changed) {
-            player.setData(AttachmentRegistry.GRANTER_PROGRESS_DATA, progress);
+            player.setData(
+                    AttachmentRegistry.GRANTER_PROGRESS_DATA,
+                    progress
+            );
         }
+
+        RecognitionAuthorityProgress.synchronize(player);
     }
 
     private static void addEarnedMasteryAndSyncToTensura(

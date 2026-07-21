@@ -218,6 +218,24 @@ public class GranterProgressData {
         return recognizedSubordinates.contains(subordinateUuid.toString());
     }
 
+    public boolean forgetRecognizedSubordinate(
+            UUID subordinateUuid
+    ) {
+        if (subordinateUuid == null) {
+            return false;
+        }
+
+        boolean removed = recognizedSubordinates.remove(
+                subordinateUuid.toString()
+        );
+
+        if (removed) {
+            markCurrentVersion();
+        }
+
+        return removed;
+    }
+
     public boolean recordGrantedSkillType(String skillId) {
         if (skillId == null || skillId.isBlank()) {
             return false;

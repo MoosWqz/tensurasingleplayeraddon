@@ -8,11 +8,12 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import java.util.List;
 
 public final class MoosTensuraConfig {
-    public static final int CURRENT_CONFIG_VERSION = 2;
+    public static final int CURRENT_CONFIG_VERSION = 3;
 
     public static final ModConfigSpec SPEC;
 
     public static final ModConfigSpec.IntValue CONFIG_VERSION;
+    public static final ModConfigSpec.BooleanValue DEBUG_MODE;
 
     public static final ModConfigSpec.BooleanValue SELF_ENDOWMENT_ENABLED;
     public static final ModConfigSpec.IntValue SELF_ENDOWMENT_REQUIRED_LEVEL;
@@ -91,6 +92,22 @@ public final class MoosTensuraConfig {
                         "Do not edit unless you intentionally want the addon to re-apply migration defaults."
                 )
                 .defineInRange("configVersion", 0, 0, Integer.MAX_VALUE);
+
+        builder.push("debug");
+
+        DEBUG_MODE = builder
+                .comment(
+                        "Enables developer commands and diagnostic tools.",
+                        "This setting is controlled by the server.",
+                        "Keep this disabled during normal gameplay and in release server configurations.",
+                        "Normal players cannot use debug tools even when this is enabled; command permission checks still apply."
+                )
+                .define(
+                        "enabled",
+                        false
+                );
+
+        builder.pop();
 
         builder.push("self_endowment");
 
@@ -372,7 +389,8 @@ public final class MoosTensuraConfig {
     }
 
     public static void migrateIfNeeded() {
-        int version = CONFIG_VERSION.get();
+        int version =
+                CONFIG_VERSION.get();
 
         if (version >= CURRENT_CONFIG_VERSION) {
             return;
@@ -382,7 +400,14 @@ public final class MoosTensuraConfig {
             migrateToVersion2();
         }
 
-        CONFIG_VERSION.set(CURRENT_CONFIG_VERSION);
+        if (version < 3) {
+            migrateToVersion3();
+        }
+
+        CONFIG_VERSION.set(
+                CURRENT_CONFIG_VERSION
+        );
+
         SPEC.save();
     }
 
@@ -401,8 +426,23 @@ public final class MoosTensuraConfig {
         GREAT_CRYSTAL_READY_PARTICLE_VERTICAL_RANGE.set(4);
     }
 
+    private static void migrateToVersion3() {
+        /*
+         * Existing worlds must enter the new debug system safely.
+         *
+         * Debug mode always begins disabled during the migration. An operator
+         * must deliberately enable it through the permission-protected,
+         * confirmation-protected command.
+         */
+        DEBUG_MODE.set(false);
+    }
+
     public static void resetToAddonDefaults() {
-        CONFIG_VERSION.set(CURRENT_CONFIG_VERSION);
+        CONFIG_VERSION.set(
+                CURRENT_CONFIG_VERSION
+        );
+
+        DEBUG_MODE.set(false);
 
         SELF_ENDOWMENT_ENABLED.set(true);
         SELF_ENDOWMENT_REQUIRED_LEVEL.set(75);

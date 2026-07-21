@@ -1,0 +1,31 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:villager",
+    "minecraft:wandering_trader",
+    {
+      "id": "tensura:goblin",
+      "required": false
+    },
+    {
+      "id": "tensura:hobgoblin",
+      "required": false
+    },
+    {
+      "id": "tensura:lizardman",
+      "required": false
+    },
+    {
+      "id": "tensura:dragonewt",
+      "required": false
+    },
+    {
+      "id": "tensura:dwarf",
+      "required": false
+    },
+    {
+      "id": "tensura:dwarf_merchant",
+      "required": false
+    }
+  ]
+}

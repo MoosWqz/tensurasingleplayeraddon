@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#moostensuraaddon:recognition/malevolent_bosses",
+    "#moostensuraaddon:recognition/benevolent_bosses",
+    "minecraft:warden"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:cow",
+    "minecraft:sheep",
+    "minecraft:pig",
+    "minecraft:chicken",
+    "minecraft:mooshroom",
+    "minecraft:rabbit",
+    "minecraft:horse",
+    "minecraft:donkey",
+    "minecraft:mule",
+    "minecraft:llama",
+    "minecraft:trader_llama",
+    "minecraft:goat",
+    "minecraft:camel",
+    "minecraft:armadillo",
+    "minecraft:turtle",
+    "minecraft:panda",
+    "minecraft:fox",
+    "minecraft:cat",
+    "minecraft:ocelot",
+    "minecraft:wolf",
+    "minecraft:polar_bear",
+    "minecraft:bee",
+    "minecraft:dolphin",
+    "minecraft:axolotl",
+    "minecraft:strider",
+    "minecraft:sniffer"
+  ]
+}
