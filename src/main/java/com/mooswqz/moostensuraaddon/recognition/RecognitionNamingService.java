@@ -231,9 +231,35 @@ public final class RecognitionNamingService {
                                 incarnationId
                         );
 
-        return data.commitNaming(
+        boolean committed = data.commitNaming(
                 record
         );
+
+        if (!committed) {
+            return false;
+        }
+
+        RecognitionStrengthRewardService.initializeNewCommit(
+                data,
+                evaluation.getDimensions()
+                        .identityStrength(),
+                evaluation.getBalance()
+                        .identityStrength()
+                        .maximum(),
+                candidate.pure()
+        );
+
+        /*
+         * Attribute reconciliation is deliberately recoverable. The identity
+         * commitment stays frozen even if another mod temporarily prevents an
+         * attribute from being available; the existing 40-tick synchronizer
+         * repairs the reward later without allowing a reroll.
+         */
+        RecognitionStrengthRewardService.reconcile(
+                player
+        );
+
+        return true;
     }
 
     /**

@@ -400,6 +400,11 @@ public final class RecognitionPathEvaluator {
                 freedom.discoveryMilestones()
         );
 
+        points += RecognitionIndependenceMilestoneManager
+                .calculateScore(
+                        data
+                );
+
         return sanitizeScore(points);
     }
 

@@ -32,7 +32,7 @@ public record RecognitionCommitRecord(
             2;
 
     public static final int CURRENT_REWARD_PROFILE_VERSION =
-            1;
+            RecognitionStrengthRewardFormula.PROFILE_VERSION;
 
     public static final String NO_CONTRADICTION =
             "none";

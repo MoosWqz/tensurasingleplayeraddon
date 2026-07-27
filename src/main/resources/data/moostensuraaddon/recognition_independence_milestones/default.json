@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "milestones": [
+    {
+      "id": "moostensuraaddon:adventuring_time",
+      "advancement": "minecraft:adventure/adventuring_time",
+      "points": 5.0
+    },
+    {
+      "id": "moostensuraaddon:uneasy_alliance",
+      "advancement": "minecraft:nether/uneasy_alliance",
+      "points": 5.0
+    },
+    {
+      "id": "moostensuraaddon:arbalistic",
+      "advancement": "minecraft:adventure/arbalistic",
+      "points": 4.0
+    },
+    {
+      "id": "moostensuraaddon:two_birds_one_arrow",
+      "advancement": "minecraft:adventure/two_birds_one_arrow",
+      "points": 3.0
+    },
+    {
+      "id": "moostensuraaddon:sniper_duel",
+      "advancement": "minecraft:adventure/sniper_duel",
+      "points": 3.0
+    },
+    {
+      "id": "moostensuraaddon:sky_is_the_limit",
+      "advancement": "minecraft:end/elytra",
+      "points": 2.0
+    },
+    {
+      "id": "moostensuraaddon:bullseye",
+      "advancement": "minecraft:adventure/bullseye",
+      "points": 2.0
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 package com.mooswqz.moostensuraaddon.recognition;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -12,15 +13,8 @@ import net.minecraft.world.level.Level;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.WeakHashMap;
 
-/**
- * Event-driven attribution for protecting civilians.
- *
- * <p>The tracker never scans the world. It only records an encounter when a
- * datapack-classified hostile targets or damages a civilian, and consumes that
- * record when the aggressor dies.</p>
- */
 public final class CivilianDefenseTracker {
 
     private static final long TARGET_ONLY_WINDOW_TICKS =
@@ -32,46 +26,43 @@ public final class CivilianDefenseTracker {
     private static final long CLEANUP_INTERVAL_TICKS =
             20L * 10L;
 
+    private static final int MAX_ACTIVE_AGGRESSORS = 4096;
+
     /**
-     * Hard safety ceiling for pathological mob swarms or malicious automation.
+     * Runtime encounter state is isolated by MinecraftServer instance.
      *
-     * <p>Existing encounters may still be refreshed while the map is full,
-     * but new encounter IDs are ignored until expired entries are cleaned.</p>
+     * <p>This fixes two lifecycle problems from the original tracker:</p>
+     * <ul>
+     *     <li>a cleanup timestamp from one dimension could suppress cleanup
+     *     for records created in another dimension;</li>
+     *     <li>a stopped integrated server could leave a high game-time value
+     *     behind for the next world loaded in the same JVM.</li>
+     * </ul>
+     *
+     * <p>Weak keys are an additional safety net. ServerStoppedEvent also
+     * removes the state explicitly.</p>
      */
-    private static final int MAX_ACTIVE_AGGRESSORS =
-            4096;
-
-    private static final Map<UUID, AggressionRecord>
-            ACTIVE_AGGRESSORS = new ConcurrentHashMap<>();
-
-    private static long lastCleanupGameTime;
+    private static final Map<MinecraftServer, TrackerState>
+            SERVER_STATES = new WeakHashMap<>();
 
     private CivilianDefenseTracker() {
     }
 
-    /**
-     * Vanilla villager-derived entities remain a safe fallback, while
-     * datapacks can extend the protected population with the civilians tag.
-     *
-     * <p>The ignored tag always wins, including for subclasses of
-     * {@link AbstractVillager}.</p>
-     */
-    public static boolean isCivilian(
-            LivingEntity entity
-    ) {
-        if (entity == null
-                || RecognitionEntityTags.isIgnored(
-                entity.getType()
-        )) {
+    public static boolean isCivilian(LivingEntity entity) {
+        if (entity == null) {
             return false;
         }
 
+        /*
+         * This catches vanilla villagers, wandering traders and modded
+         * entities that inherit Minecraft's normal villager foundation.
+         */
         if (entity instanceof AbstractVillager) {
             return true;
         }
 
-        return RecognitionEntityTags.isTaggedCivilian(
-                entity.getType()
+        return entity.getType().is(
+                RecognitionEntityTags.CIVILIANS
         );
     }
 
@@ -80,52 +71,52 @@ public final class CivilianDefenseTracker {
             LivingEntity newTarget
     ) {
         if (aggressor == null
-                || aggressor.level().isClientSide()) {
+                || !(aggressor.level()
+                instanceof ServerLevel serverLevel)) {
             return;
         }
 
-        UUID aggressorUuid =
-                aggressor.getUUID();
+        MinecraftServer server = serverLevel.getServer();
+        TrackerState state = stateFor(server);
+        EntityKey aggressorKey = keyOf(aggressor);
 
         /*
          * Player behaviour is evaluated by direct deed tracking.
-         * This encounter tracker is only for explicitly classified NPCs and
-         * creatures.
+         * This encounter tracker is for hostile NPCs and creatures.
          */
-        if (!isHostileToCivilians(aggressor)) {
-            ACTIVE_AGGRESSORS.remove(
-                    aggressorUuid
+        if (aggressor instanceof Player) {
+            removeAggressorEverywhere(
+                    state,
+                    aggressor.getUUID()
             );
             return;
         }
 
-        if (!isCivilian(newTarget)) {
-            /*
-             * A confirmed attack remains valid for its longer protection
-             * window even if the mob temporarily loses or changes its target.
-             * A target-only observation is discarded immediately.
-             */
-            ACTIVE_AGGRESSORS.computeIfPresent(
-                    aggressorUuid,
-                    (ignored, existing) ->
-                            existing.damageConfirmed()
-                                    ? existing
-                                    : null
+        if (!isCivilian(newTarget)
+                || !(newTarget.level()
+                instanceof ServerLevel targetLevel)
+                || targetLevel.getServer() != server
+                || !targetLevel.dimension().equals(
+                serverLevel.dimension()
+        )) {
+            removeAggressorEverywhere(
+                    state,
+                    aggressor.getUUID()
             );
             return;
         }
 
-        long gameTime =
-                aggressor.level().getGameTime();
+        long gameTime = getServerGameTime(
+                server,
+                serverLevel
+        );
 
-        storeRecord(
-                aggressorUuid,
+        state.activeAggressors().put(
+                aggressorKey,
                 new AggressionRecord(
-                        aggressor.level().dimension(),
-                        newTarget.getUUID(),
+                        keyOf(newTarget),
                         gameTime,
-                        gameTime
-                                + TARGET_ONLY_WINDOW_TICKS,
+                        gameTime + TARGET_ONLY_WINDOW_TICKS,
                         false
                 )
         );
@@ -137,33 +128,39 @@ public final class CivilianDefenseTracker {
     ) {
         if (civilian == null
                 || source == null
-                || civilian.level().isClientSide()
+                || !(civilian.level()
+                instanceof ServerLevel serverLevel)
                 || !isCivilian(civilian)) {
             return;
         }
 
-        LivingEntity aggressor =
-                resolveAggressor(source);
+        LivingEntity aggressor = resolveAggressor(source);
 
         if (aggressor == null
                 || aggressor == civilian
-                || !isHostileToCivilians(
-                aggressor
+                || aggressor instanceof Player
+                || !(aggressor.level()
+                instanceof ServerLevel aggressorLevel)
+                || aggressorLevel.getServer()
+                != serverLevel.getServer()
+                || !aggressorLevel.dimension().equals(
+                serverLevel.dimension()
         )) {
             return;
         }
 
-        long gameTime =
-                civilian.level().getGameTime();
+        MinecraftServer server = serverLevel.getServer();
+        long gameTime = getServerGameTime(
+                server,
+                serverLevel
+        );
 
-        storeRecord(
-                aggressor.getUUID(),
+        stateFor(server).activeAggressors().put(
+                keyOf(aggressor),
                 new AggressionRecord(
-                        civilian.level().dimension(),
-                        civilian.getUUID(),
+                        keyOf(civilian),
                         gameTime,
-                        gameTime
-                                + DAMAGE_CONFIRMED_WINDOW_TICKS,
+                        gameTime + DAMAGE_CONFIRMED_WINDOW_TICKS,
                         true
                 )
         );
@@ -171,7 +168,7 @@ public final class CivilianDefenseTracker {
 
     /**
      * Returns true exactly once when a player defeats a recently observed
-     * hostile while the protected civilian is still alive.
+     * aggressor while the protected civilian is still alive.
      */
     public static boolean consumeDefense(
             LivingEntity defeatedAggressor,
@@ -184,212 +181,265 @@ public final class CivilianDefenseTracker {
             return false;
         }
 
-        AggressionRecord record =
-                ACTIVE_AGGRESSORS.remove(
-                        defeatedAggressor.getUUID()
-                );
+        MinecraftServer server = serverLevel.getServer();
 
-        if (record == null
-                || !isHostileToCivilians(
-                defeatedAggressor
+        if (responsiblePlayer.getServer() != server) {
+            return false;
+        }
+
+        TrackerState state = existingState(server);
+
+        if (state == null) {
+            return false;
+        }
+
+        AggressionRecord record = state
+                .activeAggressors()
+                .remove(keyOf(defeatedAggressor));
+
+        if (record == null) {
+            return false;
+        }
+
+        long gameTime = getServerGameTime(
+                server,
+                serverLevel
+        );
+
+        if (gameTime > record.expirationGameTime()) {
+            return false;
+        }
+
+        if (!record.civilianKey().dimension().equals(
+                serverLevel.dimension()
         )) {
             return false;
         }
 
-        ResourceKey<Level> defeatedDimension =
-                defeatedAggressor.level().dimension();
+        Entity civilianEntity = serverLevel.getEntity(
+                record.civilianKey().entityUuid()
+        );
 
-        if (!record.dimension().equals(
-                defeatedDimension
-        )
-                || !record.dimension().equals(
-                responsiblePlayer
-                        .level()
-                        .dimension()
-        )) {
-            return false;
-        }
-
-        long gameTime =
-                defeatedAggressor
-                        .level()
-                        .getGameTime();
-
-        if (gameTime
-                < record.firstObservedGameTime()
-                || gameTime
-                > record.expirationGameTime()) {
-            return false;
-        }
-
-        Entity civilianEntity =
-                serverLevel.getEntity(
-                        record.civilianUuid()
-                );
-
-        if (!(civilianEntity
-                instanceof LivingEntity civilian)
-                || !civilian.isAlive()
-                || !isCivilian(civilian)) {
-            return false;
-        }
-
-        return true;
+        return civilianEntity instanceof LivingEntity civilian
+                && civilian.isAlive()
+                && isCivilian(civilian);
     }
 
-    public static void forget(
-            LivingEntity entity
-    ) {
-        if (entity == null) {
+    public static void forget(LivingEntity entity) {
+        if (entity == null
+                || !(entity.level()
+                instanceof ServerLevel serverLevel)) {
             return;
         }
 
-        ACTIVE_AGGRESSORS.remove(
-                entity.getUUID()
+        TrackerState state = existingState(
+                serverLevel.getServer()
         );
 
-        UUID entityUuid =
-                entity.getUUID();
+        if (state == null) {
+            return;
+        }
 
-        ACTIVE_AGGRESSORS
-                .entrySet()
-                .removeIf(
-                        entry -> entry
-                                .getValue()
-                                .civilianUuid()
-                                .equals(entityUuid)
-                );
+        EntityKey entityKey = keyOf(entity);
+
+        state.activeAggressors().remove(entityKey);
+        state.activeAggressors().removeIf(
+                entry -> entry.getValue()
+                        .civilianKey()
+                        .equals(entityKey)
+        );
     }
 
-    public static void cleanup(
+    /**
+     * Performs bounded cleanup using the overworld game time for the server.
+     * The call is cheap and may be made by several players; only one cleanup
+     * per server can pass the interval gate.
+     */
+    public static void cleanup(MinecraftServer server) {
+        if (server == null) {
+            return;
+        }
+
+        ServerLevel overworld = server.overworld();
+
+        if (overworld == null) {
+            return;
+        }
+
+        cleanup(
+                server,
+                overworld.getGameTime()
+        );
+    }
+
+    static void cleanup(
+            MinecraftServer server,
             long currentGameTime
     ) {
-        /*
-         * Static fields can survive switching integrated-server worlds in the
-         * same client process. A lower game time therefore means the old
-         * world's transient records must be discarded.
-         */
-        if (currentGameTime
-                < lastCleanupGameTime) {
-            ACTIVE_AGGRESSORS.clear();
-            lastCleanupGameTime =
-                    currentGameTime;
+        if (server == null) {
             return;
         }
 
-        if (currentGameTime
-                < lastCleanupGameTime
-                + CLEANUP_INTERVAL_TICKS) {
+        TrackerState state = existingState(server);
+
+        if (state == null) {
             return;
         }
 
-        lastCleanupGameTime =
-                currentGameTime;
+        synchronized (state) {
+            long lastCleanup = state.lastCleanupGameTime();
 
-        ACTIVE_AGGRESSORS
-                .entrySet()
-                .removeIf(
-                        entry -> {
-                            AggressionRecord record =
-                                    entry.getValue();
+            if (!shouldRunCleanup(
+                    lastCleanup,
+                    currentGameTime
+            )) {
+                return;
+            }
 
-                            return currentGameTime
-                                    < record
-                                    .firstObservedGameTime()
-                                    || currentGameTime
-                                    > record
-                                    .expirationGameTime();
-                        }
-                );
+            /*
+             * A lower clock means a world/server lifecycle changed. Treat it
+             * as a new cleanup epoch instead of waiting for the old clock to
+             * be reached again.
+             */
+            state.setLastCleanupGameTime(currentGameTime);
+
+            state.activeAggressors().removeIf(
+                    entry -> currentGameTime
+                            > entry.getValue()
+                            .expirationGameTime()
+            );
+        }
     }
 
-    private static boolean isHostileToCivilians(
-            LivingEntity entity
-    ) {
-        if (entity == null
-                || entity instanceof Player
-                || isCivilian(entity)) {
-            return false;
+    public static void clearServer(MinecraftServer server) {
+        if (server == null) {
+            return;
         }
 
-        return RecognitionEntityTags
-                .isTaggedHostileToCivilians(
-                        entity.getType()
-                );
+        synchronized (SERVER_STATES) {
+            SERVER_STATES.remove(server);
+        }
     }
 
-    private static void storeRecord(
-            UUID aggressorUuid,
-            AggressionRecord incoming
+    public static void clearAll() {
+        synchronized (SERVER_STATES) {
+            SERVER_STATES.clear();
+        }
+    }
+
+    public static RuntimeSnapshot inspect(
+            MinecraftServer server
     ) {
-        if (aggressorUuid == null
-                || incoming == null) {
-            return;
+        TrackerState state = existingState(server);
+
+        if (state == null) {
+            return new RuntimeSnapshot(
+                    0,
+                    0,
+                    0L,
+                    MAX_ACTIVE_AGGRESSORS,
+                    serverStateCount()
+            );
         }
 
-        /*
-         * Once the safety ceiling has been reached, already tracked encounters
-         * may still be updated. Entirely new encounter IDs wait until cleanup
-         * has freed capacity.
-         */
-        if (!ACTIVE_AGGRESSORS.containsKey(
-                aggressorUuid
-        )
-                && ACTIVE_AGGRESSORS.size()
-                >= MAX_ACTIVE_AGGRESSORS) {
-            return;
+        int damageConfirmed = 0;
+
+        for (Map.Entry<EntityKey, AggressionRecord> entry :
+                state.activeAggressors().snapshotEntries()) {
+            if (entry.getValue().damageConfirmed()) {
+                damageConfirmed++;
+            }
         }
 
-        ACTIVE_AGGRESSORS.merge(
-                aggressorUuid,
-                incoming,
-                CivilianDefenseTracker::mergeRecords
+        return new RuntimeSnapshot(
+                state.activeAggressors().size(),
+                damageConfirmed,
+                state.lastCleanupGameTime(),
+                MAX_ACTIVE_AGGRESSORS,
+                serverStateCount()
         );
     }
 
-    private static AggressionRecord mergeRecords(
-            AggressionRecord existing,
-            AggressionRecord incoming
-    ) {
-        boolean sameEncounter =
-                existing.dimension().equals(
-                        incoming.dimension()
-                )
-                        && existing
-                        .civilianUuid()
-                        .equals(
-                                incoming.civilianUuid()
-                        );
 
-        if (!sameEncounter) {
-            return incoming;
+    static boolean shouldRunCleanup(
+            long lastCleanupGameTime,
+            long currentGameTime
+    ) {
+        return currentGameTime < lastCleanupGameTime
+                || currentGameTime >= lastCleanupGameTime
+                + CLEANUP_INTERVAL_TICKS;
+    }
+
+    public static int maximumActiveAggressors() {
+        return MAX_ACTIVE_AGGRESSORS;
+    }
+
+    public static long cleanupIntervalTicks() {
+        return CLEANUP_INTERVAL_TICKS;
+    }
+
+    public static int serverStateCount() {
+        synchronized (SERVER_STATES) {
+            return SERVER_STATES.size();
+        }
+    }
+
+    private static TrackerState stateFor(
+            MinecraftServer server
+    ) {
+        synchronized (SERVER_STATES) {
+            return SERVER_STATES.computeIfAbsent(
+                    server,
+                    ignored -> new TrackerState()
+            );
+        }
+    }
+
+    private static TrackerState existingState(
+            MinecraftServer server
+    ) {
+        if (server == null) {
+            return null;
         }
 
-        /*
-         * Repeated target changes must not shorten a damage-confirmed
-         * encounter. The earliest observation and longest expiry are retained.
-         */
-        return new AggressionRecord(
-                existing.dimension(),
-                existing.civilianUuid(),
-                Math.min(
-                        existing.firstObservedGameTime(),
-                        incoming.firstObservedGameTime()
-                ),
-                Math.max(
-                        existing.expirationGameTime(),
-                        incoming.expirationGameTime()
-                ),
-                existing.damageConfirmed()
-                        || incoming.damageConfirmed()
+        synchronized (SERVER_STATES) {
+            return SERVER_STATES.get(server);
+        }
+    }
+
+    private static void removeAggressorEverywhere(
+            TrackerState state,
+            UUID aggressorUuid
+    ) {
+        state.activeAggressors().removeIf(
+                entry -> entry.getKey()
+                        .entityUuid()
+                        .equals(aggressorUuid)
         );
+    }
+
+    private static EntityKey keyOf(LivingEntity entity) {
+        return new EntityKey(
+                entity.level().dimension(),
+                entity.getUUID()
+        );
+    }
+
+    private static long getServerGameTime(
+            MinecraftServer server,
+            ServerLevel fallbackLevel
+    ) {
+        ServerLevel overworld = server.overworld();
+
+        return overworld == null
+                ? fallbackLevel.getGameTime()
+                : overworld.getGameTime();
     }
 
     private static LivingEntity resolveAggressor(
             DamageSource source
     ) {
-        if (source.getEntity()
-                instanceof LivingEntity livingEntity) {
+        if (source.getEntity() instanceof LivingEntity livingEntity) {
             return livingEntity;
         }
 
@@ -401,12 +451,50 @@ public final class CivilianDefenseTracker {
         return null;
     }
 
-    private record AggressionRecord(
+    private static final class TrackerState {
+
+        private final RecognitionRuntimeCapTable<EntityKey, AggressionRecord>
+                activeAggressors = new RecognitionRuntimeCapTable<>(
+                MAX_ACTIVE_AGGRESSORS,
+                AggressionRecord::firstObservedGameTime
+        );
+
+        private volatile long lastCleanupGameTime;
+
+        private RecognitionRuntimeCapTable<EntityKey, AggressionRecord>
+        activeAggressors() {
+            return activeAggressors;
+        }
+
+        private long lastCleanupGameTime() {
+            return lastCleanupGameTime;
+        }
+
+        private void setLastCleanupGameTime(long value) {
+            lastCleanupGameTime = Math.max(0L, value);
+        }
+    }
+
+    private record EntityKey(
             ResourceKey<Level> dimension,
-            UUID civilianUuid,
+            UUID entityUuid
+    ) {
+    }
+
+    private record AggressionRecord(
+            EntityKey civilianKey,
             long firstObservedGameTime,
             long expirationGameTime,
             boolean damageConfirmed
+    ) {
+    }
+
+    public record RuntimeSnapshot(
+            int activeAggressors,
+            int damageConfirmedAggressors,
+            long lastCleanupGameTime,
+            int maximumActiveAggressors,
+            int trackedServerStates
     ) {
     }
 }

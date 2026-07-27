@@ -144,6 +144,26 @@ public final class DebugCommand {
                                 .createDebugNode()
                 )
                 .then(
+                        RecognitionFreedomDebugCommand
+                                .createDebugNode()
+                )
+                .then(
+                        RecognitionIdentityHistoryDebugCommand
+                                .createDebugNode()
+                )
+                .then(
+                        RecognitionReleaseDebugCommand
+                                .createDebugNode()
+                )
+                .then(
+                        RecognitionStrengthRewardDebugCommand
+                                .createDebugNode()
+                )
+                .then(
+                        RecognitionTechnicalHardeningDebugCommand
+                                .createDebugNode()
+                )
+                .then(
                         CheckNamedCommand
                                 .createDebugNode()
                 )
@@ -293,7 +313,7 @@ public final class DebugCommand {
         if (enabled) {
             source.sendSuccess(
                     () -> Component.literal(
-                                    "Available tools: recognition, committed, named, sage and namecolors."
+                                    "Available tools: recognition, committed, freedom, history, release, strength, hardening, named, sage and namecolors."
                             )
                             .withStyle(
                                     ChatFormatting.AQUA

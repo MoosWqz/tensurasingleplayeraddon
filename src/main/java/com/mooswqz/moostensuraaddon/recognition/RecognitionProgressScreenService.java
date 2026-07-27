@@ -14,9 +14,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public final class RecognitionProgressScreenService {
@@ -69,9 +67,15 @@ public final class RecognitionProgressScreenService {
     private static final long CLEANUP_INTERVAL_NANOS =
             TimeUnit.MINUTES.toNanos(1L);
 
-    private static final Map<UUID, RequestState>
+    private static final int MAX_TRACKED_REQUEST_STATES =
+            1024;
+
+    private static final RecognitionRuntimeCapTable<UUID, RequestState>
             REQUEST_STATES =
-            new ConcurrentHashMap<>();
+            new RecognitionRuntimeCapTable<>(
+                    MAX_TRACKED_REQUEST_STATES,
+                    state -> state.lastActivityNanos
+            );
 
     private static final Object GLOBAL_BUILD_LOCK =
             new Object();
@@ -152,6 +156,16 @@ public final class RecognitionProgressScreenService {
     }
 
     public static void clear(
+            ServerPlayer player
+    ) {
+        if (player == null) {
+            return;
+        }
+
+        clear(player.getUUID());
+    }
+
+    public static void clear(
             UUID playerUuid
     ) {
         if (playerUuid == null) {
@@ -163,6 +177,33 @@ public final class RecognitionProgressScreenService {
 
     public static void clearAll() {
         REQUEST_STATES.clear();
+        nextCleanupNanos = 0L;
+
+        synchronized (GLOBAL_BUILD_LOCK) {
+            globalBuildWindowStartedNanos = 0L;
+            globalFreshBuildsInWindow = 0;
+        }
+    }
+
+    public static RuntimeSnapshot inspectRuntimeState() {
+        synchronized (GLOBAL_BUILD_LOCK) {
+            return new RuntimeSnapshot(
+                    REQUEST_STATES.size(),
+                    MAX_TRACKED_REQUEST_STATES,
+                    globalFreshBuildsInWindow,
+                    MAX_GLOBAL_FRESH_BUILDS_PER_WINDOW,
+                    globalBuildWindowStartedNanos,
+                    nextCleanupNanos
+            );
+        }
+    }
+
+    public static int maximumTrackedRequestStates() {
+        return MAX_TRACKED_REQUEST_STATES;
+    }
+
+    public static int maximumFreshBuildsPerWindow() {
+        return MAX_GLOBAL_FRESH_BUILDS_PER_WINDOW;
     }
 
     private static void requestOpen(
@@ -179,9 +220,9 @@ public final class RecognitionProgressScreenService {
         cleanupExpiredStates(now);
 
         RequestState state =
-                REQUEST_STATES.computeIfAbsent(
+                REQUEST_STATES.getOrCreate(
                         player.getUUID(),
-                        ignored -> new RequestState(now)
+                        () -> new RequestState(now)
                 );
 
         OpenRecognitionProgressScreenPayload payload =
@@ -596,6 +637,21 @@ public final class RecognitionProgressScreenService {
         RecognitionPathComponents components =
                 evaluation.getComponents();
 
+        RecognitionFreedomProgressSnapshot freedomProgress =
+                RecognitionFreedomProgressSnapshot.inspect(
+                        data,
+                        evaluation
+                );
+
+        RecognitionIdentityHistorySnapshot historySnapshot =
+                RecognitionIdentityHistoryService.inspect(data);
+
+        RecognitionIdentityHistoryModifier storedHistoryModifier =
+                historySnapshot.knownModifier()
+                        .orElse(
+                                RecognitionIdentityHistoryModifier.NONE
+                        );
+
         int recognizedSubordinates =
                 Math.max(
                         data.getCounter(
@@ -628,13 +684,38 @@ public final class RecognitionProgressScreenService {
                         ) * 4.0D
                 );
 
-        double exploration =
-                dimensions.discovery()
-                        + dimensions.freedom() * 0.5D;
-
         List<OpenRecognitionProgressScreenPayload.GuidanceEntry>
                 entries =
-                new ArrayList<>(7);
+                new ArrayList<>(11);
+
+        boolean rewardInitialized = data.getFlag(
+                RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED
+        );
+
+        double recognitionStrength;
+
+        if (rewardInitialized) {
+            recognitionStrength = data.getMeasurement(
+                    RecognitionStatKeys.RECOGNITION_STRENGTH_REWARD
+            );
+        } else if (data.isNamingCommitted()
+                || evaluation.getSelection().isPresent()) {
+            recognitionStrength = RecognitionStrengthRewardFormula
+                    .calculate(
+                            dimensions.identityStrength(),
+                            evaluation.getBalance()
+                                    .identityStrength()
+                                    .maximum(),
+                            data.isNamingCommitted()
+                                    ? data.isPureRecognition()
+                                    : evaluation.getSelection()
+                                    .map(RecognitionPathSelection::pure)
+                                    .orElse(false)
+                    )
+                    .totalStrength();
+        } else {
+            recognitionStrength = 0.0D;
+        }
 
         addGuidanceEntry(
                 entries,
@@ -685,12 +766,34 @@ public final class RecognitionProgressScreenService {
 
         addGuidanceEntry(
                 entries,
+                "independence",
+                "Independence",
+                "Major enemies overcome without subordinate assistance demonstrate personal independence.",
+                freedomProgress.soloMajorVictoryScore(),
+                freedomProgress.soloMajorVictoryMaximum(),
+                0x7F86FF,
+                debugDetailsAvailable
+        );
+
+        addGuidanceEntry(
+                entries,
                 "exploration",
                 "Exploration",
-                "Discovery, independence and meaningful journeys develop this aspect.",
-                exploration,
-                50.0D,
-                0x7F86FF,
+                "Meaningful discoveries and journeys beyond familiar boundaries develop this aspect.",
+                freedomProgress.discoveryMilestoneScore(),
+                freedomProgress.discoveryMilestoneMaximum(),
+                0x5DD9E8,
+                debugDetailsAvailable
+        );
+
+        addGuidanceEntry(
+                entries,
+                "self_reliance",
+                "Self-Reliance",
+                "Configured autonomous accomplishments and difficult feats completed through personal initiative strengthen this aspect.",
+                freedomProgress.activeIndependenceScore(),
+                freedomProgress.activeIndependenceMaximum(),
+                0xA98CFF,
                 debugDetailsAvailable
         );
 
@@ -713,6 +816,48 @@ public final class RecognitionProgressScreenService {
                 dimensions.evil(),
                 70.0D,
                 0xE05276,
+                debugDetailsAvailable
+        );
+
+        String legacyDisplayName =
+                storedHistoryModifier
+                        == RecognitionIdentityHistoryModifier.NONE
+                        ? "Legacy"
+                        : "Legacy — "
+                          + storedHistoryModifier.displayName();
+
+        addGuidanceEntry(
+                entries,
+                "legacy",
+                legacyDisplayName,
+                RecognitionIdentityHistoryResolver
+                        .playerFacingSummary(
+                                storedHistoryModifier,
+                                data.isNamingCommitted()
+                        ),
+                RecognitionIdentityHistoryResolver
+                        .guidanceProgressFor(
+                                storedHistoryModifier
+                        ),
+                100.0D,
+                RecognitionIdentityHistoryResolver
+                        .colorFor(storedHistoryModifier),
+                debugDetailsAvailable
+        );
+
+        addGuidanceEntry(
+                entries,
+                "recognition_strength",
+                "Recognition Strength",
+                RecognitionReleasePolicy
+                        .playerFacingSummary(
+                                data.isNamingCommitted()
+                        ),
+                recognitionStrength * 100.0D,
+                RecognitionStrengthRewardFormula
+                        .maximumReward(true)
+                        * 100.0D,
+                0xD7B5FF,
                 debugDetailsAvailable
         );
 
@@ -954,14 +1099,28 @@ public final class RecognitionProgressScreenService {
         nextCleanupNanos =
                 now + CLEANUP_INTERVAL_NANOS;
 
-        REQUEST_STATES.entrySet()
-                .removeIf(entry -> {
-                    RequestState state = entry.getValue();
+        REQUEST_STATES.removeIf(entry -> {
+            RequestState state = entry.getValue();
 
-                    return state == null
-                            || now - state.lastActivityNanos
-                            >= STATE_EXPIRY_NANOS;
-                });
+            if (state == null) {
+                return true;
+            }
+
+            synchronized (state) {
+                return now - state.lastActivityNanos
+                        >= STATE_EXPIRY_NANOS;
+            }
+        });
+    }
+
+    public record RuntimeSnapshot(
+            int trackedPlayerStates,
+            int maximumTrackedPlayerStates,
+            int freshBuildsInCurrentWindow,
+            int maximumFreshBuildsPerWindow,
+            long buildWindowStartedNanos,
+            long nextCleanupNanos
+    ) {
     }
 
     private enum RequestOrigin {
@@ -976,7 +1135,7 @@ public final class RecognitionProgressScreenService {
 
         private long lastResponseNanos;
         private long lastFeedbackNanos;
-        private long lastActivityNanos;
+        private volatile long lastActivityNanos;
 
         private long cacheExpiresNanos;
         private boolean cachedDebugDetails;

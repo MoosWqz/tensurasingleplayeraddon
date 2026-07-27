@@ -9,7 +9,10 @@ import com.mooswqz.moostensuraaddon.recognition.RecognitionAuthorityProgress;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatAttribution;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatAttribution.CombatCredit;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionEntityTags;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionIdentityHistoryIntegration;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionIndependenceProgress;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionStatKeys;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionStrengthRewardService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionSubordinateCombatTracker;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionSubordinateSupport;
 import com.mooswqz.moostensuraaddon.recognition.TensuraRecognitionStateHelper;
@@ -32,6 +35,7 @@ import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -46,6 +50,67 @@ public final class RecognitionProgressionEvents {
     private static final int STATE_SYNC_INTERVAL_TICKS = 40;
 
     private RecognitionProgressionEvents() {
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedIn(
+            PlayerEvent.PlayerLoggedInEvent event
+    ) {
+        if (!(event.getEntity()
+                instanceof ServerPlayer player)) {
+            return;
+        }
+
+        RecognitionData data = player.getData(
+                AttachmentRegistry.RECOGNITION_DATA
+        );
+
+        RecognitionIndependenceProgress.synchronize(
+                player,
+                data
+        );
+
+        RecognitionIdentityHistoryIntegration
+                .synchronizeAuthorityCounters(
+                        data,
+                        getOverworldGameTime(
+                                player
+                        )
+                );
+
+        RecognitionStrengthRewardService.reconcile(
+                player
+        );
+    }
+
+    @SubscribeEvent
+    public static void onPlayerRespawned(
+            PlayerEvent.PlayerRespawnEvent event
+    ) {
+        if (!(event.getEntity()
+                instanceof ServerPlayer player)) {
+            return;
+        }
+
+        RecognitionStrengthRewardService.reconcile(
+                player
+        );
+    }
+
+    @SubscribeEvent
+    public static void onAdvancementEarned(
+            AdvancementEvent.AdvancementEarnEvent event
+    ) {
+        if (!(event.getEntity()
+                instanceof ServerPlayer player)) {
+            return;
+        }
+
+        RecognitionIndependenceProgress.recordEarned(
+                player,
+                event.getAdvancement()
+                        .id()
+        );
     }
 
     @SubscribeEvent
@@ -76,11 +141,17 @@ public final class RecognitionProgressionEvents {
         );
 
         recordDimensionMilestone(
+                player,
                 data,
                 player.level().dimension()
         );
 
         synchronizeRaidVictories(
+                player,
+                data
+        );
+
+        RecognitionIndependenceProgress.synchronize(
                 player,
                 data
         );
@@ -95,12 +166,24 @@ public final class RecognitionProgressionEvents {
                 data
         );
 
+        RecognitionIdentityHistoryIntegration
+                .synchronizeAuthorityCounters(
+                        data,
+                        getOverworldGameTime(
+                                player
+                        )
+                );
+
+        RecognitionStrengthRewardService.reconcile(
+                player
+        );
+
         RecognitionSubordinateCombatTracker.cleanup(
-                player.level().getGameTime()
+                getOverworldGameTime(player)
         );
 
         CivilianDefenseTracker.cleanup(
-                player.level().getGameTime()
+                player.getServer()
         );
     }
 
@@ -118,11 +201,17 @@ public final class RecognitionProgressionEvents {
         );
 
         recordDimensionMilestone(
+                player,
                 data,
                 event.getTo()
         );
 
         synchronizeRaidVictories(
+                player,
+                data
+        );
+
+        RecognitionIndependenceProgress.synchronize(
                 player,
                 data
         );
@@ -135,6 +224,18 @@ public final class RecognitionProgressionEvents {
         RecognitionAuthorityProgress.synchronize(
                 player,
                 data
+        );
+
+        RecognitionIdentityHistoryIntegration
+                .synchronizeAuthorityCounters(
+                        data,
+                        getOverworldGameTime(
+                                player
+                        )
+                );
+
+        RecognitionStrengthRewardService.reconcile(
+                player
         );
     }
 
@@ -247,6 +348,14 @@ public final class RecognitionProgressionEvents {
 
         data.incrementCounter(
                 RecognitionStatKeys.VILLAGERS_CURED
+        );
+
+        RecognitionIdentityHistoryIntegration.record(
+                data,
+                RecognitionIdentityHistoryIntegration
+                        .TrackedDeed
+                        .VILLAGER_CURED,
+                getOverworldGameTime(player)
         );
 
         attribution.clear();
@@ -384,6 +493,16 @@ public final class RecognitionProgressionEvents {
                         RecognitionStatKeys
                                 .CIVILIANS_DEFENDED
                 );
+
+                RecognitionIdentityHistoryIntegration.record(
+                        data,
+                        RecognitionIdentityHistoryIntegration
+                                .TrackedDeed
+                                .CIVILIAN_DEFENDED,
+                        getOverworldGameTime(
+                                responsiblePlayer
+                        )
+                );
             }
 
             if (victim.getType().is(
@@ -396,11 +515,24 @@ public final class RecognitionProgressionEvents {
                 );
 
                 if (credit.isSoloPlayerAction()) {
-                    data.addUniqueValue(
-                            RecognitionStatKeys
-                                    .SOLO_MAJOR_ENEMY_TYPES_DEFEATED,
-                            entityTypeString
-                    );
+                    boolean newSoloType =
+                            data.addUniqueValue(
+                                    RecognitionStatKeys
+                                            .SOLO_MAJOR_ENEMY_TYPES_DEFEATED,
+                                    entityTypeString
+                            );
+
+                    if (newSoloType) {
+                        RecognitionIdentityHistoryIntegration.record(
+                                data,
+                                RecognitionIdentityHistoryIntegration
+                                        .TrackedDeed
+                                        .SOLO_MAJOR_VICTORY,
+                                getOverworldGameTime(
+                                        responsiblePlayer
+                                )
+                        );
+                    }
                 }
 
                 if (subordinateParticipants.contains(
@@ -409,6 +541,16 @@ public final class RecognitionProgressionEvents {
                     data.incrementCounter(
                             RecognitionStatKeys
                                     .SUBORDINATE_ASSISTED_MAJOR_VICTORIES
+                    );
+
+                    RecognitionIdentityHistoryIntegration.record(
+                            data,
+                            RecognitionIdentityHistoryIntegration
+                                    .TrackedDeed
+                                    .SUBORDINATE_ASSISTED_MAJOR_VICTORY,
+                            getOverworldGameTime(
+                                    responsiblePlayer
+                            )
                     );
                 }
             }
@@ -428,6 +570,17 @@ public final class RecognitionProgressionEvents {
                         RecognitionStatKeys
                                 .OWNED_SUBORDINATE_KILLS
                 );
+
+                RecognitionIdentityHistoryIntegration.record(
+                        data,
+                        RecognitionIdentityHistoryIntegration
+                                .TrackedDeed
+                                .OWNED_SUBORDINATE_KILLED,
+                        getOverworldGameTime(
+                                responsiblePlayer
+                        )
+                );
+
                 return;
             }
 
@@ -439,6 +592,17 @@ public final class RecognitionProgressionEvents {
                         RecognitionStatKeys
                                 .OWNED_COMPANION_KILLS
                 );
+
+                RecognitionIdentityHistoryIntegration.record(
+                        data,
+                        RecognitionIdentityHistoryIntegration
+                                .TrackedDeed
+                                .OWNED_COMPANION_KILLED,
+                        getOverworldGameTime(
+                                responsiblePlayer
+                        )
+                );
+
                 return;
             }
 
@@ -448,6 +612,17 @@ public final class RecognitionProgressionEvents {
                 data.incrementCounter(
                         RecognitionStatKeys.CIVILIAN_KILLS
                 );
+
+                RecognitionIdentityHistoryIntegration.record(
+                        data,
+                        RecognitionIdentityHistoryIntegration
+                                .TrackedDeed
+                                .CIVILIAN_KILLED,
+                        getOverworldGameTime(
+                                responsiblePlayer
+                        )
+                );
+
                 return;
             }
 
@@ -455,11 +630,25 @@ public final class RecognitionProgressionEvents {
                     RecognitionEntityTags
                             .BENEVOLENT_BOSSES
             )) {
-                data.addUniqueValue(
-                        RecognitionStatKeys
-                                .BENEVOLENT_BOSS_TYPES_KILLED,
-                        entityTypeString
-                );
+                boolean newBenevolentBossType =
+                        data.addUniqueValue(
+                                RecognitionStatKeys
+                                        .BENEVOLENT_BOSS_TYPES_KILLED,
+                                entityTypeString
+                        );
+
+                if (newBenevolentBossType) {
+                    RecognitionIdentityHistoryIntegration.record(
+                            data,
+                            RecognitionIdentityHistoryIntegration
+                                    .TrackedDeed
+                                    .BENEVOLENT_BOSS_KILLED,
+                            getOverworldGameTime(
+                                    responsiblePlayer
+                            )
+                    );
+                }
+
                 return;
             }
 
@@ -472,6 +661,17 @@ public final class RecognitionProgressionEvents {
                         RecognitionStatKeys
                                 .PASSIVE_BABY_KILLS
                 );
+
+                RecognitionIdentityHistoryIntegration.record(
+                        data,
+                        RecognitionIdentityHistoryIntegration
+                                .TrackedDeed
+                                .PASSIVE_BABY_KILLED,
+                        getOverworldGameTime(
+                                responsiblePlayer
+                        )
+                );
+
                 return;
             }
 
@@ -479,11 +679,24 @@ public final class RecognitionProgressionEvents {
                     RecognitionEntityTags
                             .MALEVOLENT_BOSSES
             )) {
-                data.addUniqueValue(
-                        RecognitionStatKeys
-                                .MALEVOLENT_BOSS_TYPES_DEFEATED,
-                        entityTypeString
-                );
+                boolean newMalevolentBossType =
+                        data.addUniqueValue(
+                                RecognitionStatKeys
+                                        .MALEVOLENT_BOSS_TYPES_DEFEATED,
+                                entityTypeString
+                        );
+
+                if (newMalevolentBossType) {
+                    RecognitionIdentityHistoryIntegration.record(
+                            data,
+                            RecognitionIdentityHistoryIntegration
+                                    .TrackedDeed
+                                    .MALEVOLENT_BOSS_DEFEATED,
+                            getOverworldGameTime(
+                                    responsiblePlayer
+                            )
+                    );
+                }
             }
         } finally {
             RecognitionSubordinateCombatTracker.forget(
@@ -513,6 +726,10 @@ public final class RecognitionProgressionEvents {
                         )
                 );
 
+        int storedRaidWins = data.getCounter(
+                RecognitionStatKeys.RAID_VICTORIES
+        );
+
         /*
          * Maximum preserves recognition history even if a command or external
          * tool later resets the player's vanilla statistics.
@@ -521,6 +738,22 @@ public final class RecognitionProgressionEvents {
                 RecognitionStatKeys.RAID_VICTORIES,
                 vanillaRaidWins
         );
+
+        int newRaidVictories = Math.max(
+                0,
+                vanillaRaidWins - storedRaidWins
+        );
+
+        if (newRaidVictories > 0) {
+            RecognitionIdentityHistoryIntegration.recordOccurrences(
+                    data,
+                    RecognitionIdentityHistoryIntegration
+                            .TrackedDeed
+                            .RAID_VICTORY,
+                    newRaidVictories,
+                    getOverworldGameTime(player)
+            );
+        }
     }
 
     private static boolean isOwnedCompanion(
@@ -542,28 +775,67 @@ public final class RecognitionProgressionEvents {
     }
 
     private static void recordDimensionMilestone(
+            ServerPlayer player,
             RecognitionData data,
             ResourceKey<Level> dimension
     ) {
-        if (data == null || dimension == null) {
+        if (player == null
+                || data == null
+                || dimension == null) {
             return;
         }
+
+        String milestoneId = "";
 
         if (Level.NETHER.equals(dimension)) {
-            data.addUniqueValue(
-                    RecognitionStatKeys
-                            .DISCOVERY_MILESTONES,
-                    "minecraft:entered_nether"
-            );
+            milestoneId = "minecraft:entered_nether";
+        } else if (Level.END.equals(dimension)) {
+            milestoneId = "minecraft:entered_end";
+        }
+
+        if (milestoneId.isBlank()) {
             return;
         }
 
-        if (Level.END.equals(dimension)) {
-            data.addUniqueValue(
-                    RecognitionStatKeys
-                            .DISCOVERY_MILESTONES,
-                    "minecraft:entered_end"
+        boolean newlyRecorded =
+                data.addUniqueValue(
+                        RecognitionStatKeys
+                                .DISCOVERY_MILESTONES,
+                        milestoneId
+                );
+
+        if (newlyRecorded) {
+            RecognitionIdentityHistoryIntegration.record(
+                    data,
+                    RecognitionIdentityHistoryIntegration
+                            .TrackedDeed
+                            .DISCOVERY_MILESTONE,
+                    getOverworldGameTime(player)
             );
         }
     }
+
+    private static long getOverworldGameTime(
+            ServerPlayer player
+    ) {
+        if (player == null) {
+            return 0L;
+        }
+
+        if (player.getServer() != null) {
+            return Math.max(
+                    0L,
+                    player.getServer()
+                            .overworld()
+                            .getGameTime()
+            );
+        }
+
+        return Math.max(
+                0L,
+                player.level()
+                        .getGameTime()
+        );
+    }
+
 }
