@@ -7,6 +7,7 @@ import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
 import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionAuthorityProgress;
 import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload;
+import com.mooswqz.moostensuraaddon.network.OpenUltimateMultiGrantScreenPayload;
 import com.mooswqz.moostensuraaddon.network.OpenUltimateConfirmationScreenPayload;
 import com.mooswqz.moostensuraaddon.network.OpenUltimateSubordinateSkillScreenPayload;
 import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
@@ -25,6 +26,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -34,8 +37,6 @@ public class UltimateSkillActions {
     private static final double TARGET_RANGE = 16.0D;
     private static final double TARGET_RADIUS = 0.5D;
     private static final double RANGED_RADIUS = 32.0D;
-
-    private static final int MAX_SKILL_VIEW_TARGETS = 10;
 
     private static final int BENEVOLENT_MASTERY_MASS_GRANT_PER_TARGET = 12;
     private static final int ABSOLUTE_MASTERY_MASS_GRANT_PER_TARGET = 10;
@@ -50,7 +51,150 @@ public class UltimateSkillActions {
     private static final boolean DEBUG_ULTIMATE_MASTERY = false;
 
     public static void chooseSkill(ServerPlayer player) {
-        GranterActions.openSkillSelection(player);
+        boolean benevolent = hasBenevolentEmpowerment(player);
+        boolean governance = hasAbsoluteGovernance(player);
+
+        if (!benevolent && !governance) {
+            GranterActions.openSkillSelection(player);
+            return;
+        }
+
+        LivingEntity target = getLookedAtSubordinate(player);
+
+        if (target == null) {
+            /*
+             * Looking away preserves the existing one-skill selector for
+             * Mass Grant and Ranged Take Back. Looking at a subordinate
+             * opens the Ultimate multi-grant workflow.
+             */
+            GranterActions.openSkillSelection(player);
+            return;
+        }
+
+        openMultiGrantSelection(
+                player,
+                target,
+                benevolent
+        );
+    }
+
+    private static void openMultiGrantSelection(
+            ServerPlayer player,
+            LivingEntity target,
+            boolean benevolent
+    ) {
+        Optional<ManasSkillInstance> authorityOptional =
+                getUltimateInstance(player, benevolent);
+
+        if (authorityOptional.isEmpty()) {
+            sendFeedback(
+                    player,
+                    Component.translatable(
+                                    "moostensuraaddon.granter.error.no_granter"
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
+            return;
+        }
+
+        String currentActiveSkillId =
+                GranterActions.getSelectedSkillId(
+                                authorityOptional.get()
+                        )
+                        .map(ResourceLocation::toString)
+                        .orElse("");
+
+        List<OpenUltimateMultiGrantScreenPayload.SkillEntry> entries =
+                new ArrayList<>();
+
+        for (ManasSkillInstance sourceInstance :
+                SkillAPI.getSkillsFrom(player)
+                        .getLearnedSkills()) {
+            if (sourceInstance == null
+                    || sourceInstance.getSkillId() == null) {
+                continue;
+            }
+
+            ResourceLocation skillId = sourceInstance.getSkillId();
+            Component displayName = sourceInstance.getDisplayName();
+
+            if (!GranterActions.isGrantableSkill(skillId)
+                    || SkillCategoryHelper.isIntrinsic(
+                    sourceInstance,
+                    skillId,
+                    displayName
+            )
+                    || SkillAPI.getSkillsFrom(target)
+                    .getSkill(skillId)
+                    .isPresent()) {
+                continue;
+            }
+
+            SkillCategoryHelper.SkillCategory category =
+                    SkillCategoryHelper.getCategory(
+                            sourceInstance,
+                            skillId,
+                            displayName
+                    );
+
+            entries.add(
+                    new OpenUltimateMultiGrantScreenPayload
+                            .SkillEntry(
+                            skillId.toString(),
+                            displayName.getString(),
+                            category.name(),
+                            sourceInstance.isMastered(player),
+                            getGrantWithoutMasteryCost(
+                                    benevolent,
+                                    sourceInstance
+                            )
+                    )
+            );
+        }
+
+        entries.sort(
+                Comparator.comparingInt(
+                                (OpenUltimateMultiGrantScreenPayload.SkillEntry entry) ->
+                                        SkillCategoryHelper
+                                                .SkillCategory
+                                                .valueOf(entry.category())
+                                                .sortOrder()
+                        )
+                        .thenComparing(
+                                OpenUltimateMultiGrantScreenPayload
+                                        .SkillEntry::displayName,
+                                String.CASE_INSENSITIVE_ORDER
+                        )
+                        .thenComparing(
+                                OpenUltimateMultiGrantScreenPayload
+                                        .SkillEntry::skillId
+                        )
+        );
+
+        if (entries.isEmpty()) {
+            sendFeedback(
+                    player,
+                    Component.literal(
+                                    target.getDisplayName().getString()
+                                            + " already has every skill this authority can grant."
+                            )
+                            .withStyle(ChatFormatting.YELLOW)
+            );
+            return;
+        }
+
+        recognizeSubordinate(player, target);
+
+        PacketDistributor.sendToPlayer(
+                player,
+                new OpenUltimateMultiGrantScreenPayload(
+                        benevolent,
+                        target.getUUID().toString(),
+                        target.getDisplayName().getString(),
+                        currentActiveSkillId,
+                        entries
+                )
+        );
     }
 
     public static void massGrant(ServerPlayer player, ManasSkillInstance ultimateInstance, boolean benevolent) {
@@ -358,6 +502,8 @@ public class UltimateSkillActions {
     }
 
     private static void openSubordinateSkillSelection(ServerPlayer player, boolean seize) {
+        AuthorityCostMigrationService.applyRecommendedDefaults();
+
         LivingEntity target = getLookedAtSubordinate(player);
 
         if (target == null) {
@@ -376,16 +522,44 @@ public class UltimateSkillActions {
                 .filter(instance -> SkillAPI.getSkillsFrom(player).getSkill(instance.getSkillId()).isEmpty())
                 .map(instance -> {
                     ResourceLocation skillId = instance.getSkillId();
+                    Component displayName = instance.getDisplayName();
                     double borrowChance = seize
                             ? 0.0D
-                            : getBorrowPermanentChance(borrowedSkillData.getBorrowCount(skillId.toString()));
+                            : getBorrowPermanentChance(
+                            borrowedSkillData.getBorrowCount(
+                                    skillId.toString()
+                            )
+                    );
+                    SkillCategoryHelper.SkillCategory category =
+                            SkillCategoryHelper.getCategory(
+                                    instance,
+                                    skillId,
+                                    displayName
+                            );
 
                     return new OpenUltimateSubordinateSkillScreenPayload.SkillEntry(
                             skillId.toString(),
-                            instance.getDisplayName().getString(),
+                            displayName.getString(),
+                            category.name(),
+                            instance.isMastered(target),
                             borrowChance
                     );
                 })
+                .sorted(
+                        Comparator.comparingInt(
+                                        (OpenUltimateSubordinateSkillScreenPayload.SkillEntry entry) ->
+                                                SkillCategoryHelper.SkillCategory
+                                                        .valueOf(entry.category())
+                                                        .sortOrder()
+                                )
+                                .thenComparing(
+                                        OpenUltimateSubordinateSkillScreenPayload.SkillEntry::displayName,
+                                        String.CASE_INSENSITIVE_ORDER
+                                )
+                                .thenComparing(
+                                        OpenUltimateSubordinateSkillScreenPayload.SkillEntry::skillId
+                                )
+                )
                 .toList();
 
         if (skillEntries.isEmpty()) {
@@ -404,6 +578,7 @@ public class UltimateSkillActions {
                 seize,
                 target.getUUID().toString(),
                 target.getDisplayName().getString(),
+                getCurrentMagicules(player),
                 costPerSkill,
                 MoosTensuraConfig.SEIZE_DEATH_CHANCE_PER_SKILL.get(),
                 MoosTensuraConfig.SEIZE_DEATH_CHANCE_MAX.get(),
@@ -417,31 +592,168 @@ public class UltimateSkillActions {
             UUID targetUuid,
             List<ResourceLocation> skillIds
     ) {
+        AuthorityCostMigrationService.applyRecommendedDefaults();
+
         if (skillIds == null || skillIds.isEmpty()) {
+            sendFeedback(
+                    player,
+                    Component.literal("Select at least one skill.")
+                            .withStyle(ChatFormatting.RED)
+            );
             return;
         }
 
+        UltimateBorrowSeizePolicy.RequestAnalysis request =
+                UltimateBorrowSeizePolicy.analyseRequest(
+                        skillIds.stream()
+                                .map(skillId -> skillId == null
+                                        ? ""
+                                        : skillId.toString())
+                                .toList()
+                );
+
+        if (request.overLimit()) {
+            sendFeedback(
+                    player,
+                    Component.literal(
+                                    "Too many skills were submitted at once."
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
+            return;
+        }
+
+        if (request.rejectedCount() > 0
+                || request.uniqueSkillIds().size() != skillIds.size()) {
+            sendFeedback(
+                    player,
+                    Component.literal(
+                                    "The request contains an invalid or duplicate skill."
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
+            return;
+        }
+
+        List<ResourceLocation> validatedSkillIds = new ArrayList<>();
+
+        for (String rawSkillId : request.uniqueSkillIds()) {
+            ResourceLocation skillId = ResourceLocation.tryParse(rawSkillId);
+
+            if (skillId == null) {
+                sendFeedback(
+                        player,
+                        Component.literal(
+                                        "One selected skill has an invalid registry ID."
+                                )
+                                .withStyle(ChatFormatting.RED)
+                );
+                return;
+            }
+
+            validatedSkillIds.add(skillId);
+        }
+
         if (seize && !hasAbsoluteGovernance(player)) {
+            sendFeedback(
+                    player,
+                    Component.literal(
+                                    "Absolute Governance is no longer available."
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
             return;
         }
 
         if (!seize && !hasBenevolentEmpowerment(player)) {
+            sendFeedback(
+                    player,
+                    Component.literal(
+                                    "Benevolent Empowerment is no longer available."
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
             return;
         }
 
         LivingEntity target = getSubordinateByUuid(player, targetUuid);
 
         if (target == null) {
-            sendFeedback(player, Component.translatable("moostensuraaddon.granter.error.no_subordinate")
-                    .withStyle(ChatFormatting.RED));
+            sendFeedback(
+                    player,
+                    Component.literal(
+                                    "The selected subordinate is no longer available or within range."
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
             return;
+        }
+
+        for (ResourceLocation skillId : validatedSkillIds) {
+            if (!isValidBorrowOrSeizeSkill(skillId, seize)) {
+                sendFeedback(
+                        player,
+                        Component.literal(
+                                        "The selected skill "
+                                                + skillId
+                                                + " is not valid for this action."
+                                )
+                                .withStyle(ChatFormatting.RED)
+                );
+                return;
+            }
+
+            Optional<ManasSkillInstance> targetSkill =
+                    SkillAPI.getSkillsFrom(target).getSkill(skillId);
+
+            if (targetSkill.isEmpty()) {
+                sendFeedback(
+                        player,
+                        Component.literal(
+                                        target.getDisplayName().getString()
+                                                + " no longer possesses "
+                                                + skillId
+                                                + "."
+                                )
+                                .withStyle(ChatFormatting.RED)
+                );
+                return;
+            }
+
+            if (SkillAPI.getSkillsFrom(player).getSkill(skillId).isPresent()) {
+                sendFeedback(
+                        player,
+                        Component.literal(
+                                        "You already possess "
+                                                + targetSkill.orElseThrow()
+                                                .getDisplayName()
+                                                .getString()
+                                                + "."
+                                )
+                                .withStyle(ChatFormatting.RED)
+                );
+                return;
+            }
+
+            if (SkillAPI.getSkillRegistry().get(skillId) == null) {
+                sendFeedback(
+                        player,
+                        Component.literal(
+                                        "One selected skill is no longer registered."
+                                )
+                                .withStyle(ChatFormatting.RED)
+                );
+                return;
+            }
         }
 
         double costPerSkill = seize
                 ? MoosTensuraConfig.SEIZE_COST_PER_SKILL.get()
                 : MoosTensuraConfig.BORROW_COST_PER_SKILL.get();
-
-        double totalCost = costPerSkill * skillIds.size();
+        double totalCost = UltimateBorrowSeizePolicy.calculateTotalCost(
+                costPerSkill,
+                validatedSkillIds.size()
+        );
 
         if (!hasMagicules(player, totalCost)) {
             sendNotEnoughMagicules(player, totalCost);
@@ -452,42 +764,45 @@ public class UltimateSkillActions {
         int permanentBorrowed = 0;
         double highestBorrowChance = 0.0D;
 
-        for (ResourceLocation skillId : skillIds) {
-            if (!isValidBorrowOrSeizeSkill(skillId, seize)) {
-                continue;
-            }
-
+        for (ResourceLocation skillId : validatedSkillIds) {
             BorrowOrSeizeResult result = seize
                     ? executeSingleSeize(player, target, skillId)
                     : executeSingleBorrow(player, target, skillId);
 
-            if (result.success()) {
-                successful++;
+            if (!result.success()) {
+                sendFeedback(
+                        player,
+                        Component.literal(
+                                        "The action failed during application. No further skills were processed."
+                                )
+                                .withStyle(ChatFormatting.RED)
+                );
+                return;
+            }
 
-                if (!seize) {
-                    highestBorrowChance = Math.max(highestBorrowChance, result.permanentChance());
+            successful++;
 
-                    if (result.permanent()) {
-                        permanentBorrowed++;
-                    }
+            if (!seize) {
+                highestBorrowChance = Math.max(
+                        highestBorrowChance,
+                        result.permanentChance()
+                );
+
+                if (result.permanent()) {
+                    permanentBorrowed++;
                 }
             }
         }
 
-        if (successful <= 0) {
-            sendFeedback(player, Component.translatable(
-                    seize
-                            ? "moostensuraaddon.ultimate.error.seize_failed"
-                            : "moostensuraaddon.ultimate.error.borrow_failed"
-            ).withStyle(ChatFormatting.RED));
-            return;
-        }
-
-        double realCost = costPerSkill * successful;
-        consumeMagicules(player, realCost);
+        consumeMagicules(player, totalCost);
         recognizeSubordinate(player, target);
-
-        addUltimateMastery(player, seize, successful * (seize ? MASTERY_SEIZE_PER_SKILL : MASTERY_BORROW_PER_SKILL));
+        addUltimateMastery(
+                player,
+                seize,
+                successful * (seize
+                        ? MASTERY_SEIZE_PER_SKILL
+                        : MASTERY_BORROW_PER_SKILL)
+        );
 
         if (seize) {
             RecognitionAuthorityProgress.recordSkillsSeized(
@@ -496,7 +811,11 @@ public class UltimateSkillActions {
             );
 
             double deathChance = getSeizeDeathChance(successful);
-            boolean killedBySeize = rollSeizeDeath(player, target, deathChance);
+            boolean killedBySeize = rollSeizeDeath(
+                    player,
+                    target,
+                    deathChance
+            );
 
             AddonAdvancementHelper.awardSeizedAuthority(player);
 
@@ -512,15 +831,22 @@ public class UltimateSkillActions {
                     "moostensuraaddon.ultimate.absolute.seize.multi_success",
                     successful,
                     target.getDisplayName(),
-                    formatNumber(realCost)
+                    formatNumber(totalCost)
             ).withStyle(ChatFormatting.DARK_PURPLE);
 
-            message.append(Component.literal(" | Soul strain: " + formatPercent(deathChance))
-                    .withStyle(ChatFormatting.RED));
+            message.append(
+                    Component.literal(
+                                    " | Soul strain: "
+                                            + formatPercent(deathChance)
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
 
             if (killedBySeize) {
-                message.append(Component.literal(" | Soul shattered")
-                        .withStyle(ChatFormatting.DARK_RED));
+                message.append(
+                        Component.literal(" | Soul shattered")
+                                .withStyle(ChatFormatting.DARK_RED)
+                );
             }
 
             sendFeedback(player, message);
@@ -529,19 +855,269 @@ public class UltimateSkillActions {
                     "moostensuraaddon.ultimate.benevolent.borrow.multi_success",
                     successful,
                     target.getDisplayName(),
-                    formatNumber(realCost)
+                    formatNumber(totalCost)
             ).withStyle(ChatFormatting.GOLD);
 
-            message.append(Component.literal(" Chance: " + formatPercent(highestBorrowChance))
-                    .withStyle(ChatFormatting.LIGHT_PURPLE));
+            message.append(
+                    Component.literal(
+                                    " Chance: "
+                                            + formatPercent(highestBorrowChance)
+                            )
+                            .withStyle(ChatFormatting.LIGHT_PURPLE)
+            );
 
             if (permanentBorrowed > 0) {
-                message.append(Component.literal(" | Permanent: " + permanentBorrowed)
-                        .withStyle(ChatFormatting.LIGHT_PURPLE));
+                message.append(
+                        Component.literal(
+                                        " | Permanent: "
+                                                + permanentBorrowed
+                                )
+                                .withStyle(ChatFormatting.LIGHT_PURPLE)
+                );
             }
 
             sendFeedback(player, message);
         }
+    }
+
+    public static void executeMultiGrantSelection(
+            ServerPlayer player,
+            boolean benevolent,
+            String targetUuid,
+            List<String> requestedSkillIds
+    ) {
+        if (player == null) {
+            return;
+        }
+
+        UltimateMultiGrantPolicy.RequestAnalysis request =
+                UltimateMultiGrantPolicy.analyseRequest(
+                        requestedSkillIds
+                );
+
+        if (request.uniqueSkillIds().isEmpty()) {
+            return;
+        }
+
+        if (request.overLimit()) {
+            sendFeedback(
+                    player,
+                    Component.literal(
+                                    "Too many skills were submitted at once."
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
+            return;
+        }
+
+        if (benevolent
+                ? !hasBenevolentEmpowerment(player)
+                : !hasAbsoluteGovernance(player)) {
+            return;
+        }
+
+        if (targetUuid == null
+                || targetUuid.isBlank()) {
+            return;
+        }
+
+        UUID parsedTargetUuid;
+
+        try {
+            parsedTargetUuid = UUID.fromString(targetUuid);
+        } catch (IllegalArgumentException exception) {
+            return;
+        }
+
+        LivingEntity target = getSubordinateByUuid(
+                player,
+                parsedTargetUuid
+        );
+
+        if (target == null) {
+            sendFeedback(
+                    player,
+                    Component.translatable(
+                                    "moostensuraaddon.granter.error.no_subordinate"
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
+            return;
+        }
+
+        List<MultiGrantCandidate> candidates =
+                new ArrayList<>();
+        int rejected = request.rejectedCount();
+
+        for (String rawSkillId : request.uniqueSkillIds()) {
+            ResourceLocation skillId = ResourceLocation.tryParse(
+                    rawSkillId
+            );
+
+            if (skillId == null
+                    || !GranterActions.isGrantableSkill(skillId)
+                    || SkillAPI.getSkillsFrom(target)
+                    .getSkill(skillId)
+                    .isPresent()) {
+                rejected++;
+                continue;
+            }
+
+            Optional<ManasSkillInstance> sourceOptional =
+                    SkillAPI.getSkillsFrom(player)
+                            .getSkill(skillId);
+            ManasSkill selectedSkill =
+                    SkillAPI.getSkillRegistry()
+                            .get(skillId);
+
+            if (sourceOptional.isEmpty()
+                    || selectedSkill == null) {
+                rejected++;
+                continue;
+            }
+
+            ManasSkillInstance sourceInstance =
+                    sourceOptional.get();
+
+            if (SkillCategoryHelper.isIntrinsic(
+                    sourceInstance,
+                    skillId,
+                    sourceInstance.getDisplayName()
+            )) {
+                rejected++;
+                continue;
+            }
+
+            candidates.add(
+                    new MultiGrantCandidate(
+                            skillId,
+                            selectedSkill,
+                            sourceInstance,
+                            getGrantWithoutMasteryCost(
+                                    benevolent,
+                                    sourceInstance
+                            )
+                    )
+            );
+        }
+
+        if (candidates.isEmpty()) {
+            sendFeedback(
+                    player,
+                    Component.literal(
+                                    "None of the submitted skills can currently be granted to "
+                                            + target.getDisplayName().getString()
+                                            + "."
+                            )
+                            .withStyle(ChatFormatting.YELLOW)
+            );
+            return;
+        }
+
+        double requestedCost = candidates.stream()
+                .mapToDouble(MultiGrantCandidate::cost)
+                .sum();
+
+        if (!hasMagicules(player, requestedCost)) {
+            sendNotEnoughMagicules(
+                    player,
+                    requestedCost
+            );
+            return;
+        }
+
+        int granted = 0;
+        double realCost = 0.0D;
+
+        for (MultiGrantCandidate candidate : candidates) {
+            if (SkillAPI.getSkillsFrom(target)
+                    .getSkill(candidate.skillId())
+                    .isPresent()) {
+                rejected++;
+                continue;
+            }
+
+            boolean learned = grantSkillToTarget(
+                    player,
+                    target,
+                    candidate.skill(),
+                    candidate.sourceInstance(),
+                    candidate.skillId()
+            );
+
+            if (!learned) {
+                rejected++;
+                continue;
+            }
+
+            granted++;
+            realCost += candidate.cost();
+        }
+
+        if (granted <= 0) {
+            sendFeedback(
+                    player,
+                    Component.translatable(
+                                    "moostensuraaddon.granter.error.grant_failed"
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
+            return;
+        }
+
+        consumeMagicules(player, realCost);
+        recognizeSubordinate(player, target);
+
+        RecognitionAuthorityProgress.recordEmpoweredSubordinate(
+                player,
+                target
+        );
+        RecognitionAuthorityProgress.recordMassGrant(
+                player,
+                granted
+        );
+        RecognitionAuthorityProgress.synchronize(player);
+
+        Optional<ManasSkillInstance> authorityOptional =
+                getUltimateInstance(player, benevolent);
+
+        if (authorityOptional.isPresent()) {
+            addUltimateMastery(
+                    player,
+                    authorityOptional.get(),
+                    granted * (benevolent
+                            ? BENEVOLENT_MASTERY_GRANT_WITHOUT_MASTERY
+                            : ABSOLUTE_MASTERY_GRANT_WITHOUT_MASTERY)
+            );
+        }
+
+        AddonAdvancementHelper.awardFirstGift(player);
+
+        String skippedText = rejected > 0
+                ? " • " + rejected + " skipped"
+                : "";
+
+        sendFeedback(
+                player,
+                Component.literal(
+                                "Granted "
+                                        + granted
+                                        + " skill"
+                                        + (granted == 1 ? "" : "s")
+                                        + " to "
+                                        + target.getDisplayName().getString()
+                                        + " for "
+                                        + formatNumber(realCost)
+                                        + " magicules"
+                                        + skippedText
+                                        + "."
+                        )
+                        .withStyle(
+                                benevolent
+                                        ? ChatFormatting.GOLD
+                                        : ChatFormatting.DARK_PURPLE
+                        )
+        );
     }
 
     public static void grantWithoutMastery(ServerPlayer player, ManasSkillInstance ultimateInstance, boolean benevolent) {
@@ -631,35 +1207,37 @@ public class UltimateSkillActions {
         ).withStyle(benevolent ? ChatFormatting.GOLD : ChatFormatting.DARK_PURPLE));
     }
 
-    public static void rangedSkillView(ServerPlayer player, boolean benevolent) {
-        List<LivingEntity> targets = getNearbySubordinates(player)
-                .stream()
-                .limit(MAX_SKILL_VIEW_TARGETS)
-                .toList();
-
-        if (targets.isEmpty()) {
-            sendFeedback(player, Component.translatable("moostensuraaddon.granter.error.no_subordinate")
-                    .withStyle(ChatFormatting.RED));
-            return;
-        }
+    public static void rangedSkillView(
+            ServerPlayer player,
+            boolean benevolent
+    ) {
+        List<LivingEntity> targets =
+                SubordinateOverviewService
+                        .discoverNearbySubordinates(player);
 
         for (LivingEntity target : targets) {
             recognizeSubordinate(player, target);
         }
 
         int masteryGain = Math.min(
-                targets.size() * MASTERY_RANGED_SKILL_VIEW_PER_TARGET,
+                targets.size()
+                        * MASTERY_RANGED_SKILL_VIEW_PER_TARGET,
                 MASTERY_RANGED_SKILL_VIEW_MAX
         );
 
-        addUltimateMastery(player, benevolent ? false : true, masteryGain);
+        if (masteryGain > 0) {
+            addUltimateMastery(
+                    player,
+                    !benevolent,
+                    masteryGain
+            );
+        }
 
-        List<OpenSubordinateOverviewScreenPayload.TargetEntry> entries = targets
-                .stream()
-                .map(target -> GranterActions.buildSubordinateOverviewEntry(player, target))
-                .toList();
-
-        PacketDistributor.sendToPlayer(player, new OpenSubordinateOverviewScreenPayload(entries));
+        SubordinateOverviewService.sendSnapshot(
+                player,
+                benevolent,
+                targets
+        );
     }
 
     private static BorrowOrSeizeResult executeSingleBorrow(ServerPlayer player, LivingEntity target, ResourceLocation skillId) {
@@ -947,7 +1525,6 @@ public class UltimateSkillActions {
         GranterProgressData progress = player.getData(
                 AttachmentRegistry.GRANTER_PROGRESS_DATA
         );
-
         boolean changed = progress.recognizeSubordinate(
                 target.getUUID()
         );
@@ -960,6 +1537,16 @@ public class UltimateSkillActions {
         }
 
         RecognitionAuthorityProgress.synchronize(player);
+    }
+
+    private static double getCurrentMagicules(
+            ServerPlayer player
+    ) {
+        IExistence existence = TensuraStorages.getExistenceFrom(player);
+
+        return existence == null
+                ? 0.0D
+                : Math.max(0.0D, existence.getMagicule());
     }
 
     private static boolean hasMagicules(ServerPlayer player, double amount) {
@@ -1111,6 +1698,20 @@ public class UltimateSkillActions {
 
     private static String formatPercent(double value) {
         return String.format(Locale.US, "%.1f%%", value * 100.0D);
+    }
+
+    private record MultiGrantCandidate(
+            ResourceLocation skillId,
+            ManasSkill skill,
+            ManasSkillInstance sourceInstance,
+            double cost
+    ) {
+
+        private MultiGrantCandidate {
+            cost = !Double.isFinite(cost) || cost < 0.0D
+                    ? 0.0D
+                    : cost;
+        }
     }
 
     private record BorrowOrSeizeResult(

@@ -1,9 +1,7 @@
 package com.mooswqz.moostensuraaddon.network;
 
-import com.mooswqz.moostensuraaddon.client
-        .ClientPayloadHandler;
-import net.neoforged.neoforge.network.handling
-        .IPayloadContext;
+import com.mooswqz.moostensuraaddon.client.ClientPayloadHandler;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public final class ClientboundPayloadHandlers {
 
@@ -18,6 +16,18 @@ public final class ClientboundPayloadHandlers {
                 ClientPayloadHandler.openGranterScreen(
                         payload
                 )
+        );
+    }
+
+    public static void handleOpenUltimateMultiGrantScreen(
+            OpenUltimateMultiGrantScreenPayload payload,
+            IPayloadContext context
+    ) {
+        context.enqueueWork(() ->
+                ClientPayloadHandler
+                        .openUltimateMultiGrantScreen(
+                                payload
+                        )
         );
     }
 

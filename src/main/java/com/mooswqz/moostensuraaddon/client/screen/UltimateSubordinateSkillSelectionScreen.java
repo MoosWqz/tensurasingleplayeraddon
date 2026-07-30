@@ -1,6 +1,5 @@
 package com.mooswqz.moostensuraaddon.client.screen;
 
-import com.mooswqz.moostensuraaddon.client.screen.skillui.GranterSkillUiEntryFactory;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillDetailsPanel;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillListWidget;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiButton;
@@ -13,7 +12,10 @@ import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiRenderHelper;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionMode;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionModel;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiTheme;
-import com.mooswqz.moostensuraaddon.network.SelectSkillPayload;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.UltimateBorrowSeizeUiEntryFactory;
+import com.mooswqz.moostensuraaddon.network.ExecuteUltimateSubordinateSkillPayload;
+import com.mooswqz.moostensuraaddon.network.OpenUltimateSubordinateSkillScreenPayload;
+import com.mooswqz.moostensuraaddon.util.UltimateBorrowSeizePolicy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -26,100 +28,98 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-/**
- * Searchable, category-aware Granter skill selector.
- */
-public class GranterSkillSelectionScreen extends Screen {
+public final class UltimateSubordinateSkillSelectionScreen
+        extends Screen {
 
-    private static final SkillUiTheme THEME =
-            SkillUiTheme.GRANTER;
     private static final int FILTER_GAP = 4;
-    private static final int FOOTER_BUTTON_GAP = 5;
+    private static final int FOOTER_GAP = 4;
 
+    private final OpenUltimateSubordinateSkillScreenPayload payload;
+    private final SkillUiTheme theme;
     private final SkillUiFilterState filterState =
             new SkillUiFilterState();
     private final SkillUiSelectionModel selectionModel =
             new SkillUiSelectionModel(
-                    SkillUiSelectionMode.SINGLE
+                    SkillUiSelectionMode.MULTI,
+                    UltimateBorrowSeizePolicy.MAX_SELECTED_SKILLS
             );
-    private final EnumMap<
-            SkillUiCategory,
-            SkillUiButton
-            > categoryButtons = new EnumMap<>(
+    private final EnumMap<SkillUiCategory, SkillUiButton>
+            categoryButtons = new EnumMap<>(
             SkillUiCategory.class
     );
 
     private List<SkillUiEntry> entries = List.of();
+    private Map<String, Double> borrowChances = Map.of();
     private SkillUiLayout layout;
     private SkillUiListModel listModel;
     private SkillListWidget listWidget;
     private EditBox searchBox;
+    private SkillUiButton selectShownButton;
+    private SkillUiButton clearButton;
     private SkillUiButton cancelButton;
     private SkillUiButton confirmButton;
-    private int footerButtonsLeft;
-
     private SkillUiEntry focusedEntry;
     private String retainedQuery = "";
-    private String currentSkillId = "";
-    private Component authorityName =
-            Component.literal("Granter");
-    private boolean evolvedAuthority;
-    private boolean initialSelectionApplied;
-
     private Component statusMessage = Component.empty();
-    private int statusColor = THEME.mutedTextColor();
+    private int statusColor;
 
-    public GranterSkillSelectionScreen() {
+    public UltimateSubordinateSkillSelectionScreen(
+            OpenUltimateSubordinateSkillScreenPayload payload
+    ) {
         super(
                 Component.literal(
-                        "Active Skill Selection"
+                        payload != null && payload.seize()
+                                ? "Seize Skills"
+                                : "Borrow Skills"
                 )
         );
+
+        this.payload = payload == null
+                ? new OpenUltimateSubordinateSkillScreenPayload(
+                false,
+                "",
+                "Unknown subordinate",
+                0.0D,
+                0.0D,
+                0.0D,
+                List.of()
+        )
+                : payload;
+        this.theme = this.payload.seize()
+                ? SkillUiTheme.SEIZE
+                : SkillUiTheme.BENEVOLENT;
+        this.statusColor = this.theme.mutedTextColor();
     }
 
-    public static void open() {
+    public static void open(
+            OpenUltimateSubordinateSkillScreenPayload payload
+    ) {
         Minecraft.getInstance().setScreen(
-                new GranterSkillSelectionScreen()
+                new UltimateSubordinateSkillSelectionScreen(
+                        payload
+                )
         );
     }
 
     @Override
     protected void init() {
-        List<String> previousSelection =
-                new ArrayList<>(
-                        selectionModel.selectedSkillIds()
-                );
-
-        GranterSkillUiEntryFactory.BuildResult result =
-                GranterSkillUiEntryFactory.build(
-                        minecraft == null
-                                ? null
-                                : minecraft.player
+        List<String> previousSelection = new ArrayList<>(
+                selectionModel.selectedSkillIds()
+        );
+        UltimateBorrowSeizeUiEntryFactory.BuildResult result =
+                UltimateBorrowSeizeUiEntryFactory.build(
+                        payload
                 );
 
         entries = result.entries();
-        evolvedAuthority = result.evolvedAuthority();
-        authorityName = result.authorityName();
-        currentSkillId = result.currentSelection()
-                .orElse("");
-
-        if (!initialSelectionApplied) {
-            selectionModel.replaceSelection(
-                    result.currentSelection()
-                            .map(skillId -> List.of(skillId))
-                            .orElseGet(List::of),
-                    entries
-            );
-            initialSelectionApplied = true;
-        } else {
-            selectionModel.replaceSelection(
-                    previousSelection,
-                    entries
-            );
-        }
-
+        borrowChances = result.borrowChances();
+        selectionModel.replaceSelection(
+                previousSelection,
+                entries
+        );
         filterState.setQuery(retainedQuery);
         layout = SkillUiLayout.calculate(
                 width,
@@ -129,14 +129,13 @@ public class GranterSkillSelectionScreen extends Screen {
         listModel = new SkillUiListModel(
                 filterState
         );
-
         listWidget = new SkillListWidget(
                 layout.list().left(),
                 layout.list().top(),
                 layout.list().width(),
                 layout.list().height(),
                 font,
-                THEME,
+                theme,
                 listModel,
                 selectionModel
         );
@@ -149,12 +148,14 @@ public class GranterSkillSelectionScreen extends Screen {
                 this::onSelectionChanged
         );
 
-        selectionModel.selectedSkillIds()
-                .stream()
-                .findFirst()
-                .filter(listModel::focusEntry)
-                .flatMap(this::findEntry)
-                .ifPresent(entry -> focusedEntry = entry);
+        if (focusedEntry != null
+                && listModel.focusEntry(
+                focusedEntry.skillId()
+        )) {
+            focusedEntry = findEntry(
+                    focusedEntry.skillId()
+            ).orElse(null);
+        }
 
         if (focusedEntry == null) {
             listModel.focusFirst()
@@ -182,7 +183,6 @@ public class GranterSkillSelectionScreen extends Screen {
                 0,
                 (filters.height() - buttonHeight) / 2
         );
-
         int categoryCount = SkillUiCategory.values().length;
         int desiredSearchWidth = Math.max(
                 60,
@@ -238,17 +238,16 @@ public class GranterSkillSelectionScreen extends Screen {
                 (categoriesWidth - totalGaps)
                         / categoryCount
         );
-
         int buttonX = categoriesLeft;
 
         for (SkillUiCategory category :
                 SkillUiCategory.values()) {
             int availableRight = filters.right()
                     - buttonX;
-            int widthForButton = category == SkillUiCategory.OTHER
+            int widthForButton = category
+                    == SkillUiCategory.OTHER
                     ? Math.max(1, availableRight)
                     : categoryButtonWidth;
-
             SkillUiButton button = new SkillUiButton(
                     buttonX,
                     controlY,
@@ -258,10 +257,11 @@ public class GranterSkillSelectionScreen extends Screen {
                             category,
                             widthForButton
                     ),
-                    THEME,
+                    theme,
                     SkillUiButton.Tone.NORMAL,
                     () -> toggleCategory(category)
             );
+
             button.setHighlighted(
                     filterState.isCategoryVisible(category)
             );
@@ -270,15 +270,9 @@ public class GranterSkillSelectionScreen extends Screen {
                             category.displayName()
                     )
             );
-
-            categoryButtons.put(
-                    category,
-                    button
-            );
+            categoryButtons.put(category, button);
             addRenderableWidget(button);
-
-            buttonX += widthForButton
-                    + FILTER_GAP;
+            buttonX += widthForButton + FILTER_GAP;
         }
     }
 
@@ -293,47 +287,90 @@ public class GranterSkillSelectionScreen extends Screen {
                 0,
                 (footer.height() - buttonHeight) / 2
         );
+        int buttonCount = 4;
         int buttonWidth = Math.max(
                 1,
-                Math.min(
-                        116,
-                        Math.max(
-                                1,
-                                (footer.width()
-                                        - FOOTER_BUTTON_GAP)
-                                        / 2
+                (footer.width()
+                        - FOOTER_GAP * (buttonCount - 1))
+                        / buttonCount
+        );
+        boolean compactLabels = buttonWidth < 82;
+        int buttonX = footer.left();
+
+        selectShownButton = new SkillUiButton(
+                buttonX,
+                buttonY,
+                buttonWidth,
+                buttonHeight,
+                Component.literal(
+                        compactLabels
+                                ? "All Shown"
+                                : "Select Shown"
+                ),
+                theme,
+                SkillUiButton.Tone.NORMAL,
+                this::selectShown
+        );
+        selectShownButton.setTooltip(
+                Tooltip.create(
+                        Component.literal(
+                                "Select every filtered skill, up to the 32-skill safety limit."
                         )
                 )
         );
+        addRenderableWidget(selectShownButton);
+        buttonX += buttonWidth + FOOTER_GAP;
 
-        int confirmX = footer.right()
-                - buttonWidth;
-        int cancelX = confirmX
-                - FOOTER_BUTTON_GAP
-                - buttonWidth;
-        footerButtonsLeft = cancelX;
+        clearButton = new SkillUiButton(
+                buttonX,
+                buttonY,
+                buttonWidth,
+                buttonHeight,
+                Component.literal("Clear"),
+                theme,
+                SkillUiButton.Tone.NORMAL,
+                this::clearSelection
+        );
+        addRenderableWidget(clearButton);
+        buttonX += buttonWidth + FOOTER_GAP;
 
         cancelButton = new SkillUiButton(
-                cancelX,
+                buttonX,
                 buttonY,
                 buttonWidth,
                 buttonHeight,
                 Component.literal("Cancel"),
-                THEME,
+                theme,
                 SkillUiButton.Tone.NORMAL,
                 this::onClose
         );
         addRenderableWidget(cancelButton);
+        buttonX += buttonWidth + FOOTER_GAP;
 
         confirmButton = new SkillUiButton(
-                confirmX,
+                buttonX,
                 buttonY,
-                buttonWidth,
+                Math.max(1, footer.right() - buttonX),
                 buttonHeight,
-                Component.literal("Set Active Skill"),
-                THEME,
-                SkillUiButton.Tone.PRIMARY,
+                Component.literal(
+                        payload.seize()
+                                ? "Seize Skills"
+                                : "Borrow Skills"
+                ),
+                theme,
+                payload.seize()
+                        ? SkillUiButton.Tone.DANGER
+                        : SkillUiButton.Tone.PRIMARY,
                 this::confirmSelection
+        );
+        confirmButton.setTooltip(
+                Tooltip.create(
+                        Component.literal(
+                                payload.seize()
+                                        ? "Immediately take the selected skills from the displayed target."
+                                        : "Immediately copy the selected skills from the displayed target."
+                        )
+                )
         );
         addRenderableWidget(confirmButton);
     }
@@ -353,9 +390,7 @@ public class GranterSkillSelectionScreen extends Screen {
     ) {
         filterState.toggleCategory(category);
 
-        SkillUiButton button = categoryButtons.get(
-                category
-        );
+        SkillUiButton button = categoryButtons.get(category);
 
         if (button != null) {
             button.setHighlighted(
@@ -371,24 +406,21 @@ public class GranterSkillSelectionScreen extends Screen {
             return;
         }
 
-        String previouslyFocused = focusedEntry == null
+        String previousFocus = focusedEntry == null
                 ? ""
                 : focusedEntry.skillId();
 
         listWidget.rebuildFilter();
 
-        Optional<SkillUiEntry> nextFocus = Optional.empty();
-
-        if (!previouslyFocused.isBlank()
-                && listModel.focusEntry(previouslyFocused)) {
-            nextFocus = findEntry(previouslyFocused);
+        if (!previousFocus.isBlank()
+                && listModel.focusEntry(previousFocus)) {
+            focusedEntry = findEntry(previousFocus)
+                    .orElse(null);
+        } else {
+            focusedEntry = listModel.focusedEntry()
+                    .orElse(null);
         }
 
-        if (nextFocus.isEmpty()) {
-            nextFocus = listModel.focusedEntry();
-        }
-
-        focusedEntry = nextFocus.orElse(null);
         clearStatus();
         updateControls();
     }
@@ -398,15 +430,34 @@ public class GranterSkillSelectionScreen extends Screen {
             SkillUiSelectionModel.ToggleResult result
     ) {
         focusedEntry = entry;
+        String action = payload.seize()
+                ? "seizure"
+                : "borrow";
 
         switch (result) {
             case SELECTED -> setStatus(
-                    Component.literal("Ready to set this as the active skill."),
-                    THEME.successColor()
+                    Component.literal(
+                            entry.displayName().getString()
+                                    + " added to the "
+                                    + action
+                                    + "."
+                    ),
+                    theme.successColor()
             );
             case DESELECTED -> setStatus(
-                    Component.literal("Selection cleared."),
-                    THEME.mutedTextColor()
+                    Component.literal(
+                            entry.displayName().getString()
+                                    + " removed from the "
+                                    + action
+                                    + "."
+                    ),
+                    theme.mutedTextColor()
+            );
+            case LIMIT_REACHED -> setStatus(
+                    Component.literal(
+                            "A maximum of 32 skills can be submitted at once."
+                    ),
+                    theme.warningColor()
             );
             case NOT_SELECTABLE -> setStatus(
                     entry.hasDisabledReason()
@@ -414,13 +465,7 @@ public class GranterSkillSelectionScreen extends Screen {
                             : Component.literal(
                             "This skill cannot be selected."
                     ),
-                    THEME.warningColor()
-            );
-            case LIMIT_REACHED -> setStatus(
-                    Component.literal(
-                            "Only one skill can be selected here."
-                    ),
-                    THEME.warningColor()
+                    theme.warningColor()
             );
             case READ_ONLY,
                  NO_ENTRY -> clearStatus();
@@ -429,36 +474,101 @@ public class GranterSkillSelectionScreen extends Screen {
         updateControls();
     }
 
-    private void updateControls() {
-        if (confirmButton != null) {
-            confirmButton.active =
-                    selectionModel.selectedCount() == 1;
-        }
+    private void selectShown() {
+        int added = selectionModel.selectAllVisible(
+                listModel.filteredEntries()
+        );
+
+        setStatus(
+                Component.literal(
+                        added > 0
+                                ? added
+                                  + " visible skill(s) selected."
+                                : "No additional visible skills could be selected."
+                ),
+                added > 0
+                        ? theme.successColor()
+                        : theme.mutedTextColor()
+        );
+        updateControls();
+    }
+
+    private void clearSelection() {
+        selectionModel.clear();
+        setStatus(
+                Component.literal("Selection cleared."),
+                theme.mutedTextColor()
+        );
+        updateControls();
     }
 
     private void confirmSelection() {
-        Optional<String> selected = selectionModel
-                .selectedSkillIds()
-                .stream()
-                .findFirst();
-
-        if (selected.isEmpty()) {
+        if (selectionModel.selectedCount() <= 0) {
             setStatus(
                     Component.literal(
-                            "Select a skill first."
+                            "Select at least one skill first."
                     ),
-                    THEME.warningColor()
+                    theme.warningColor()
             );
             updateControls();
             return;
         }
 
-        PacketDistributor.sendToServer(
-                new SelectSkillPayload(
-                        selected.get()
+        List<SkillUiEntry> selectedEntries =
+                selectionModel.selectedSkillIds()
+                        .stream()
+                        .map(this::findEntry)
+                        .flatMap(Optional::stream)
+                        .toList();
+
+        minecraft.setScreen(
+                UltimateConfirmationScreen.forBorrowOrSeize(
+                        this,
+                        payload,
+                        selectedEntries,
+                        borrowChances
                 )
         );
-        onClose();
+    }
+
+    private void updateControls() {
+        int selectedCount = selectionModel.selectedCount();
+
+        if (selectShownButton != null) {
+            selectShownButton.active = listModel != null
+                    && listModel.filteredEntries()
+                    .stream()
+                    .anyMatch(entry -> entry.selectable()
+                            && !selectionModel.isSelected(
+                            entry.skillId()
+                    ));
+        }
+
+        if (clearButton != null) {
+            clearButton.active = selectedCount > 0;
+        }
+
+        if (confirmButton != null) {
+            confirmButton.active = selectedCount > 0;
+            confirmButton.setMessage(
+                    Component.literal(
+                            selectedCount > 0
+                                    ? actionVerb()
+                                      + " "
+                                      + selectedCount
+                                      + (selectedCount == 1
+                                         ? " Skill"
+                                         : " Skills")
+                                    : actionVerb() + " Skills"
+                    )
+            );
+        }
+    }
+
+    private String actionVerb() {
+        return payload.seize()
+                ? "Seize"
+                : "Borrow";
     }
 
     private Optional<SkillUiEntry> findEntry(
@@ -513,7 +623,7 @@ public class GranterSkillSelectionScreen extends Screen {
 
     private void clearStatus() {
         statusMessage = Component.empty();
-        statusColor = THEME.mutedTextColor();
+        statusColor = theme.mutedTextColor();
     }
 
     @Override
@@ -527,19 +637,26 @@ public class GranterSkillSelectionScreen extends Screen {
                 guiGraphics,
                 width,
                 height,
-                THEME
+                theme
         );
         SkillUiRenderHelper.drawBorderedPanel(
                 guiGraphics,
                 layout.panel(),
-                THEME.accentColor(),
-                THEME.panelFillColor(),
+                payload.seize()
+                        ? theme.dangerColor()
+                        : theme.accentColor(),
+                theme.panelFillColor(),
                 2
         );
 
         renderHeader(guiGraphics);
-        renderFooterStatus(guiGraphics);
-
+        SkillUiRenderHelper.drawDivider(
+                guiGraphics,
+                layout.footer().left(),
+                layout.footer().right(),
+                layout.footer().top(),
+                theme.panelBorderColor()
+        );
         renderWidgetsWithoutParentBlur(
                 guiGraphics,
                 mouseX,
@@ -556,7 +673,7 @@ public class GranterSkillSelectionScreen extends Screen {
                 guiGraphics,
                 font,
                 layout.details(),
-                THEME,
+                theme,
                 detailsEntry,
                 selectionModel
         );
@@ -597,6 +714,24 @@ public class GranterSkillSelectionScreen extends Screen {
             );
         }
 
+        if (selectShownButton != null) {
+            selectShownButton.render(
+                    guiGraphics,
+                    mouseX,
+                    mouseY,
+                    partialTick
+            );
+        }
+
+        if (clearButton != null) {
+            clearButton.render(
+                    guiGraphics,
+                    mouseX,
+                    mouseY,
+                    partialTick
+            );
+        }
+
         if (cancelButton != null) {
             cancelButton.render(
                     guiGraphics,
@@ -621,13 +756,21 @@ public class GranterSkillSelectionScreen extends Screen {
     ) {
         SkillUiLayout.Rect header = layout.header();
         int textLeft = header.left() + 2;
+        String modeName = payload.seize()
+                ? "SEIZE"
+                : "BORROW";
         int badgeLeft = SkillUiRenderHelper.drawModeBadge(
                 guiGraphics,
                 font,
-                Component.literal("ACTIVE SKILL"),
+                Component.literal(modeName),
                 header.right() - 2,
                 header.top() + 1,
-                THEME
+                payload.seize()
+                        ? theme.withAccents(
+                        theme.dangerColor(),
+                        theme.secondaryAccentColor()
+                )
+                        : theme
         );
 
         SkillUiRenderHelper.drawClippedText(
@@ -640,116 +783,117 @@ public class GranterSkillSelectionScreen extends Screen {
                         1,
                         badgeLeft - textLeft - 6
                 ),
-                THEME.primaryTextColor()
+                theme.primaryTextColor()
         );
 
+        SkillUiLayout.Rect targetStrip = new SkillUiLayout.Rect(
+                header.left() + 1,
+                header.top() + 14,
+                Math.max(1, header.width() - 2),
+                13
+        );
+        int targetAccent = payload.seize()
+                ? theme.dangerColor()
+                : theme.secondaryAccentColor();
+
+        SkillUiRenderHelper.drawBorderedPanel(
+                guiGraphics,
+                targetStrip,
+                targetAccent,
+                theme.categoryFillColor(),
+                1
+        );
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
                 Component.literal(
-                        "Choose one skill for Mass Grant or Ranged Take Back."
+                        "TARGET • " + payload.targetName()
                 ),
-                textLeft,
-                header.top() + 15,
-                Math.max(1, header.width() - 4),
-                THEME.secondaryTextColor()
+                targetStrip.left() + 5,
+                targetStrip.top() + 3,
+                Math.max(1, targetStrip.width() - 10),
+                targetAccent
         );
 
-        int visibleCount = listModel == null
-                ? 0
-                : listModel.filteredEntries().size();
-        StringBuilder stateLine = new StringBuilder(
-                authorityName.getString()
-        );
-        stateLine.append(
-                evolvedAuthority
-                        ? " • mastery bypass active"
-                        : " • mastered skills only"
-        );
-        stateLine.append(" • ")
-                .append(visibleCount)
-                .append("/")
-                .append(entries.size())
-                .append(" shown");
+        Component summary = statusMessage;
+        int summaryColor = statusColor;
 
-        if (!currentSkillId.isBlank()) {
-            String currentName = findEntry(currentSkillId)
-                    .map(entry -> entry
-                            .displayName()
-                            .getString())
-                    .orElse(currentSkillId);
-            stateLine.append(" • current: ")
-                    .append(currentName);
+        if (summary.getString().isBlank()) {
+            summary = buildSelectionSummary();
+            summaryColor = selectionModel.selectedCount() > 0
+                    ? payload.seize()
+                      ? theme.dangerColor()
+                      : theme.accentColor()
+                    : theme.mutedTextColor();
         }
 
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal(stateLine.toString()),
+                summary,
                 textLeft,
-                header.top() + 28,
+                header.top() + 29,
                 Math.max(1, header.width() - 4),
-                THEME.mutedTextColor()
+                summaryColor
         );
-
         SkillUiRenderHelper.drawDivider(
                 guiGraphics,
                 header.left(),
                 header.right(),
                 header.bottom() - 1,
-                THEME.panelBorderColor()
+                theme.panelBorderColor()
         );
     }
 
-    private void renderFooterStatus(
-            GuiGraphics guiGraphics
-    ) {
-        SkillUiLayout.Rect footer = layout.footer();
-        SkillUiRenderHelper.drawDivider(
-                guiGraphics,
-                footer.left(),
-                footer.right(),
-                footer.top(),
-                THEME.panelBorderColor()
-        );
+    private Component buildSelectionSummary() {
+        int selectedCount = selectionModel.selectedCount();
+        double totalCost = UltimateBorrowSeizePolicy
+                .calculateTotalCost(
+                        payload.costPerSkill(),
+                        selectedCount
+                );
 
-        Component footerText = statusMessage;
-        int footerColor = statusColor;
+        if (payload.seize()) {
+            double deathChance = UltimateBorrowSeizePolicy
+                    .calculateSeizeDeathChance(
+                            payload.seizeDeathChancePerSkill(),
+                            payload.seizeDeathChanceMax(),
+                            selectedCount
+                    );
 
-        if (footerText.getString().isBlank()) {
-            footerText = selectionModel
-                    .selectedSkillIds()
-                    .stream()
-                    .findFirst()
-                    .flatMap(this::findEntry)
-                    .map(entry -> Component.literal(
-                            "Selected: "
-                                    + entry.displayName().getString()
-                                    + " • Set Active Skill confirms; nothing is granted now."
-                    ))
-                    .orElseGet(() -> Component.literal(
-                            "Select one skill. This sets the active skill only; nothing is granted now."
-                    ));
-            footerColor = selectionModel.selectedCount() == 1
-                    ? THEME.accentColor()
-                    : THEME.mutedTextColor();
+            return Component.literal(
+                    "Absolute Governance • "
+                            + selectedCount
+                            + " selected • "
+                            + UltimateBorrowSeizePolicy.formatNumber(
+                            totalCost
+                    )
+                            + " magicules • target death risk "
+                            + UltimateBorrowSeizePolicy.formatPercent(
+                            deathChance
+                    )
+                            + " • selected skills are removed permanently"
+            );
         }
 
-        int maximumWidth = Math.max(
-                1,
-                footerButtonsLeft
-                        - footer.left()
-                        - 6
-        );
+        double highestChance = UltimateBorrowSeizePolicy
+                .highestBorrowChance(
+                        selectionModel.selectedSkillIds(),
+                        borrowChances
+                );
 
-        SkillUiRenderHelper.drawClippedText(
-                guiGraphics,
-                font,
-                footerText,
-                footer.left() + 2,
-                footer.centerY() - 4,
-                maximumWidth,
-                footerColor
+        return Component.literal(
+                "Benevolent Empowerment • "
+                        + selectedCount
+                        + " selected • "
+                        + UltimateBorrowSeizePolicy.formatNumber(
+                        totalCost
+                )
+                        + " magicules • highest permanent chance "
+                        + UltimateBorrowSeizePolicy.formatPercent(
+                        highestChance
+                )
+                        + " • target keeps every skill"
         );
     }
 

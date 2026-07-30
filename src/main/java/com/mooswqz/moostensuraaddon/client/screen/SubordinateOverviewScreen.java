@@ -1,445 +1,1183 @@
 package com.mooswqz.moostensuraaddon.client.screen;
 
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillDetailsPanel;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillListWidget;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiButton;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiCategory;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiEntry;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiFilterState;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiLayout;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiListModel;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiRenderHelper;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionMode;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionModel;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiTheme;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SubordinateListWidget;
 import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload;
-import net.minecraft.ChatFormatting;
+import com.mooswqz.moostensuraaddon.network.RequestSubordinateOverviewPayload;
+import com.mooswqz.moostensuraaddon.util.SubordinateOverviewPolicy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
-public class SubordinateOverviewScreen extends Screen {
-    private static final int ROW_HEIGHT = 22;
-    private static final int TOP_Y = 92;
-    private static final int BUTTON_WIDTH = 280;
-    private static final int BUTTON_HEIGHT = 20;
+public final class SubordinateOverviewScreen extends Screen {
 
-    private final OpenSubordinateOverviewScreenPayload payload;
+    private static final int GAP = 6;
+    private static final int FILTER_GAP = 4;
 
-    private int targetIndex = 0;
-    private int skillPage = 0;
-    private int maxSkillPage = 0;
+    private OpenSubordinateOverviewScreenPayload payload;
+    private SkillUiTheme theme;
+    private OverviewLayout layout;
 
-    public SubordinateOverviewScreen(OpenSubordinateOverviewScreenPayload payload) {
-        super(Component.literal("Subordinate Overview"));
-        this.payload = payload;
+    private final SkillUiFilterState skillFilterState =
+            new SkillUiFilterState();
+    private final SkillUiSelectionModel readOnlySelection =
+            new SkillUiSelectionModel(
+                    SkillUiSelectionMode.READ_ONLY
+            );
+    private final EnumMap<SkillUiCategory, SkillUiButton>
+            categoryButtons = new EnumMap<>(SkillUiCategory.class);
+    private final List<SkillUiButton> footerButtons =
+            new ArrayList<>();
+
+    private SubordinateListWidget subordinateListWidget;
+    private SkillUiListModel skillListModel;
+    private SkillListWidget skillListWidget;
+    private EditBox subordinateSearchBox;
+    private EditBox skillSearchBox;
+    private SkillUiButton refreshButton;
+    private SkillUiButton closeButton;
+
+    private String selectedTargetUuid = "";
+    private String retainedSubordinateQuery = "";
+    private String retainedSkillQuery = "";
+    private String retainedFocusedSkillId = "";
+    private OpenSubordinateOverviewScreenPayload.TargetEntry
+            selectedTarget;
+    private SkillUiEntry focusedSkill;
+    private Component statusMessage = Component.empty();
+    private int statusColor;
+    private int refreshTicks =
+            SubordinateOverviewPolicy.AUTO_REFRESH_TICKS;
+
+    public SubordinateOverviewScreen(
+            OpenSubordinateOverviewScreenPayload payload
+    ) {
+        super(Component.literal("Subordinate Skills"));
+        this.payload = payload == null
+                ? emptyPayload()
+                : payload;
+        this.theme = resolveTheme(this.payload);
+        this.statusColor = theme.mutedTextColor();
     }
 
-    public static void open(OpenSubordinateOverviewScreenPayload payload) {
-        Minecraft.getInstance().setScreen(new SubordinateOverviewScreen(payload));
+    public static void open(
+            OpenSubordinateOverviewScreenPayload payload
+    ) {
+        Minecraft.getInstance().setScreen(
+                new SubordinateOverviewScreen(payload)
+        );
+    }
+
+    public void applyPayload(
+            OpenSubordinateOverviewScreenPayload updatedPayload
+    ) {
+        if (updatedPayload == null) {
+            return;
+        }
+
+        rememberCurrentState();
+        payload = updatedPayload;
+        theme = resolveTheme(payload);
+        statusMessage = Component.literal("Overview refreshed");
+        statusColor = theme.successColor();
+        refreshTicks = SubordinateOverviewPolicy.AUTO_REFRESH_TICKS;
+
+        clearWidgets();
+        init();
     }
 
     @Override
     protected void init() {
-        rebuildButtons();
+        layout = OverviewLayout.calculate(width, height);
+        restoreSelectedTarget();
+        buildSubordinateList();
+        buildSkillList();
+        buildSearchControls();
+        buildFooterControls();
     }
 
-    private void rebuildButtons() {
-        clearWidgets();
-        clampTargetIndex();
-        updateMaxSkillPage();
+    private void buildSubordinateList() {
+        subordinateListWidget = new SubordinateListWidget(
+                layout.targets().left(),
+                layout.targets().top(),
+                layout.targets().width(),
+                layout.targets().height(),
+                font,
+                theme
+        );
+        subordinateListWidget.setTargets(payload.targets());
+        subordinateListWidget.setQuery(retainedSubordinateQuery);
+        subordinateListWidget.setSelectionListener(
+                this::selectTarget
+        );
+        subordinateListWidget.select(selectedTargetUuid);
+        addRenderableWidget(subordinateListWidget);
+    }
 
-        int centerX = this.width / 2;
+    private void buildSkillList() {
+        skillFilterState.setQuery(retainedSkillQuery);
+        skillListModel = new SkillUiListModel(skillFilterState);
+        skillListWidget = new SkillListWidget(
+                layout.skills().left(),
+                layout.skills().top(),
+                layout.skills().width(),
+                layout.skills().height(),
+                font,
+                theme,
+                skillListModel,
+                readOnlySelection
+        );
+        skillListWidget.setFocusListener(entry -> {
+            focusedSkill = entry;
+            retainedFocusedSkillId = entry.skillId();
+        });
+        updateSkillEntries();
+        addRenderableWidget(skillListWidget);
+    }
 
-        if (getCurrentTarget() == null) {
-            Button emptyButton = Button.builder(
-                    Component.literal("No subordinate data found.").withStyle(ChatFormatting.GRAY),
-                    button -> {
-                    }
-            ).pos(centerX - 140, TOP_Y + 22).size(BUTTON_WIDTH, BUTTON_HEIGHT).build();
+    private void buildSearchControls() {
+        int targetControlHeight = Math.max(
+                16,
+                layout.targetFilter().height()
+        );
+        subordinateSearchBox = new EditBox(
+                font,
+                layout.targetFilter().left(),
+                layout.targetFilter().top(),
+                layout.targetFilter().width(),
+                targetControlHeight,
+                Component.literal("Search subordinates")
+        );
+        subordinateSearchBox.setMaxLength(80);
+        subordinateSearchBox.setHint(
+                Component.literal("Search names or skills…")
+        );
+        subordinateSearchBox.setValue(retainedSubordinateQuery);
+        subordinateSearchBox.setResponder(query -> {
+            retainedSubordinateQuery = query;
+            subordinateListWidget.setQuery(query);
+        });
+        addRenderableWidget(subordinateSearchBox);
 
-            emptyButton.active = false;
-            addRenderableWidget(emptyButton);
+        SkillUiLayout.Rect skillFilter = layout.skillFilter();
+        int buttonHeight = Math.max(16, skillFilter.height());
+        int categoryCount = SkillUiCategory.values().length;
+        int desiredSearchWidth = Math.max(
+                80,
+                Math.min(190, skillFilter.width() * 38 / 100)
+        );
+        int minimumCategoryWidth = skillFilter.width() < 360
+                ? 18
+                : 38;
+        int maximumSearchWidth = skillFilter.width()
+                - FILTER_GAP
+                - categoryCount * minimumCategoryWidth
+                - (categoryCount - 1) * FILTER_GAP;
+        int searchWidth = Math.max(
+                60,
+                Math.min(desiredSearchWidth, maximumSearchWidth)
+        );
 
-            addRenderableWidget(Button.builder(
-                    Component.literal("Close"),
-                    button -> onClose()
-            ).pos(centerX - 60, this.height - 32).size(120, BUTTON_HEIGHT).build());
+        skillSearchBox = new EditBox(
+                font,
+                skillFilter.left(),
+                skillFilter.top(),
+                searchWidth,
+                buttonHeight,
+                Component.literal("Search skills")
+        );
+        skillSearchBox.setMaxLength(80);
+        skillSearchBox.setHint(Component.literal("Search skills…"));
+        skillSearchBox.setValue(retainedSkillQuery);
+        skillSearchBox.setResponder(query -> {
+            retainedSkillQuery = query;
+            skillFilterState.setQuery(query);
+            skillListWidget.rebuildFilter();
+        });
+        addRenderableWidget(skillSearchBox);
 
-            return;
+        categoryButtons.clear();
+        int categoriesLeft = skillFilter.left()
+                + searchWidth
+                + FILTER_GAP;
+        int categoriesWidth = Math.max(
+                1,
+                skillFilter.right() - categoriesLeft
+        );
+        int totalGaps = FILTER_GAP * (categoryCount - 1);
+        int categoryWidth = Math.max(
+                1,
+                (categoriesWidth - totalGaps) / categoryCount
+        );
+        int buttonX = categoriesLeft;
+
+        for (SkillUiCategory category : SkillUiCategory.values()) {
+            int buttonWidth = category == SkillUiCategory.OTHER
+                    ? Math.max(1, skillFilter.right() - buttonX)
+                    : categoryWidth;
+            SkillUiButton button = new SkillUiButton(
+                    buttonX,
+                    skillFilter.top(),
+                    buttonWidth,
+                    buttonHeight,
+                    categoryLabel(category, buttonWidth),
+                    theme,
+                    SkillUiButton.Tone.NORMAL,
+                    () -> toggleCategory(category)
+            );
+            button.setHighlighted(
+                    skillFilterState.isCategoryVisible(category)
+            );
+            button.setTooltip(Tooltip.create(category.displayName()));
+            categoryButtons.put(category, button);
+            addRenderableWidget(button);
+            buttonX += buttonWidth + FILTER_GAP;
         }
+    }
 
-        List<DisplayRow> rows = getDisplayRowsForCurrentTarget();
+    private void buildFooterControls() {
+        footerButtons.clear();
+        SkillUiLayout.Rect footer = layout.footer();
+        int buttonHeight = Math.max(
+                16,
+                Math.min(20, footer.height() - 2)
+        );
+        int buttonY = footer.top()
+                + Math.max(0, (footer.height() - buttonHeight) / 2);
+        int buttonWidth = Math.max(
+                68,
+                Math.min(170, footer.width() / 6)
+        );
+        int closeWidth = buttonWidth;
+        int refreshWidth = buttonWidth;
 
-        if (rows.isEmpty()) {
-            Button noSkillsButton = Button.builder(
-                    Component.literal("This subordinate has no visible skills.")
-                            .withStyle(ChatFormatting.GRAY),
-                    button -> {
-                    }
-            ).pos(centerX - 140, TOP_Y + 22).size(BUTTON_WIDTH, BUTTON_HEIGHT).build();
+        refreshButton = new SkillUiButton(
+                footer.right() - closeWidth - refreshWidth - GAP,
+                buttonY,
+                refreshWidth,
+                buttonHeight,
+                Component.literal("Refresh"),
+                theme,
+                SkillUiButton.Tone.NORMAL,
+                this::requestRefresh
+        );
+        refreshButton.active = payload.refreshAllowed();
+        refreshButton.setTooltip(
+                Tooltip.create(
+                        Component.literal(
+                                "Refresh nearby subordinate information"
+                        )
+                )
+        );
+        footerButtons.add(refreshButton);
+        addRenderableWidget(refreshButton);
 
-            noSkillsButton.active = false;
-            addRenderableWidget(noSkillsButton);
-        } else {
-            int rowsPerPage = getRowsPerPage();
-            int startIndex = skillPage * rowsPerPage;
-            int endIndex = Math.min(startIndex + rowsPerPage, rows.size());
-
-            int visibleRow = 0;
-
-            for (int index = startIndex; index < endIndex; index++) {
-                DisplayRow row = rows.get(index);
-
-                if (!row.isSkill()) {
-                    visibleRow++;
-                    continue;
-                }
-
-                OpenSubordinateOverviewScreenPayload.SkillEntry entry = row.skillEntry();
-                int y = TOP_Y + visibleRow * ROW_HEIGHT;
-
-                Button skillButton = Button.builder(
-                        getSkillButtonText(entry),
-                        button -> {
-                        }
-                ).pos(centerX - 140, y).size(BUTTON_WIDTH, BUTTON_HEIGHT).build();
-
-                skillButton.active = false;
-                addRenderableWidget(skillButton);
-
-                visibleRow++;
-            }
-        }
-
-        addRenderableWidget(Button.builder(
-                Component.literal("Prev Target"),
-                button -> {
-                    if (targetIndex > 0) {
-                        targetIndex--;
-                        skillPage = 0;
-                        rebuildButtons();
-                    }
-                }
-        ).pos(centerX - 145, this.height - 80).size(95, BUTTON_HEIGHT).build()).active = targetIndex > 0;
-
-        Button targetPageButton = Button.builder(
-                Component.literal(getTargetPageText()).withStyle(ChatFormatting.GRAY),
-                button -> {
-                }
-        ).pos(centerX - 45, this.height - 80).size(90, BUTTON_HEIGHT).build();
-
-        targetPageButton.active = false;
-        addRenderableWidget(targetPageButton);
-
-        addRenderableWidget(Button.builder(
-                Component.literal("Next Target"),
-                button -> {
-                    if (targetIndex < getTargetCount() - 1) {
-                        targetIndex++;
-                        skillPage = 0;
-                        rebuildButtons();
-                    }
-                }
-        ).pos(centerX + 50, this.height - 80).size(95, BUTTON_HEIGHT).build()).active = targetIndex < getTargetCount() - 1;
-
-        addRenderableWidget(Button.builder(
-                Component.literal("Prev Skills"),
-                button -> {
-                    if (skillPage > 0) {
-                        skillPage--;
-                        rebuildButtons();
-                    }
-                }
-        ).pos(centerX - 145, this.height - 56).size(95, BUTTON_HEIGHT).build()).active = skillPage > 0;
-
-        Button skillPageButton = Button.builder(
-                Component.literal((skillPage + 1) + " / " + (maxSkillPage + 1))
-                        .withStyle(ChatFormatting.GRAY),
-                button -> {
-                }
-        ).pos(centerX - 45, this.height - 56).size(90, BUTTON_HEIGHT).build();
-
-        skillPageButton.active = false;
-        addRenderableWidget(skillPageButton);
-
-        addRenderableWidget(Button.builder(
-                Component.literal("Next Skills"),
-                button -> {
-                    if (skillPage < maxSkillPage) {
-                        skillPage++;
-                        rebuildButtons();
-                    }
-                }
-        ).pos(centerX + 50, this.height - 56).size(95, BUTTON_HEIGHT).build()).active = skillPage < maxSkillPage;
-
-        addRenderableWidget(Button.builder(
+        closeButton = new SkillUiButton(
+                footer.right() - closeWidth,
+                buttonY,
+                closeWidth,
+                buttonHeight,
                 Component.literal("Close"),
-                button -> onClose()
-        ).pos(centerX - 60, this.height - 32).size(120, BUTTON_HEIGHT).build());
+                theme,
+                SkillUiButton.Tone.NORMAL,
+                this::onClose
+        );
+        footerButtons.add(closeButton);
+        addRenderableWidget(closeButton);
     }
 
-    private Component getSkillButtonText(OpenSubordinateOverviewScreenPayload.SkillEntry entry) {
-        if (entry == null) {
-            return Component.literal("Unknown Skill").withStyle(ChatFormatting.GRAY);
-        }
+    @Override
+    public void tick() {
+        super.tick();
 
-        Component crown = Component.literal(entry.mastered() ? "♛ " : "")
-                .withStyle(ChatFormatting.GOLD);
-
-        Component name = Component.literal(entry.displayName())
-                .withStyle(entry.mastered() ? ChatFormatting.AQUA : ChatFormatting.WHITE);
-
-        Component granted = entry.grantedByViewer()
-                ? Component.literal("  [Granted]").withStyle(ChatFormatting.GREEN)
-                : Component.empty();
-
-        return Component.empty()
-                .append(crown)
-                .append(name)
-                .append(granted);
-    }
-
-    private void updateMaxSkillPage() {
-        List<DisplayRow> rows = getDisplayRowsForCurrentTarget();
-        int rowsPerPage = getRowsPerPage();
-
-        maxSkillPage = rows.isEmpty() ? 0 : Math.max(0, (rows.size() - 1) / rowsPerPage);
-        skillPage = Math.max(0, Math.min(skillPage, maxSkillPage));
-    }
-
-    private int getRowsPerPage() {
-        int bottomReservedY = this.height - 100;
-        int availableHeight = Math.max(ROW_HEIGHT * 3, bottomReservedY - TOP_Y);
-        int calculatedRows = availableHeight / ROW_HEIGHT;
-
-        return Math.max(3, calculatedRows);
-    }
-
-    private List<DisplayRow> getDisplayRowsForCurrentTarget() {
-        OpenSubordinateOverviewScreenPayload.TargetEntry target = getCurrentTarget();
-
-        if (target == null || target.skills() == null || target.skills().isEmpty()) {
-            return List.of();
-        }
-
-        List<OpenSubordinateOverviewScreenPayload.SkillEntry> sortedSkills = new ArrayList<>(target.skills());
-
-        sortedSkills.sort(Comparator
-                .comparingInt(OpenSubordinateOverviewScreenPayload.SkillEntry::categoryOrder)
-                .thenComparing(OpenSubordinateOverviewScreenPayload.SkillEntry::displayName, String.CASE_INSENSITIVE_ORDER)
-                .thenComparing(OpenSubordinateOverviewScreenPayload.SkillEntry::skillId));
-
-        List<DisplayRow> rows = new ArrayList<>();
-        String currentCategory = null;
-
-        for (OpenSubordinateOverviewScreenPayload.SkillEntry skill : sortedSkills) {
-            if (skill == null) {
-                continue;
-            }
-
-            String categoryName = skill.categoryName() == null || skill.categoryName().isBlank()
-                    ? "Other"
-                    : skill.categoryName();
-
-            if (!categoryName.equals(currentCategory)) {
-                rows.add(DisplayRow.header(categoryName));
-                currentCategory = categoryName;
-            }
-
-            rows.add(DisplayRow.skill(skill));
-        }
-
-        return rows;
-    }
-
-    private OpenSubordinateOverviewScreenPayload.TargetEntry getCurrentTarget() {
-        if (payload == null || payload.targets() == null || payload.targets().isEmpty()) {
-            return null;
-        }
-
-        clampTargetIndex();
-
-        return payload.targets().get(targetIndex);
-    }
-
-    private void clampTargetIndex() {
-        int count = getTargetCount();
-
-        if (count <= 0) {
-            targetIndex = 0;
+        if (!payload.refreshAllowed()) {
             return;
         }
 
-        targetIndex = Math.max(0, Math.min(targetIndex, count - 1));
+        refreshTicks--;
+
+        if (refreshTicks <= 0) {
+            requestRefresh();
+        }
     }
 
-    private int getTargetCount() {
-        if (payload == null || payload.targets() == null) {
+    private void requestRefresh() {
+        if (!payload.refreshAllowed()) {
+            return;
+        }
+
+        refreshTicks = SubordinateOverviewPolicy.AUTO_REFRESH_TICKS;
+        statusMessage = Component.literal("Refreshing…");
+        statusColor = theme.mutedTextColor();
+        PacketDistributor.sendToServer(
+                new RequestSubordinateOverviewPayload(
+                        payload.benevolent()
+                )
+        );
+    }
+
+    private void selectTarget(
+            OpenSubordinateOverviewScreenPayload.TargetEntry target
+    ) {
+        selectedTarget = target;
+        selectedTargetUuid = target == null
+                ? ""
+                : target.targetUuid();
+        focusedSkill = null;
+        retainedFocusedSkillId = "";
+        updateSkillEntries();
+    }
+
+    private void restoreSelectedTarget() {
+        selectedTarget = findTarget(selectedTargetUuid).orElse(null);
+
+        if (selectedTarget == null && !payload.targets().isEmpty()) {
+            selectedTarget = payload.targets().getFirst();
+            selectedTargetUuid = selectedTarget.targetUuid();
+        }
+
+        if (selectedTarget == null) {
+            selectedTargetUuid = "";
+        }
+    }
+
+    private void updateSkillEntries() {
+        if (skillListWidget == null) {
+            return;
+        }
+
+        List<SkillUiEntry> entries = selectedTarget == null
+                ? List.of()
+                : selectedTarget.skills()
+                .stream()
+                .map(this::toSkillUiEntry)
+                .toList();
+        skillListWidget.setEntries(entries);
+
+        if (!retainedFocusedSkillId.isBlank()
+                && skillListModel.focusEntry(retainedFocusedSkillId)) {
+            focusedSkill = entries.stream()
+                    .filter(entry -> entry.skillId()
+                            .equals(retainedFocusedSkillId))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (focusedSkill == null) {
+            skillListModel.focusFirst().ifPresent(entry -> {
+                focusedSkill = entry;
+                retainedFocusedSkillId = entry.skillId();
+            });
+        }
+    }
+
+    private SkillUiEntry toSkillUiEntry(
+            OpenSubordinateOverviewScreenPayload.SkillEntry entry
+    ) {
+        SkillUiCategory category = SkillUiCategory.fromRaw(
+                entry.categoryName()
+        );
+        List<Component> details = new ArrayList<>();
+        details.add(
+                Component.literal(
+                        entry.grantedByViewer()
+                                ? "This skill was granted by you."
+                                : "This skill was not recorded as your grant."
+                )
+        );
+
+        return new SkillUiEntry(
+                entry.skillId(),
+                Component.literal(entry.displayName()),
+                category,
+                true,
+                entry.mastered(),
+                Component.empty(),
+                Component.literal(
+                        entry.grantedByViewer()
+                                ? "Granted by you"
+                                : "Native or other source"
+                ),
+                details,
+                category.defaultAccentColor()
+        );
+    }
+
+    private void toggleCategory(
+            SkillUiCategory category
+    ) {
+        skillFilterState.toggleCategory(category);
+        skillListWidget.rebuildFilter();
+        SkillUiButton button = categoryButtons.get(category);
+
+        if (button != null) {
+            button.setHighlighted(
+                    skillFilterState.isCategoryVisible(category)
+            );
+        }
+    }
+
+    private void rememberCurrentState() {
+        if (subordinateSearchBox != null) {
+            retainedSubordinateQuery = subordinateSearchBox.getValue();
+        }
+
+        if (skillSearchBox != null) {
+            retainedSkillQuery = skillSearchBox.getValue();
+        }
+
+        if (selectedTarget != null) {
+            selectedTargetUuid = selectedTarget.targetUuid();
+        }
+
+        if (focusedSkill != null) {
+            retainedFocusedSkillId = focusedSkill.skillId();
+        }
+    }
+
+    @Override
+    public void render(
+            GuiGraphics guiGraphics,
+            int mouseX,
+            int mouseY,
+            float partialTick
+    ) {
+        SkillUiRenderHelper.fillBackground(
+                guiGraphics,
+                width,
+                height,
+                theme
+        );
+        SkillUiRenderHelper.drawBorderedPanel(
+                guiGraphics,
+                layout.panel(),
+                theme.accentColor(),
+                theme.panelFillColor(),
+                2
+        );
+        renderHeader(guiGraphics);
+        renderColumnLabels(guiGraphics);
+        renderWidgetsWithoutParentBlur(
+                guiGraphics,
+                mouseX,
+                mouseY,
+                partialTick
+        );
+        renderDetails(guiGraphics);
+        renderFooterStatus(guiGraphics);
+    }
+
+    private void renderHeader(
+            GuiGraphics guiGraphics
+    ) {
+        SkillUiLayout.Rect header = layout.header();
+        int badgeLeft = SkillUiRenderHelper.drawModeBadge(
+                guiGraphics,
+                font,
+                Component.literal(
+                        payload.governance()
+                                ? "GOVERNANCE"
+                                : payload.benevolent()
+                                  ? "BENEVOLENT"
+                                  : "GRANTER"
+                ),
+                header.right() - 2,
+                header.top() + 1,
+                theme
+        );
+        SkillUiRenderHelper.drawClippedText(
+                guiGraphics,
+                font,
+                Component.literal("Subordinate Skills"),
+                header.left() + 2,
+                header.top() + 2,
+                Math.max(1, badgeLeft - header.left() - 10),
+                theme.primaryTextColor()
+        );
+
+        String summary = payload.targets().size()
+                + (payload.targets().size() == 1
+                ? " subordinate"
+                : " subordinates")
+                + " within "
+                + formatRadius(payload.radius())
+                + " blocks";
+
+        if (payload.truncated()) {
+            summary += " • display safety limit reached";
+        }
+
+        SkillUiRenderHelper.drawClippedText(
+                guiGraphics,
+                font,
+                Component.literal(summary),
+                header.left() + 2,
+                header.top() + (layout.compact() ? 14 : 18),
+                Math.max(1, header.width() - 4),
+                payload.truncated()
+                        ? theme.warningColor()
+                        : theme.mutedTextColor()
+        );
+        SkillUiRenderHelper.drawDivider(
+                guiGraphics,
+                header.left(),
+                header.right(),
+                header.bottom() - 1,
+                theme.panelBorderColor()
+        );
+    }
+
+    private void renderColumnLabels(
+            GuiGraphics guiGraphics
+    ) {
+        SkillUiRenderHelper.drawText(
+                guiGraphics,
+                font,
+                Component.literal(
+                        "SUBORDINATES • "
+                                + (subordinateListWidget == null
+                                ? 0
+                                : subordinateListWidget
+                                .visibleTargetCount())
+                ),
+                layout.targetLabel().left(),
+                layout.targetLabel().top(),
+                theme.secondaryAccentColor()
+        );
+        SkillUiRenderHelper.drawText(
+                guiGraphics,
+                font,
+                Component.literal(
+                        selectedTarget == null
+                                ? "SKILLS"
+                                : "SKILLS • "
+                                  + selectedTarget.skills().size()
+                ),
+                layout.skillLabel().left(),
+                layout.skillLabel().top(),
+                theme.secondaryAccentColor()
+        );
+        SkillUiRenderHelper.drawText(
+                guiGraphics,
+                font,
+                Component.literal("DETAILS"),
+                layout.detailLabel().left(),
+                layout.detailLabel().top(),
+                theme.secondaryAccentColor()
+        );
+    }
+
+    private void renderWidgetsWithoutParentBlur(
+            GuiGraphics guiGraphics,
+            int mouseX,
+            int mouseY,
+            float partialTick
+    ) {
+        if (subordinateSearchBox != null) {
+            subordinateSearchBox.render(
+                    guiGraphics,
+                    mouseX,
+                    mouseY,
+                    partialTick
+            );
+        }
+
+        if (skillSearchBox != null) {
+            skillSearchBox.render(
+                    guiGraphics,
+                    mouseX,
+                    mouseY,
+                    partialTick
+            );
+        }
+
+        for (SkillUiButton button : categoryButtons.values()) {
+            button.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
+
+        if (subordinateListWidget != null) {
+            subordinateListWidget.render(
+                    guiGraphics,
+                    mouseX,
+                    mouseY,
+                    partialTick
+            );
+        }
+
+        if (skillListWidget != null) {
+            skillListWidget.render(
+                    guiGraphics,
+                    mouseX,
+                    mouseY,
+                    partialTick
+            );
+        }
+
+        for (SkillUiButton button : footerButtons) {
+            button.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
+    }
+
+    private void renderDetails(
+            GuiGraphics guiGraphics
+    ) {
+        SkillUiLayout.Rect bounds = layout.details();
+        SkillUiRenderHelper.drawBorderedPanel(
+                guiGraphics,
+                bounds,
+                theme.panelBorderColor(),
+                theme.panelFillColor(),
+                1
+        );
+
+        if (selectedTarget == null) {
+            SkillUiRenderHelper.drawCenteredText(
+                    guiGraphics,
+                    font,
+                    Component.literal("No subordinate selected"),
+                    bounds.centerX(),
+                    bounds.centerY() - 4,
+                    theme.mutedTextColor()
+            );
+            return;
+        }
+
+        int left = bounds.left() + 7;
+        int top = bounds.top() + 7;
+        int maximumWidth = Math.max(1, bounds.width() - 14);
+        boolean compact = layout.compact();
+
+        SkillUiRenderHelper.drawClippedText(
+                guiGraphics,
+                font,
+                Component.literal(selectedTarget.targetName()),
+                left,
+                top,
+                maximumWidth,
+                theme.accentColor()
+        );
+
+        int detailsTop;
+
+        if (compact) {
+            SkillUiRenderHelper.drawClippedText(
+                    guiGraphics,
+                    font,
+                    Component.literal(
+                            selectedTarget.typeName()
+                                    + " • "
+                                    + formatDistance(
+                                    selectedTarget.distance()
+                            )
+                    ),
+                    left,
+                    top + 11,
+                    maximumWidth,
+                    theme.secondaryTextColor()
+            );
+            SkillUiRenderHelper.drawClippedText(
+                    guiGraphics,
+                    font,
+                    Component.literal(
+                            "Health: "
+                                    + formatCompact(
+                                    selectedTarget.health()
+                            )
+                                    + " / "
+                                    + formatCompact(
+                                    selectedTarget.maxHealth()
+                            )
+                    ),
+                    left,
+                    top + 22,
+                    maximumWidth,
+                    theme.secondaryTextColor()
+            );
+            SkillUiRenderHelper.drawClippedText(
+                    guiGraphics,
+                    font,
+                    Component.literal(
+                            "EP "
+                                    + formatNumber(selectedTarget.ep())
+                                    + " • Magicules "
+                                    + formatNumber(
+                                    selectedTarget.magicules()
+                            )
+                    ),
+                    left,
+                    top + 33,
+                    maximumWidth,
+                    theme.secondaryTextColor()
+            );
+            int grantedCount = grantedCount(selectedTarget);
+            SkillUiRenderHelper.drawClippedText(
+                    guiGraphics,
+                    font,
+                    Component.literal(
+                            selectedTarget.skills().size()
+                                    + " skills • "
+                                    + grantedCount
+                                    + " granted by you"
+                    ),
+                    left,
+                    top + 44,
+                    maximumWidth,
+                    theme.mutedTextColor()
+            );
+            SkillUiRenderHelper.drawDivider(
+                    guiGraphics,
+                    bounds.left() + 5,
+                    bounds.right() - 5,
+                    top + 56,
+                    theme.panelBorderColor()
+            );
+            detailsTop = top + 61;
+        } else {
+            SkillUiRenderHelper.drawClippedText(
+                    guiGraphics,
+                    font,
+                    Component.literal(selectedTarget.typeName()),
+                    left,
+                    top + 12,
+                    maximumWidth,
+                    theme.secondaryTextColor()
+            );
+            SkillUiRenderHelper.drawText(
+                    guiGraphics,
+                    font,
+                    Component.literal(
+                            "Distance: "
+                                    + formatDistance(
+                                    selectedTarget.distance()
+                            )
+                    ),
+                    left,
+                    top + 24,
+                    theme.mutedTextColor()
+            );
+            SkillUiRenderHelper.drawText(
+                    guiGraphics,
+                    font,
+                    Component.literal(
+                            "Health: "
+                                    + formatCompact(
+                                    selectedTarget.health()
+                            )
+                                    + " / "
+                                    + formatCompact(
+                                    selectedTarget.maxHealth()
+                            )
+                    ),
+                    left,
+                    top + 35,
+                    theme.secondaryTextColor()
+            );
+            SkillUiRenderHelper.drawText(
+                    guiGraphics,
+                    font,
+                    Component.literal(
+                            "EP: "
+                                    + formatNumber(selectedTarget.ep())
+                    ),
+                    left,
+                    top + 46,
+                    theme.secondaryTextColor()
+            );
+            SkillUiRenderHelper.drawText(
+                    guiGraphics,
+                    font,
+                    Component.literal(
+                            "Magicules: "
+                                    + formatNumber(
+                                    selectedTarget.magicules()
+                            )
+                    ),
+                    left,
+                    top + 57,
+                    theme.secondaryTextColor()
+            );
+            int grantedCount = grantedCount(selectedTarget);
+            SkillUiRenderHelper.drawText(
+                    guiGraphics,
+                    font,
+                    Component.literal(
+                            selectedTarget.skills().size()
+                                    + " skills • "
+                                    + grantedCount
+                                    + " granted by you"
+                    ),
+                    left,
+                    top + 68,
+                    theme.mutedTextColor()
+            );
+            SkillUiRenderHelper.drawDivider(
+                    guiGraphics,
+                    bounds.left() + 5,
+                    bounds.right() - 5,
+                    top + 81,
+                    theme.panelBorderColor()
+            );
+            detailsTop = top + 86;
+        }
+
+        SkillUiLayout.Rect skillDetails = new SkillUiLayout.Rect(
+                bounds.left() + 1,
+                detailsTop,
+                Math.max(1, bounds.width() - 2),
+                Math.max(1, bounds.bottom() - detailsTop - 1)
+        );
+        guiGraphics.enableScissor(
+                skillDetails.left(),
+                skillDetails.top(),
+                skillDetails.right(),
+                skillDetails.bottom()
+        );
+        SkillDetailsPanel.render(
+                guiGraphics,
+                font,
+                skillDetails,
+                theme,
+                skillListWidget == null
+                        ? focusedSkill
+                        : skillListWidget.hoveredEntry()
+                        .orElse(focusedSkill),
+                readOnlySelection
+        );
+        guiGraphics.disableScissor();
+    }
+
+    private void renderFooterStatus(
+            GuiGraphics guiGraphics
+    ) {
+        SkillUiLayout.Rect footer = layout.footer();
+        Component message = statusMessage;
+        int color = statusColor;
+
+        if (message.getString().isBlank()) {
+            message = Component.literal(
+                    payload.refreshAllowed()
+                            ? "Updates automatically while this screen is open"
+                            : "Read-only subordinate information"
+            );
+            color = theme.mutedTextColor();
+        }
+
+        int rightLimit = refreshButton == null
+                ? footer.right()
+                : refreshButton.getX() - GAP;
+        SkillUiRenderHelper.drawClippedText(
+                guiGraphics,
+                font,
+                message,
+                footer.left() + 2,
+                footer.top() + footer.height() / 2 - 4,
+                Math.max(1, rightLimit - footer.left() - 4),
+                color
+        );
+    }
+
+    private static int grantedCount(
+            OpenSubordinateOverviewScreenPayload.TargetEntry target
+    ) {
+        if (target == null) {
             return 0;
         }
 
-        return payload.targets().size();
+        return (int) target.skills()
+                .stream()
+                .filter(OpenSubordinateOverviewScreenPayload.SkillEntry
+                        ::grantedByViewer)
+                .count();
     }
 
-    private String getTargetPageText() {
-        int targetCount = getTargetCount();
-
-        if (targetCount <= 0) {
-            return "0 / 0";
+    private Optional<OpenSubordinateOverviewScreenPayload.TargetEntry>
+    findTarget(
+            String targetUuid
+    ) {
+        if (targetUuid == null || targetUuid.isBlank()) {
+            return Optional.empty();
         }
 
-        return (targetIndex + 1) + " / " + targetCount;
+        return payload.targets().stream()
+                .filter(target -> target.targetUuid().equals(targetUuid))
+                .findFirst();
     }
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-
-        OpenSubordinateOverviewScreenPayload.TargetEntry target = getCurrentTarget();
-
-        int centerX = this.width / 2;
-
-        guiGraphics.drawCenteredString(
-                this.font,
-                this.title,
-                centerX,
-                14,
-                0xFFFFFF
-        );
-
-        if (target == null) {
-            return;
+    private static Component categoryLabel(
+            SkillUiCategory category,
+            int width
+    ) {
+        if (width < 34) {
+            return Component.literal(
+                    category.id().substring(0, 1).toUpperCase(Locale.ROOT)
+            );
         }
 
-        guiGraphics.drawCenteredString(
-                this.font,
-                Component.literal(target.targetName())
-                        .withStyle(ChatFormatting.GOLD),
-                centerX,
-                30,
-                0xFFFFFF
-        );
-
-        guiGraphics.drawCenteredString(
-                this.font,
-                getStatsLine(target),
-                centerX,
-                44,
-                0xA0A0A0
-        );
-
-        guiGraphics.drawCenteredString(
-                this.font,
-                getSkillSummaryLine(target),
-                centerX,
-                58,
-                0x808080
-        );
-
-        guiGraphics.drawCenteredString(
-                this.font,
-                Component.literal("♛ = mastered | [Granted] = granted by you")
-                        .withStyle(ChatFormatting.DARK_GRAY),
-                centerX,
-                72,
-                0x707070
-        );
-
-        renderCategoryHeaders(guiGraphics);
-    }
-
-    private void renderCategoryHeaders(GuiGraphics guiGraphics) {
-        List<DisplayRow> rows = getDisplayRowsForCurrentTarget();
-
-        if (rows.isEmpty()) {
-            return;
+        if (width < 54) {
+            return Component.literal(
+                    switch (category) {
+                        case UNIQUE -> "Uniq";
+                        case EXTRA -> "Extra";
+                        case BASIC -> "Basic";
+                        case RESISTANCE -> "Res";
+                        case OTHER -> "Other";
+                    }
+            );
         }
 
-        int centerX = this.width / 2;
-        int rowsPerPage = getRowsPerPage();
-
-        int startIndex = skillPage * rowsPerPage;
-        int endIndex = Math.min(startIndex + rowsPerPage, rows.size());
-
-        int visibleRow = 0;
-
-        for (int index = startIndex; index < endIndex; index++) {
-            DisplayRow row = rows.get(index);
-            int y = TOP_Y + visibleRow * ROW_HEIGHT + 6;
-
-            if (row.isHeader()) {
-                guiGraphics.drawCenteredString(
-                        this.font,
-                        Component.literal(row.categoryName())
-                                .withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.BOLD),
-                        centerX,
-                        y,
-                        0xFFFFFF
-                );
-            }
-
-            visibleRow++;
-        }
+        return category.displayName();
     }
 
-    private Component getStatsLine(OpenSubordinateOverviewScreenPayload.TargetEntry target) {
-        return Component.literal(
-                "HP: " + formatNumber(target.health()) + " / " + formatNumber(target.maxHealth())
-                        + " | Magicules: " + formatNumber(target.magicules())
-                        + " | EP: " + formatNumber(target.ep())
+    private static SkillUiTheme resolveTheme(
+            OpenSubordinateOverviewScreenPayload payload
+    ) {
+        if (payload == null) {
+            return SkillUiTheme.GRANTER;
+        }
+
+        if (payload.benevolent()) {
+            return SkillUiTheme.BENEVOLENT;
+        }
+
+        if (payload.governance()) {
+            return SkillUiTheme.GOVERNANCE;
+        }
+
+        return SkillUiTheme.GRANTER;
+    }
+
+    private static OpenSubordinateOverviewScreenPayload emptyPayload() {
+        return new OpenSubordinateOverviewScreenPayload(
+                OpenSubordinateOverviewScreenPayload.THEME_GRANTER,
+                SubordinateOverviewPolicy.NEARBY_RADIUS,
+                false,
+                false,
+                List.of()
         );
     }
 
-    private Component getSkillSummaryLine(OpenSubordinateOverviewScreenPayload.TargetEntry target) {
-        int skillCount = target.skills() == null ? 0 : target.skills().size();
-        int mastered = 0;
-        int granted = 0;
-
-        if (target.skills() != null) {
-            for (OpenSubordinateOverviewScreenPayload.SkillEntry skill : target.skills()) {
-                if (skill == null) {
-                    continue;
-                }
-
-                if (skill.mastered()) {
-                    mastered++;
-                }
-
-                if (skill.grantedByViewer()) {
-                    granted++;
-                }
-            }
-        }
-
-        return Component.literal("Skills: " + skillCount
-                + " | Mastered: " + mastered
-                + " | Granted by you: " + granted);
+    private static String formatRadius(
+            double radius
+    ) {
+        return String.format(Locale.US, "%.0f", radius);
     }
 
-    private String formatNumber(double value) {
+    private static String formatDistance(
+            double distance
+    ) {
+        return String.format(
+                Locale.US,
+                distance < 10.0D ? "%.1f m" : "%.0f m",
+                distance
+        );
+    }
+
+    private static String formatCompact(
+            double value
+    ) {
+        return String.format(Locale.US, "%.1f", value);
+    }
+
+    private static String formatNumber(
+            double value
+    ) {
         return String.format(Locale.US, "%,.0f", value);
     }
 
-    @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
-
-    private record DisplayRow(
-            String categoryName,
-            OpenSubordinateOverviewScreenPayload.SkillEntry skillEntry
+    private record OverviewLayout(
+            SkillUiLayout.Rect panel,
+            SkillUiLayout.Rect header,
+            SkillUiLayout.Rect targetLabel,
+            SkillUiLayout.Rect skillLabel,
+            SkillUiLayout.Rect detailLabel,
+            SkillUiLayout.Rect targetFilter,
+            SkillUiLayout.Rect skillFilter,
+            SkillUiLayout.Rect targets,
+            SkillUiLayout.Rect skills,
+            SkillUiLayout.Rect details,
+            SkillUiLayout.Rect footer,
+            boolean compact
     ) {
-        private static DisplayRow header(String categoryName) {
-            return new DisplayRow(categoryName, null);
-        }
 
-        private static DisplayRow skill(OpenSubordinateOverviewScreenPayload.SkillEntry skillEntry) {
-            return new DisplayRow(null, skillEntry);
-        }
+        private static OverviewLayout calculate(
+                int screenWidth,
+                int screenHeight
+        ) {
+            boolean compact = screenHeight < 310;
+            int outerMargin = compact ? 3 : 8;
+            int panelWidth = Math.max(
+                    1,
+                    screenWidth - outerMargin * 2
+            );
+            int panelHeight = Math.max(
+                    1,
+                    screenHeight - outerMargin * 2
+            );
+            int panelLeft = (screenWidth - panelWidth) / 2;
+            int panelTop = (screenHeight - panelHeight) / 2;
+            SkillUiLayout.Rect panel = new SkillUiLayout.Rect(
+                    panelLeft,
+                    panelTop,
+                    panelWidth,
+                    panelHeight
+            );
 
-        private boolean isHeader() {
-            return categoryName != null;
-        }
+            int inset = compact ? 5 : 8;
+            int contentLeft = panel.left() + inset;
+            int contentRight = panel.right() - inset;
+            int headerHeight = compact ? 30 : 38;
+            int labelHeight = compact ? 10 : 12;
+            int filterHeight = compact ? 18 : 20;
+            int footerHeight = compact ? 22 : 26;
+            int headerTop = panel.top() + inset;
+            SkillUiLayout.Rect header = new SkillUiLayout.Rect(
+                    contentLeft,
+                    headerTop,
+                    Math.max(1, contentRight - contentLeft),
+                    headerHeight
+            );
 
-        private boolean isSkill() {
-            return skillEntry != null;
+            int labelsTop = header.bottom() + (compact ? 2 : 4);
+            int filtersTop = labelsTop + labelHeight;
+            int listsTop = filtersTop + filterHeight + 4;
+            int footerTop = panel.bottom() - inset - footerHeight;
+            int listHeight = Math.max(
+                    1,
+                    footerTop - listsTop - 4
+            );
+            int contentWidth = Math.max(
+                    1,
+                    contentRight - contentLeft
+            );
+
+            int targetMinimum = compact ? 118 : 165;
+            int targetMaximum = compact ? 155 : 320;
+            int targetWidth = Math.max(
+                    targetMinimum,
+                    Math.min(
+                            targetMaximum,
+                            contentWidth * 24 / 100
+                    )
+            );
+            targetWidth = Math.min(
+                    targetWidth,
+                    Math.max(1, contentWidth - GAP * 2 - 220)
+            );
+
+            int remaining = Math.max(
+                    2,
+                    contentWidth - targetWidth - GAP * 2
+            );
+            int minimumDetailWidth = compact ? 108 : 180;
+            int desiredSkillWidth = remaining * 55 / 100;
+            int skillWidth = Math.max(
+                    compact ? 145 : 210,
+                    desiredSkillWidth
+            );
+            skillWidth = Math.min(
+                    skillWidth,
+                    Math.max(1, remaining - minimumDetailWidth)
+            );
+            int detailWidth = Math.max(
+                    1,
+                    remaining - skillWidth
+            );
+
+            int targetLeft = contentLeft;
+            int skillLeft = targetLeft + targetWidth + GAP;
+            int detailLeft = skillLeft + skillWidth + GAP;
+
+            SkillUiLayout.Rect targetLabel = new SkillUiLayout.Rect(
+                    targetLeft,
+                    labelsTop,
+                    targetWidth,
+                    labelHeight
+            );
+            SkillUiLayout.Rect skillLabel = new SkillUiLayout.Rect(
+                    skillLeft,
+                    labelsTop,
+                    skillWidth,
+                    labelHeight
+            );
+            SkillUiLayout.Rect detailLabel = new SkillUiLayout.Rect(
+                    detailLeft,
+                    labelsTop,
+                    detailWidth,
+                    labelHeight
+            );
+            SkillUiLayout.Rect targetFilter = new SkillUiLayout.Rect(
+                    targetLeft,
+                    filtersTop,
+                    targetWidth,
+                    filterHeight
+            );
+            SkillUiLayout.Rect skillFilter = new SkillUiLayout.Rect(
+                    skillLeft,
+                    filtersTop,
+                    Math.max(1, contentRight - skillLeft),
+                    filterHeight
+            );
+            SkillUiLayout.Rect targets = new SkillUiLayout.Rect(
+                    targetLeft,
+                    listsTop,
+                    targetWidth,
+                    listHeight
+            );
+            SkillUiLayout.Rect skills = new SkillUiLayout.Rect(
+                    skillLeft,
+                    listsTop,
+                    skillWidth,
+                    listHeight
+            );
+            SkillUiLayout.Rect details = new SkillUiLayout.Rect(
+                    detailLeft,
+                    listsTop,
+                    detailWidth,
+                    listHeight
+            );
+            SkillUiLayout.Rect footer = new SkillUiLayout.Rect(
+                    contentLeft,
+                    footerTop,
+                    contentWidth,
+                    footerHeight
+            );
+
+            return new OverviewLayout(
+                    panel,
+                    header,
+                    targetLabel,
+                    skillLabel,
+                    detailLabel,
+                    targetFilter,
+                    skillFilter,
+                    targets,
+                    skills,
+                    details,
+                    footer,
+                    compact
+            );
         }
     }
 }

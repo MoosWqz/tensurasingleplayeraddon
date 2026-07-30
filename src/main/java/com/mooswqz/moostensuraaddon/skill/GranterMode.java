@@ -1,15 +1,17 @@
 package com.mooswqz.moostensuraaddon.skill;
 
 public enum GranterMode {
+
     GRANT(0, "grant"),
-    CHOOSE_SKILL(1, "choose_skill"),
-    TAKE_BACK(2, "take_back"),
-    LIST_SKILLS(3, "list");
+    TAKE_BACK(1, "take_back");
 
     private final int id;
     private final String modeId;
 
-    GranterMode(int id, String modeId) {
+    GranterMode(
+            int id,
+            String modeId
+    ) {
         this.id = id;
         this.modeId = modeId;
     }
@@ -23,13 +25,11 @@ public enum GranterMode {
     }
 
     public static GranterMode fromId(int id) {
-        for (GranterMode mode : values()) {
-            if (mode.id == id) {
-                return mode;
-            }
-        }
-
-        return GRANT;
+        return switch (id) {
+            case 1, 2 -> TAKE_BACK;
+            case 0, 3 -> GRANT;
+            default -> GRANT;
+        };
     }
 
     public static int count() {
@@ -37,17 +37,9 @@ public enum GranterMode {
     }
 
     public GranterMode next(boolean reverse) {
-        GranterMode[] values = values();
-        int nextIndex = reverse ? this.ordinal() - 1 : this.ordinal() + 1;
-
-        if (nextIndex < 0) {
-            nextIndex = values.length - 1;
-        }
-
-        if (nextIndex >= values.length) {
-            nextIndex = 0;
-        }
-
-        return values[nextIndex];
+        return switch (this) {
+            case GRANT -> TAKE_BACK;
+            case TAKE_BACK -> GRANT;
+        };
     }
 }

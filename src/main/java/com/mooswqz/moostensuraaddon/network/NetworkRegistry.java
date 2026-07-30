@@ -1,10 +1,8 @@
 package com.mooswqz.moostensuraaddon.network;
 
 import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
-import net.neoforged.neoforge.network.event
-        .RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration
-        .PayloadRegistrar;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public final class NetworkRegistry {
 
@@ -14,25 +12,10 @@ public final class NetworkRegistry {
     public static void registerPayloads(
             RegisterPayloadHandlersEvent event
     ) {
-        PayloadRegistrar registrar =
-                event.registrar(
-                                MoosTensuraAddon.MODID
-                        )
-                        /*
-                         * Version 3 added authoritative RGB and bold-state
-                         * fields to the recognition display-name payload.
-                         *
-                         * Version 4 added the server-authoritative recognition
-                         * progress-screen payload.
-                         *
-                         * Version 5 adds:
-                         * - the protected client-to-server refresh request,
-                         * - recognition guidance entries,
-                         * - authorized debug details in the screen snapshot.
-                         *
-                         * Older clients must not decode the new structures.
-                         */
-                        .versioned("5");
+        PayloadRegistrar registrar = event.registrar(
+                        MoosTensuraAddon.MODID
+                )
+                .versioned("9");
 
         registrar.playToServer(
                 SelectSkillPayload.TYPE,
@@ -53,9 +36,15 @@ public final class NetworkRegistry {
         );
 
         registrar.playToServer(
-                RequestRecognitionProgressScreenPayload.TYPE,
-                RequestRecognitionProgressScreenPayload.STREAM_CODEC,
-                RequestRecognitionProgressScreenPayload::handle
+                ExecuteUltimateMultiGrantPayload.TYPE,
+                ExecuteUltimateMultiGrantPayload.STREAM_CODEC,
+                ExecuteUltimateMultiGrantPayload::handle
+        );
+
+        registrar.playToServer(
+                RequestSubordinateOverviewPayload.TYPE,
+                RequestSubordinateOverviewPayload.STREAM_CODEC,
+                RequestSubordinateOverviewPayload::handle
         );
 
         registrar.playToClient(
@@ -63,6 +52,13 @@ public final class NetworkRegistry {
                 OpenGranterScreenPayload.STREAM_CODEC,
                 ClientboundPayloadHandlers
                         ::handleOpenGranterScreen
+        );
+
+        registrar.playToClient(
+                OpenUltimateMultiGrantScreenPayload.TYPE,
+                OpenUltimateMultiGrantScreenPayload.STREAM_CODEC,
+                ClientboundPayloadHandlers
+                        ::handleOpenUltimateMultiGrantScreen
         );
 
         registrar.playToClient(
