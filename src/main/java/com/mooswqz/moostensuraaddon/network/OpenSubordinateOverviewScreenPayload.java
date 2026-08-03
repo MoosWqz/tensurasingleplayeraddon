@@ -2,12 +2,15 @@ package com.mooswqz.moostensuraaddon.network;
 
 import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
 import com.mooswqz.moostensuraaddon.util.SubordinateOverviewPolicy;
+import com.mooswqz.moostensuraaddon.util.UiFinalPolicy;
+import com.mooswqz.moostensuraaddon.util.UiTranslationToken;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public record OpenSubordinateOverviewScreenPayload(
@@ -186,9 +189,16 @@ public record OpenSubordinateOverviewScreenPayload(
             targetUuid = clean(targetUuid, "");
             targetName = clean(
                     targetName,
-                    "Unknown Subordinate"
+                    UiTranslationToken.encode(
+                            "screen.moostensuraaddon.skill_ui.common.unknown_subordinate"
+                    )
             );
-            typeName = clean(typeName, "Subordinate");
+            typeName = clean(
+                    typeName,
+                    UiTranslationToken.encode(
+                            "screen.moostensuraaddon.skill_ui.overview.type_subordinate"
+                    )
+            );
             health = Float.isFinite(health)
                     ? Math.max(0.0F, health)
                     : 0.0F;
@@ -203,6 +213,19 @@ public record OpenSubordinateOverviewScreenPayload(
                     : List.copyOf(
                     skills.stream()
                             .filter(skill -> skill != null)
+                            .sorted(
+                                    Comparator
+                                            .comparingInt(
+                                                    SkillEntry::categoryOrder
+                                            )
+                                            .thenComparing(
+                                                    SkillEntry::displayName,
+                                                    String.CASE_INSENSITIVE_ORDER
+                                            )
+                                            .thenComparing(
+                                                    SkillEntry::skillId
+                                            )
+                            )
                             .limit(
                                     SubordinateOverviewPolicy
                                     .MAX_SKILLS_PER_TARGET
@@ -223,7 +246,9 @@ public record OpenSubordinateOverviewScreenPayload(
             this(
                     targetUuid,
                     targetName,
-                    "Subordinate",
+                    UiTranslationToken.encode(
+                            "screen.moostensuraaddon.skill_ui.overview.type_subordinate"
+                    ),
                     health,
                     maxHealth,
                     magicules,
@@ -316,8 +341,16 @@ public record OpenSubordinateOverviewScreenPayload(
         public SkillEntry {
             skillId = clean(skillId, "unknown");
             displayName = clean(displayName, skillId);
-            categoryName = clean(categoryName, "Other Skills");
-            categoryOrder = Math.max(0, categoryOrder);
+            categoryName = UiFinalPolicy.canonicalCategoryId(
+                    categoryName
+            );
+            categoryOrder = UiFinalPolicy.categoryOrder(
+                    categoryName
+            );
+        }
+
+        public String categoryId() {
+            return categoryName;
         }
 
         private static SkillEntry decode(

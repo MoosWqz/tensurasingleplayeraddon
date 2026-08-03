@@ -15,7 +15,7 @@ public final class NetworkRegistry {
         PayloadRegistrar registrar = event.registrar(
                         MoosTensuraAddon.MODID
                 )
-                .versioned("9");
+                .versioned("10");
 
         registrar.playToServer(
                 SelectSkillPayload.TYPE,
@@ -73,6 +73,13 @@ public final class NetworkRegistry {
                 OpenSubordinateOverviewScreenPayload.STREAM_CODEC,
                 ClientboundPayloadHandlers
                         ::handleOpenSubordinateOverviewScreen
+        );
+
+        registrar.playToClient(
+                RemoveSubordinateOverviewEntryPayload.TYPE,
+                RemoveSubordinateOverviewEntryPayload.STREAM_CODEC,
+                ClientboundPayloadHandlers
+                        ::handleRemoveSubordinateOverviewEntry
         );
 
         registrar.playToClient(

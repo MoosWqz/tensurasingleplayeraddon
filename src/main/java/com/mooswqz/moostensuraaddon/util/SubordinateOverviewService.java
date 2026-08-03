@@ -1,11 +1,17 @@
 package com.mooswqz.moostensuraaddon.util;
 
+import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+import com.mooswqz.moostensuraaddon.attachment.GrantedSkillData;
 import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload;
 import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
+import io.github.manasmods.manascore.skill.api.ManasSkillInstance;
 import io.github.manasmods.manascore.skill.api.SkillAPI;
+import io.github.manasmods.tensura.storage.TensuraStorages;
+import io.github.manasmods.tensura.storage.ep.IExistence;
 import io.github.manasmods.tensura.util.SubordinateHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -132,10 +138,8 @@ public final class SubordinateOverviewService {
                 || !hasRequiredAuthority(player, benevolent)) {
             if (player != null) {
                 player.displayClientMessage(
-                        Component.literal(
-                                        "Subordinate overview closed: "
-                                                + "the required Ultimate "
-                                                + "Skill is no longer active."
+                        Component.translatable(
+                                        "message.moostensuraaddon.subordinate_overview.authority_missing"
                                 )
                                 .withStyle(ChatFormatting.RED),
                         false
@@ -169,27 +173,95 @@ public final class SubordinateOverviewService {
         );
     }
 
+    public static void forget(
+            UUID playerUuid
+    ) {
+        if (playerUuid != null) {
+            LAST_REFRESH_NANOS.remove(playerUuid);
+        }
+    }
+
     private static OpenSubordinateOverviewScreenPayload.TargetEntry
     buildTargetEntry(
             ServerPlayer viewer,
             LivingEntity target
     ) {
-        OpenSubordinateOverviewScreenPayload.TargetEntry base =
-                GranterActions.buildSubordinateOverviewEntry(
-                        viewer,
-                        target
-                );
+        IExistence existence = TensuraStorages.getExistenceFrom(target);
+        double magicules = existence == null
+                ? 0.0D
+                : existence.getMagicule();
+        double ep = existence == null
+                ? 0.0D
+                : existence.getEP();
+        GrantedSkillData grantedSkillData = target.getData(
+                AttachmentRegistry.GRANTED_SKILL_DATA
+        );
+        List<OpenSubordinateOverviewScreenPayload.SkillEntry> skills =
+                new ArrayList<>();
+
+        for (ManasSkillInstance instance :
+                SkillAPI.getSkillsFrom(target).getLearnedSkills()) {
+            if (instance == null || instance.getSkillId() == null) {
+                continue;
+            }
+
+            ResourceLocation skillId = instance.getSkillId();
+            Component displayName = instance.getDisplayName();
+            SkillCategoryHelper.SkillCategory category =
+                    SkillCategoryHelper.getCategory(
+                            instance,
+                            skillId,
+                            displayName
+                    );
+            String categoryId = UiFinalPolicy.canonicalCategoryId(
+                    category.name()
+            );
+            boolean grantedByViewer = grantedSkillData.getGrant(
+                    skillId.toString(),
+                    viewer.getUUID()
+            ).isPresent();
+
+            skills.add(
+                    new OpenSubordinateOverviewScreenPayload.SkillEntry(
+                            skillId.toString(),
+                            displayName.getString(),
+                            categoryId,
+                            UiFinalPolicy.categoryOrder(categoryId),
+                            instance.isMastered(target),
+                            grantedByViewer
+                    )
+            );
+        }
+
+        skills.sort(
+                Comparator
+                        .comparingInt(
+                                OpenSubordinateOverviewScreenPayload
+                                        .SkillEntry::categoryOrder
+                        )
+                        .thenComparing(
+                                OpenSubordinateOverviewScreenPayload
+                                        .SkillEntry::displayName,
+                                String.CASE_INSENSITIVE_ORDER
+                        )
+                        .thenComparing(
+                                OpenSubordinateOverviewScreenPayload
+                                        .SkillEntry::skillId
+                        )
+        );
 
         return new OpenSubordinateOverviewScreenPayload.TargetEntry(
-                base.targetUuid(),
-                base.targetName(),
-                target.getType().getDescription().getString(),
-                base.health(),
-                base.maxHealth(),
-                base.magicules(),
-                base.ep(),
+                target.getUUID().toString(),
+                target.getDisplayName().getString(),
+                UiTranslationToken.encode(
+                        target.getType().getDescriptionId()
+                ),
+                target.getHealth(),
+                target.getMaxHealth(),
+                magicules,
+                ep,
                 viewer.distanceTo(target),
-                base.skills()
+                skills
         );
     }
 

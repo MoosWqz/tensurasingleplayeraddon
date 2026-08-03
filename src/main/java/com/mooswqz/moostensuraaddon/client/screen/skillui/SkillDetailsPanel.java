@@ -56,8 +56,8 @@ public final class SkillDetailsPanel {
             SkillUiRenderHelper.drawCenteredText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            "Select a skill to view details"
+                    SkillUiText.component(
+                            "details.select_skill"
                     ),
                     bounds.centerX(),
                     bounds.centerY() - 4,
@@ -103,8 +103,10 @@ public final class SkillDetailsPanel {
             SkillUiRenderHelper.drawClippedText(
                     guiGraphics,
                     font,
-                    Component.literal("Source: ")
-                            .append(entry.sourceName()),
+                    SkillUiText.component(
+                            "details.source",
+                            entry.sourceName()
+                    ),
                     left,
                     currentY,
                     maximumWidth,
@@ -113,13 +115,13 @@ public final class SkillDetailsPanel {
             currentY += LINE_HEIGHT;
         }
 
-        String masteryText = entry.mastered()
-                ? "Mastered"
-                : "Not mastered";
+        Component masteryText = entry.mastered()
+                ? SkillUiText.component("state.mastered")
+                : SkillUiText.component("state.not_mastered");
         SkillUiRenderHelper.drawText(
                 guiGraphics,
                 font,
-                Component.literal(masteryText),
+                masteryText,
                 left,
                 currentY,
                 entry.mastered()
@@ -138,11 +140,9 @@ public final class SkillDetailsPanel {
             SkillUiRenderHelper.drawText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            selected
-                                    ? "Selected"
-                                    : "Not selected"
-                    ),
+                    selected
+                            ? SkillUiText.component("state.selected")
+                            : SkillUiText.component("state.not_selected"),
                     left,
                     currentY,
                     selected

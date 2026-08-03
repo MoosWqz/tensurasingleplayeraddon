@@ -2,13 +2,10 @@ package com.mooswqz.moostensuraaddon.client.screen.skillui;
 
 import com.mooswqz.moostensuraaddon.network.OpenUltimateMultiGrantScreenPayload;
 import com.mooswqz.moostensuraaddon.util.AuthorityActionMode;
+import com.mooswqz.moostensuraaddon.util.UiTranslationToken;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public final class UltimateMultiGrantUiEntryFactory {
 
@@ -40,97 +37,79 @@ public final class UltimateMultiGrantUiEntryFactory {
 
             if (mode.takeBack()) {
                 details.add(
-                        Component.literal(
+                        SkillUiText.component(
                                 source.affectedTargets() == 1
-                                        ? "Reclaimable from 1 subordinate."
-                                        : "Reclaimable from "
-                                          + source.affectedTargets()
-                                          + " subordinates."
+                                        ? "details.reclaimable_one"
+                                        : "details.reclaimable_many",
+                                source.affectedTargets()
                         )
                 );
                 details.add(
-                        Component.literal(
-                                "No magicule cost."
+                        SkillUiText.component(
+                                "details.no_magicule_cost"
                         )
                 );
             } else if (mode.massGrant()) {
                 details.add(
-                        Component.literal(
-                                "Mastered skill required for Mass Grant."
+                        SkillUiText.component(
+                                "details.mass_grant_mastery_required"
                         )
                 );
                 details.add(
-                        Component.literal(
+                        SkillUiText.component(
+                                source.affectedTargets() == 1
+                                        ? "details.eligible_recipient_one"
+                                        : "details.eligible_recipient_many",
                                 source.affectedTargets()
-                                        + " eligible recipient"
-                                        + (source.affectedTargets() == 1
-                                        ? ""
-                                        : "s")
-                                        + "."
                         )
                 );
                 details.add(
-                        Component.literal(
-                                "Cost per recipient: "
-                                        + formatNumber(
-                                        source.standardCost()
-                                )
-                                        + " magicules."
+                        SkillUiText.component(
+                                "details.cost_per_recipient",
+                                formatNumber(source.standardCost())
                         )
                 );
                 details.add(
-                        Component.literal(
-                                "Total cost: "
-                                        + formatNumber(
-                                        source.finalCost()
-                                )
-                                        + " magicules."
+                        SkillUiText.component(
+                                "details.total_cost",
+                                formatNumber(source.finalCost())
                         )
                 );
             } else {
                 if (source.mastered()) {
                     details.add(
-                            Component.literal(
-                                    "Mastered skill. Standard transfer cost applies."
+                            SkillUiText.component(
+                                    "details.mastered_standard_cost"
                             )
                     );
                 } else {
                     details.add(
-                            Component.literal(
-                                    "WARNING: Unmastered skill. Increased magicule cost applies."
+                            SkillUiText.component(
+                                    "warning.unmastered_increased_cost"
                             )
                     );
                 }
 
                 details.add(
-                        Component.literal(
-                                "Standard cost: "
-                                        + formatNumber(
-                                        source.standardCost()
-                                )
-                                        + " magicules."
+                        SkillUiText.component(
+                                "details.standard_cost",
+                                formatNumber(source.standardCost())
                         )
                 );
 
                 if (source.surcharge() > 0.0D) {
                     details.add(
-                            Component.literal(
-                                    "Mastery bypass surcharge: +"
-                                            + formatNumber(
-                                            source.surcharge()
-                                    )
-                                            + " magicules."
+                            SkillUiText.component(
+                                    "details.mastery_bypass_surcharge",
+                                    formatNumber(source.surcharge())
                             )
                     );
                 }
 
                 details.add(
-                        Component.literal(
-                                "Final cost: "
-                                        + formatNumber(
-                                        source.finalCost()
-                                )
-                                        + " magicules."
+                        SkillUiText.component(
+                                "details.final_cost",
+                                formatNumber(source.finalCost())
                         )
                 );
             }
@@ -138,7 +117,7 @@ public final class UltimateMultiGrantUiEntryFactory {
             if (!source.selectable()
                     && !source.disabledReason().isBlank()) {
                 details.add(
-                        Component.literal(
+                        UiTranslationToken.toComponent(
                                 source.disabledReason()
                         )
                 );
@@ -146,7 +125,9 @@ public final class UltimateMultiGrantUiEntryFactory {
 
             Component disabledReason = source.disabledReason().isBlank()
                     ? Component.empty()
-                    : Component.literal(source.disabledReason());
+                    : UiTranslationToken.toComponent(
+                    source.disabledReason()
+            );
 
             entries.add(
                     new SkillUiEntry(
@@ -186,20 +167,7 @@ public final class UltimateMultiGrantUiEntryFactory {
     public static SkillUiCategory toUiCategory(
             String rawCategory
     ) {
-        if (rawCategory == null || rawCategory.isBlank()) {
-            return SkillUiCategory.OTHER;
-        }
-
-        String cleaned = rawCategory.trim()
-                .toUpperCase(Locale.ROOT);
-
-        return switch (cleaned) {
-            case "UNIQUE", "ULTIMATE" -> SkillUiCategory.UNIQUE;
-            case "EXTRA" -> SkillUiCategory.EXTRA;
-            case "BASIC", "COMMON" -> SkillUiCategory.BASIC;
-            case "RESISTANCE", "RESIST" -> SkillUiCategory.RESISTANCE;
-            default -> SkillUiCategory.OTHER;
-        };
+        return SkillUiCategory.fromRaw(rawCategory);
     }
 
     public static double calculateTotalCost(

@@ -76,12 +76,12 @@ public class AbsoluteGovernanceSkill extends Skill {
             int mode
     ) {
         return switch (normalizeMode(mode)) {
-            case MODE_INVEST -> Component.literal("Invest");
-            case MODE_MASS_GRANT -> Component.literal("Mass Grant");
-            case MODE_GLOBAL_TAKE_BACK -> Component.literal("Global Take Back");
-            case MODE_SEIZE_SKILL -> Component.literal("Seize");
-            case MODE_RANGED_SKILL_VIEW -> Component.literal("List Skills");
-            default -> Component.literal("Invest");
+            case MODE_INVEST -> Component.translatable("skill.moostensuraaddon.mode.governance.invest");
+            case MODE_MASS_GRANT -> Component.translatable("skill.moostensuraaddon.mode.governance.mass_grant");
+            case MODE_GLOBAL_TAKE_BACK -> Component.translatable("skill.moostensuraaddon.mode.governance.global_take_back");
+            case MODE_SEIZE_SKILL -> Component.translatable("skill.moostensuraaddon.mode.governance.seize");
+            case MODE_RANGED_SKILL_VIEW -> Component.translatable("skill.moostensuraaddon.mode.governance.list_skills");
+            default -> Component.translatable("skill.moostensuraaddon.mode.governance.invest");
         };
     }
 

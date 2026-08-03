@@ -1,5 +1,7 @@
 package com.mooswqz.moostensuraaddon.util;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.Locale;
 import java.util.Optional;
 
@@ -146,67 +148,66 @@ public enum AuthorityActionMode {
                 || this == GOVERNANCE_TAKE_BACK;
     }
 
+    public Component titleComponent() {
+        return Component.translatable(
+                "screen.moostensuraaddon.skill_ui.action."
+                        + id
+                        + ".title"
+        );
+    }
+
     public String title() {
-        return switch (this) {
-            case GRANTER_GRANT -> "Grant Skill";
-            case GRANTER_TAKE_BACK -> "Take Back Skill";
-            case BENEVOLENT_BESTOW -> "Skill Bestowal";
-            case GOVERNANCE_INVEST -> "Skill Investiture";
-            case BENEVOLENT_MASS_GRANT,
-                 GOVERNANCE_MASS_GRANT -> "Mass Grant";
-            case BENEVOLENT_TAKE_BACK -> "Ranged Take Back";
-            case GOVERNANCE_TAKE_BACK -> "Global Take Back";
-        };
+        return titleComponent().getString();
+    }
+
+    public Component badgeComponent() {
+        return Component.translatable(
+                "screen.moostensuraaddon.skill_ui.action."
+                        + id
+                        + ".badge"
+        );
     }
 
     public String badge() {
-        return switch (this) {
-            case GRANTER_GRANT -> "GRANT";
-            case GRANTER_TAKE_BACK -> "TAKE BACK";
-            case BENEVOLENT_BESTOW -> "BESTOW";
-            case GOVERNANCE_INVEST -> "INVEST";
-            case BENEVOLENT_MASS_GRANT,
-                 GOVERNANCE_MASS_GRANT -> "MASS GRANT";
-            case BENEVOLENT_TAKE_BACK -> "RANGED RETURN";
-            case GOVERNANCE_TAKE_BACK -> "GLOBAL RETURN";
-        };
+        return badgeComponent().getString();
     }
 
-    public String actionButtonLabel(int selectedCount) {
+    public Component actionButtonComponent(
+            int selectedCount
+    ) {
         int safeCount = Math.max(0, selectedCount);
-
-        return switch (this) {
-            case GRANTER_GRANT -> "Grant Skill";
-            case GRANTER_TAKE_BACK -> "Take Back";
-            case BENEVOLENT_BESTOW -> "Bestow " + safeCount
-                    + (safeCount == 1 ? " Skill" : " Skills");
-            case GOVERNANCE_INVEST -> "Invest " + safeCount
-                    + (safeCount == 1 ? " Skill" : " Skills");
-            case BENEVOLENT_MASS_GRANT,
-                 GOVERNANCE_MASS_GRANT -> "Grant to All";
-            case BENEVOLENT_TAKE_BACK,
-                 GOVERNANCE_TAKE_BACK -> "Take Back";
+        String suffix = switch (this) {
+            case BENEVOLENT_BESTOW,
+                 GOVERNANCE_INVEST -> safeCount == 1
+                    ? ".button_one"
+                    : ".button_many";
+            default -> ".button";
         };
+
+        return Component.translatable(
+                "screen.moostensuraaddon.skill_ui.action."
+                        + id
+                        + suffix,
+                safeCount
+        );
+    }
+
+    public String actionButtonLabel(
+            int selectedCount
+    ) {
+        return actionButtonComponent(selectedCount).getString();
+    }
+
+    public Component subtitleComponent() {
+        return Component.translatable(
+                "screen.moostensuraaddon.skill_ui.action."
+                        + id
+                        + ".subtitle"
+        );
     }
 
     public String subtitle() {
-        return switch (this) {
-            case GRANTER_GRANT ->
-                    "Choose one mastered skill and transfer it immediately.";
-            case GRANTER_TAKE_BACK ->
-                    "Choose one skill previously granted by you and reclaim it.";
-            case BENEVOLENT_BESTOW ->
-                    "Transfer one or several skills to one subordinate.";
-            case GOVERNANCE_INVEST ->
-                    "Invest one or several skills into one subordinate.";
-            case BENEVOLENT_MASS_GRANT,
-                 GOVERNANCE_MASS_GRANT ->
-                    "Choose one mastered skill for every eligible recipient.";
-            case BENEVOLENT_TAKE_BACK ->
-                    "Reclaim one granted skill from a target or all nearby recipients.";
-            case GOVERNANCE_TAKE_BACK ->
-                    "Reclaim one granted skill from a target or every loaded recipient in range.";
-        };
+        return subtitleComponent().getString();
     }
 
     public static Optional<AuthorityActionMode> fromId(

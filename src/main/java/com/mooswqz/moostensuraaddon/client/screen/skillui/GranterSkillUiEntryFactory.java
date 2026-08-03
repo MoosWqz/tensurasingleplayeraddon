@@ -66,15 +66,15 @@ public final class GranterSkillUiEntryFactory {
         Component authorityName;
 
         if (benevolent.isPresent()) {
-            authorityName = Component.literal(
-                    "Benevolent Empowerment"
+            authorityName = SkillUiText.component(
+                    "authority.benevolent"
             );
         } else if (governance.isPresent()) {
-            authorityName = Component.literal(
-                    "Absolute Governance"
+            authorityName = SkillUiText.component(
+                    "authority.governance"
             );
         } else {
-            authorityName = Component.literal("Granter");
+            authorityName = SkillUiText.component("authority.granter");
         }
 
         List<SkillUiEntry> entries = new ArrayList<>();
@@ -123,14 +123,14 @@ public final class GranterSkillUiEntryFactory {
 
             if (mastered) {
                 details.add(
-                        Component.literal(
-                                "Eligible through skill mastery."
+                        SkillUiText.component(
+                                "details.eligible_mastery"
                         )
                 );
             } else {
                 details.add(
-                        Component.literal(
-                                "Ultimate authority permits granting without mastery."
+                        SkillUiText.component(
+                                "details.ultimate_mastery_bypass"
                         )
                 );
             }
@@ -139,8 +139,8 @@ public final class GranterSkillUiEntryFactory {
                     .filter(skillId.toString()::equals)
                     .isPresent()) {
                 details.add(
-                        Component.literal(
-                                "Currently selected for this authority."
+                        SkillUiText.component(
+                                "details.current_authority_selection"
                         )
                 );
             }
@@ -210,7 +210,7 @@ public final class GranterSkillUiEntryFactory {
                     ? Optional.empty()
                     : currentSelection;
             authorityName = authorityName == null
-                    ? Component.literal("Granter")
+                    ? SkillUiText.component("authority.granter")
                     : authorityName;
         }
 
@@ -219,7 +219,7 @@ public final class GranterSkillUiEntryFactory {
                     List.of(),
                     Optional.empty(),
                     false,
-                    Component.literal("Granter")
+                    SkillUiText.component("authority.granter")
             );
         }
     }

@@ -147,8 +147,8 @@ public record ExecuteUltimateSubordinateSkillPayload(
 
             if (analysis.overLimit()) {
                 player.sendSystemMessage(
-                        Component.literal(
-                                        "Too many skills were submitted at once."
+                        Component.translatable(
+                                        "message.moostensuraaddon.authority.error.selection_over_limit"
                                 )
                                 .withStyle(ChatFormatting.RED)
                 );
@@ -157,8 +157,8 @@ public record ExecuteUltimateSubordinateSkillPayload(
 
             if (analysis.rejectedCount() > 0) {
                 player.sendSystemMessage(
-                        Component.literal(
-                                        "The request contains an invalid or duplicate skill."
+                        Component.translatable(
+                                        "message.moostensuraaddon.authority.error.invalid_or_duplicate"
                                 )
                                 .withStyle(ChatFormatting.RED)
                 );
@@ -174,8 +174,8 @@ public record ExecuteUltimateSubordinateSkillPayload(
 
                 if (skillId == null) {
                     player.sendSystemMessage(
-                            Component.literal(
-                                            "One selected skill has an invalid registry ID."
+                            Component.translatable(
+                                            "message.moostensuraaddon.authority.error.invalid_registry_id"
                                     )
                                     .withStyle(ChatFormatting.RED)
                     );

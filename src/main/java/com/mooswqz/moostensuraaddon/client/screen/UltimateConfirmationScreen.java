@@ -5,6 +5,7 @@ import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiEntry;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiLayout;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiRenderHelper;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiTheme;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiText;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.UltimateConfirmationPolicy;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.UltimateMultiGrantUiEntryFactory;
 import com.mooswqz.moostensuraaddon.network.ExecuteUltimateConfirmationPayload;
@@ -42,11 +43,9 @@ public final class UltimateConfirmationScreen extends Screen {
             ConfirmationRequest request
     ) {
         super(
-                Component.literal(
-                        request == null
-                                ? "Confirm Authority Action"
-                                : request.title()
-                )
+                request == null
+                        ? SkillUiText.component("confirmation.default_title")
+                        : Component.literal(request.title())
         );
         this.parent = parent;
         this.request = request == null
@@ -78,7 +77,7 @@ public final class UltimateConfirmationScreen extends Screen {
                 ? new OpenUltimateMultiGrantScreenPayload(
                 safeMode.id(),
                 "",
-                "Unknown subordinate",
+                SkillUiText.string("common.unknown_subordinate"),
                 0.0D,
                 0,
                 false,
@@ -110,19 +109,25 @@ public final class UltimateConfirmationScreen extends Screen {
         String subjectValue;
 
         if (safeMode.massGrant()) {
-            subjectLabel = "SCOPE";
-            subjectValue = affectedTargets
-                    + " eligible subordinate"
-                    + (affectedTargets == 1 ? "" : "s");
+            subjectLabel = SkillUiText.string("common.scope_label");
+            subjectValue = SkillUiText.string(
+                    affectedTargets == 1
+                            ? "confirmation.eligible_subordinate_one"
+                            : "confirmation.eligible_subordinate_many",
+                    affectedTargets
+            );
         } else if (safeMode.takeBack() && allEligible) {
-            subjectLabel = "SCOPE";
-            subjectValue = affectedTargets
-                    + " eligible grant"
-                    + (affectedTargets == 1 ? "" : "s");
+            subjectLabel = SkillUiText.string("common.scope_label");
+            subjectValue = SkillUiText.string(
+                    affectedTargets == 1
+                            ? "confirmation.eligible_grant_one"
+                            : "confirmation.eligible_grant_many",
+                    affectedTargets
+            );
         } else {
-            subjectLabel = "TARGET";
+            subjectLabel = SkillUiText.string("common.target_label");
             subjectValue = safePayload.targetName().isBlank()
-                    ? "Unknown subordinate"
+                    ? SkillUiText.string("common.unknown_subordinate")
                     : safePayload.targetName();
         }
 
@@ -134,14 +139,21 @@ public final class UltimateConfirmationScreen extends Screen {
             String secondary;
 
             if (safeMode.takeBack()) {
-                secondary = affectedTargets + " affected • no cost";
+                secondary = SkillUiText.string(
+                        "confirmation.affected_no_cost",
+                        affectedTargets
+                );
             } else if (cost != null && !cost.mastered()) {
-                secondary = "Unmastered • "
-                        + formatNumber(cost.finalCost());
+                secondary = SkillUiText.string(
+                        "confirmation.unmastered_cost",
+                        formatNumber(cost.finalCost())
+                );
             } else {
-                secondary = "Mastered • "
-                        + formatNumber(
-                        cost == null ? 0.0D : cost.finalCost()
+                secondary = SkillUiText.string(
+                        "confirmation.mastered_cost",
+                        formatNumber(
+                                cost == null ? 0.0D : cost.finalCost()
+                        )
                 );
             }
 
@@ -156,27 +168,33 @@ public final class UltimateConfirmationScreen extends Screen {
         }
 
         SkillUiTheme theme = resolveTheme(safeMode);
-        String warning = switch (safeMode) {
-            case BENEVOLENT_BESTOW ->
-                    "The selected skills will be bestowed immediately. Unmastered skills use the displayed mastery-bypass surcharge.";
-            case GOVERNANCE_INVEST ->
-                    "The selected skills will be invested immediately. Unmastered skills use the displayed mastery-bypass surcharge.";
-            case BENEVOLENT_MASS_GRANT,
-                 GOVERNANCE_MASS_GRANT ->
-                    "The selected mastered skill will be granted to every currently eligible recipient in scope.";
-            case BENEVOLENT_TAKE_BACK,
-                 GOVERNANCE_TAKE_BACK ->
-                    "The selected grant will be removed from every affected subordinate. The server revalidates the full action before changing anything.";
-            case GRANTER_GRANT,
-                 GRANTER_TAKE_BACK ->
-                    "The server revalidates this action before changing anything.";
-        };
+        String warning = SkillUiText.string(
+                switch (safeMode) {
+                    case BENEVOLENT_BESTOW ->
+                            "confirmation.warning_bestow";
+                    case GOVERNANCE_INVEST ->
+                            "confirmation.warning_invest";
+                    case BENEVOLENT_MASS_GRANT,
+                         GOVERNANCE_MASS_GRANT ->
+                            "confirmation.warning_mass_grant";
+                    case BENEVOLENT_TAKE_BACK,
+                         GOVERNANCE_TAKE_BACK ->
+                            "confirmation.warning_take_back";
+                    case GRANTER_GRANT,
+                         GRANTER_TAKE_BACK ->
+                            "confirmation.warning_revalidate";
+                }
+        );
         String outcome = summary.unmastered() > 0
-                ? summary.unmastered()
-                  + " unmastered skill"
-                  + (summary.unmastered() == 1 ? "" : "s")
-                  + " use increased-cost transfer"
-                : "Every selected skill uses the standard mastered cost";
+                ? SkillUiText.string(
+                summary.unmastered() == 1
+                ? "confirmation.outcome_unmastered_one"
+                : "confirmation.outcome_unmastered_many",
+                summary.unmastered()
+        )
+                : SkillUiText.string(
+                "confirmation.outcome_standard_cost"
+        );
         boolean ready = !safeEntries.isEmpty()
                 && affectedTargets > 0
                 && safePayload.cooldownTicks() <= 0
@@ -197,7 +215,10 @@ public final class UltimateConfirmationScreen extends Screen {
         return new UltimateConfirmationScreen(
                 parent,
                 new ConfirmationRequest(
-                        "Confirm " + safeMode.title(),
+                        SkillUiText.string(
+                                "confirmation.confirm_action",
+                                safeMode.titleComponent()
+                        ),
                         safeMode.badge(),
                         authorityName(safeMode),
                         subjectLabel,
@@ -232,7 +253,7 @@ public final class UltimateConfirmationScreen extends Screen {
                 ? new OpenUltimateSubordinateSkillScreenPayload(
                 false,
                 "",
-                "Unknown subordinate",
+                SkillUiText.string("common.unknown_subordinate"),
                 0.0D,
                 0.0D,
                 0.0D,
@@ -279,18 +300,23 @@ public final class UltimateConfirmationScreen extends Screen {
                     entry.skillId(),
                     0.0D
             );
-            String masteryLabel = entry.mastered()
-                    ? "Target mastered"
-                    : "Not mastered";
+            String masteryLabel = SkillUiText.string(
+                    entry.mastered()
+                            ? "confirmation.target_mastered"
+                            : "state.not_mastered"
+            );
             String secondary = safePayload.seize()
-                    ? masteryLabel
-                      + " • permanent • "
-                      + formatNumber(safePayload.costPerSkill())
-                    : masteryLabel
-                      + " • "
-                      + UltimateBorrowSeizePolicy.formatPercent(chance)
-                      + " • "
-                      + formatNumber(safePayload.costPerSkill());
+                    ? SkillUiText.string(
+                    "confirmation.seize_skill_line",
+                    masteryLabel,
+                    formatNumber(safePayload.costPerSkill())
+            )
+                    : SkillUiText.string(
+                    "confirmation.borrow_skill_line",
+                    masteryLabel,
+                    UltimateBorrowSeizePolicy.formatPercent(chance),
+                    formatNumber(safePayload.costPerSkill())
+            );
 
             skillLines.add(
                     new SkillLine(
@@ -305,31 +331,34 @@ public final class UltimateConfirmationScreen extends Screen {
         String outcome;
 
         if (safePayload.seize()) {
-            outcome = "Combined death risk: "
-                    + UltimateBorrowSeizePolicy.formatPercent(
-                    combinedRisk
+            outcome = SkillUiText.string(
+                    "confirmation.combined_death_risk",
+                    UltimateBorrowSeizePolicy.formatPercent(combinedRisk)
             );
         } else if (chanceRange.minimum() == chanceRange.maximum()) {
-            outcome = "Permanent-copy chance: "
-                    + UltimateBorrowSeizePolicy.formatPercent(
-                    chanceRange.minimum()
-            )
-                    + " per skill";
+            outcome = SkillUiText.string(
+                    "confirmation.permanent_chance_single",
+                    UltimateBorrowSeizePolicy.formatPercent(
+                            chanceRange.minimum()
+                    )
+            );
         } else {
-            outcome = "Permanent-copy chance: "
-                    + UltimateBorrowSeizePolicy.formatPercent(
-                    chanceRange.minimum()
-            )
-                    + "–"
-                    + UltimateBorrowSeizePolicy.formatPercent(
-                    chanceRange.maximum()
-            )
-                    + " per skill";
+            outcome = SkillUiText.string(
+                    "confirmation.permanent_chance_range",
+                    UltimateBorrowSeizePolicy.formatPercent(
+                            chanceRange.minimum()
+                    ),
+                    UltimateBorrowSeizePolicy.formatPercent(
+                            chanceRange.maximum()
+                    )
+            );
         }
 
-        String warning = safePayload.seize()
-                ? "Selected skills will be permanently removed from the subordinate. A valid seizure can still cause backlash or death."
-                : "The subordinate keeps the original skills. Non-permanent borrowed copies expire according to the configured duration.";
+        String warning = SkillUiText.string(
+                safePayload.seize()
+                        ? "confirmation.warning_seize"
+                        : "confirmation.warning_borrow"
+        );
         boolean ready = !selectedIds.isEmpty()
                 && UltimateConfirmationPolicy.affordable(
                 safePayload.availableMagicules(),
@@ -347,18 +376,24 @@ public final class UltimateConfirmationScreen extends Screen {
         return new UltimateConfirmationScreen(
                 parent,
                 new ConfirmationRequest(
-                        safePayload.seize()
-                                ? "Confirm Seizure"
-                                : "Confirm Borrow",
-                        safePayload.seize()
-                                ? "SEIZE"
-                                : "BORROW",
-                        safePayload.seize()
-                                ? "Absolute Governance"
-                                : "Benevolent Empowerment",
-                        "TARGET",
+                        SkillUiText.string(
+                                safePayload.seize()
+                                        ? "confirmation.title_seize"
+                                        : "confirmation.title_borrow"
+                        ),
+                        SkillUiText.string(
+                                safePayload.seize()
+                                        ? "seize.badge"
+                                        : "borrow.badge"
+                        ),
+                        SkillUiText.string(
+                                safePayload.seize()
+                                        ? "authority.governance"
+                                        : "authority.benevolent"
+                        ),
+                        SkillUiText.string("common.target_label"),
                         safePayload.targetName().isBlank()
-                                ? "Unknown subordinate"
+                                ? SkillUiText.string("common.unknown_subordinate")
                                 : safePayload.targetName(),
                         List.copyOf(skillLines),
                         safeEntries.size(),
@@ -371,9 +406,11 @@ public final class UltimateConfirmationScreen extends Screen {
                         safePayload.availableMagicules(),
                         outcome,
                         warning,
-                        safePayload.seize()
-                                ? "Confirm Seize"
-                                : "Confirm Borrow",
+                        SkillUiText.string(
+                                safePayload.seize()
+                                        ? "confirmation.confirm_seize"
+                                        : "confirmation.confirm_borrow"
+                        ),
                         safePayload.seize()
                                 ? SkillUiTheme.SEIZE
                                 : SkillUiTheme.BENEVOLENT,
@@ -407,9 +444,9 @@ public final class UltimateConfirmationScreen extends Screen {
                         layout.footer().top(),
                         buttonWidth,
                         layout.footer().height(),
-                        Component.literal(parent == null
-                                ? "Cancel"
-                                : "Back"),
+                        parent == null
+                                ? SkillUiText.component("common.cancel")
+                                : SkillUiText.component("common.back"),
                         request.theme(),
                         SkillUiButton.Tone.NORMAL,
                         this::goBack
@@ -616,11 +653,10 @@ public final class UltimateConfirmationScreen extends Screen {
             SkillUiRenderHelper.drawClippedText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            "Selected: "
-                                    + request.selectedSkills()
-                                    + " • Affected: "
-                                    + request.affectedTargets()
+                    SkillUiText.component(
+                            "confirmation.compact_selected_affected",
+                            request.selectedSkills(),
+                            request.affectedTargets()
                     ),
                     x,
                     y,
@@ -633,10 +669,9 @@ public final class UltimateConfirmationScreen extends Screen {
                 SkillUiRenderHelper.drawClippedText(
                         guiGraphics,
                         font,
-                        Component.literal(
-                                "Unmastered: "
-                                        + request.unmasteredSkills()
-                                        + " • increased cost"
+                        SkillUiText.component(
+                                "confirmation.compact_unmastered",
+                                request.unmasteredSkills()
                         ),
                         x,
                         y,
@@ -647,12 +682,15 @@ public final class UltimateConfirmationScreen extends Screen {
             }
 
             String compactCostLine = request.availableMagicules() >= 0.0D
-                    ? "Required: "
-                      + formatNumber(request.totalCost())
-                      + " • Available: "
-                      + formatNumber(request.availableMagicules())
-                    : "Required: "
-                      + formatNumber(request.totalCost());
+                    ? SkillUiText.string(
+                    "confirmation.compact_required_available",
+                    formatNumber(request.totalCost()),
+                    formatNumber(request.availableMagicules())
+            )
+                    : SkillUiText.string(
+                    "confirmation.compact_required",
+                    formatNumber(request.totalCost())
+            );
             SkillUiRenderHelper.drawClippedText(
                     guiGraphics,
                     font,
@@ -688,7 +726,7 @@ public final class UltimateConfirmationScreen extends Screen {
 
         drawSummaryLine(
                 guiGraphics,
-                "Selected skills",
+                SkillUiText.string("confirmation.label_selected_skills"),
                 Integer.toString(request.selectedSkills()),
                 x,
                 y,
@@ -698,7 +736,7 @@ public final class UltimateConfirmationScreen extends Screen {
         y += lineHeight;
         drawSummaryLine(
                 guiGraphics,
-                "Affected",
+                SkillUiText.string("confirmation.label_affected"),
                 Integer.toString(request.affectedTargets()),
                 x,
                 y,
@@ -710,7 +748,7 @@ public final class UltimateConfirmationScreen extends Screen {
         if (request.unmasteredSkills() > 0) {
             drawSummaryLine(
                     guiGraphics,
-                    "Unmastered",
+                    SkillUiText.string("confirmation.label_unmastered"),
                     Integer.toString(request.unmasteredSkills()),
                     x,
                     y,
@@ -723,7 +761,7 @@ public final class UltimateConfirmationScreen extends Screen {
         if (request.surcharge() > 0.0D) {
             drawSummaryLine(
                     guiGraphics,
-                    "Base cost",
+                    SkillUiText.string("confirmation.label_base_cost"),
                     formatNumber(request.standardCost()),
                     x,
                     y,
@@ -733,7 +771,7 @@ public final class UltimateConfirmationScreen extends Screen {
             y += lineHeight;
             drawSummaryLine(
                     guiGraphics,
-                    "Surcharge",
+                    SkillUiText.string("confirmation.label_surcharge"),
                     "+" + formatNumber(request.surcharge()),
                     x,
                     y,
@@ -745,7 +783,7 @@ public final class UltimateConfirmationScreen extends Screen {
 
         drawSummaryLine(
                 guiGraphics,
-                "Required",
+                SkillUiText.string("confirmation.label_required"),
                 formatNumber(request.totalCost()),
                 x,
                 y,
@@ -760,7 +798,7 @@ public final class UltimateConfirmationScreen extends Screen {
         if (request.availableMagicules() >= 0.0D) {
             drawSummaryLine(
                     guiGraphics,
-                    "Available",
+                    SkillUiText.string("confirmation.label_available"),
                     formatNumber(request.availableMagicules()),
                     x,
                     y,
@@ -833,7 +871,7 @@ public final class UltimateConfirmationScreen extends Screen {
         SkillUiRenderHelper.drawText(
                 guiGraphics,
                 font,
-                Component.literal("SELECTED SKILLS"),
+                SkillUiText.component("confirmation.selected_skills_header"),
                 bounds.left() + 5,
                 bounds.top() + 4,
                 theme.accentColor()
@@ -894,8 +932,9 @@ public final class UltimateConfirmationScreen extends Screen {
             SkillUiRenderHelper.drawClippedText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            "+" + remaining + " more selected"
+                    SkillUiText.component(
+                            "confirmation.more_selected",
+                            remaining
                     ),
                     bounds.left() + 6,
                     y,
@@ -1038,11 +1077,13 @@ public final class UltimateConfirmationScreen extends Screen {
         SkillUiTheme theme = payload.benevolent()
                 ? SkillUiTheme.BENEVOLENT
                 : SkillUiTheme.GOVERNANCE;
-        String action = payload.massGrant()
-                ? "Mass Grant"
-                : payload.benevolent()
-                  ? "Ranged Take Back"
-                  : "Global Take Back";
+        String action = SkillUiText.string(
+                payload.massGrant()
+                        ? "action.legacy_mass_grant.title"
+                        : payload.benevolent()
+                          ? "action.benevolent_take_back.title"
+                          : "action.governance_take_back.title"
+        );
         Runnable confirmAction = () ->
                 PacketDistributor.sendToServer(
                         new ExecuteUltimateConfirmationPayload(
@@ -1052,23 +1093,35 @@ public final class UltimateConfirmationScreen extends Screen {
                 );
 
         return new ConfirmationRequest(
-                "Confirm " + action,
-                payload.massGrant()
-                        ? "MASS GRANT"
-                        : "TAKE BACK",
-                payload.benevolent()
-                        ? "Benevolent Empowerment"
-                        : "Absolute Governance",
-                "SCOPE",
-                payload.affectedTargets()
-                        + " affected subordinate"
-                        + (payload.affectedTargets() == 1 ? "" : "s"),
+                SkillUiText.string(
+                        "confirmation.confirm_action",
+                        action
+                ),
+                SkillUiText.string(
+                        payload.massGrant()
+                                ? "action.legacy_mass_grant.badge"
+                                : "confirmation.take_back_badge"
+                ),
+                SkillUiText.string(
+                        payload.benevolent()
+                                ? "authority.benevolent"
+                                : "authority.governance"
+                ),
+                SkillUiText.string("common.scope_label"),
+                SkillUiText.string(
+                        payload.affectedTargets() == 1
+                                ? "confirmation.affected_subordinate_one"
+                                : "confirmation.affected_subordinate_many",
+                        payload.affectedTargets()
+                ),
                 List.of(
                         new SkillLine(
                                 payload.selectedSkillName(),
-                                payload.massGrant()
-                                        ? "Mastered"
-                                        : "Granted by you",
+                                SkillUiText.string(
+                                        payload.massGrant()
+                                                ? "state.mastered"
+                                                : "overview.skill_granted_by_you"
+                                ),
                                 payload.totalCost(),
                                 false
                         )
@@ -1081,15 +1134,21 @@ public final class UltimateConfirmationScreen extends Screen {
                 0.0D,
                 payload.totalCost(),
                 -1.0D,
-                payload.massGrant()
-                        ? "Every valid recipient will receive the skill"
-                        : "The grant will be removed from every valid recipient",
-                payload.massGrant()
-                        ? "The selected skill will be granted to every valid subordinate in scope."
-                        : "The selected grant will be removed from every valid subordinate in scope.",
-                payload.massGrant()
-                        ? "Confirm Grant"
-                        : "Confirm Take Back",
+                SkillUiText.string(
+                        payload.massGrant()
+                                ? "confirmation.legacy_outcome_mass"
+                                : "confirmation.legacy_outcome_take_back"
+                ),
+                SkillUiText.string(
+                        payload.massGrant()
+                                ? "confirmation.legacy_warning_mass"
+                                : "confirmation.legacy_warning_take_back"
+                ),
+                SkillUiText.string(
+                        payload.massGrant()
+                                ? "confirmation.confirm_grant"
+                                : "confirmation.confirm_take_back"
+                ),
                 theme,
                 false,
                 payload.affectedTargets() > 0,
@@ -1113,27 +1172,36 @@ public final class UltimateConfirmationScreen extends Screen {
             AuthorityActionMode mode
     ) {
         if (mode == null || mode.granter()) {
-            return "Granter";
+            return SkillUiText.string("authority.granter");
         }
 
-        return mode.benevolent()
-                ? "Benevolent Empowerment"
-                : "Absolute Governance";
+        return SkillUiText.string(
+                mode.benevolent()
+                        ? "authority.benevolent"
+                        : "authority.governance"
+        );
     }
 
     private static String confirmLabel(
             AuthorityActionMode mode
     ) {
-        return switch (mode) {
-            case BENEVOLENT_BESTOW -> "Confirm Bestow";
-            case GOVERNANCE_INVEST -> "Confirm Invest";
-            case BENEVOLENT_MASS_GRANT,
-                 GOVERNANCE_MASS_GRANT -> "Confirm Mass Grant";
-            case BENEVOLENT_TAKE_BACK,
-                 GOVERNANCE_TAKE_BACK -> "Confirm Take Back";
-            case GRANTER_GRANT -> "Confirm Grant";
-            case GRANTER_TAKE_BACK -> "Confirm Take Back";
-        };
+        return SkillUiText.string(
+                switch (mode) {
+                    case BENEVOLENT_BESTOW ->
+                            "confirmation.confirm_bestow";
+                    case GOVERNANCE_INVEST ->
+                            "confirmation.confirm_invest";
+                    case BENEVOLENT_MASS_GRANT,
+                         GOVERNANCE_MASS_GRANT ->
+                            "confirmation.confirm_mass_grant";
+                    case BENEVOLENT_TAKE_BACK,
+                         GOVERNANCE_TAKE_BACK,
+                         GRANTER_TAKE_BACK ->
+                            "confirmation.confirm_take_back";
+                    case GRANTER_GRANT ->
+                            "confirmation.confirm_grant";
+                }
+        );
     }
 
     private static String formatNumber(
@@ -1192,11 +1260,11 @@ public final class UltimateConfirmationScreen extends Screen {
             Runnable confirmAction
     ) {
         public ConfirmationRequest {
-            title = clean(title, "Confirm Authority Action");
-            badge = clean(badge, "CONFIRM");
-            authorityName = clean(authorityName, "Ultimate Authority");
-            subjectLabel = clean(subjectLabel, "TARGET");
-            subjectValue = clean(subjectValue, "Unknown");
+            title = clean(title, SkillUiText.string("confirmation.default_title"));
+            badge = clean(badge, SkillUiText.string("confirmation.default_badge"));
+            authorityName = clean(authorityName, SkillUiText.string("confirmation.default_authority"));
+            subjectLabel = clean(subjectLabel, SkillUiText.string("common.target_label"));
+            subjectValue = clean(subjectValue, SkillUiText.string("common.unknown"));
             skills = skills == null
                     ? List.of()
                     : List.copyOf(skills);
@@ -1216,7 +1284,7 @@ public final class UltimateConfirmationScreen extends Screen {
             );
             outcomeLine = clean(outcomeLine, "");
             warning = clean(warning, "");
-            confirmLabel = clean(confirmLabel, "Confirm");
+            confirmLabel = clean(confirmLabel, SkillUiText.string("common.confirm"));
             theme = theme == null
                     ? SkillUiTheme.GOVERNANCE
                     : theme;
@@ -1228,11 +1296,11 @@ public final class UltimateConfirmationScreen extends Screen {
 
         public static ConfirmationRequest empty() {
             return new ConfirmationRequest(
-                    "Confirm Authority Action",
-                    "CONFIRM",
-                    "Ultimate Authority",
-                    "TARGET",
-                    "Unknown",
+                    SkillUiText.string("confirmation.default_title"),
+                    SkillUiText.string("confirmation.default_badge"),
+                    SkillUiText.string("confirmation.default_authority"),
+                    SkillUiText.string("common.target_label"),
+                    SkillUiText.string("common.unknown"),
                     List.of(),
                     0,
                     0,
@@ -1243,8 +1311,8 @@ public final class UltimateConfirmationScreen extends Screen {
                     0.0D,
                     0.0D,
                     "",
-                    "No valid action is available.",
-                    "Confirm",
+                    SkillUiText.string("confirmation.no_valid_action"),
+                    SkillUiText.string("common.confirm"),
                     SkillUiTheme.GOVERNANCE,
                     false,
                     false,

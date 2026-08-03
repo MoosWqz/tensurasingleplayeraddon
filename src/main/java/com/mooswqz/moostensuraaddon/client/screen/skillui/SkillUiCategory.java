@@ -1,9 +1,9 @@
 package com.mooswqz.moostensuraaddon.client.screen.skillui;
 
+import com.mooswqz.moostensuraaddon.util.UiFinalPolicy;
 import net.minecraft.network.chat.Component;
 
 import java.util.Comparator;
-import java.util.Locale;
 
 /**
  * Canonical category order shared by every skill-facing screen.
@@ -12,36 +12,36 @@ public enum SkillUiCategory {
 
     UNIQUE(
             0,
-            "unique",
-            Component.literal("Unique Skills"),
+            UiFinalPolicy.CATEGORY_UNIQUE,
+            "category.unique",
             0xD6A5FF
     ),
 
     EXTRA(
             1,
-            "extra",
-            Component.literal("Extra Skills"),
+            UiFinalPolicy.CATEGORY_EXTRA,
+            "category.extra",
             0x71C7FF
     ),
 
     BASIC(
             2,
-            "basic",
-            Component.literal("Basic Skills"),
+            UiFinalPolicy.CATEGORY_BASIC,
+            "category.basic",
             0xD0D0D0
     ),
 
     RESISTANCE(
             3,
-            "resistance",
-            Component.literal("Resistances"),
+            UiFinalPolicy.CATEGORY_RESISTANCE,
+            "category.resistance",
             0x71E0B8
     ),
 
     OTHER(
             4,
-            "other",
-            Component.literal("Other Skills"),
+            UiFinalPolicy.CATEGORY_OTHER,
+            "category.other",
             0xA0A0A0
     );
 
@@ -52,18 +52,18 @@ public enum SkillUiCategory {
 
     private final int order;
     private final String id;
-    private final Component displayName;
+    private final String translationKey;
     private final int defaultAccentColor;
 
     SkillUiCategory(
             int order,
             String id,
-            Component displayName,
+            String translationKey,
             int defaultAccentColor
     ) {
         this.order = order;
         this.id = id;
-        this.displayName = displayName;
+        this.translationKey = translationKey;
         this.defaultAccentColor = defaultAccentColor;
     }
 
@@ -76,7 +76,7 @@ public enum SkillUiCategory {
     }
 
     public Component displayName() {
-        return displayName;
+        return SkillUiText.component(translationKey);
     }
 
     public int defaultAccentColor() {
@@ -86,36 +86,12 @@ public enum SkillUiCategory {
     public static SkillUiCategory fromRaw(
             String rawCategory
     ) {
-        if (rawCategory == null
-                || rawCategory.isBlank()) {
-            return OTHER;
-        }
-
-        String normalized = rawCategory
-                .trim()
-                .toLowerCase(Locale.ROOT)
-                .replace('-', '_')
-                .replace(' ', '_');
-
-        if (normalized.contains("unique")
-                || normalized.contains("ultimate")) {
-            return UNIQUE;
-        }
-
-        if (normalized.contains("extra")) {
-            return EXTRA;
-        }
-
-        if (normalized.contains("basic")
-                || normalized.contains("common")) {
-            return BASIC;
-        }
-
-        if (normalized.contains("resistance")
-                || normalized.contains("resist")) {
-            return RESISTANCE;
-        }
-
-        return OTHER;
+        return switch (UiFinalPolicy.canonicalCategoryId(rawCategory)) {
+            case UiFinalPolicy.CATEGORY_UNIQUE -> UNIQUE;
+            case UiFinalPolicy.CATEGORY_EXTRA -> EXTRA;
+            case UiFinalPolicy.CATEGORY_BASIC -> BASIC;
+            case UiFinalPolicy.CATEGORY_RESISTANCE -> RESISTANCE;
+            default -> OTHER;
+        };
     }
 }

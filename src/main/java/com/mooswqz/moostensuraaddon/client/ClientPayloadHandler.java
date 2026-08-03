@@ -12,6 +12,7 @@ import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload
 import com.mooswqz.moostensuraaddon.network.OpenUltimateConfirmationScreenPayload;
 import com.mooswqz.moostensuraaddon.network.OpenUltimateMultiGrantScreenPayload;
 import com.mooswqz.moostensuraaddon.network.OpenUltimateSubordinateSkillScreenPayload;
+import com.mooswqz.moostensuraaddon.network.RemoveSubordinateOverviewEntryPayload;
 import com.mooswqz.moostensuraaddon.network.SyncRecognitionDisplayNamePayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -85,6 +86,19 @@ public final class ClientPayloadHandler {
         minecraft.setScreen(
                 new SubordinateOverviewScreen(payload)
         );
+    }
+
+    public static void removeSubordinateOverviewEntry(
+            RemoveSubordinateOverviewEntryPayload payload
+    ) {
+        Minecraft minecraft = Minecraft.getInstance();
+
+        if (payload == null
+                || !(minecraft.screen instanceof SubordinateOverviewScreen screen)) {
+            return;
+        }
+
+        screen.removeTarget(payload.targetUuid());
     }
 
     public static void openUltimateConfirmationScreen(

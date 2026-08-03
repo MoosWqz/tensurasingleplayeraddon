@@ -12,10 +12,12 @@ import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiRenderHelper;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionMode;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionModel;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiTheme;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiText;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SubordinateListWidget;
 import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload;
 import com.mooswqz.moostensuraaddon.network.RequestSubordinateOverviewPayload;
 import com.mooswqz.moostensuraaddon.util.SubordinateOverviewPolicy;
+import com.mooswqz.moostensuraaddon.util.UiTranslationToken;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -25,6 +27,7 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
@@ -74,7 +77,7 @@ public final class SubordinateOverviewScreen extends Screen {
     public SubordinateOverviewScreen(
             OpenSubordinateOverviewScreenPayload payload
     ) {
-        super(Component.literal("Subordinate Skills"));
+        super(SkillUiText.component("overview.title"));
         this.payload = payload == null
                 ? emptyPayload()
                 : payload;
@@ -100,10 +103,57 @@ public final class SubordinateOverviewScreen extends Screen {
         rememberCurrentState();
         payload = updatedPayload;
         theme = resolveTheme(payload);
-        statusMessage = Component.literal("Overview refreshed");
+        statusMessage = SkillUiText.component("overview.status_refreshed");
         statusColor = theme.successColor();
         refreshTicks = SubordinateOverviewPolicy.AUTO_REFRESH_TICKS;
 
+        clearWidgets();
+        init();
+    }
+
+    public void removeTarget(
+            String targetUuid
+    ) {
+        if (targetUuid == null || targetUuid.isBlank()) {
+            return;
+        }
+
+        Optional<OpenSubordinateOverviewScreenPayload.TargetEntry> removed =
+                payload.targets().stream()
+                        .filter(target -> target.targetUuid().equals(targetUuid))
+                        .findFirst();
+
+        if (removed.isEmpty()) {
+            return;
+        }
+
+        rememberCurrentState();
+        List<OpenSubordinateOverviewScreenPayload.TargetEntry> remaining =
+                payload.targets().stream()
+                        .filter(target -> !target.targetUuid().equals(targetUuid))
+                        .toList();
+        payload = new OpenSubordinateOverviewScreenPayload(
+                payload.themeId(),
+                payload.radius(),
+                payload.refreshAllowed(),
+                payload.truncated(),
+                remaining
+        );
+
+        if (selectedTargetUuid.equals(targetUuid)) {
+            selectedTargetUuid = "";
+            selectedTarget = null;
+            focusedSkill = null;
+            retainedFocusedSkillId = "";
+        }
+
+        statusMessage = SkillUiText.component(
+                "overview.status_subordinate_died",
+                UiTranslationToken.toComponent(
+                        removed.orElseThrow().targetName()
+                )
+        );
+        statusColor = theme.warningColor();
         clearWidgets();
         init();
     }
@@ -168,11 +218,16 @@ public final class SubordinateOverviewScreen extends Screen {
                 layout.targetFilter().top(),
                 layout.targetFilter().width(),
                 targetControlHeight,
-                Component.literal("Search subordinates")
+                SkillUiText.component("overview.search_subordinates")
         );
         subordinateSearchBox.setMaxLength(80);
         subordinateSearchBox.setHint(
-                Component.literal("Search names or skills…")
+                fitSearchHint(
+                        SkillUiText.component(
+                                "overview.search_subordinates_hint"
+                        ),
+                        layout.targetFilter().width()
+                )
         );
         subordinateSearchBox.setValue(retainedSubordinateQuery);
         subordinateSearchBox.setResponder(query -> {
@@ -206,10 +261,17 @@ public final class SubordinateOverviewScreen extends Screen {
                 skillFilter.top(),
                 searchWidth,
                 buttonHeight,
-                Component.literal("Search skills")
+                SkillUiText.component("common.search_skills")
         );
         skillSearchBox.setMaxLength(80);
-        skillSearchBox.setHint(Component.literal("Search skills…"));
+        skillSearchBox.setHint(
+                fitSearchHint(
+                        SkillUiText.component(
+                                "common.search_skills_hint"
+                        ),
+                        searchWidth
+                )
+        );
         skillSearchBox.setValue(retainedSkillQuery);
         skillSearchBox.setResponder(query -> {
             retainedSkillQuery = query;
@@ -278,7 +340,7 @@ public final class SubordinateOverviewScreen extends Screen {
                 buttonY,
                 refreshWidth,
                 buttonHeight,
-                Component.literal("Refresh"),
+                SkillUiText.component("common.refresh"),
                 theme,
                 SkillUiButton.Tone.NORMAL,
                 this::requestRefresh
@@ -286,8 +348,8 @@ public final class SubordinateOverviewScreen extends Screen {
         refreshButton.active = payload.refreshAllowed();
         refreshButton.setTooltip(
                 Tooltip.create(
-                        Component.literal(
-                                "Refresh nearby subordinate information"
+                        SkillUiText.component(
+                                "overview.refresh_tooltip"
                         )
                 )
         );
@@ -299,7 +361,7 @@ public final class SubordinateOverviewScreen extends Screen {
                 buttonY,
                 closeWidth,
                 buttonHeight,
-                Component.literal("Close"),
+                SkillUiText.component("common.close"),
                 theme,
                 SkillUiButton.Tone.NORMAL,
                 this::onClose
@@ -329,7 +391,7 @@ public final class SubordinateOverviewScreen extends Screen {
         }
 
         refreshTicks = SubordinateOverviewPolicy.AUTO_REFRESH_TICKS;
-        statusMessage = Component.literal("Refreshing…");
+        statusMessage = SkillUiText.component("overview.status_refreshing");
         statusColor = theme.mutedTextColor();
         PacketDistributor.sendToServer(
                 new RequestSubordinateOverviewPayload(
@@ -373,6 +435,19 @@ public final class SubordinateOverviewScreen extends Screen {
                 : selectedTarget.skills()
                 .stream()
                 .map(this::toSkillUiEntry)
+                .sorted(
+                        Comparator
+                                .comparingInt(
+                                        (SkillUiEntry entry) ->
+                                                entry.category().order()
+                                )
+                                .thenComparing(
+                                        (SkillUiEntry entry) ->
+                                                entry.displayName().getString(),
+                                        String.CASE_INSENSITIVE_ORDER
+                                )
+                                .thenComparing(SkillUiEntry::skillId)
+                )
                 .toList();
         skillListWidget.setEntries(entries);
 
@@ -397,14 +472,14 @@ public final class SubordinateOverviewScreen extends Screen {
             OpenSubordinateOverviewScreenPayload.SkillEntry entry
     ) {
         SkillUiCategory category = SkillUiCategory.fromRaw(
-                entry.categoryName()
+                entry.categoryId()
         );
         List<Component> details = new ArrayList<>();
         details.add(
-                Component.literal(
+                SkillUiText.component(
                         entry.grantedByViewer()
-                                ? "This skill was granted by you."
-                                : "This skill was not recorded as your grant."
+                                ? "overview.skill_granted_by_you"
+                                : "overview.skill_not_your_grant"
                 )
         );
 
@@ -415,10 +490,10 @@ public final class SubordinateOverviewScreen extends Screen {
                 true,
                 entry.mastered(),
                 Component.empty(),
-                Component.literal(
+                SkillUiText.component(
                         entry.grantedByViewer()
-                                ? "Granted by you"
-                                : "Native or other source"
+                                ? "overview.source_granted_by_you"
+                                : "overview.source_other"
                 ),
                 details,
                 category.defaultAccentColor()
@@ -496,12 +571,12 @@ public final class SubordinateOverviewScreen extends Screen {
         int badgeLeft = SkillUiRenderHelper.drawModeBadge(
                 guiGraphics,
                 font,
-                Component.literal(
+                SkillUiText.component(
                         payload.governance()
-                                ? "GOVERNANCE"
+                                ? "overview.badge_governance"
                                 : payload.benevolent()
-                                  ? "BENEVOLENT"
-                                  : "GRANTER"
+                                  ? "overview.badge_benevolent"
+                                  : "overview.badge_granter"
                 ),
                 header.right() - 2,
                 header.top() + 1,
@@ -510,23 +585,26 @@ public final class SubordinateOverviewScreen extends Screen {
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal("Subordinate Skills"),
+                SkillUiText.component("overview.title"),
                 header.left() + 2,
                 header.top() + 2,
                 Math.max(1, badgeLeft - header.left() - 10),
                 theme.primaryTextColor()
         );
 
-        String summary = payload.targets().size()
-                + (payload.targets().size() == 1
-                ? " subordinate"
-                : " subordinates")
-                + " within "
-                + formatRadius(payload.radius())
-                + " blocks";
+        String summary = SkillUiText.string(
+                payload.targets().size() == 1
+                        ? "overview.summary_one"
+                        : "overview.summary_many",
+                payload.targets().size(),
+                formatRadius(payload.radius())
+        );
 
         if (payload.truncated()) {
-            summary += " • display safety limit reached";
+            summary = SkillUiText.string(
+                    "overview.summary_truncated",
+                    summary
+            );
         }
 
         SkillUiRenderHelper.drawClippedText(
@@ -555,12 +633,11 @@ public final class SubordinateOverviewScreen extends Screen {
         SkillUiRenderHelper.drawText(
                 guiGraphics,
                 font,
-                Component.literal(
-                        "SUBORDINATES • "
-                                + (subordinateListWidget == null
+                SkillUiText.component(
+                        "overview.column_subordinates",
+                        subordinateListWidget == null
                                 ? 0
-                                : subordinateListWidget
-                                .visibleTargetCount())
+                                : subordinateListWidget.visibleTargetCount()
                 ),
                 layout.targetLabel().left(),
                 layout.targetLabel().top(),
@@ -569,11 +646,11 @@ public final class SubordinateOverviewScreen extends Screen {
         SkillUiRenderHelper.drawText(
                 guiGraphics,
                 font,
-                Component.literal(
-                        selectedTarget == null
-                                ? "SKILLS"
-                                : "SKILLS • "
-                                  + selectedTarget.skills().size()
+                selectedTarget == null
+                        ? SkillUiText.component("overview.column_skills")
+                        : SkillUiText.component(
+                        "overview.column_skills_count",
+                        selectedTarget.skills().size()
                 ),
                 layout.skillLabel().left(),
                 layout.skillLabel().top(),
@@ -582,7 +659,7 @@ public final class SubordinateOverviewScreen extends Screen {
         SkillUiRenderHelper.drawText(
                 guiGraphics,
                 font,
-                Component.literal("DETAILS"),
+                SkillUiText.component("overview.column_details"),
                 layout.detailLabel().left(),
                 layout.detailLabel().top(),
                 theme.secondaryAccentColor()
@@ -656,7 +733,7 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawCenteredText(
                     guiGraphics,
                     font,
-                    Component.literal("No subordinate selected"),
+                    SkillUiText.component("overview.no_subordinate_selected"),
                     bounds.centerX(),
                     bounds.centerY() - 4,
                     theme.mutedTextColor()
@@ -672,7 +749,7 @@ public final class SubordinateOverviewScreen extends Screen {
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal(selectedTarget.targetName()),
+                UiTranslationToken.toComponent(selectedTarget.targetName()),
                 left,
                 top,
                 maximumWidth,
@@ -685,12 +762,12 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawClippedText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            selectedTarget.typeName()
-                                    + " • "
-                                    + formatDistance(
-                                    selectedTarget.distance()
-                            )
+                    SkillUiText.component(
+                            "overview.type_distance",
+                            UiTranslationToken.toComponent(
+                                    selectedTarget.typeName()
+                            ),
+                            formatDistance(selectedTarget.distance())
                     ),
                     left,
                     top + 11,
@@ -700,15 +777,10 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawClippedText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            "Health: "
-                                    + formatCompact(
-                                    selectedTarget.health()
-                            )
-                                    + " / "
-                                    + formatCompact(
-                                    selectedTarget.maxHealth()
-                            )
+                    SkillUiText.component(
+                            "overview.health",
+                            formatCompact(selectedTarget.health()),
+                            formatCompact(selectedTarget.maxHealth())
                     ),
                     left,
                     top + 22,
@@ -718,13 +790,10 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawClippedText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            "EP "
-                                    + formatNumber(selectedTarget.ep())
-                                    + " • Magicules "
-                                    + formatNumber(
-                                    selectedTarget.magicules()
-                            )
+                    SkillUiText.component(
+                            "overview.ep_magicules_compact",
+                            formatNumber(selectedTarget.ep()),
+                            formatNumber(selectedTarget.magicules())
                     ),
                     left,
                     top + 33,
@@ -735,11 +804,10 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawClippedText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            selectedTarget.skills().size()
-                                    + " skills • "
-                                    + grantedCount
-                                    + " granted by you"
+                    SkillUiText.component(
+                            "overview.skill_grant_counts",
+                            selectedTarget.skills().size(),
+                            grantedCount
                     ),
                     left,
                     top + 44,
@@ -758,7 +826,7 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawClippedText(
                     guiGraphics,
                     font,
-                    Component.literal(selectedTarget.typeName()),
+                    UiTranslationToken.toComponent(selectedTarget.typeName()),
                     left,
                     top + 12,
                     maximumWidth,
@@ -767,11 +835,9 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            "Distance: "
-                                    + formatDistance(
-                                    selectedTarget.distance()
-                            )
+                    SkillUiText.component(
+                            "overview.distance",
+                            formatDistance(selectedTarget.distance())
                     ),
                     left,
                     top + 24,
@@ -780,15 +846,10 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            "Health: "
-                                    + formatCompact(
-                                    selectedTarget.health()
-                            )
-                                    + " / "
-                                    + formatCompact(
-                                    selectedTarget.maxHealth()
-                            )
+                    SkillUiText.component(
+                            "overview.health",
+                            formatCompact(selectedTarget.health()),
+                            formatCompact(selectedTarget.maxHealth())
                     ),
                     left,
                     top + 35,
@@ -797,9 +858,9 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            "EP: "
-                                    + formatNumber(selectedTarget.ep())
+                    SkillUiText.component(
+                            "overview.ep",
+                            formatNumber(selectedTarget.ep())
                     ),
                     left,
                     top + 46,
@@ -808,11 +869,9 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            "Magicules: "
-                                    + formatNumber(
-                                    selectedTarget.magicules()
-                            )
+                    SkillUiText.component(
+                            "overview.magicules",
+                            formatNumber(selectedTarget.magicules())
                     ),
                     left,
                     top + 57,
@@ -822,11 +881,10 @@ public final class SubordinateOverviewScreen extends Screen {
             SkillUiRenderHelper.drawText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            selectedTarget.skills().size()
-                                    + " skills • "
-                                    + grantedCount
-                                    + " granted by you"
+                    SkillUiText.component(
+                            "overview.skill_grant_counts",
+                            selectedTarget.skills().size(),
+                            grantedCount
                     ),
                     left,
                     top + 68,
@@ -876,10 +934,10 @@ public final class SubordinateOverviewScreen extends Screen {
         int color = statusColor;
 
         if (message.getString().isBlank()) {
-            message = Component.literal(
+            message = SkillUiText.component(
                     payload.refreshAllowed()
-                            ? "Updates automatically while this screen is open"
-                            : "Read-only subordinate information"
+                            ? "overview.footer_auto_refresh"
+                            : "overview.footer_read_only"
             );
             color = theme.mutedTextColor();
         }
@@ -930,24 +988,44 @@ public final class SubordinateOverviewScreen extends Screen {
             int width
     ) {
         if (width < 34) {
-            return Component.literal(
-                    category.id().substring(0, 1).toUpperCase(Locale.ROOT)
+            return SkillUiText.component(
+                    "category." + category.id() + "_compact"
             );
         }
 
         if (width < 54) {
-            return Component.literal(
-                    switch (category) {
-                        case UNIQUE -> "Uniq";
-                        case EXTRA -> "Extra";
-                        case BASIC -> "Basic";
-                        case RESISTANCE -> "Res";
-                        case OTHER -> "Other";
-                    }
+            return SkillUiText.component(
+                    "category." + category.id() + "_short"
             );
         }
 
         return category.displayName();
+    }
+
+    private Component fitSearchHint(
+            Component hint,
+            int editBoxWidth
+    ) {
+        int maximumTextWidth = Math.max(
+                1,
+                editBoxWidth - 10
+        );
+
+        if (font.width(hint) <= maximumTextWidth) {
+            return hint;
+        }
+
+        String ellipsis = "...";
+        int clippedWidth = Math.max(
+                1,
+                maximumTextWidth - font.width(ellipsis)
+        );
+        String clippedText = font.plainSubstrByWidth(
+                hint.getString(),
+                clippedWidth
+        );
+
+        return Component.literal(clippedText + ellipsis);
     }
 
     private static SkillUiTheme resolveTheme(

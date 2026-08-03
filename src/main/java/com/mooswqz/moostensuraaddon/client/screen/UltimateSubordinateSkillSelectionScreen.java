@@ -12,6 +12,7 @@ import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiRenderHelper;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionMode;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionModel;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiTheme;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiText;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.UltimateBorrowSeizeUiEntryFactory;
 import com.mooswqz.moostensuraaddon.network.ExecuteUltimateSubordinateSkillPayload;
 import com.mooswqz.moostensuraaddon.network.OpenUltimateSubordinateSkillScreenPayload;
@@ -70,18 +71,16 @@ public final class UltimateSubordinateSkillSelectionScreen
             OpenUltimateSubordinateSkillScreenPayload payload
     ) {
         super(
-                Component.literal(
-                        payload != null && payload.seize()
-                                ? "Seize Skills"
-                                : "Borrow Skills"
-                )
+                payload != null && payload.seize()
+                        ? SkillUiText.component("seize.title")
+                        : SkillUiText.component("borrow.title")
         );
 
         this.payload = payload == null
                 ? new OpenUltimateSubordinateSkillScreenPayload(
                 false,
                 "",
-                "Unknown subordinate",
+                SkillUiText.string("common.unknown_subordinate"),
                 0.0D,
                 0.0D,
                 0.0D,
@@ -212,11 +211,11 @@ public final class UltimateSubordinateSkillSelectionScreen
                 controlY,
                 searchWidth,
                 buttonHeight,
-                Component.literal("Search skills")
+                SkillUiText.component("common.search_skills")
         );
         searchBox.setMaxLength(80);
         searchBox.setHint(
-                Component.literal("Search skills…")
+                SkillUiText.component("common.search_skills_hint")
         );
         searchBox.setValue(retainedQuery);
         searchBox.setResponder(
@@ -302,19 +301,17 @@ public final class UltimateSubordinateSkillSelectionScreen
                 buttonY,
                 buttonWidth,
                 buttonHeight,
-                Component.literal(
-                        compactLabels
-                                ? "All Shown"
-                                : "Select Shown"
-                ),
+                compactLabels
+                        ? SkillUiText.component("common.all_shown")
+                        : SkillUiText.component("common.select_shown"),
                 theme,
                 SkillUiButton.Tone.NORMAL,
                 this::selectShown
         );
         selectShownButton.setTooltip(
                 Tooltip.create(
-                        Component.literal(
-                                "Select every filtered skill, up to the 32-skill safety limit."
+                        SkillUiText.component(
+                                "tooltip.select_filtered_limit_32"
                         )
                 )
         );
@@ -326,7 +323,7 @@ public final class UltimateSubordinateSkillSelectionScreen
                 buttonY,
                 buttonWidth,
                 buttonHeight,
-                Component.literal("Clear"),
+                SkillUiText.component("common.clear"),
                 theme,
                 SkillUiButton.Tone.NORMAL,
                 this::clearSelection
@@ -339,7 +336,7 @@ public final class UltimateSubordinateSkillSelectionScreen
                 buttonY,
                 buttonWidth,
                 buttonHeight,
-                Component.literal("Cancel"),
+                SkillUiText.component("common.cancel"),
                 theme,
                 SkillUiButton.Tone.NORMAL,
                 this::onClose
@@ -352,11 +349,9 @@ public final class UltimateSubordinateSkillSelectionScreen
                 buttonY,
                 Math.max(1, footer.right() - buttonX),
                 buttonHeight,
-                Component.literal(
-                        payload.seize()
-                                ? "Seize Skills"
-                                : "Borrow Skills"
-                ),
+                payload.seize()
+                        ? SkillUiText.component("seize.button_many", 0)
+                        : SkillUiText.component("borrow.button_many", 0),
                 theme,
                 payload.seize()
                         ? SkillUiButton.Tone.DANGER
@@ -365,11 +360,9 @@ public final class UltimateSubordinateSkillSelectionScreen
         );
         confirmButton.setTooltip(
                 Tooltip.create(
-                        Component.literal(
-                                payload.seize()
-                                        ? "Immediately take the selected skills from the displayed target."
-                                        : "Immediately copy the selected skills from the displayed target."
-                        )
+                        payload.seize()
+                                ? SkillUiText.component("seize.tooltip")
+                                : SkillUiText.component("borrow.tooltip")
                 )
         );
         addRenderableWidget(confirmButton);
@@ -430,40 +423,36 @@ public final class UltimateSubordinateSkillSelectionScreen
             SkillUiSelectionModel.ToggleResult result
     ) {
         focusedEntry = entry;
-        String action = payload.seize()
-                ? "seizure"
-                : "borrow";
-
         switch (result) {
             case SELECTED -> setStatus(
-                    Component.literal(
-                            entry.displayName().getString()
-                                    + " added to the "
-                                    + action
-                                    + "."
+                    SkillUiText.component(
+                            payload.seize()
+                                    ? "seize.status_added"
+                                    : "borrow.status_added",
+                            entry.displayName()
                     ),
                     theme.successColor()
             );
             case DESELECTED -> setStatus(
-                    Component.literal(
-                            entry.displayName().getString()
-                                    + " removed from the "
-                                    + action
-                                    + "."
+                    SkillUiText.component(
+                            payload.seize()
+                                    ? "seize.status_removed"
+                                    : "borrow.status_removed",
+                            entry.displayName()
                     ),
                     theme.mutedTextColor()
             );
             case LIMIT_REACHED -> setStatus(
-                    Component.literal(
-                            "A maximum of 32 skills can be submitted at once."
+                    SkillUiText.component(
+                            "error.maximum_32_skills"
                     ),
                     theme.warningColor()
             );
             case NOT_SELECTABLE -> setStatus(
                     entry.hasDisabledReason()
                             ? entry.disabledReason()
-                            : Component.literal(
-                            "This skill cannot be selected."
+                            : SkillUiText.component(
+                            "error.skill_not_selectable"
                     ),
                     theme.warningColor()
             );
@@ -480,11 +469,13 @@ public final class UltimateSubordinateSkillSelectionScreen
         );
 
         setStatus(
-                Component.literal(
-                        added > 0
-                                ? added
-                                  + " visible skill(s) selected."
-                                : "No additional visible skills could be selected."
+                added > 0
+                        ? SkillUiText.component(
+                        "status.visible_skills_selected",
+                        added
+                )
+                        : SkillUiText.component(
+                        "status.no_additional_visible_skills"
                 ),
                 added > 0
                         ? theme.successColor()
@@ -496,7 +487,7 @@ public final class UltimateSubordinateSkillSelectionScreen
     private void clearSelection() {
         selectionModel.clear();
         setStatus(
-                Component.literal("Selection cleared."),
+                SkillUiText.component("status.selection_cleared"),
                 theme.mutedTextColor()
         );
         updateControls();
@@ -505,8 +496,8 @@ public final class UltimateSubordinateSkillSelectionScreen
     private void confirmSelection() {
         if (selectionModel.selectedCount() <= 0) {
             setStatus(
-                    Component.literal(
-                            "Select at least one skill first."
+                    SkillUiText.component(
+                            "error.select_at_least_one_skill"
                     ),
                     theme.warningColor()
             );
@@ -551,24 +542,26 @@ public final class UltimateSubordinateSkillSelectionScreen
         if (confirmButton != null) {
             confirmButton.active = selectedCount > 0;
             confirmButton.setMessage(
-                    Component.literal(
-                            selectedCount > 0
-                                    ? actionVerb()
-                                      + " "
-                                      + selectedCount
-                                      + (selectedCount == 1
-                                         ? " Skill"
-                                         : " Skills")
-                                    : actionVerb() + " Skills"
+                    SkillUiText.component(
+                            payload.seize()
+                                    ? selectedCount == 1
+                                      ? "seize.button_one"
+                                      : "seize.button_many"
+                                    : selectedCount == 1
+                                      ? "borrow.button_one"
+                                      : "borrow.button_many",
+                            selectedCount
                     )
             );
         }
     }
 
     private String actionVerb() {
-        return payload.seize()
-                ? "Seize"
-                : "Borrow";
+        return SkillUiText.string(
+                payload.seize()
+                        ? "seize.verb"
+                        : "borrow.verb"
+        );
     }
 
     private Optional<SkillUiEntry> findEntry(
@@ -592,23 +585,21 @@ public final class UltimateSubordinateSkillSelectionScreen
     ) {
         if (buttonWidth >= 58) {
             return switch (category) {
-                case UNIQUE -> Component.literal("Unique");
-                case EXTRA -> Component.literal("Extra");
-                case BASIC -> Component.literal("Basic");
-                case RESISTANCE -> Component.literal("Resist");
-                case OTHER -> Component.literal("Other");
+                case UNIQUE -> SkillUiText.component("category.unique_short");
+                case EXTRA -> SkillUiText.component("category.extra_short");
+                case BASIC -> SkillUiText.component("category.basic_short");
+                case RESISTANCE -> SkillUiText.component("category.resistance_short");
+                case OTHER -> SkillUiText.component("category.other_short");
             };
         }
 
-        return Component.literal(
-                switch (category) {
-                    case UNIQUE -> "U";
-                    case EXTRA -> "E";
-                    case BASIC -> "B";
-                    case RESISTANCE -> "R";
-                    case OTHER -> "O";
-                }
-        );
+        return switch (category) {
+            case UNIQUE -> SkillUiText.component("category.unique_compact");
+            case EXTRA -> SkillUiText.component("category.extra_compact");
+            case BASIC -> SkillUiText.component("category.basic_compact");
+            case RESISTANCE -> SkillUiText.component("category.resistance_compact");
+            case OTHER -> SkillUiText.component("category.other_compact");
+        };
     }
 
     private void setStatus(
@@ -756,13 +747,13 @@ public final class UltimateSubordinateSkillSelectionScreen
     ) {
         SkillUiLayout.Rect header = layout.header();
         int textLeft = header.left() + 2;
-        String modeName = payload.seize()
-                ? "SEIZE"
-                : "BORROW";
+        Component modeName = payload.seize()
+                ? SkillUiText.component("seize.badge")
+                : SkillUiText.component("borrow.badge");
         int badgeLeft = SkillUiRenderHelper.drawModeBadge(
                 guiGraphics,
                 font,
-                Component.literal(modeName),
+                modeName,
                 header.right() - 2,
                 header.top() + 1,
                 payload.seize()
@@ -806,8 +797,9 @@ public final class UltimateSubordinateSkillSelectionScreen
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal(
-                        "TARGET • " + payload.targetName()
+                SkillUiText.component(
+                        "header.target_value",
+                        payload.targetName()
                 ),
                 targetStrip.left() + 5,
                 targetStrip.top() + 3,
@@ -861,18 +853,11 @@ public final class UltimateSubordinateSkillSelectionScreen
                             selectedCount
                     );
 
-            return Component.literal(
-                    "Absolute Governance • "
-                            + selectedCount
-                            + " selected • "
-                            + UltimateBorrowSeizePolicy.formatNumber(
-                            totalCost
-                    )
-                            + " magicules • target death risk "
-                            + UltimateBorrowSeizePolicy.formatPercent(
-                            deathChance
-                    )
-                            + " • selected skills are removed permanently"
+            return SkillUiText.component(
+                    "seize.summary",
+                    selectedCount,
+                    UltimateBorrowSeizePolicy.formatNumber(totalCost),
+                    UltimateBorrowSeizePolicy.formatPercent(deathChance)
             );
         }
 
@@ -882,18 +867,11 @@ public final class UltimateSubordinateSkillSelectionScreen
                         borrowChances
                 );
 
-        return Component.literal(
-                "Benevolent Empowerment • "
-                        + selectedCount
-                        + " selected • "
-                        + UltimateBorrowSeizePolicy.formatNumber(
-                        totalCost
-                )
-                        + " magicules • highest permanent chance "
-                        + UltimateBorrowSeizePolicy.formatPercent(
-                        highestChance
-                )
-                        + " • target keeps every skill"
+        return SkillUiText.component(
+                "borrow.summary",
+                selectedCount,
+                UltimateBorrowSeizePolicy.formatNumber(totalCost),
+                UltimateBorrowSeizePolicy.formatPercent(highestChance)
         );
     }
 

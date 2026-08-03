@@ -57,8 +57,12 @@ public class GranterSkill extends Skill {
             int mode
     ) {
         return switch (GranterMode.fromId(mode)) {
-            case GRANT -> Component.literal("Grant");
-            case TAKE_BACK -> Component.literal("Take Back");
+            case GRANT -> Component.translatable(
+                    "skill.moostensuraaddon.mode.granter.grant"
+            );
+            case TAKE_BACK -> Component.translatable(
+                    "skill.moostensuraaddon.mode.granter.take_back"
+            );
         };
     }
 

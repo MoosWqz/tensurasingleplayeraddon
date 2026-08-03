@@ -61,7 +61,7 @@ public final class AuthorityActionService {
         LivingEntity target = getLookedAtSubordinate(player);
 
         if (target == null) {
-            sendError(player, "Look at one of your subordinates first.");
+            sendError(player, AuthorityText.component("error.look_at_subordinate"));
             return;
         }
 
@@ -101,7 +101,7 @@ public final class AuthorityActionService {
         LivingEntity target = getLookedAtSubordinate(player);
 
         if (target == null) {
-            sendError(player, "Look at one of your subordinates first.");
+            sendError(player, AuthorityText.component("error.look_at_subordinate"));
             return;
         }
 
@@ -115,8 +115,10 @@ public final class AuthorityActionService {
         if (entries.isEmpty()) {
             sendError(
                     player,
-                    target.getDisplayName().getString()
-                            + " has no skill that was granted by you."
+                    AuthorityText.component(
+                            "error.target_has_no_grant",
+                            target.getDisplayName()
+                    )
             );
             return;
         }
@@ -144,14 +146,14 @@ public final class AuthorityActionService {
                 : AuthorityActionMode.GOVERNANCE_INVEST;
 
         if (!hasAuthority(player, mode)) {
-            sendError(player, "The required Ultimate authority is missing.");
+            sendError(player, AuthorityText.component("error.ultimate_missing"));
             return;
         }
 
         LivingEntity target = getLookedAtSubordinate(player);
 
         if (target == null) {
-            sendError(player, "Look at one of your subordinates first.");
+            sendError(player, AuthorityText.component("error.look_at_subordinate"));
             return;
         }
 
@@ -186,14 +188,14 @@ public final class AuthorityActionService {
                 : AuthorityActionMode.GOVERNANCE_MASS_GRANT;
 
         if (!hasAuthority(player, mode)) {
-            sendError(player, "The required Ultimate authority is missing.");
+            sendError(player, AuthorityText.component("error.ultimate_missing"));
             return;
         }
 
         List<LivingEntity> scope = getScopeSubordinates(player, mode);
 
         if (scope.isEmpty()) {
-            sendError(player, "No eligible subordinates are currently within the authority radius.");
+            sendError(player, AuthorityText.component("error.no_eligible_subordinates"));
             return;
         }
 
@@ -223,7 +225,7 @@ public final class AuthorityActionService {
                 : AuthorityActionMode.GOVERNANCE_TAKE_BACK;
 
         if (!hasAuthority(player, mode)) {
-            sendError(player, "The required Ultimate authority is missing.");
+            sendError(player, AuthorityText.component("error.ultimate_missing"));
             return;
         }
 
@@ -237,7 +239,7 @@ public final class AuthorityActionService {
                 );
 
         if (entries.isEmpty()) {
-            sendError(player, "No reclaimable grants were found in the current authority scope.");
+            sendError(player, AuthorityText.component("error.no_reclaimable_grants"));
             return;
         }
 
@@ -266,7 +268,7 @@ public final class AuthorityActionService {
                 AuthorityActionMode.fromId(rawActionId);
 
         if (modeOptional.isEmpty()) {
-            sendError(player, "The requested authority action is unknown.");
+            sendError(player, AuthorityText.component("error.unknown_action"));
             return;
         }
 
@@ -278,7 +280,7 @@ public final class AuthorityActionService {
                 );
 
         if (request.uniqueSkillIds().isEmpty()) {
-            sendError(player, "Select at least one skill.");
+            sendError(player, AuthorityText.component("error.select_skill"));
             return;
         }
 
@@ -286,8 +288,8 @@ public final class AuthorityActionService {
             sendError(
                     player,
                     request.overLimit()
-                            ? "The skill selection exceeds the allowed limit."
-                            : "The skill request contains an invalid or duplicate entry."
+                            ? AuthorityText.component("error.selection_over_limit")
+                            : AuthorityText.component("error.invalid_or_duplicate")
             );
             return;
         }
@@ -298,7 +300,7 @@ public final class AuthorityActionService {
             ResourceLocation skillId = ResourceLocation.tryParse(rawSkillId);
 
             if (skillId == null) {
-                sendError(player, "One selected skill has an invalid registry ID.");
+                sendError(player, AuthorityText.component("error.invalid_registry_id"));
                 return;
             }
 
@@ -306,7 +308,7 @@ public final class AuthorityActionService {
         }
 
         if (!hasAuthority(player, mode)) {
-            sendError(player, "The required authority is no longer available.");
+            sendError(player, AuthorityText.component("error.authority_unavailable"));
             return;
         }
 
@@ -350,14 +352,14 @@ public final class AuthorityActionService {
             List<ResourceLocation> skillIds
     ) {
         if (targetUuid == null) {
-            sendError(player, "The selected subordinate is invalid.");
+            sendError(player, AuthorityText.component("error.invalid_subordinate"));
             return;
         }
 
         LivingEntity target = getSubordinateByUuid(player, targetUuid);
 
         if (target == null) {
-            sendError(player, "The selected subordinate is no longer available or within range.");
+            sendError(player, AuthorityText.component("error.subordinate_unavailable"));
             return;
         }
 
@@ -365,7 +367,7 @@ public final class AuthorityActionService {
                 getAuthorityInstance(player, mode);
 
         if (authorityOptional.isEmpty()) {
-            sendError(player, "The required authority is no longer available.");
+            sendError(player, AuthorityText.component("error.authority_unavailable"));
             return;
         }
 
@@ -375,11 +377,12 @@ public final class AuthorityActionService {
                 && authority.onCoolDown(GranterMode.GRANT.id())) {
             sendError(
                     player,
-                    "Grant is still cooling down for "
-                            + formatSeconds(
-                            authority.getCoolDown(GranterMode.GRANT.id())
+                    AuthorityText.component(
+                            "error.grant_cooldown",
+                            formatSeconds(
+                                    authority.getCoolDown(GranterMode.GRANT.id())
+                            )
                     )
-                            + "."
             );
             return;
         }
@@ -392,7 +395,7 @@ public final class AuthorityActionService {
             ManasSkill skill = SkillAPI.getSkillRegistry().get(skillId);
 
             if (sourceOptional.isEmpty() || skill == null) {
-                sendError(player, "A selected skill is no longer owned or registered.");
+                sendError(player, AuthorityText.component("error.skill_unavailable"));
                 return;
             }
 
@@ -404,23 +407,30 @@ public final class AuthorityActionService {
                     skillId,
                     source.getDisplayName()
             )) {
-                sendError(player, source.getDisplayName().getString() + " cannot be transferred.");
+                sendError(player, AuthorityText.component(
+                        "error.cannot_transfer",
+                        source.getDisplayName()
+                ));
                 return;
             }
 
             if (mode == AuthorityActionMode.GRANTER_GRANT
                     && !source.isMastered(player)) {
-                sendError(player, source.getDisplayName().getString() + " is not mastered.");
+                sendError(player, AuthorityText.component(
+                        "error.not_mastered",
+                        source.getDisplayName()
+                ));
                 return;
             }
 
             if (SkillAPI.getSkillsFrom(target).getSkill(skillId).isPresent()) {
                 sendError(
                         player,
-                        target.getDisplayName().getString()
-                                + " already possesses "
-                                + source.getDisplayName().getString()
-                                + "."
+                        AuthorityText.component(
+                                "error.target_already_possesses",
+                                target.getDisplayName(),
+                                source.getDisplayName()
+                        )
                 );
                 return;
             }
@@ -453,7 +463,7 @@ public final class AuthorityActionService {
                 rollbackGrantedSkills(player, target, applied);
                 sendError(
                         player,
-                        "The transfer failed before completion. No magicules were consumed."
+                        AuthorityText.component("error.transfer_rolled_back")
                 );
                 return;
             }
@@ -491,23 +501,21 @@ public final class AuthorityActionService {
         sendSuccess(
                 player,
                 mode == AuthorityActionMode.GRANTER_GRANT
-                        ? "Granted "
-                          + candidates.getFirst().source().getDisplayName().getString()
-                          + " to "
-                          + target.getDisplayName().getString()
-                          + " for "
-                          + formatNumber(totalCost)
-                          + " magicules."
-                        : mode.title()
-                          + " completed: "
-                          + candidates.size()
-                          + " skill"
-                          + (candidates.size() == 1 ? "" : "s")
-                          + " transferred to "
-                          + target.getDisplayName().getString()
-                          + " for "
-                          + formatNumber(totalCost)
-                          + " magicules."
+                        ? AuthorityText.component(
+                        "success.granter_grant",
+                        candidates.getFirst().source().getDisplayName(),
+                        target.getDisplayName(),
+                        formatNumber(totalCost)
+                )
+                        : AuthorityText.component(
+                        candidates.size() == 1
+                        ? "success.direct_one"
+                        : "success.direct_many",
+                        mode.titleComponent(),
+                        candidates.size(),
+                        target.getDisplayName(),
+                        formatNumber(totalCost)
+                )
         );
     }
 
@@ -525,14 +533,14 @@ public final class AuthorityActionService {
         if (authorityOptional.isEmpty()
                 || sourceOptional.isEmpty()
                 || skill == null) {
-            sendError(player, "The selected Mass Grant skill is no longer available.");
+            sendError(player, AuthorityText.component("error.mass_skill_unavailable"));
             return;
         }
 
         ManasSkillInstance source = sourceOptional.orElseThrow();
 
         if (!source.isMastered(player)) {
-            sendError(player, "Mass Grant requires a mastered skill.");
+            sendError(player, AuthorityText.component("error.mass_requires_mastery"));
             return;
         }
 
@@ -542,7 +550,10 @@ public final class AuthorityActionService {
                 skillId,
                 source.getDisplayName()
         )) {
-            sendError(player, source.getDisplayName().getString() + " cannot be mass granted.");
+            sendError(player, AuthorityText.component(
+                    "error.cannot_mass_grant",
+                    source.getDisplayName()
+            ));
             return;
         }
 
@@ -554,7 +565,7 @@ public final class AuthorityActionService {
                 .toList();
 
         if (targets.isEmpty()) {
-            sendError(player, "No eligible subordinate can currently receive that skill.");
+            sendError(player, AuthorityText.component("error.no_mass_recipient"));
             return;
         }
 
@@ -586,7 +597,7 @@ public final class AuthorityActionService {
 
                 sendError(
                         player,
-                        "Mass Grant failed before completion. No magicules were consumed."
+                        AuthorityText.component("error.mass_rolled_back")
                 );
                 return;
             }
@@ -617,15 +628,14 @@ public final class AuthorityActionService {
 
         sendSuccess(
                 player,
-                "Mass granted "
-                        + source.getDisplayName().getString()
-                        + " to "
-                        + targets.size()
-                        + " subordinate"
-                        + (targets.size() == 1 ? "" : "s")
-                        + " for "
-                        + formatNumber(totalCost)
-                        + " magicules."
+                AuthorityText.component(
+                        targets.size() == 1
+                                ? "success.mass_one"
+                                : "success.mass_many",
+                        source.getDisplayName(),
+                        targets.size(),
+                        formatNumber(totalCost)
+                )
         );
     }
 
@@ -640,7 +650,7 @@ public final class AuthorityActionService {
                 getAuthorityInstance(player, mode);
 
         if (authorityOptional.isEmpty()) {
-            sendError(player, "The required authority is no longer available.");
+            sendError(player, AuthorityText.component("error.authority_unavailable"));
             return;
         }
 
@@ -649,14 +659,14 @@ public final class AuthorityActionService {
         if (mode == AuthorityActionMode.GRANTER_TAKE_BACK
                 || !allEligible) {
             if (targetUuid == null) {
-                sendError(player, "Select a subordinate or enable all eligible recipients.");
+                sendError(player, AuthorityText.component("error.select_target_or_all"));
                 return;
             }
 
             LivingEntity target = getSubordinateByUuid(player, targetUuid);
 
             if (target == null) {
-                sendError(player, "The selected subordinate is no longer available or within range.");
+                sendError(player, AuthorityText.component("error.subordinate_unavailable"));
                 return;
             }
 
@@ -684,15 +694,17 @@ public final class AuthorityActionService {
             } else if (!allEligible) {
                 sendError(
                         player,
-                        target.getDisplayName().getString()
-                                + " does not have that skill from you."
+                        AuthorityText.component(
+                                "error.target_missing_your_grant",
+                                target.getDisplayName()
+                        )
                 );
                 return;
             }
         }
 
         if (candidates.isEmpty()) {
-            sendError(player, "No eligible grant remains to take back.");
+            sendError(player, AuthorityText.component("error.no_grant_to_take_back"));
             return;
         }
 
@@ -746,13 +758,13 @@ public final class AuthorityActionService {
 
         sendSuccess(
                 player,
-                "Took back "
-                        + getSkillDisplayName(player, skillId).getString()
-                        + " from "
-                        + candidates.size()
-                        + " subordinate"
-                        + (candidates.size() == 1 ? "" : "s")
-                        + "."
+                AuthorityText.component(
+                        candidates.size() == 1
+                                ? "success.take_back_one"
+                                : "success.take_back_many",
+                        getSkillDisplayName(player, skillId),
+                        candidates.size()
+                )
         );
     }
 
@@ -793,10 +805,14 @@ public final class AuthorityActionService {
             String disabledReason = "";
 
             if (targetAlreadyHas) {
-                disabledReason = "Target already possesses this skill.";
+                disabledReason = UiTranslationToken.encode(
+                        "message.moostensuraaddon.authority.disabled.target_has_skill"
+                );
             } else if (!mastered
                     && !mode.supportsUnmasteredSkills()) {
-                disabledReason = "Granter can transfer mastered skills only.";
+                disabledReason = UiTranslationToken.encode(
+                        "message.moostensuraaddon.authority.disabled.granter_mastered_only"
+                );
             }
 
             CostBreakdown cost = getDirectCost(mode, source, player);
@@ -863,7 +879,9 @@ public final class AuthorityActionService {
             boolean selectable = affectedTargets > 0;
             String disabledReason = selectable
                     ? ""
-                    : "Every subordinate in scope already possesses this skill.";
+                    : UiTranslationToken.encode(
+                    "message.moostensuraaddon.authority.disabled.every_target_has_skill"
+            );
             double totalCost = costPerTarget * affectedTargets;
             SkillCategoryHelper.SkillCategory category =
                     SkillCategoryHelper.getCategory(
@@ -1013,7 +1031,7 @@ public final class AuthorityActionService {
             List<OpenUltimateMultiGrantScreenPayload.SkillEntry> entries
     ) {
         if (entries.isEmpty()) {
-            sendError(player, "No skill is currently available for this action.");
+            sendError(player, AuthorityText.component("error.no_skill_available"));
             return;
         }
 
@@ -1026,9 +1044,13 @@ public final class AuthorityActionService {
         if (target != null) {
             targetName = target.getDisplayName().getString();
         } else if (mode == AuthorityActionMode.GOVERNANCE_TAKE_BACK) {
-            targetName = "Loaded subordinates within 128 blocks";
+            targetName = UiTranslationToken.encode(
+                    "message.moostensuraaddon.authority.scope.governance_128"
+            );
         } else {
-            targetName = "Nearby subordinates within 32 blocks";
+            targetName = UiTranslationToken.encode(
+                    "message.moostensuraaddon.authority.scope.benevolent_32"
+            );
         }
 
         PacketDistributor.sendToPlayer(
@@ -1267,7 +1289,7 @@ public final class AuthorityActionService {
         for (ResourceLocation skillId : skillIds) {
             SkillAPI.getSkillsFrom(target).forgetSkill(
                     skillId,
-                    Component.literal("Authority action rolled back")
+                    AuthorityText.component("rollback.reason")
             );
             data.removeGrant(skillId.toString(), player.getUUID());
         }
@@ -1457,7 +1479,7 @@ public final class AuthorityActionService {
         }
 
         return skillId == null
-                ? Component.literal("Unknown Skill")
+                ? AuthorityText.component("unknown_skill")
                 : Component.literal(skillId.toString());
     }
 
@@ -1467,33 +1489,31 @@ public final class AuthorityActionService {
     ) {
         sendError(
                 player,
-                "This action requires "
-                        + formatNumber(required)
-                        + " magicules, but only "
-                        + formatNumber(getCurrentMagicules(player))
-                        + " are available."
+                AuthorityText.component(
+                        "error.insufficient_magicules",
+                        formatNumber(required),
+                        formatNumber(getCurrentMagicules(player))
+                )
         );
     }
 
     private static void sendError(
             ServerPlayer player,
-            String message
+            Component message
     ) {
         ActionbarHelper.send(
                 player,
-                Component.literal(message)
-                        .withStyle(ChatFormatting.RED)
+                message.copy().withStyle(ChatFormatting.RED)
         );
     }
 
     private static void sendSuccess(
             ServerPlayer player,
-            String message
+            Component message
     ) {
         ActionbarHelper.send(
                 player,
-                Component.literal(message)
-                        .withStyle(ChatFormatting.GREEN)
+                message.copy().withStyle(ChatFormatting.GREEN)
         );
     }
 
@@ -1507,11 +1527,14 @@ public final class AuthorityActionService {
         return String.format(Locale.US, "%,.0f", value);
     }
 
-    private static String formatSeconds(int ticks) {
-        return String.format(
-                Locale.US,
-                "%.1f seconds",
-                Math.max(0, ticks) / 20.0D
+    private static Component formatSeconds(int ticks) {
+        return AuthorityText.component(
+                "seconds",
+                String.format(
+                        Locale.US,
+                        "%.1f",
+                        Math.max(0, ticks) / 20.0D
+                )
         );
     }
 

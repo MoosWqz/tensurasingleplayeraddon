@@ -2,6 +2,7 @@ package com.mooswqz.moostensuraaddon.client.screen.skillui;
 
 import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload;
 import com.mooswqz.moostensuraaddon.util.SubordinateOverviewPolicy;
+import com.mooswqz.moostensuraaddon.util.UiTranslationToken;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -51,7 +52,7 @@ public final class SubordinateListWidget extends AbstractWidget {
                 y,
                 Math.max(1, width),
                 Math.max(1, height),
-                Component.literal("Subordinate list")
+                SkillUiText.component("narration.subordinate_list")
         );
         this.font = font == null
                 ? Minecraft.getInstance().font
@@ -167,7 +168,7 @@ public final class SubordinateListWidget extends AbstractWidget {
             SkillUiRenderHelper.drawCenteredText(
                     guiGraphics,
                     font,
-                    Component.literal("No matching subordinates"),
+                    SkillUiText.component("empty.no_matching_subordinates"),
                     getX() + getWidth() / 2,
                     getY() + getHeight() / 2 - 4,
                     theme.mutedTextColor()
@@ -273,7 +274,7 @@ public final class SubordinateListWidget extends AbstractWidget {
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal(target.targetName()),
+                UiTranslationToken.toComponent(target.targetName()),
                 left + 6,
                 top + 4,
                 Math.max(1, right - left - 12),
@@ -284,10 +285,10 @@ public final class SubordinateListWidget extends AbstractWidget {
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal(
-                        target.typeName()
-                                + " • "
-                                + formatDistance(target.distance())
+                SkillUiText.component(
+                        "overview.type_distance",
+                        UiTranslationToken.toComponent(target.typeName()),
+                        formatDistance(target.distance())
                 ),
                 left + 6,
                 top + 15,
@@ -297,11 +298,11 @@ public final class SubordinateListWidget extends AbstractWidget {
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal(
+                SkillUiText.component(
+                        target.skills().size() == 1
+                                ? "count.skill_one"
+                                : "count.skill_many",
                         target.skills().size()
-                                + (target.skills().size() == 1
-                                ? " skill"
-                                : " skills")
                 ),
                 left + 6,
                 top + 25,
@@ -450,8 +451,8 @@ public final class SubordinateListWidget extends AbstractWidget {
 
             if (SubordinateOverviewPolicy.matchesTarget(
                     query,
-                    target.targetName(),
-                    target.typeName(),
+                    UiTranslationToken.toComponent(target.targetName()).getString(),
+                    UiTranslationToken.toComponent(target.typeName()).getString(),
                     skillSearchTexts
             )) {
                 filteredTargets.add(target);
@@ -527,14 +528,14 @@ public final class SubordinateListWidget extends AbstractWidget {
                     );
             narrationElementOutput.add(
                     NarratedElementType.POSITION,
-                    Component.literal(focused.targetName())
+                    UiTranslationToken.toComponent(focused.targetName())
             );
         }
 
         narrationElementOutput.add(
                 NarratedElementType.USAGE,
-                Component.literal(
-                        "Use arrow keys to move, Enter to select, and the mouse wheel to scroll."
+                SkillUiText.component(
+                        "narration.subordinate_list_usage"
                 )
         );
     }

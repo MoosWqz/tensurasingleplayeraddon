@@ -55,6 +55,18 @@ public final class ClientboundPayloadHandlers {
         );
     }
 
+    public static void handleRemoveSubordinateOverviewEntry(
+            RemoveSubordinateOverviewEntryPayload payload,
+            IPayloadContext context
+    ) {
+        context.enqueueWork(() ->
+                ClientPayloadHandler
+                        .removeSubordinateOverviewEntry(
+                                payload
+                        )
+        );
+    }
+
     public static void handleOpenUltimateConfirmationScreen(
             OpenUltimateConfirmationScreenPayload payload,
             IPayloadContext context

@@ -54,7 +54,7 @@ public final class SkillListWidget extends AbstractWidget {
                 y,
                 Math.max(1, width),
                 Math.max(1, height),
-                Component.literal("Skill list")
+                SkillUiText.component("narration.skill_list")
         );
 
         this.font = font == null
@@ -177,8 +177,8 @@ public final class SkillListWidget extends AbstractWidget {
             SkillUiRenderHelper.drawCenteredText(
                     guiGraphics,
                     font,
-                    Component.literal(
-                            "No matching skills"
+                    SkillUiText.component(
+                            "empty.no_matching_skills"
                     ),
                     getX() + getWidth() / 2,
                     getY() + getHeight() / 2 - 4,
@@ -406,7 +406,7 @@ public final class SkillListWidget extends AbstractWidget {
             SkillUiRenderHelper.drawText(
                     guiGraphics,
                     font,
-                    Component.literal("Mastered"),
+                    SkillUiText.component("state.mastered"),
                     right - 45,
                     top + 4,
                     theme.successColor()
@@ -598,8 +598,8 @@ public final class SkillListWidget extends AbstractWidget {
 
         narrationElementOutput.add(
                 NarratedElementType.USAGE,
-                Component.literal(
-                        "Use arrow keys to move, Enter to select, and the mouse wheel to scroll."
+                SkillUiText.component(
+                        "narration.skill_list_usage"
                 )
         );
     }

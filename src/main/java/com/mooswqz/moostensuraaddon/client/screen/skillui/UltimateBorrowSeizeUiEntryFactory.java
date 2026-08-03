@@ -43,48 +43,44 @@ public final class UltimateBorrowSeizeUiEntryFactory {
 
             if (payload.seize()) {
                 details.add(
-                        Component.literal(
-                                "This skill will be permanently removed from "
-                                        + payload.targetName()
-                                        + "."
+                        SkillUiText.component(
+                                "details.seize_permanent_removal",
+                                payload.targetName()
                         )
                 );
                 details.add(
-                        Component.literal(
-                                "The target can suffer non-lethal backlash, and the total selection can carry a death risk."
+                        SkillUiText.component(
+                                "details.seize_backlash_risk"
                         )
                 );
             } else {
                 details.add(
-                        Component.literal(
+                        SkillUiText.component(
+                                "details.borrow_target_keeps",
                                 payload.targetName()
-                                        + " keeps this skill."
                         )
                 );
                 details.add(
-                        Component.literal(
-                                "Permanent-copy chance: "
-                                        + UltimateBorrowSeizePolicy
-                                        .formatPercent(
-                                                source.borrowPermanentChance()
-                                        )
-                                        + "."
+                        SkillUiText.component(
+                                "details.borrow_permanent_chance",
+                                UltimateBorrowSeizePolicy.formatPercent(
+                                        source.borrowPermanentChance()
+                                )
                         )
                 );
                 details.add(
-                        Component.literal(
-                                "A non-permanent copy expires according to the server's configured borrow duration."
+                        SkillUiText.component(
+                                "details.borrow_duration"
                         )
                 );
             }
 
             details.add(
-                    Component.literal(
-                            "Cost: "
-                                    + UltimateBorrowSeizePolicy.formatNumber(
+                    SkillUiText.component(
+                            "details.cost",
+                            UltimateBorrowSeizePolicy.formatNumber(
                                     payload.costPerSkill()
                             )
-                                    + " magicules."
                     )
             );
 

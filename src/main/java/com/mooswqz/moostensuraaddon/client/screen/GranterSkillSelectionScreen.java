@@ -13,6 +13,7 @@ import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiRenderHelper;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionMode;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionModel;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiTheme;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiText;
 import com.mooswqz.moostensuraaddon.network.SelectSkillPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -64,7 +65,7 @@ public class GranterSkillSelectionScreen extends Screen {
     private String retainedQuery = "";
     private String currentSkillId = "";
     private Component authorityName =
-            Component.literal("Granter");
+            SkillUiText.component("authority.granter");
     private boolean evolvedAuthority;
     private boolean initialSelectionApplied;
 
@@ -73,8 +74,8 @@ public class GranterSkillSelectionScreen extends Screen {
 
     public GranterSkillSelectionScreen() {
         super(
-                Component.literal(
-                        "Active Skill Selection"
+                SkillUiText.component(
+                        "legacy_active.title"
                 )
         );
     }
@@ -212,11 +213,11 @@ public class GranterSkillSelectionScreen extends Screen {
                 controlY,
                 searchWidth,
                 buttonHeight,
-                Component.literal("Search skills")
+                SkillUiText.component("common.search_skills")
         );
         searchBox.setMaxLength(80);
         searchBox.setHint(
-                Component.literal("Search skills…")
+                SkillUiText.component("common.search_skills_hint")
         );
         searchBox.setValue(retainedQuery);
         searchBox.setResponder(
@@ -318,7 +319,7 @@ public class GranterSkillSelectionScreen extends Screen {
                 buttonY,
                 buttonWidth,
                 buttonHeight,
-                Component.literal("Cancel"),
+                SkillUiText.component("common.cancel"),
                 THEME,
                 SkillUiButton.Tone.NORMAL,
                 this::onClose
@@ -330,7 +331,7 @@ public class GranterSkillSelectionScreen extends Screen {
                 buttonY,
                 buttonWidth,
                 buttonHeight,
-                Component.literal("Set Active Skill"),
+                SkillUiText.component("legacy_active.set_active"),
                 THEME,
                 SkillUiButton.Tone.PRIMARY,
                 this::confirmSelection
@@ -401,24 +402,24 @@ public class GranterSkillSelectionScreen extends Screen {
 
         switch (result) {
             case SELECTED -> setStatus(
-                    Component.literal("Ready to set this as the active skill."),
+                    SkillUiText.component("legacy_active.ready"),
                     THEME.successColor()
             );
             case DESELECTED -> setStatus(
-                    Component.literal("Selection cleared."),
+                    SkillUiText.component("status.selection_cleared"),
                     THEME.mutedTextColor()
             );
             case NOT_SELECTABLE -> setStatus(
                     entry.hasDisabledReason()
                             ? entry.disabledReason()
-                            : Component.literal(
-                            "This skill cannot be selected."
+                            : SkillUiText.component(
+                            "error.skill_not_selectable"
                     ),
                     THEME.warningColor()
             );
             case LIMIT_REACHED -> setStatus(
-                    Component.literal(
-                            "Only one skill can be selected here."
+                    SkillUiText.component(
+                            "error.single_selection_only"
                     ),
                     THEME.warningColor()
             );
@@ -444,8 +445,8 @@ public class GranterSkillSelectionScreen extends Screen {
 
         if (selected.isEmpty()) {
             setStatus(
-                    Component.literal(
-                            "Select a skill first."
+                    SkillUiText.component(
+                            "error.select_skill_first"
                     ),
                     THEME.warningColor()
             );
@@ -482,23 +483,21 @@ public class GranterSkillSelectionScreen extends Screen {
     ) {
         if (buttonWidth >= 58) {
             return switch (category) {
-                case UNIQUE -> Component.literal("Unique");
-                case EXTRA -> Component.literal("Extra");
-                case BASIC -> Component.literal("Basic");
-                case RESISTANCE -> Component.literal("Resist");
-                case OTHER -> Component.literal("Other");
+                case UNIQUE -> SkillUiText.component("category.unique_short");
+                case EXTRA -> SkillUiText.component("category.extra_short");
+                case BASIC -> SkillUiText.component("category.basic_short");
+                case RESISTANCE -> SkillUiText.component("category.resistance_short");
+                case OTHER -> SkillUiText.component("category.other_short");
             };
         }
 
-        return Component.literal(
-                switch (category) {
-                    case UNIQUE -> "U";
-                    case EXTRA -> "E";
-                    case BASIC -> "B";
-                    case RESISTANCE -> "R";
-                    case OTHER -> "O";
-                }
-        );
+        return switch (category) {
+            case UNIQUE -> SkillUiText.component("category.unique_compact");
+            case EXTRA -> SkillUiText.component("category.extra_compact");
+            case BASIC -> SkillUiText.component("category.basic_compact");
+            case RESISTANCE -> SkillUiText.component("category.resistance_compact");
+            case OTHER -> SkillUiText.component("category.other_compact");
+        };
     }
 
     private void setStatus(
@@ -624,7 +623,7 @@ public class GranterSkillSelectionScreen extends Screen {
         int badgeLeft = SkillUiRenderHelper.drawModeBadge(
                 guiGraphics,
                 font,
-                Component.literal("ACTIVE SKILL"),
+                SkillUiText.component("legacy_active.badge"),
                 header.right() - 2,
                 header.top() + 1,
                 THEME
@@ -646,8 +645,8 @@ public class GranterSkillSelectionScreen extends Screen {
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal(
-                        "Choose one skill for Mass Grant or Ranged Take Back."
+                SkillUiText.component(
+                        "legacy_active.subtitle"
                 ),
                 textLeft,
                 header.top() + 15,
@@ -658,34 +657,32 @@ public class GranterSkillSelectionScreen extends Screen {
         int visibleCount = listModel == null
                 ? 0
                 : listModel.filteredEntries().size();
-        StringBuilder stateLine = new StringBuilder(
-                authorityName.getString()
-        );
-        stateLine.append(
+        String stateLine = SkillUiText.string(
                 evolvedAuthority
-                        ? " • mastery bypass active"
-                        : " • mastered skills only"
+                        ? "legacy_active.state_bypass"
+                        : "legacy_active.state_mastered",
+                authorityName,
+                visibleCount,
+                entries.size()
         );
-        stateLine.append(" • ")
-                .append(visibleCount)
-                .append("/")
-                .append(entries.size())
-                .append(" shown");
 
         if (!currentSkillId.isBlank()) {
             String currentName = findEntry(currentSkillId)
-                    .map(entry -> entry
+                    .map((SkillUiEntry entry) -> entry
                             .displayName()
                             .getString())
                     .orElse(currentSkillId);
-            stateLine.append(" • current: ")
-                    .append(currentName);
+            stateLine = SkillUiText.string(
+                    "legacy_active.state_current",
+                    stateLine,
+                    currentName
+            );
         }
 
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal(stateLine.toString()),
+                Component.literal(stateLine),
                 textLeft,
                 header.top() + 28,
                 Math.max(1, header.width() - 4),
@@ -722,13 +719,12 @@ public class GranterSkillSelectionScreen extends Screen {
                     .stream()
                     .findFirst()
                     .flatMap(this::findEntry)
-                    .map(entry -> Component.literal(
-                            "Selected: "
-                                    + entry.displayName().getString()
-                                    + " • Set Active Skill confirms; nothing is granted now."
+                    .map(entry -> SkillUiText.component(
+                            "legacy_active.footer_selected",
+                            entry.displayName()
                     ))
-                    .orElseGet(() -> Component.literal(
-                            "Select one skill. This sets the active skill only; nothing is granted now."
+                    .orElseGet(() -> SkillUiText.component(
+                            "legacy_active.footer_empty"
                     ));
             footerColor = selectionModel.selectedCount() == 1
                     ? THEME.accentColor()

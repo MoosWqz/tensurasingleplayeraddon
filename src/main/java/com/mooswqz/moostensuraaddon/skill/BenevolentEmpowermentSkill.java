@@ -76,12 +76,12 @@ public class BenevolentEmpowermentSkill extends Skill {
             int mode
     ) {
         return switch (normalizeMode(mode)) {
-            case MODE_BESTOW -> Component.literal("Bestow");
-            case MODE_MASS_GRANT -> Component.literal("Mass Grant");
-            case MODE_RANGED_TAKE_BACK -> Component.literal("Ranged Take Back");
-            case MODE_BORROW_SKILL -> Component.literal("Borrow");
-            case MODE_RANGED_SKILL_VIEW -> Component.literal("List Skills");
-            default -> Component.literal("Bestow");
+            case MODE_BESTOW -> Component.translatable("skill.moostensuraaddon.mode.benevolent.bestow");
+            case MODE_MASS_GRANT -> Component.translatable("skill.moostensuraaddon.mode.benevolent.mass_grant");
+            case MODE_RANGED_TAKE_BACK -> Component.translatable("skill.moostensuraaddon.mode.benevolent.ranged_take_back");
+            case MODE_BORROW_SKILL -> Component.translatable("skill.moostensuraaddon.mode.benevolent.borrow");
+            case MODE_RANGED_SKILL_VIEW -> Component.translatable("skill.moostensuraaddon.mode.benevolent.list_skills");
+            default -> Component.translatable("skill.moostensuraaddon.mode.benevolent.bestow");
         };
     }
 

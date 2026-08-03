@@ -12,10 +12,12 @@ import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiRenderHelper;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionMode;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionModel;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiTheme;
+import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiText;
 import com.mooswqz.moostensuraaddon.client.screen.skillui.UltimateMultiGrantUiEntryFactory;
 import com.mooswqz.moostensuraaddon.network.ExecuteUltimateMultiGrantPayload;
 import com.mooswqz.moostensuraaddon.network.OpenUltimateMultiGrantScreenPayload;
 import com.mooswqz.moostensuraaddon.util.AuthorityActionMode;
+import com.mooswqz.moostensuraaddon.util.UiTranslationToken;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
@@ -67,17 +69,15 @@ public final class UltimateMultiGrantScreen extends Screen {
             OpenUltimateMultiGrantScreenPayload payload
     ) {
         super(
-                Component.literal(
-                        payload == null
-                                ? "Authority Action"
-                                : payload.actionMode().title()
-                )
+                payload == null
+                        ? SkillUiText.component("common.authority_action")
+                        : payload.actionMode().titleComponent()
         );
         this.payload = payload == null
                 ? new OpenUltimateMultiGrantScreenPayload(
                 AuthorityActionMode.BENEVOLENT_BESTOW.id(),
                 "",
-                "Unknown subordinate",
+                SkillUiText.string("common.unknown_subordinate"),
                 0.0D,
                 0,
                 false,
@@ -183,10 +183,10 @@ public final class UltimateMultiGrantScreen extends Screen {
                 controlY,
                 searchWidth,
                 buttonHeight,
-                Component.literal("Search skills")
+                SkillUiText.component("common.search_skills")
         );
         searchBox.setMaxLength(80);
-        searchBox.setHint(Component.literal("Search skills…"));
+        searchBox.setHint(SkillUiText.component("common.search_skills_hint"));
         searchBox.setValue(retainedQuery);
         searchBox.setResponder(this::onSearchChanged);
         addRenderableWidget(searchBox);
@@ -269,14 +269,16 @@ public final class UltimateMultiGrantScreen extends Screen {
                     buttonY,
                     buttonWidth,
                     buttonHeight,
-                    compact ? "All" : "Select Shown",
+                    compact
+                            ? SkillUiText.component("common.all")
+                            : SkillUiText.component("common.select_shown"),
                     SkillUiButton.Tone.NORMAL,
                     this::selectShown
             );
             selectShownButton.setTooltip(
                     Tooltip.create(
-                            Component.literal(
-                                    "Select every visible valid skill up to the action limit."
+                            SkillUiText.component(
+                                    "tooltip.select_visible_limit"
                             )
                     )
             );
@@ -288,7 +290,7 @@ public final class UltimateMultiGrantScreen extends Screen {
                 buttonY,
                 buttonWidth,
                 buttonHeight,
-                "Clear",
+                SkillUiText.component("common.clear"),
                 SkillUiButton.Tone.NORMAL,
                 this::clearSelection
         );
@@ -300,15 +302,17 @@ public final class UltimateMultiGrantScreen extends Screen {
                     buttonY,
                     buttonWidth,
                     buttonHeight,
-                    compact ? "All Targets" : "All Eligible",
+                    compact
+                            ? SkillUiText.component("common.all_targets")
+                            : SkillUiText.component("common.all_eligible"),
                     SkillUiButton.Tone.NORMAL,
                     this::toggleAllEligible
             );
             allEligibleButton.setHighlighted(allEligible);
             allEligibleButton.setTooltip(
                     Tooltip.create(
-                            Component.literal(
-                                    "When enabled, reclaim the selected skill from every eligible subordinate in scope."
+                            SkillUiText.component(
+                                    "tooltip.all_eligible_take_back"
                             )
                     )
             );
@@ -320,7 +324,7 @@ public final class UltimateMultiGrantScreen extends Screen {
                 buttonY,
                 buttonWidth,
                 buttonHeight,
-                "Cancel",
+                SkillUiText.component("common.cancel"),
                 SkillUiButton.Tone.NORMAL,
                 this::onClose
         );
@@ -331,7 +335,7 @@ public final class UltimateMultiGrantScreen extends Screen {
                 buttonY,
                 Math.max(1, footer.right() - buttonX),
                 buttonHeight,
-                mode.actionButtonLabel(0),
+                mode.actionButtonComponent(0),
                 mode == AuthorityActionMode.GOVERNANCE_INVEST
                         ? SkillUiButton.Tone.DANGER
                         : SkillUiButton.Tone.PRIMARY,
@@ -344,7 +348,7 @@ public final class UltimateMultiGrantScreen extends Screen {
             int y,
             int width,
             int height,
-            String label,
+            Component label,
             SkillUiButton.Tone tone,
             Runnable action
     ) {
@@ -353,7 +357,7 @@ public final class UltimateMultiGrantScreen extends Screen {
                 y,
                 width,
                 height,
-                Component.literal(label),
+                label,
                 theme,
                 tone,
                 action
@@ -412,31 +416,30 @@ public final class UltimateMultiGrantScreen extends Screen {
         switch (result) {
             case SELECTED -> setStatus(
                     entry.mastered()
-                            ? Component.literal("Skill selected.")
-                            : Component.literal(
-                            "Unmastered skill selected — increased magicule cost applies."
+                            ? SkillUiText.component("status.skill_selected")
+                            : SkillUiText.component(
+                            "warning.unmastered_selected"
                     ),
                     entry.mastered()
                             ? theme.successColor()
                             : theme.warningColor()
             );
             case DESELECTED -> setStatus(
-                    Component.literal("Selection removed."),
+                    SkillUiText.component("status.selection_removed"),
                     theme.mutedTextColor()
             );
             case NOT_SELECTABLE -> setStatus(
                     entry.hasDisabledReason()
                             ? entry.disabledReason()
-                            : Component.literal(
-                            "This skill is not valid for the current action."
+                            : SkillUiText.component(
+                            "error.skill_invalid_for_action"
                     ),
                     theme.warningColor()
             );
             case LIMIT_REACHED -> setStatus(
-                    Component.literal(
-                            "Selection limit reached: "
-                                    + mode.selectionLimit()
-                                    + "."
+                    SkillUiText.component(
+                            "error.selection_limit_reached",
+                            mode.selectionLimit()
                     ),
                     theme.warningColor()
             );
@@ -466,22 +469,22 @@ public final class UltimateMultiGrantScreen extends Screen {
 
         if (limitReached) {
             setStatus(
-                    Component.literal(
-                            "Selected "
-                                    + selectionModel.selectedCount()
-                                    + " skills; the limit is "
-                                    + mode.selectionLimit()
-                                    + "."
+                    SkillUiText.component(
+                            "status.selected_limit",
+                            selectionModel.selectedCount(),
+                            mode.selectionLimit()
                     ),
                     theme.warningColor()
             );
         } else {
             setStatus(
-                    Component.literal(
-                            added > 0
-                                    ? "Added " + added
-                                      + " visible skills."
-                                    : "Every visible valid skill is already selected."
+                    added > 0
+                            ? SkillUiText.component(
+                            "status.added_visible_skills",
+                            added
+                    )
+                            : SkillUiText.component(
+                            "status.all_visible_selected"
                     ),
                     added > 0
                             ? theme.successColor()
@@ -495,7 +498,7 @@ public final class UltimateMultiGrantScreen extends Screen {
     private void clearSelection() {
         selectionModel.clear();
         setStatus(
-                Component.literal("Selection cleared."),
+                SkillUiText.component("status.selection_cleared"),
                 theme.mutedTextColor()
         );
         updateControls();
@@ -509,10 +512,12 @@ public final class UltimateMultiGrantScreen extends Screen {
         }
 
         setStatus(
-                Component.literal(
-                        allEligible
-                                ? "All eligible subordinates in scope will be affected."
-                                : "Only the displayed target will be affected."
+                allEligible
+                        ? SkillUiText.component(
+                        "status.all_eligible_affected"
+                )
+                        : SkillUiText.component(
+                        "status.single_target_affected"
                 ),
                 allEligible
                         ? theme.accentColor()
@@ -528,7 +533,7 @@ public final class UltimateMultiGrantScreen extends Screen {
 
         if (selected.isEmpty()) {
             setStatus(
-                    Component.literal("Select a skill first."),
+                    SkillUiText.component("error.select_skill_first"),
                     theme.warningColor()
             );
             return;
@@ -536,8 +541,8 @@ public final class UltimateMultiGrantScreen extends Screen {
 
         if (payload.cooldownTicks() > 0) {
             setStatus(
-                    Component.literal(
-                            "This action is still cooling down."
+                    SkillUiText.component(
+                            "error.action_cooling_down"
                     ),
                     theme.warningColor()
             );
@@ -548,11 +553,10 @@ public final class UltimateMultiGrantScreen extends Screen {
 
         if (required > payload.availableMagicules()) {
             setStatus(
-                    Component.literal(
-                            "Insufficient magicules: "
-                                    + UltimateMultiGrantUiEntryFactory
+                    SkillUiText.component(
+                            "error.insufficient_magicules_required",
+                            UltimateMultiGrantUiEntryFactory
                                     .formatNumber(required)
-                                    + " required."
                     ),
                     theme.warningColor()
             );
@@ -563,8 +567,8 @@ public final class UltimateMultiGrantScreen extends Screen {
                 && !allEligible
                 && payload.targetUuid().isBlank()) {
             setStatus(
-                    Component.literal(
-                            "No single subordinate is selected. Enable All Eligible."
+                    SkillUiText.component(
+                            "error.enable_all_eligible"
                     ),
                     theme.warningColor()
             );
@@ -630,8 +634,8 @@ public final class UltimateMultiGrantScreen extends Screen {
         if (actionButton != null) {
             actionButton.active = ready;
             actionButton.setMessage(
-                    Component.literal(
-                            mode.actionButtonLabel(selectedCount)
+                    mode.actionButtonComponent(
+                            selectedCount
                     )
             );
         }
@@ -660,23 +664,21 @@ public final class UltimateMultiGrantScreen extends Screen {
     ) {
         if (buttonWidth >= 58) {
             return switch (category) {
-                case UNIQUE -> Component.literal("Unique");
-                case EXTRA -> Component.literal("Extra");
-                case BASIC -> Component.literal("Basic");
-                case RESISTANCE -> Component.literal("Resist");
-                case OTHER -> Component.literal("Other");
+                case UNIQUE -> SkillUiText.component("category.unique_short");
+                case EXTRA -> SkillUiText.component("category.extra_short");
+                case BASIC -> SkillUiText.component("category.basic_short");
+                case RESISTANCE -> SkillUiText.component("category.resistance_short");
+                case OTHER -> SkillUiText.component("category.other_short");
             };
         }
 
-        return Component.literal(
-                switch (category) {
-                    case UNIQUE -> "U";
-                    case EXTRA -> "E";
-                    case BASIC -> "B";
-                    case RESISTANCE -> "R";
-                    case OTHER -> "O";
-                }
-        );
+        return switch (category) {
+            case UNIQUE -> SkillUiText.component("category.unique_compact");
+            case EXTRA -> SkillUiText.component("category.extra_compact");
+            case BASIC -> SkillUiText.component("category.basic_compact");
+            case RESISTANCE -> SkillUiText.component("category.resistance_compact");
+            case OTHER -> SkillUiText.component("category.other_compact");
+        };
     }
 
     private void setStatus(Component message, int color) {
@@ -773,7 +775,7 @@ public final class UltimateMultiGrantScreen extends Screen {
         int badgeLeft = SkillUiRenderHelper.drawModeBadge(
                 guiGraphics,
                 font,
-                Component.literal(mode.badge()),
+                mode.badgeComponent(),
                 header.right() - 2,
                 header.top() + 1,
                 theme
@@ -782,7 +784,7 @@ public final class UltimateMultiGrantScreen extends Screen {
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal(mode.title()),
+                mode.titleComponent(),
                 textLeft,
                 header.top() + 2,
                 Math.max(1, badgeLeft - textLeft - 6),
@@ -805,11 +807,11 @@ public final class UltimateMultiGrantScreen extends Screen {
         SkillUiRenderHelper.drawClippedText(
                 guiGraphics,
                 font,
-                Component.literal(
-                        (mode.massGrant() || allEligible
-                                ? "SCOPE • "
-                                : "TARGET • ")
-                                + displayedTargetOrScope()
+                SkillUiText.component(
+                        mode.massGrant() || allEligible
+                                ? "header.scope_value"
+                                : "header.target_value",
+                        displayedTargetOrScope()
                 ),
                 targetStrip.left() + 5,
                 targetStrip.top() + 3,
@@ -829,44 +831,45 @@ public final class UltimateMultiGrantScreen extends Screen {
                             selected,
                             costs
                     );
-            StringBuilder text = new StringBuilder();
-            text.append(selectionModel.selectedCount())
-                    .append(" / ")
-                    .append(mode.selectionLimit())
-                    .append(" selected");
+            String text = SkillUiText.string(
+                    "summary.selected_limit",
+                    selectionModel.selectedCount(),
+                    mode.selectionLimit()
+            );
 
             if (selection.unmastered() > 0) {
-                text.append(" • WARNING: ")
-                        .append(selection.unmastered())
-                        .append(" unmastered");
+                text = SkillUiText.string(
+                        "summary.with_unmastered_warning",
+                        text,
+                        selection.unmastered()
+                );
             }
 
             if (!mode.takeBack()) {
-                text.append(" • ")
-                        .append(
-                                UltimateMultiGrantUiEntryFactory
-                                        .formatNumber(selection.totalCost())
+                text = SkillUiText.string(
+                        "summary.with_magicules",
+                        text,
+                        UltimateMultiGrantUiEntryFactory.formatNumber(
+                                selection.totalCost()
+                        ),
+                        UltimateMultiGrantUiEntryFactory.formatNumber(
+                                payload.availableMagicules()
                         )
-                        .append(" required / ")
-                        .append(
-                                UltimateMultiGrantUiEntryFactory
-                                        .formatNumber(
-                                                payload.availableMagicules()
-                                        )
-                        )
-                        .append(" available");
+                );
             }
 
             if (payload.cooldownTicks() > 0) {
-                text.append(" • cooldown ")
-                        .append(String.format(
-                                java.util.Locale.US,
-                                "%.1fs",
-                                payload.cooldownTicks() / 20.0D
-                        ));
+                text = SkillUiText.string(
+                        "summary.with_cooldown",
+                        text,
+                        SkillUiText.formatDecimal(
+                                payload.cooldownTicks() / 20.0D,
+                                1
+                        )
+                );
             }
 
-            summary = Component.literal(text.toString());
+            summary = Component.literal(text);
             summaryColor = selection.unmastered() > 0
                     ? theme.warningColor()
                     : selection.totalCost()
@@ -894,14 +897,18 @@ public final class UltimateMultiGrantScreen extends Screen {
     }
 
 
-    private String displayedTargetOrScope() {
+    private Component displayedTargetOrScope() {
         if (!allEligible) {
-            return payload.targetName();
+            return UiTranslationToken.toComponent(
+                    payload.targetName()
+            );
         }
 
-        return mode.governance()
-                ? "All eligible subordinates within 128 blocks"
-                : "All eligible subordinates within 32 blocks";
+        return SkillUiText.component(
+                mode.governance()
+                        ? "scope.governance_128"
+                        : "scope.benevolent_32"
+        );
     }
 
     private static SkillUiTheme resolveTheme(

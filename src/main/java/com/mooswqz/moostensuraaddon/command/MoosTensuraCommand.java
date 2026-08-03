@@ -2,14 +2,10 @@ package com.mooswqz.moostensuraaddon.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
-import com.mooswqz.moostensuraaddon.attachment.BorrowedSkillData;
-import com.mooswqz.moostensuraaddon.attachment.GrantedSkillData;
-import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
-import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
 import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
 import com.mooswqz.moostensuraaddon.debug.DebugModeService;
-import com.mooswqz.moostensuraaddon.recognition.RecognitionDisplayNameSyncService;
+import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
+import com.mooswqz.moostensuraaddon.lifecycle.AddonPlayerDataResetService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionProgressScreenService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionUnnameService;
 import io.github.manasmods.tensura.storage.TensuraStorages;
@@ -65,6 +61,31 @@ public final class MoosTensuraCommand {
                                         .executes(context -> sendHelp(
                                                 context.getSource()
                                         ))
+                        )
+
+                        .then(
+                                Commands.literal("lifecycle")
+                                        .requires(source ->
+                                                source.hasPermission(2)
+                                        )
+                                        .executes(context -> inspectLifecycle(
+                                                context.getSource(),
+                                                context.getSource()
+                                                        .getPlayerOrException()
+                                        ))
+                                        .then(
+                                                Commands.argument(
+                                                                "player",
+                                                                EntityArgument.player()
+                                                        )
+                                                        .executes(context -> inspectLifecycle(
+                                                                context.getSource(),
+                                                                EntityArgument.getPlayer(
+                                                                        context,
+                                                                        "player"
+                                                                )
+                                                        ))
+                                        )
                         )
 
                         /*
@@ -159,11 +180,125 @@ public final class MoosTensuraCommand {
     private static int openRecognitionPaths(
             CommandSourceStack source
     ) throws CommandSyntaxException {
-        ServerPlayer player =
-                source.getPlayerOrException();
-
         RecognitionProgressScreenService.open(
-                player
+                source.getPlayerOrException()
+        );
+
+        return 1;
+    }
+
+    private static int inspectLifecycle(
+            CommandSourceStack source,
+            ServerPlayer target
+    ) {
+        if (target == null) {
+            source.sendFailure(
+                    Component.literal("Target player could not be found.")
+                            .withStyle(ChatFormatting.RED)
+            );
+            return 0;
+        }
+
+        AddonIncarnationState.Snapshot snapshot =
+                AddonIncarnationState.inspect(target);
+        long now = System.currentTimeMillis();
+        long epochGuardRemainingMillis = Math.max(
+                0L,
+                snapshot.resetGuardUntilEpochMillis() - now
+        );
+        long tickGuardRemainingMillis = Math.max(
+                0L,
+                snapshot.resetGuardUntilGameTime()
+                        - target.serverLevel().getGameTime()
+        ) * 50L;
+        long guardRemainingMillis = Math.max(
+                epochGuardRemainingMillis,
+                tickGuardRemainingMillis
+        );
+
+        source.sendSuccess(
+                () -> Component.literal(
+                                "Addon Lifecycle: "
+                                        + target.getGameProfile().getName()
+                        )
+                        .withStyle(
+                                ChatFormatting.LIGHT_PURPLE,
+                                ChatFormatting.BOLD
+                        ),
+                false
+        );
+        source.sendSuccess(
+                () -> Component.literal(
+                                "State revision: " + snapshot.revision()
+                        )
+                        .withStyle(ChatFormatting.GRAY),
+                false
+        );
+        source.sendSuccess(
+                () -> Component.literal(
+                                "Life token: " + snapshot.lifeToken()
+                        )
+                        .withStyle(ChatFormatting.GRAY),
+                false
+        );
+        source.sendSuccess(
+                () -> Component.literal(
+                                "Reset sequence: "
+                                        + snapshot.resetSequence()
+                                        + " | Last reason: "
+                                        + (snapshot.lastResetReason().isBlank()
+                                        ? "none"
+                                        : snapshot.lastResetReason())
+                        )
+                        .withStyle(ChatFormatting.GRAY),
+                false
+        );
+        source.sendSuccess(
+                () -> Component.literal(
+                                "Reset guard: "
+                                        + (snapshot.resetGuardActive()
+                                        ? "active for about "
+                                          + String.format(
+                                        Locale.US,
+                                        "%.1f",
+                                        guardRemainingMillis / 1000.0D
+                                )
+                                          + " seconds"
+                                        : "inactive")
+                        )
+                        .withStyle(
+                                snapshot.resetGuardActive()
+                                        ? ChatFormatting.YELLOW
+                                        : ChatFormatting.GREEN
+                        ),
+                false
+        );
+        source.sendSuccess(
+                () -> Component.literal(
+                                "Native endowment marker: "
+                                        + (snapshot.nativeEndowmentIncarnation()
+                                        .isBlank()
+                                        ? "none"
+                                        : snapshot.nativeEndowmentIncarnation())
+                                        + " | Failed attempts: "
+                                        + snapshot.nativeEndowmentAttempts()
+                        )
+                        .withStyle(ChatFormatting.GRAY),
+                false
+        );
+        source.sendSuccess(
+                () -> Component.literal(
+                                "Authority observation: "
+                                        + (snapshot.authorityObservationInitialized()
+                                        ? "initialized"
+                                        : "not initialized")
+                                        + " | Last owned: "
+                                        + snapshot.authorityLastOwned()
+                                        + " | Acquired this life: "
+                                        + snapshot.authorityAcquiredThisLife()
+                        )
+                        .withStyle(ChatFormatting.GRAY),
+                false
         );
 
         return 1;
@@ -527,6 +662,13 @@ public final class MoosTensuraCommand {
         );
 
         if (source.hasPermission(2)) {
+            sendHelpLine(
+                    source,
+                    "/moostensura lifecycle [player]",
+                    "Admin-only. Shows incarnation, reset-guard, endowment and Granter transition state.",
+                    ChatFormatting.YELLOW
+            );
+
             sendHelpLine(
                     source,
                     "/moostensura unname",
@@ -1051,28 +1193,19 @@ public final class MoosTensuraCommand {
             );
         }
 
-        target.setData(
-                AttachmentRegistry.GRANTED_SKILL_DATA,
-                new GrantedSkillData()
-        );
+        AddonPlayerDataResetService.ResetResult result =
+                AddonPlayerDataResetService.resetForNewIncarnation(
+                        target,
+                        AddonPlayerDataResetService.ResetReason.ADMIN_COMMAND
+                );
 
-        target.setData(
-                AttachmentRegistry.GRANTER_PROGRESS_DATA,
-                new GranterProgressData()
-        );
-
-        target.setData(
-                AttachmentRegistry.BORROWED_SKILL_DATA,
-                new BorrowedSkillData()
-        );
-
-        target.setData(
-                AttachmentRegistry.RECOGNITION_DATA,
-                new RecognitionData()
-        );
-
-        RecognitionDisplayNameSyncService
-                .refreshAndBroadcast(target);
+        if (!result.successful()) {
+            source.sendFailure(
+                    Component.literal(result.message())
+                            .withStyle(ChatFormatting.RED)
+            );
+            return 0;
+        }
 
         String targetName =
                 target.getGameProfile()

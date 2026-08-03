@@ -174,9 +174,9 @@ public class UltimateSkillActions {
         if (entries.isEmpty()) {
             sendFeedback(
                     player,
-                    Component.literal(
-                                    target.getDisplayName().getString()
-                                            + " already has every skill this authority can grant."
+                    AuthorityText.component(
+                                    "error.target_has_all_grantable",
+                                    target.getDisplayName()
                             )
                             .withStyle(ChatFormatting.YELLOW)
             );
@@ -597,7 +597,7 @@ public class UltimateSkillActions {
         if (skillIds == null || skillIds.isEmpty()) {
             sendFeedback(
                     player,
-                    Component.literal("Select at least one skill.")
+                    AuthorityText.component("error.select_skill")
                             .withStyle(ChatFormatting.RED)
             );
             return;
@@ -606,7 +606,7 @@ public class UltimateSkillActions {
         UltimateBorrowSeizePolicy.RequestAnalysis request =
                 UltimateBorrowSeizePolicy.analyseRequest(
                         skillIds.stream()
-                                .map(skillId -> skillId == null
+                                .map((ResourceLocation skillId) -> skillId == null
                                         ? ""
                                         : skillId.toString())
                                 .toList()
@@ -615,9 +615,7 @@ public class UltimateSkillActions {
         if (request.overLimit()) {
             sendFeedback(
                     player,
-                    Component.literal(
-                                    "Too many skills were submitted at once."
-                            )
+                    AuthorityText.component("error.selection_over_limit")
                             .withStyle(ChatFormatting.RED)
             );
             return;
@@ -627,9 +625,7 @@ public class UltimateSkillActions {
                 || request.uniqueSkillIds().size() != skillIds.size()) {
             sendFeedback(
                     player,
-                    Component.literal(
-                                    "The request contains an invalid or duplicate skill."
-                            )
+                    AuthorityText.component("error.invalid_or_duplicate")
                             .withStyle(ChatFormatting.RED)
             );
             return;
@@ -643,9 +639,7 @@ public class UltimateSkillActions {
             if (skillId == null) {
                 sendFeedback(
                         player,
-                        Component.literal(
-                                        "One selected skill has an invalid registry ID."
-                                )
+                        AuthorityText.component("error.invalid_registry_id")
                                 .withStyle(ChatFormatting.RED)
                 );
                 return;
@@ -657,9 +651,7 @@ public class UltimateSkillActions {
         if (seize && !hasAbsoluteGovernance(player)) {
             sendFeedback(
                     player,
-                    Component.literal(
-                                    "Absolute Governance is no longer available."
-                            )
+                    AuthorityText.component("error.governance_unavailable")
                             .withStyle(ChatFormatting.RED)
             );
             return;
@@ -668,9 +660,7 @@ public class UltimateSkillActions {
         if (!seize && !hasBenevolentEmpowerment(player)) {
             sendFeedback(
                     player,
-                    Component.literal(
-                                    "Benevolent Empowerment is no longer available."
-                            )
+                    AuthorityText.component("error.benevolent_unavailable")
                             .withStyle(ChatFormatting.RED)
             );
             return;
@@ -681,9 +671,7 @@ public class UltimateSkillActions {
         if (target == null) {
             sendFeedback(
                     player,
-                    Component.literal(
-                                    "The selected subordinate is no longer available or within range."
-                            )
+                    AuthorityText.component("error.subordinate_unavailable")
                             .withStyle(ChatFormatting.RED)
             );
             return;
@@ -693,10 +681,9 @@ public class UltimateSkillActions {
             if (!isValidBorrowOrSeizeSkill(skillId, seize)) {
                 sendFeedback(
                         player,
-                        Component.literal(
-                                        "The selected skill "
-                                                + skillId
-                                                + " is not valid for this action."
+                        AuthorityText.component(
+                                        "error.skill_invalid_for_action",
+                                        skillId.toString()
                                 )
                                 .withStyle(ChatFormatting.RED)
                 );
@@ -709,11 +696,10 @@ public class UltimateSkillActions {
             if (targetSkill.isEmpty()) {
                 sendFeedback(
                         player,
-                        Component.literal(
-                                        target.getDisplayName().getString()
-                                                + " no longer possesses "
-                                                + skillId
-                                                + "."
+                        AuthorityText.component(
+                                        "error.target_no_longer_possesses",
+                                        target.getDisplayName(),
+                                        skillId.toString()
                                 )
                                 .withStyle(ChatFormatting.RED)
                 );
@@ -723,12 +709,9 @@ public class UltimateSkillActions {
             if (SkillAPI.getSkillsFrom(player).getSkill(skillId).isPresent()) {
                 sendFeedback(
                         player,
-                        Component.literal(
-                                        "You already possess "
-                                                + targetSkill.orElseThrow()
-                                                .getDisplayName()
-                                                .getString()
-                                                + "."
+                        AuthorityText.component(
+                                        "error.player_already_possesses",
+                                        targetSkill.orElseThrow().getDisplayName()
                                 )
                                 .withStyle(ChatFormatting.RED)
                 );
@@ -738,9 +721,7 @@ public class UltimateSkillActions {
             if (SkillAPI.getSkillRegistry().get(skillId) == null) {
                 sendFeedback(
                         player,
-                        Component.literal(
-                                        "One selected skill is no longer registered."
-                                )
+                        AuthorityText.component("error.skill_unregistered")
                                 .withStyle(ChatFormatting.RED)
                 );
                 return;
@@ -772,9 +753,7 @@ public class UltimateSkillActions {
             if (!result.success()) {
                 sendFeedback(
                         player,
-                        Component.literal(
-                                        "The action failed during application. No further skills were processed."
-                                )
+                        AuthorityText.component("error.application_failed")
                                 .withStyle(ChatFormatting.RED)
                 );
                 return;
@@ -835,16 +814,16 @@ public class UltimateSkillActions {
             ).withStyle(ChatFormatting.DARK_PURPLE);
 
             message.append(
-                    Component.literal(
-                                    " | Soul strain: "
-                                            + formatPercent(deathChance)
+                    AuthorityText.component(
+                                    "seize.soul_strain",
+                                    formatPercent(deathChance)
                             )
                             .withStyle(ChatFormatting.RED)
             );
 
             if (killedBySeize) {
                 message.append(
-                        Component.literal(" | Soul shattered")
+                        AuthorityText.component("seize.soul_shattered")
                                 .withStyle(ChatFormatting.DARK_RED)
                 );
             }
@@ -859,18 +838,18 @@ public class UltimateSkillActions {
             ).withStyle(ChatFormatting.GOLD);
 
             message.append(
-                    Component.literal(
-                                    " Chance: "
-                                            + formatPercent(highestBorrowChance)
+                    AuthorityText.component(
+                                    "borrow.chance",
+                                    formatPercent(highestBorrowChance)
                             )
                             .withStyle(ChatFormatting.LIGHT_PURPLE)
             );
 
             if (permanentBorrowed > 0) {
                 message.append(
-                        Component.literal(
-                                        " | Permanent: "
-                                                + permanentBorrowed
+                        AuthorityText.component(
+                                        "borrow.permanent_count",
+                                        permanentBorrowed
                                 )
                                 .withStyle(ChatFormatting.LIGHT_PURPLE)
                 );
@@ -902,9 +881,7 @@ public class UltimateSkillActions {
         if (request.overLimit()) {
             sendFeedback(
                     player,
-                    Component.literal(
-                                    "Too many skills were submitted at once."
-                            )
+                    AuthorityText.component("error.selection_over_limit")
                             .withStyle(ChatFormatting.RED)
             );
             return;
@@ -1004,10 +981,9 @@ public class UltimateSkillActions {
         if (candidates.isEmpty()) {
             sendFeedback(
                     player,
-                    Component.literal(
-                                    "None of the submitted skills can currently be granted to "
-                                            + target.getDisplayName().getString()
-                                            + "."
+                    AuthorityText.component(
+                                    "error.none_grantable_to_target",
+                                    target.getDisplayName()
                             )
                             .withStyle(ChatFormatting.YELLOW)
             );
@@ -1093,24 +1069,16 @@ public class UltimateSkillActions {
 
         AddonAdvancementHelper.awardFirstGift(player);
 
-        String skippedText = rejected > 0
-                ? " • " + rejected + " skipped"
-                : "";
-
         sendFeedback(
                 player,
-                Component.literal(
-                                "Granted "
-                                        + granted
-                                        + " skill"
-                                        + (granted == 1 ? "" : "s")
-                                        + " to "
-                                        + target.getDisplayName().getString()
-                                        + " for "
-                                        + formatNumber(realCost)
-                                        + " magicules"
-                                        + skippedText
-                                        + "."
+                AuthorityText.component(
+                                rejected > 0
+                                        ? "success.compat_multi_grant_skipped"
+                                        : "success.compat_multi_grant",
+                                granted,
+                                target.getDisplayName(),
+                                formatNumber(realCost),
+                                rejected
                         )
                         .withStyle(
                                 benevolent
@@ -1685,7 +1653,9 @@ public class UltimateSkillActions {
             }
         }
 
-        return skillId == null ? Component.literal("Unknown Skill") : Component.literal(skillId.toString());
+        return skillId == null
+                ? AuthorityText.component("unknown_skill")
+                : Component.literal(skillId.toString());
     }
 
     private static void sendFeedback(ServerPlayer player, Component message) {
