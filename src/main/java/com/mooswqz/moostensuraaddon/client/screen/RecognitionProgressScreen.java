@@ -1,41 +1,34 @@
 package com.mooswqz.moostensuraaddon.client.screen;
 
-import com.mooswqz.moostensuraaddon.network
-        .OpenRecognitionProgressScreenPayload;
-import com.mooswqz.moostensuraaddon.network
-        .RequestRecognitionProgressScreenPayload;
+import com.mooswqz.moostensuraaddon.client.ClientRecognitionBenefitsCache;
+import com.mooswqz.moostensuraaddon.network.OpenRecognitionProgressScreenPayload;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
+/**
+ * Unified player-facing view of recognition guidance, paths and benefits.
+ *
+ * <p>The server remains authoritative for every displayed value. This screen
+ * only presents the sanitized progress payload and the separately synchronized
+ * recognition-benefit snapshot.</p>
+ */
 public final class RecognitionProgressScreen extends Screen {
 
-    private static final int BUTTON_WIDTH = 90;
-    private static final int BUTTON_HEIGHT = 20;
-    private static final int BUTTON_GAP = 4;
-
-    private static final int MATRIX_TOP = 60;
-    private static final int CELL_HEIGHT = 31;
+    private static final int MARGIN = 12;
+    private static final int HEADER_BOTTOM = 47;
+    private static final int TAB_TOP = 49;
+    private static final int TAB_HEIGHT = 20;
+    private static final int CONTENT_TOP = 74;
+    private static final int FOOTER_HEIGHT = 30;
     private static final int CELL_GAP = 3;
-
-    private static final int GUIDANCE_TOP = 58;
-    private static final int GUIDANCE_CARD_HEIGHT = 45;
-    private static final int GUIDANCE_GAP = 4;
-
-    private static final long CLIENT_REFRESH_COOLDOWN_NANOS =
-            TimeUnit.SECONDS.toNanos(2L);
-
-    private static final long NOTICE_DURATION_NANOS =
-            TimeUnit.SECONDS.toNanos(3L);
+    private static final int PANEL_GAP = 6;
 
     private static final String[] MATRIX_PATH_IDS = {
             "lawful_good",
@@ -61,163 +54,153 @@ public final class RecognitionProgressScreen extends Screen {
             "C"
     };
 
-    private OpenRecognitionProgressScreenPayload payload;
+    private final OpenRecognitionProgressScreenPayload payload;
 
-    private Button viewButton;
-    private Button refreshButton;
+    private View activeView;
+    private int overviewFirstRow;
+
+    private Button overviewTabButton;
+    private Button pathsTabButton;
+    private Button benefitsTabButton;
+    private Button previousPageButton;
+    private Button nextPageButton;
     private Button closeButton;
-    private Button debugButton;
-
-    private boolean guidanceView;
-    private boolean debugDetailsVisible;
-
-    private long lastRefreshRequestNanos;
-    private long noticeExpiresNanos;
-
-    private String noticeText = "";
-
-    private OpenRecognitionProgressScreenPayload.PathEntry
-            hoveredPath;
-
-    private OpenRecognitionProgressScreenPayload.GuidanceEntry
-            hoveredGuidance;
 
     public RecognitionProgressScreen(
             OpenRecognitionProgressScreenPayload payload
     ) {
-        super(Component.literal("Soul Recognition"));
+        super(Component.translatable(
+                "screen.moostensuraaddon.recognition.title"
+        ));
 
         this.payload = payload;
-    }
-
-    /**
-     * Applies a server refresh without recreating the screen.
-     */
-    public void applyPayload(
-            OpenRecognitionProgressScreenPayload newPayload
-    ) {
-        if (newPayload == null) {
-            return;
-        }
-
-        this.payload = newPayload;
-
-        if (!newPayload.debugDetailsAvailable()) {
-            this.debugDetailsVisible = false;
-        }
-
-        setNotice("Recognition data updated.");
-        updateButtonStates();
+        this.activeView = payload != null
+                && payload.recognitionCommitted()
+                ? View.PATHS
+                : View.OVERVIEW;
     }
 
     @Override
     protected void init() {
-        int buttonY =
+        int tabAreaWidth = Math.min(
+                390,
                 Math.max(
-                        0,
-                        this.height - 28
-                );
+                        210,
+                        this.width - MARGIN * 2
+                )
+        );
 
-        int totalWidth =
-                BUTTON_WIDTH * 3
-                        + BUTTON_GAP * 2;
+        int tabGap = 3;
+        int tabWidth = Math.max(
+                64,
+                (tabAreaWidth - tabGap * 2) / 3
+        );
+        int realTabWidth = tabWidth * 3 + tabGap * 2;
+        int tabLeft = this.width / 2 - realTabWidth / 2;
 
-        int buttonLeft =
-                this.width / 2
-                        - totalWidth / 2;
+        this.overviewTabButton = Button.builder(
+                        Component.translatable(
+                                "screen.moostensuraaddon.recognition.tab.overview"
+                        ),
+                        button -> setActiveView(View.OVERVIEW)
+                )
+                .pos(tabLeft, TAB_TOP)
+                .size(tabWidth, TAB_HEIGHT)
+                .build();
 
-        this.viewButton =
-                Button.builder(
-                                getViewButtonText(),
-                                button -> toggleView()
-                        )
-                        .pos(
-                                buttonLeft,
-                                buttonY
-                        )
-                        .size(
-                                BUTTON_WIDTH,
-                                BUTTON_HEIGHT
-                        )
-                        .build();
+        this.pathsTabButton = Button.builder(
+                        Component.translatable(
+                                "screen.moostensuraaddon.recognition.tab.paths"
+                        ),
+                        button -> setActiveView(View.PATHS)
+                )
+                .pos(
+                        tabLeft + tabWidth + tabGap,
+                        TAB_TOP
+                )
+                .size(tabWidth, TAB_HEIGHT)
+                .build();
 
-        this.refreshButton =
-                Button.builder(
-                                Component.literal("Refresh"),
-                                button -> requestRefresh()
-                        )
-                        .pos(
-                                buttonLeft
-                                        + BUTTON_WIDTH
-                                        + BUTTON_GAP,
-                                buttonY
-                        )
-                        .size(
-                                BUTTON_WIDTH,
-                                BUTTON_HEIGHT
-                        )
-                        .build();
+        this.benefitsTabButton = Button.builder(
+                        Component.translatable(
+                                "screen.moostensuraaddon.recognition.tab.benefits"
+                        ),
+                        button -> setActiveView(View.BENEFITS)
+                )
+                .pos(
+                        tabLeft + (tabWidth + tabGap) * 2,
+                        TAB_TOP
+                )
+                .size(tabWidth, TAB_HEIGHT)
+                .build();
 
-        this.closeButton =
-                Button.builder(
-                                Component.literal("Close"),
-                                button -> onClose()
-                        )
-                        .pos(
-                                buttonLeft
-                                        + (BUTTON_WIDTH
-                                        + BUTTON_GAP) * 2,
-                                buttonY
-                        )
-                        .size(
-                                BUTTON_WIDTH,
-                                BUTTON_HEIGHT
-                        )
-                        .build();
+        int footerY = Math.max(
+                CONTENT_TOP,
+                this.height - 25
+        );
 
-        addRenderableWidget(this.viewButton);
-        addRenderableWidget(this.refreshButton);
+        this.previousPageButton = Button.builder(
+                        Component.translatable(
+                                "screen.moostensuraaddon.recognition.previous"
+                        ),
+                        button -> changeOverviewPage(-1)
+                )
+                .pos(MARGIN, footerY)
+                .size(
+                        Math.min(92, Math.max(66, this.width / 5)),
+                        20
+                )
+                .build();
+
+        this.nextPageButton = Button.builder(
+                        Component.translatable(
+                                "screen.moostensuraaddon.recognition.next"
+                        ),
+                        button -> changeOverviewPage(1)
+                )
+                .size(
+                        Math.min(92, Math.max(66, this.width / 5)),
+                        20
+                )
+                .build();
+
+        this.nextPageButton.setX(
+                Math.max(
+                        MARGIN,
+                        this.width
+                                - MARGIN
+                                - this.nextPageButton.getWidth()
+                )
+        );
+        this.nextPageButton.setY(footerY);
+
+        int closeWidth = Math.min(
+                120,
+                Math.max(80, this.width / 3)
+        );
+
+        this.closeButton = Button.builder(
+                        Component.translatable(
+                                "screen.moostensuraaddon.recognition.close"
+                        ),
+                        button -> onClose()
+                )
+                .pos(
+                        this.width / 2 - closeWidth / 2,
+                        footerY
+                )
+                .size(closeWidth, 20)
+                .build();
+
+        addRenderableWidget(this.overviewTabButton);
+        addRenderableWidget(this.pathsTabButton);
+        addRenderableWidget(this.benefitsTabButton);
+        addRenderableWidget(this.previousPageButton);
+        addRenderableWidget(this.nextPageButton);
         addRenderableWidget(this.closeButton);
 
-        if (payload != null
-                && payload.debugDetailsAvailable()) {
-
-            this.debugButton =
-                    Button.builder(
-                                    getDebugButtonText(),
-                                    button -> toggleDebugDetails()
-                            )
-                            .pos(
-                                    Math.max(
-                                            4,
-                                            this.width - 86
-                                    ),
-                                    6
-                            )
-                            .size(
-                                    80,
-                                    BUTTON_HEIGHT
-                            )
-                            .build();
-
-            addRenderableWidget(this.debugButton);
-        }
-
-        updateButtonStates();
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        updateButtonStates();
-
-        if (noticeExpiresNanos != 0L
-                && System.nanoTime()
-                >= noticeExpiresNanos) {
-
-            noticeText = "";
-            noticeExpiresNanos = 0L;
-        }
+        clampOverviewPage();
+        updateWidgetStates();
     }
 
     @Override
@@ -228,12 +211,11 @@ public final class RecognitionProgressScreen extends Screen {
             float partialTick
     ) {
         /*
-         * Do not call Screen#renderBackground or Screen#render here.
+         * Do not call Screen#renderBackground or Screen#render.
          *
-         * The working 1.21.1 implementation renders the fully opaque
-         * background, custom content and registered buttons in one final
-         * sharp pass. Calling the parent render path after the custom content
-         * reintroduces the post-process blur that was fixed in Packet 6E.1b.
+         * The custom opaque background avoids Minecraft's menu blur path.
+         * Registered widgets are rendered explicitly after all custom panels
+         * so labels, progress bars and buttons remain equally sharp.
          */
         guiGraphics.fill(
                 0,
@@ -243,263 +225,838 @@ public final class RecognitionProgressScreen extends Screen {
                 0xFF0D0F14
         );
 
-        hoveredPath = null;
-        hoveredGuidance = null;
-
         renderHeader(guiGraphics);
 
-        int contentBottom;
+        PanelRect content = createContentPanel();
 
-        if (guidanceView) {
-            contentBottom = renderGuidanceView(
-                    guiGraphics,
-                    mouseX,
-                    mouseY
-            );
-        } else {
-            contentBottom = renderPathsView(
-                    guiGraphics,
-                    mouseX,
-                    mouseY
-            );
+        switch (activeView) {
+            case OVERVIEW ->
+                    renderOverview(guiGraphics, content);
+            case PATHS ->
+                    renderPaths(guiGraphics, content);
+            case BENEFITS ->
+                    renderBenefitsPanel(guiGraphics, content);
         }
 
-        renderStatusPanel(
-                guiGraphics,
-                contentBottom
-        );
-
-        renderNotice(guiGraphics);
-        renderButtons(
+        renderWidget(
+                this.overviewTabButton,
                 guiGraphics,
                 mouseX,
                 mouseY,
                 partialTick
         );
-
-        renderHoveredTooltip(
+        renderWidget(
+                this.pathsTabButton,
                 guiGraphics,
                 mouseX,
-                mouseY
+                mouseY,
+                partialTick
         );
+        renderWidget(
+                this.benefitsTabButton,
+                guiGraphics,
+                mouseX,
+                mouseY,
+                partialTick
+        );
+        renderWidget(
+                this.previousPageButton,
+                guiGraphics,
+                mouseX,
+                mouseY,
+                partialTick
+        );
+        renderWidget(
+                this.nextPageButton,
+                guiGraphics,
+                mouseX,
+                mouseY,
+                partialTick
+        );
+        renderWidget(
+                this.closeButton,
+                guiGraphics,
+                mouseX,
+                mouseY,
+                partialTick
+        );
+    }
+
+    /**
+     * Minecraft 1.21.x supplies horizontal and vertical wheel deltas.
+     * The page buttons remain available when a platform does not forward a
+     * wheel event to this method.
+     */
+    public boolean mouseScrolled(
+            double mouseX,
+            double mouseY,
+            double scrollX,
+            double scrollY
+    ) {
+        if (activeView != View.OVERVIEW
+                || scrollY == 0.0D
+                || !createContentPanel().contains(
+                mouseX,
+                mouseY
+        )) {
+            return false;
+        }
+
+        changeOverviewPage(
+                scrollY > 0.0D ? -1 : 1
+        );
+        return true;
+    }
+
+    private void setActiveView(
+            View view
+    ) {
+        if (view == null || activeView == view) {
+            return;
+        }
+
+        activeView = view;
+
+        if (activeView == View.OVERVIEW) {
+            clampOverviewPage();
+        }
+
+        updateWidgetStates();
+    }
+
+    private void changeOverviewPage(
+            int delta
+    ) {
+        OverviewLayout layout = createOverviewLayout(
+                createContentPanel()
+        );
+
+        int maximumFirstRow = Math.max(
+                0,
+                layout.totalRows()
+                        - layout.visibleRows()
+        );
+
+        overviewFirstRow = Math.max(
+                0,
+                Math.min(
+                        maximumFirstRow,
+                        overviewFirstRow + delta
+                )
+        );
+
+        updateWidgetStates();
+    }
+
+    private void clampOverviewPage() {
+        OverviewLayout layout = createOverviewLayout(
+                createContentPanel()
+        );
+
+        overviewFirstRow = Math.max(
+                0,
+                Math.min(
+                        Math.max(
+                                0,
+                                layout.totalRows()
+                                        - layout.visibleRows()
+                        ),
+                        overviewFirstRow
+                )
+        );
+    }
+
+    private void updateWidgetStates() {
+        if (this.overviewTabButton != null) {
+            this.overviewTabButton.active =
+                    activeView != View.OVERVIEW;
+        }
+
+        if (this.pathsTabButton != null) {
+            this.pathsTabButton.active =
+                    activeView != View.PATHS;
+        }
+
+        if (this.benefitsTabButton != null) {
+            this.benefitsTabButton.active =
+                    activeView != View.BENEFITS;
+        }
+
+        OverviewLayout layout = createOverviewLayout(
+                createContentPanel()
+        );
+
+        boolean paginated = activeView == View.OVERVIEW
+                && layout.totalRows() > layout.visibleRows();
+
+        if (this.previousPageButton != null) {
+            this.previousPageButton.visible = paginated;
+            this.previousPageButton.active =
+                    overviewFirstRow > 0;
+        }
+
+        if (this.nextPageButton != null) {
+            this.nextPageButton.visible = paginated;
+            this.nextPageButton.active =
+                    overviewFirstRow
+                            + layout.visibleRows()
+                            < layout.totalRows();
+        }
     }
 
     private void renderHeader(
             GuiGraphics guiGraphics
     ) {
-        int centerX =
-                this.width / 2;
-
-        drawCenteredText(
+        drawCenteredClipped(
                 guiGraphics,
-                this.title.copy()
-                        .withStyle(
-                                ChatFormatting.LIGHT_PURPLE,
-                                ChatFormatting.BOLD
-                        ),
-                centerX,
-                10,
+                this.title.copy().withStyle(
+                        ChatFormatting.LIGHT_PURPLE,
+                        ChatFormatting.BOLD
+                ),
+                this.width / 2,
+                6,
+                this.width - MARGIN * 2,
                 0xFFFFFF
         );
 
-        if (payload == null) {
-            drawCenteredText(
+        MutableComponent identity = Component.literal(
+                        safeText(payload == null
+                                ? ""
+                                : payload.identityLine())
+                )
+                .withColor(
+                        payload == null
+                                ? 0xFFFFFF
+                                : payload.recognitionColor()
+                );
+
+        if (payload != null
+                && payload.recognitionBold()) {
+            identity.withStyle(ChatFormatting.BOLD);
+        }
+
+        drawCenteredClipped(
+                guiGraphics,
+                identity,
+                this.width / 2,
+                20,
+                this.width - MARGIN * 2,
+                payload == null
+                        ? 0xFFFFFF
+                        : payload.recognitionColor()
+        );
+
+        drawCenteredClipped(
+                guiGraphics,
+                Component.literal(
+                                safeText(
+                                        payload == null
+                                                ? ""
+                                                : payload.pathSummary()
+                                )
+                        )
+                        .withStyle(ChatFormatting.GRAY),
+                this.width / 2,
+                34,
+                this.width - MARGIN * 2,
+                0xA0A0A0
+        );
+
+        guiGraphics.fill(
+                MARGIN,
+                HEADER_BOTTOM,
+                Math.max(MARGIN, this.width - MARGIN),
+                HEADER_BOTTOM + 1,
+                0xFF2B2633
+        );
+    }
+
+    private PanelRect createContentPanel() {
+        int bottom = Math.max(
+                CONTENT_TOP + 1,
+                this.height - FOOTER_HEIGHT
+        );
+
+        return new PanelRect(
+                MARGIN,
+                CONTENT_TOP,
+                Math.max(1, this.width - MARGIN * 2),
+                Math.max(1, bottom - CONTENT_TOP)
+        );
+    }
+
+    private void renderOverview(
+            GuiGraphics guiGraphics,
+            PanelRect panel
+    ) {
+        OverviewLayout layout =
+                createOverviewLayout(panel);
+
+        renderStatusPanel(
+                guiGraphics,
+                layout.statusPanel()
+        );
+
+        List<OpenRecognitionProgressScreenPayload.GuidanceEntry>
+                entries =
+                guidanceEntries();
+
+        if (entries.isEmpty()) {
+            drawBorderedPanel(
                     guiGraphics,
-                    "No recognition data received.",
-                    centerX,
-                    28,
-                    0xFF8A8A
+                    layout.guidancePanel().left(),
+                    layout.guidancePanel().top(),
+                    layout.guidancePanel().right(),
+                    layout.guidancePanel().bottom(),
+                    0xFF3A3148,
+                    0xD014141A,
+                    1
+            );
+
+            drawCenteredClipped(
+                    guiGraphics,
+                    Component.translatable(
+                            "screen.moostensuraaddon.recognition.overview.empty"
+                    ),
+                    layout.guidancePanel().left()
+                            + layout.guidancePanel().width() / 2,
+                    layout.guidancePanel().top()
+                            + Math.max(
+                            5,
+                            layout.guidancePanel().height() / 2 - 4
+                    ),
+                    layout.guidancePanel().width() - 12,
+                    0x9FA7B3
             );
             return;
         }
 
-        MutableComponent identity =
-                Component.literal(
-                                payload.identityLine()
-                        )
-                        .withColor(
-                                payload.recognitionColor()
-                        );
+        int firstEntry =
+                overviewFirstRow * layout.columns();
 
-        if (payload.recognitionBold()) {
-            identity.withStyle(
-                    ChatFormatting.BOLD
-            );
-        }
-
-        drawCenteredText(
-                guiGraphics,
-                identity,
-                centerX,
-                25,
-                payload.recognitionColor()
+        int lastEntryExclusive = Math.min(
+                entries.size(),
+                firstEntry
+                        + layout.visibleRows()
+                        * layout.columns()
         );
 
-        MutableComponent pathSummary =
-                Component.literal(
-                                payload.pathSummary()
-                        )
-                        .withStyle(
-                                ChatFormatting.GRAY
-                        );
+        for (int entryIndex = firstEntry;
+             entryIndex < lastEntryExclusive;
+             entryIndex++) {
 
-        if (payload.revealPending()) {
-            pathSummary.append(
-                    Component.literal("  •  PENDING")
-                            .withStyle(
-                                    ChatFormatting.LIGHT_PURPLE,
-                                    ChatFormatting.BOLD
-                            )
+            int localIndex = entryIndex - firstEntry;
+            int row = localIndex / layout.columns();
+            int column = localIndex % layout.columns();
+
+            int left = layout.guidancePanel().left()
+                    + column
+                    * (
+                    layout.cardWidth()
+                            + PANEL_GAP
             );
-        } else if (payload.recognitionCommitted()) {
-            pathSummary.append(
-                    Component.literal("  •  LOCKED")
-                            .withStyle(
-                                    ChatFormatting.GOLD,
-                                    ChatFormatting.BOLD
-                            )
+
+            int top = layout.guidancePanel().top()
+                    + row
+                    * (
+                    layout.cardHeight()
+                            + PANEL_GAP
+            );
+
+            renderGuidanceCard(
+                    guiGraphics,
+                    entries.get(entryIndex),
+                    new PanelRect(
+                            left,
+                            top,
+                            layout.cardWidth(),
+                            layout.cardHeight()
+                    )
             );
         }
 
-        drawCenteredText(
-                guiGraphics,
-                pathSummary,
-                centerX,
-                39,
-                0xA0A0A0
+        if (layout.totalRows()
+                > layout.visibleRows()) {
+            int page = Math.min(
+                    layout.totalRows(),
+                    overviewFirstRow + 1
+            );
+
+            drawCenteredClipped(
+                    guiGraphics,
+                    Component.translatable(
+                            "screen.moostensuraaddon.recognition.page",
+                            page,
+                            layout.totalRows()
+                    ),
+                    panel.left() + panel.width() / 2,
+                    panel.bottom() - 10,
+                    Math.max(1, panel.width() - 180),
+                    0x747B86
+            );
+        }
+    }
+
+    private OverviewLayout createOverviewLayout(
+            PanelRect panel
+    ) {
+        int statusHeight = Math.min(
+                72,
+                Math.max(
+                        56,
+                        panel.height() / 4
+                )
+        );
+
+        PanelRect statusPanel = new PanelRect(
+                panel.left(),
+                panel.top(),
+                panel.width(),
+                Math.min(
+                        panel.height(),
+                        statusHeight
+                )
+        );
+
+        int guidanceTop = Math.min(
+                panel.bottom(),
+                statusPanel.bottom() + PANEL_GAP
+        );
+
+        int pageReserve = 14;
+        int guidanceHeight = Math.max(
+                1,
+                panel.bottom()
+                        - guidanceTop
+                        - pageReserve
+        );
+
+        PanelRect guidancePanel = new PanelRect(
+                panel.left(),
+                guidanceTop,
+                panel.width(),
+                guidanceHeight
+        );
+
+        int columns = panel.width() >= 520
+                ? 2
+                : 1;
+
+        int cardWidth = Math.max(
+                1,
+                (
+                        guidancePanel.width()
+                                - PANEL_GAP
+                                * (columns - 1)
+                ) / columns
+        );
+
+        int cardHeight;
+
+        if (guidancePanel.height() >= 260) {
+            cardHeight = 64;
+        } else if (guidancePanel.height() >= 190) {
+            cardHeight = 57;
+        } else {
+            cardHeight = 50;
+        }
+
+        int visibleRows = Math.max(
+                1,
+                (
+                        guidancePanel.height()
+                                + PANEL_GAP
+                ) / (
+                        cardHeight
+                                + PANEL_GAP
+                )
+        );
+
+        int totalRows = Math.max(
+                1,
+                (
+                        guidanceEntries().size()
+                                + columns - 1
+                ) / columns
+        );
+
+        return new OverviewLayout(
+                statusPanel,
+                guidancePanel,
+                columns,
+                cardWidth,
+                cardHeight,
+                visibleRows,
+                totalRows
         );
     }
 
-    private int renderPathsView(
+    private void renderStatusPanel(
             GuiGraphics guiGraphics,
-            int mouseX,
-            int mouseY
+            PanelRect panel
     ) {
-        MatrixLayout layout =
-                createMatrixLayout();
+        int accent = getStatusColor();
 
-        renderColumnLabels(
+        drawBorderedPanel(
                 guiGraphics,
-                layout
+                panel.left(),
+                panel.top(),
+                panel.right(),
+                panel.bottom(),
+                opaque(accent),
+                0xD014141A,
+                1
+        );
+
+        int left = panel.left() + 7;
+        int width = Math.max(
+                1,
+                panel.width() - 14
+        );
+        int y = panel.top() + 5;
+
+        drawLineClipped(
+                guiGraphics,
+                Component.translatable(
+                                "screen.moostensuraaddon.recognition.overview"
+                        )
+                        .withStyle(
+                                ChatFormatting.LIGHT_PURPLE,
+                                ChatFormatting.BOLD
+                        ),
+                left,
+                y,
+                width,
+                0xD7B5FF
+        );
+
+        y += 12;
+
+        drawLineClipped(
+                guiGraphics,
+                Component.literal(
+                                safeText(
+                                        payload == null
+                                                ? ""
+                                                : payload.statusHeading()
+                                )
+                        )
+                        .withStyle(ChatFormatting.BOLD),
+                left,
+                y,
+                width,
+                accent
+        );
+
+        y += 11;
+
+        int levelY = panel.bottom()
+                - this.font.lineHeight - 4;
+
+        int detailHeight = Math.max(
+                0,
+                levelY - y - 2
+        );
+
+        drawWrappedLines(
+                guiGraphics,
+                Component.literal(
+                        safeText(
+                                payload == null
+                                        ? ""
+                                        : payload.statusDetail()
+                        )
+                ),
+                left,
+                y,
+                width,
+                detailHeight,
+                0xC7C9CE
+        );
+
+        if (levelY >= panel.top() + 4) {
+            drawLineClipped(
+                    guiGraphics,
+                    Component.literal(
+                            safeText(
+                                    payload == null
+                                            ? ""
+                                            : payload.levelLine()
+                            )
+                    ),
+                    left,
+                    levelY,
+                    width,
+                    0x8F96A1
+            );
+        }
+    }
+
+    private void renderGuidanceCard(
+            GuiGraphics guiGraphics,
+            OpenRecognitionProgressScreenPayload.GuidanceEntry entry,
+            PanelRect card
+    ) {
+        if (entry == null) {
+            return;
+        }
+
+        int color = entry.color();
+
+        drawBorderedPanel(
+                guiGraphics,
+                card.left(),
+                card.top(),
+                card.right(),
+                card.bottom(),
+                opaque(color),
+                0xD014141A,
+                1
+        );
+
+        int left = card.left() + 6;
+        int width = Math.max(
+                1,
+                card.width() - 12
+        );
+
+        int stageWidth = Math.min(
+                Math.max(42, card.width() / 3),
+                Math.max(42, width)
+        );
+
+        drawLineClipped(
+                guiGraphics,
+                Component.literal(
+                                safeText(entry.displayName())
+                        )
+                        .withColor(color)
+                        .withStyle(ChatFormatting.BOLD),
+                left,
+                card.top() + 4,
+                Math.max(1, width - stageWidth - 3),
+                color
+        );
+
+        drawRightAlignedClipped(
+                guiGraphics,
+                Component.literal(
+                                safeText(entry.stageLabel())
+                        )
+                        .withStyle(ChatFormatting.GRAY),
+                card.right() - 6,
+                card.top() + 4,
+                stageWidth,
+                stageColor(entry.stageLabel())
+        );
+
+        int textTop = card.top() + 16;
+        int barTop = card.bottom() - 7;
+        int textHeight = Math.max(
+                0,
+                barTop - textTop - 2
+        );
+
+        drawWrappedLines(
+                guiGraphics,
+                Component.literal(
+                        safeText(entry.guidanceText())
+                ),
+                left,
+                textTop,
+                width,
+                textHeight,
+                0xB6BAC2
+        );
+
+        guiGraphics.fill(
+                left,
+                barTop,
+                left + width,
+                barTop + 3,
+                0xFF272727
+        );
+
+        int filledWidth = (int) Math.round(
+                width * clampProgress(entry.progress())
+        );
+
+        if (filledWidth > 0) {
+            guiGraphics.fill(
+                    left,
+                    barTop,
+                    left + Math.min(width, filledWidth),
+                    barTop + 3,
+                    opaque(color)
+            );
+        }
+    }
+
+    private void renderPaths(
+            GuiGraphics guiGraphics,
+            PanelRect panel
+    ) {
+        int statusHeight = Math.min(
+                68,
+                Math.max(
+                        52,
+                        panel.height() / 4
+                )
+        );
+
+        int matrixHeight = Math.max(
+                1,
+                panel.height()
+                        - statusHeight
+                        - PANEL_GAP
+        );
+
+        PanelRect matrixPanel = new PanelRect(
+                panel.left(),
+                panel.top(),
+                panel.width(),
+                matrixHeight
+        );
+
+        PanelRect summaryPanel = new PanelRect(
+                panel.left(),
+                matrixPanel.bottom() + PANEL_GAP,
+                panel.width(),
+                Math.max(
+                        1,
+                        panel.bottom()
+                                - matrixPanel.bottom()
+                                - PANEL_GAP
+                )
         );
 
         renderPathMatrix(
                 guiGraphics,
-                layout,
-                mouseX,
-                mouseY
+                matrixPanel
         );
-
-        return layout.matrixBottom();
-    }
-
-    private MatrixLayout createMatrixLayout() {
-        int matrixWidth =
-                Math.max(
-                        180,
-                        Math.min(
-                                390,
-                                this.width - 38
-                        )
-                );
-
-        int cellWidth =
-                Math.max(
-                        50,
-                        (
-                                matrixWidth
-                                        - CELL_GAP * 2
-                        ) / 3
-                );
-
-        int realMatrixWidth =
-                cellWidth * 3
-                        + CELL_GAP * 2;
-
-        int matrixLeft =
-                this.width / 2
-                        - realMatrixWidth / 2;
-
-        int matrixBottom =
-                MATRIX_TOP
-                        + CELL_HEIGHT * 3
-                        + CELL_GAP * 2;
-
-        return new MatrixLayout(
-                matrixLeft,
-                realMatrixWidth,
-                cellWidth,
-                matrixBottom
+        renderPathSummary(
+                guiGraphics,
+                summaryPanel
         );
-    }
-
-    private void renderColumnLabels(
-            GuiGraphics guiGraphics,
-            MatrixLayout layout
-    ) {
-        for (int column = 0;
-             column < COLUMN_LABELS.length;
-             column++) {
-
-            int cellLeft =
-                    layout.matrixLeft()
-                            + column
-                            * (
-                            layout.cellWidth()
-                                    + CELL_GAP
-                    );
-
-            drawCenteredText(
-                    guiGraphics,
-                    COLUMN_LABELS[column],
-                    cellLeft
-                            + layout.cellWidth() / 2,
-                    50,
-                    0xA0A0A0
-            );
-        }
     }
 
     private void renderPathMatrix(
             GuiGraphics guiGraphics,
-            MatrixLayout layout,
-            int mouseX,
-            int mouseY
+            PanelRect panel
     ) {
+        drawBorderedPanel(
+                guiGraphics,
+                panel.left(),
+                panel.top(),
+                panel.right(),
+                panel.bottom(),
+                0xFF3A3148,
+                0xD014141A,
+                1
+        );
+
+        int innerLeft = panel.left() + 14;
+        int innerRight = panel.right() - 5;
+        int labelsTop = panel.top() + 16;
+        int innerTop = labelsTop + 12;
+        int innerBottom = panel.bottom() - 5;
+        int matrixWidth = Math.max(
+                3,
+                innerRight - innerLeft
+        );
+        int cellWidth = Math.max(
+                1,
+                (
+                        matrixWidth
+                                - CELL_GAP * 2
+                ) / 3
+        );
+        int rowHeight = Math.max(
+                19,
+                (
+                        Math.max(
+                                57,
+                                innerBottom - innerTop
+                        )
+                                - CELL_GAP * 2
+                ) / 3
+        );
+
+        drawLineClipped(
+                guiGraphics,
+                Component.translatable(
+                                "screen.moostensuraaddon.recognition.paths"
+                        )
+                        .withStyle(
+                                ChatFormatting.LIGHT_PURPLE,
+                                ChatFormatting.BOLD
+                        ),
+                panel.left() + 6,
+                panel.top() + 4,
+                Math.max(1, panel.width() - 12),
+                0xD7B5FF
+        );
+
+        for (int column = 0;
+             column < COLUMN_LABELS.length;
+             column++) {
+
+            int cellLeft = innerLeft
+                    + column
+                    * (
+                    cellWidth
+                            + CELL_GAP
+            );
+
+            drawCenteredClipped(
+                    guiGraphics,
+                    Component.literal(
+                            COLUMN_LABELS[column]
+                    ),
+                    cellLeft + cellWidth / 2,
+                    labelsTop,
+                    cellWidth,
+                    0x9096A0
+            );
+        }
+
         for (int index = 0;
              index < MATRIX_PATH_IDS.length;
              index++) {
 
             int row = index / 3;
             int column = index % 3;
-
-            int cellLeft =
-                    layout.matrixLeft()
-                            + column
-                            * (
-                            layout.cellWidth()
-                                    + CELL_GAP
-                    );
-
-            int cellTop =
-                    MATRIX_TOP
-                            + row
-                            * (
-                            CELL_HEIGHT
-                                    + CELL_GAP
-                    );
+            int left = innerLeft
+                    + column
+                    * (
+                    cellWidth
+                            + CELL_GAP
+            );
+            int top = innerTop
+                    + row
+                    * (
+                    rowHeight
+                            + CELL_GAP
+            );
 
             if (column == 0) {
-                drawCenteredText(
+                drawCenteredClipped(
                         guiGraphics,
-                        ROW_LABELS[row],
-                        layout.matrixLeft() - 9,
-                        cellTop + 11,
-                        0x707070
+                        Component.literal(
+                                ROW_LABELS[row]
+                        ),
+                        panel.left() + 7,
+                        top + Math.max(
+                                4,
+                                rowHeight / 2 - 4
+                        ),
+                        10,
+                        0x707782
                 );
             }
 
-            OpenRecognitionProgressScreenPayload.PathEntry path =
+            OpenRecognitionProgressScreenPayload.PathEntry
+                    path =
                     payload == null
                             ? null
                             : payload.findPath(
@@ -507,61 +1064,34 @@ public final class RecognitionProgressScreen extends Screen {
                     );
 
             if (path == null) {
-                renderMissingCell(
+                drawBorderedPanel(
                         guiGraphics,
-                        cellLeft,
-                        cellTop,
-                        layout.cellWidth()
+                        left,
+                        top,
+                        left + cellWidth,
+                        Math.min(
+                                panel.bottom() - 3,
+                                top + rowHeight
+                        ),
+                        0xFF333333,
+                        0xCC151515,
+                        1
                 );
-
                 continue;
             }
 
             renderPathCell(
                     guiGraphics,
                     path,
-                    cellLeft,
-                    cellTop,
-                    layout.cellWidth()
+                    left,
+                    top,
+                    cellWidth,
+                    Math.min(
+                            rowHeight,
+                            panel.bottom() - top - 3
+                    )
             );
-
-            if (isMouseInside(
-                    mouseX,
-                    mouseY,
-                    cellLeft,
-                    cellTop,
-                    cellLeft + layout.cellWidth(),
-                    cellTop + CELL_HEIGHT
-            )) {
-                hoveredPath = path;
-            }
         }
-    }
-
-    private void renderMissingCell(
-            GuiGraphics guiGraphics,
-            int left,
-            int top,
-            int width
-    ) {
-        drawBorderedPanel(
-                guiGraphics,
-                left,
-                top,
-                left + width,
-                top + CELL_HEIGHT,
-                0xFF333333,
-                0xCC151515,
-                1
-        );
-
-        drawCenteredText(
-                guiGraphics,
-                "Unavailable",
-                left + width / 2,
-                top + 11,
-                0x707070
-        );
     }
 
     private void renderPathCell(
@@ -569,8 +1099,14 @@ public final class RecognitionProgressScreen extends Screen {
             OpenRecognitionProgressScreenPayload.PathEntry path,
             int left,
             int top,
-            int width
+            int width,
+            int height
     ) {
+        int safeHeight = Math.max(
+                1,
+                height
+        );
+
         int borderColor =
                 path.primary()
                         || path.secondary()
@@ -582,495 +1118,602 @@ public final class RecognitionProgressScreen extends Screen {
                         ? 2
                         : 1;
 
-        int fillColor =
-                path.primary()
-                        ? 0xE01A201A
-                        : path.secondary()
-                          ? 0xDC18181E
-                          : 0xD0161616;
-
         drawBorderedPanel(
                 guiGraphics,
                 left,
                 top,
                 left + width,
-                top + CELL_HEIGHT,
+                top + safeHeight,
                 borderColor,
-                fillColor,
+                0xD0161616,
                 borderThickness
         );
 
-        if (path.primary()
-                && payload.pureRecognition()) {
-            drawOutline(
-                    guiGraphics,
-                    left + 3,
-                    top + 3,
-                    left + width - 3,
-                    top + CELL_HEIGHT - 3,
-                    0xFFFFD36A
-            );
-        }
-
         MutableComponent displayName =
                 Component.literal(
-                                path.displayName()
+                                safeText(path.displayName())
                         )
-                        .withColor(
-                                path.color()
-                        );
+                        .withColor(path.color());
 
         if (path.primary()
+                && payload != null
                 && payload.pureRecognition()) {
             displayName.withStyle(
                     ChatFormatting.BOLD
             );
         }
 
-        drawCenteredText(
+        drawCenteredClipped(
                 guiGraphics,
                 displayName,
                 left + width / 2,
-                top + 4,
+                top + 3,
+                Math.max(1, width - 8),
                 path.color()
         );
 
-        drawCenteredText(
-                guiGraphics,
-                path.stageLabel(),
-                left + width / 2,
-                top + 15,
-                path.primary()
-                        || path.secondary()
-                        ? 0xD0D0D0
-                        : 0x858585
-        );
+        if (safeHeight >= 25) {
+            drawCenteredClipped(
+                    guiGraphics,
+                    Component.literal(
+                            safeText(path.stageLabel())
+                    ),
+                    left + width / 2,
+                    top + 14,
+                    Math.max(1, width - 8),
+                    path.primary()
+                            || path.secondary()
+                            ? 0xD0D0D0
+                            : 0x858585
+            );
+        }
 
         if (path.primary()
                 || path.secondary()) {
             guiGraphics.drawString(
                     this.font,
                     path.primary()
-                            ? "★"
-                            : "◆",
-                    left + width - 9,
+                            ? "P"
+                            : "S",
+                    left + width - 8,
                     top + 3,
                     opaque(path.color()),
                     false
             );
         }
 
-        renderProgressBar(
-                guiGraphics,
-                path.progress(),
-                path.color(),
-                left + 4,
-                top + CELL_HEIGHT - 6,
-                Math.max(1, width - 8),
-                true
-        );
-    }
+        if (safeHeight >= 8) {
+            int barLeft = left + 4;
+            int barWidth = Math.max(
+                    1,
+                    width - 8
+            );
+            int barTop = top + safeHeight - 5;
 
-    private int renderGuidanceView(
-            GuiGraphics guiGraphics,
-            int mouseX,
-            int mouseY
-    ) {
-        if (payload == null
-                || payload.guidanceEntries().isEmpty()) {
-
-            drawCenteredText(
-                    guiGraphics,
-                    "No guidance data is available.",
-                    this.width / 2,
-                    78,
-                    0xA0A0A0
+            guiGraphics.fill(
+                    barLeft,
+                    barTop,
+                    barLeft + barWidth,
+                    barTop + 2,
+                    0xFF272727
             );
 
-            return 100;
-        }
-
-        int contentWidth =
-                Math.max(
-                        220,
-                        Math.min(
-                                500,
-                                this.width - 32
-                        )
-                );
-
-        int cardWidth =
-                Math.max(
-                        100,
-                        (contentWidth
-                                - GUIDANCE_GAP) / 2
-                );
-
-        int realWidth =
-                cardWidth * 2
-                        + GUIDANCE_GAP;
-
-        int contentLeft =
-                this.width / 2
-                        - realWidth / 2;
-
-        List<OpenRecognitionProgressScreenPayload.GuidanceEntry>
-                guidanceEntries =
-                payload.guidanceEntries();
-
-        for (int index = 0;
-             index < guidanceEntries.size();
-             index++) {
-
-            OpenRecognitionProgressScreenPayload.GuidanceEntry
-                    entry =
-                    guidanceEntries.get(index);
-
-            int row = index / 2;
-            int column = index % 2;
-
-            int left =
-                    contentLeft
-                            + column
-                            * (
-                            cardWidth
-                                    + GUIDANCE_GAP
-                    );
-
-            int top =
-                    GUIDANCE_TOP
-                            + row
-                            * (
-                            GUIDANCE_CARD_HEIGHT
-                                    + GUIDANCE_GAP
-                    );
-
-            renderGuidanceCard(
-                    guiGraphics,
-                    entry,
-                    left,
-                    top,
-                    cardWidth
+            int filledWidth = (int) Math.round(
+                    barWidth
+                            * clampProgress(path.progress())
             );
 
-            if (isMouseInside(
-                    mouseX,
-                    mouseY,
-                    left,
-                    top,
-                    left + cardWidth,
-                    top + GUIDANCE_CARD_HEIGHT
-            )) {
-                hoveredGuidance = entry;
+            if (filledWidth > 0) {
+                guiGraphics.fill(
+                        barLeft,
+                        barTop,
+                        barLeft
+                                + Math.min(
+                                barWidth,
+                                filledWidth
+                        ),
+                        barTop + 2,
+                        opaque(path.color())
+                );
             }
         }
-
-        int rows =
-                (guidanceEntries.size() + 1) / 2;
-
-        return GUIDANCE_TOP
-                + rows * GUIDANCE_CARD_HEIGHT
-                + Math.max(0, rows - 1)
-                * GUIDANCE_GAP;
     }
 
-    private void renderGuidanceCard(
+    private void renderPathSummary(
             GuiGraphics guiGraphics,
-            OpenRecognitionProgressScreenPayload.GuidanceEntry entry,
-            int left,
-            int top,
-            int width
+            PanelRect panel
     ) {
+        int accent = getStatusColor();
+
         drawBorderedPanel(
                 guiGraphics,
-                left,
-                top,
-                left + width,
-                top + GUIDANCE_CARD_HEIGHT,
-                opaque(entry.color()),
-                0xD0161616,
+                panel.left(),
+                panel.top(),
+                panel.right(),
+                panel.bottom(),
+                opaque(accent),
+                0xD014141A,
                 1
         );
 
-        guiGraphics.drawString(
-                this.font,
-                Component.literal(entry.displayName())
-                        .withColor(entry.color()),
-                left + 5,
-                top + 5,
-                opaque(entry.color()),
-                false
+        int left = panel.left() + 7;
+        int width = Math.max(
+                1,
+                panel.width() - 14
+        );
+        int y = panel.top() + 5;
+
+        drawLineClipped(
+                guiGraphics,
+                Component.literal(
+                                safeText(
+                                        payload == null
+                                                ? ""
+                                                : payload.statusHeading()
+                                )
+                        )
+                        .withStyle(ChatFormatting.BOLD),
+                left,
+                y,
+                width,
+                accent
         );
 
-        int stageWidth =
-                this.font.width(entry.stageLabel());
+        y += 12;
 
-        guiGraphics.drawString(
-                this.font,
-                entry.stageLabel(),
-                left + width - stageWidth - 5,
-                top + 5,
-                0xFFC0C0C0,
-                false
+        int levelWidth = Math.min(
+                Math.max(90, width / 3),
+                width
         );
 
-        List<String> guidanceLines =
-                wrapText(
-                        entry.guidanceText(),
-                        Math.max(
-                                40,
-                                width - 10
+        drawRightAlignedClipped(
+                guiGraphics,
+                Component.literal(
+                        safeText(
+                                payload == null
+                                        ? ""
+                                        : payload.levelLine()
+                        )
+                ),
+                panel.right() - 7,
+                y,
+                levelWidth,
+                0x8F96A1
+        );
+
+        drawWrappedLines(
+                guiGraphics,
+                Component.literal(
+                        safeText(
+                                payload == null
+                                        ? ""
+                                        : payload.statusDetail()
+                        )
+                ),
+                left,
+                y,
+                Math.max(
+                        1,
+                        width - levelWidth - 6
+                ),
+                Math.max(
+                        1,
+                        panel.bottom() - y - 4
+                ),
+                0xC7C9CE
+        );
+    }
+
+    private void renderBenefitsPanel(
+            GuiGraphics guiGraphics,
+            PanelRect panel
+    ) {
+        int accent = payload != null
+                && payload.recognitionCommitted()
+                ? payload.recognitionColor()
+                : getStatusColor();
+
+        drawBorderedPanel(
+                guiGraphics,
+                panel.left(),
+                panel.top(),
+                panel.right(),
+                panel.bottom(),
+                opaque(accent),
+                0xD014141A,
+                1
+        );
+
+        int textLeft = panel.left() + 8;
+        int maxWidth = Math.max(
+                1,
+                panel.width() - 16
+        );
+        int y = panel.top() + 6;
+
+        drawLineClipped(
+                guiGraphics,
+                Component.translatable(
+                                "screen.moostensuraaddon.recognition.benefits"
+                        )
+                        .withStyle(
+                                ChatFormatting.GOLD,
+                                ChatFormatting.BOLD
                         ),
-                        2
-                );
+                textLeft,
+                y,
+                maxWidth,
+                0xFFD36A
+        );
 
-        for (int index = 0;
-             index < guidanceLines.size();
-             index++) {
+        y += 14;
+
+        ClientRecognitionBenefitsCache.Snapshot benefits =
+                ClientRecognitionBenefitsCache.current();
+
+        if (!benefits.active()) {
+            drawLineClipped(
+                    guiGraphics,
+                    Component.translatable(
+                            "screen.moostensuraaddon.recognition.benefit_state."
+                                    + benefits.stateId()
+                    ),
+                    textLeft,
+                    y,
+                    maxWidth,
+                    benefitsStateColor(
+                            benefits.stateId()
+                    )
+            );
+
+            y += 14;
+
+            drawWrappedLines(
+                    guiGraphics,
+                    Component.literal(
+                            safeText(
+                                    payload == null
+                                            ? ""
+                                            : payload.statusHeading()
+                            )
+                    ),
+                    textLeft,
+                    y,
+                    maxWidth,
+                    Math.max(
+                            1,
+                            panel.bottom() - y - 6
+                    ),
+                    0xC7C9CE
+            );
+            return;
+        }
+
+        int lineStep = panel.height() < 105
+                ? 11
+                : 14;
+
+        drawBenefitLine(
+                guiGraphics,
+                textLeft,
+                y,
+                maxWidth,
+                "screen.moostensuraaddon.recognition.native_endowment",
+                Component.translatable(
+                        benefits.nativeEndowmentAnchored()
+                                ? "screen.moostensuraaddon.recognition.anchored"
+                                : "screen.moostensuraaddon.recognition.pending"
+                ),
+                benefits.nativeEndowmentAnchored()
+                        ? 0xD7B5FF
+                        : 0xFFD36A
+        );
+        y += lineStep;
+
+        if (!hasLineSpace(panel, y)) {
+            return;
+        }
+
+        drawBenefitLine(
+                guiGraphics,
+                textLeft,
+                y,
+                maxWidth,
+                "screen.moostensuraaddon.recognition.permanent_strength",
+                Component.literal(
+                        formatPercent(
+                                benefits.totalStrength()
+                        )
+                ),
+                0xFFD36A
+        );
+        y += lineStep;
+
+        if (!hasLineSpace(panel, y)) {
+            return;
+        }
+
+        drawBenefitLine(
+                guiGraphics,
+                textLeft,
+                y,
+                maxWidth,
+                "screen.moostensuraaddon.recognition.health_damage",
+                Component.literal(
+                        formatPercent(
+                                benefits.maxHealthMultiplier()
+                        )
+                                + " / "
+                                + formatPercent(
+                                benefits.attackDamageMultiplier()
+                        )
+                ),
+                0xFF8A8A
+        );
+        y += lineStep;
+
+        if (!hasLineSpace(panel, y)) {
+            return;
+        }
+
+        drawBenefitLine(
+                guiGraphics,
+                textLeft,
+                y,
+                maxWidth,
+                "screen.moostensuraaddon.recognition.speed",
+                Component.literal(
+                        formatPercent(
+                                benefits.movementSpeedMultiplier()
+                        )
+                                + " / "
+                                + formatPercent(
+                                benefits.attackSpeedMultiplier()
+                        )
+                ),
+                0x73DCE8
+        );
+        y += lineStep;
+
+        if (!hasLineSpace(panel, y)) {
+            return;
+        }
+
+        drawBenefitLine(
+                guiGraphics,
+                textLeft,
+                y,
+                maxWidth,
+                "screen.moostensuraaddon.recognition.knockback",
+                Component.literal(
+                        formatPercent(
+                                benefits.knockbackResistanceAddition()
+                        )
+                ),
+                0x71E0B8
+        );
+        y += lineStep;
+
+        if (hasLineSpace(panel, y)) {
+            drawBenefitLine(
+                    guiGraphics,
+                    textLeft,
+                    y,
+                    maxWidth,
+                    "screen.moostensuraaddon.recognition.identity_strength",
+                    Component.literal(
+                            formatDecimal(
+                                    benefits.frozenIdentityStrength()
+                            )
+                                    + " / "
+                                    + formatDecimal(
+                                    benefits.identityStrengthMaximum()
+                            )
+                    ),
+                    0xC8A5FF
+            );
+            y += lineStep;
+        }
+
+        if (!benefits.attributeStateMatches()
+                && hasLineSpace(panel, y)) {
+            drawLineClipped(
+                    guiGraphics,
+                    Component.translatable(
+                            "screen.moostensuraaddon.recognition.reconciling"
+                    ),
+                    textLeft,
+                    y,
+                    maxWidth,
+                    0xFFD36A
+            );
+        }
+    }
+
+    private List<
+            OpenRecognitionProgressScreenPayload.GuidanceEntry
+            > guidanceEntries() {
+        if (payload == null
+                || payload.guidanceEntries() == null) {
+            return List.of();
+        }
+
+        return payload.guidanceEntries();
+    }
+
+    private boolean hasLineSpace(
+            PanelRect panel,
+            int y
+    ) {
+        return panel != null
+                && y + this.font.lineHeight
+                <= panel.bottom() - 3;
+    }
+
+    private void drawBenefitLine(
+            GuiGraphics guiGraphics,
+            int left,
+            int y,
+            int maxWidth,
+            String labelKey,
+            Component value,
+            int valueColor
+    ) {
+        Component line =
+                Component.translatable(labelKey)
+                        .withStyle(
+                                ChatFormatting.GRAY
+                        )
+                        .append(
+                                Component.literal(": ")
+                        )
+                        .append(
+                                value.copy()
+                                        .withColor(
+                                                valueColor
+                                        )
+                        );
+
+        drawLineClipped(
+                guiGraphics,
+                line,
+                left,
+                y,
+                maxWidth,
+                0xD7D9DE
+        );
+    }
+
+    private void drawWrappedLines(
+            GuiGraphics guiGraphics,
+            Component text,
+            int left,
+            int top,
+            int maxWidth,
+            int maxHeight,
+            int color
+    ) {
+        int y = top;
+        int bottom = top
+                + Math.max(
+                0,
+                maxHeight
+        );
+
+        for (var line :
+                this.font.split(
+                        text == null
+                                ? Component.empty()
+                                : text,
+                        Math.max(1, maxWidth)
+                )) {
+
+            if (y + this.font.lineHeight > bottom) {
+                break;
+            }
 
             guiGraphics.drawString(
                     this.font,
-                    guidanceLines.get(index),
-                    left + 5,
-                    top + 17 + index * 9,
-                    0xFF909090,
+                    line,
+                    left,
+                    y,
+                    opaque(color),
                     false
             );
-        }
 
-        renderProgressBar(
-                guiGraphics,
-                entry.progress(),
-                entry.color(),
-                left + 5,
-                top + GUIDANCE_CARD_HEIGHT - 6,
-                Math.max(1, width - 10),
+            y += this.font.lineHeight + 1;
+        }
+    }
+
+    private void drawCenteredClipped(
+            GuiGraphics guiGraphics,
+            Component text,
+            int centerX,
+            int y,
+            int maxWidth,
+            int color
+    ) {
+        String clipped =
+                this.font.plainSubstrByWidth(
+                        text == null
+                                ? ""
+                                : text.getString(),
+                        Math.max(1, maxWidth)
+                );
+
+        int left = centerX
+                - this.font.width(clipped) / 2;
+
+        guiGraphics.drawString(
+                this.font,
+                clipped,
+                left,
+                y,
+                opaque(color),
                 false
         );
     }
 
-    private void renderProgressBar(
+    private void drawRightAlignedClipped(
             GuiGraphics guiGraphics,
-            double progress,
-            int color,
+            Component text,
+            int right,
+            int y,
+            int maxWidth,
+            int color
+    ) {
+        String clipped =
+                this.font.plainSubstrByWidth(
+                        text == null
+                                ? ""
+                                : text.getString(),
+                        Math.max(1, maxWidth)
+                );
+
+        guiGraphics.drawString(
+                this.font,
+                clipped,
+                right - this.font.width(clipped),
+                y,
+                opaque(color),
+                false
+        );
+    }
+
+    private void drawLineClipped(
+            GuiGraphics guiGraphics,
+            Component text,
             int left,
-            int top,
-            int width,
-            boolean showEstablishedMarker
+            int y,
+            int maxWidth,
+            int color
     ) {
-        guiGraphics.fill(
+        String clipped =
+                this.font.plainSubstrByWidth(
+                        text == null
+                                ? ""
+                                : text.getString(),
+                        Math.max(1, maxWidth)
+                );
+
+        guiGraphics.drawString(
+                this.font,
+                clipped,
                 left,
-                top,
-                left + width,
-                top + 3,
-                0xFF272727
-        );
-
-        if (showEstablishedMarker) {
-            int establishedMarker =
-                    left + width / 2;
-
-            guiGraphics.fill(
-                    establishedMarker,
-                    top,
-                    establishedMarker + 1,
-                    top + 3,
-                    0xFF707070
-            );
-        }
-
-        int filledWidth =
-                (int) Math.round(
-                        width
-                                * Math.max(
-                                0.0D,
-                                Math.min(
-                                        1.0D,
-                                        progress
-                                )
-                        )
-                );
-
-        if (filledWidth <= 0) {
-            return;
-        }
-
-        guiGraphics.fill(
-                left,
-                top,
-                left + Math.min(
-                        width,
-                        filledWidth
-                ),
-                top + 3,
-                opaque(color)
+                y,
+                opaque(color),
+                false
         );
     }
 
-    private void renderStatusPanel(
-            GuiGraphics guiGraphics,
-            int contentBottom
-    ) {
-        if (payload == null) {
-            return;
-        }
-
-        int panelWidth =
-                Math.max(
-                        200,
-                        Math.min(
-                                500,
-                                this.width - 24
-                        )
-                );
-
-        int panelLeft =
-                this.width / 2
-                        - panelWidth / 2;
-
-        int panelRight =
-                panelLeft + panelWidth;
-
-        int panelTop =
-                contentBottom + 6;
-
-        int buttonTop =
-                Math.max(
-                        0,
-                        this.height - 28
-                );
-
-        int reservedNoticeSpace =
-                noticeText.isBlank()
-                        ? 5
-                        : 16;
-
-        int panelBottom =
-                Math.min(
-                        panelTop + 44,
-                        buttonTop
-                                - reservedNoticeSpace
-                );
-
-        if (panelBottom <= panelTop + 10) {
-            return;
-        }
-
-        int statusColor =
-                getStatusColor();
-
-        drawBorderedPanel(
-                guiGraphics,
-                panelLeft,
-                panelTop,
-                panelRight,
-                panelBottom,
-                opaque(statusColor),
-                0xD0141414,
-                1
-        );
-
-        drawCenteredText(
-                guiGraphics,
-                Component.literal(
-                                payload.statusHeading()
-                        )
-                        .withColor(statusColor),
-                this.width / 2,
-                panelTop + 5,
-                statusColor
-        );
-
-        if (panelBottom >= panelTop + 28) {
-            drawCenteredText(
-                    guiGraphics,
-                    payload.statusDetail(),
-                    this.width / 2,
-                    panelTop + 17,
-                    0xB0B0B0
-            );
-        }
-
-        if (panelBottom >= panelTop + 40) {
-            drawCenteredText(
-                    guiGraphics,
-                    payload.levelLine(),
-                    this.width / 2,
-                    panelTop + 29,
-                    0x808080
-            );
-        }
-    }
-
-    private void renderNotice(
-            GuiGraphics guiGraphics
-    ) {
-        if (noticeText.isBlank()) {
-            return;
-        }
-
-        int buttonTop =
-                Math.max(
-                        0,
-                        this.height - 28
-                );
-
-        drawCenteredText(
-                guiGraphics,
-                noticeText,
-                this.width / 2,
-                Math.max(2, buttonTop - 11),
-                0x9FA7B3
-        );
-    }
-
-    private void renderButtons(
-            GuiGraphics guiGraphics,
-            int mouseX,
-            int mouseY,
-            float partialTick
-    ) {
-        renderButton(
-                viewButton,
-                guiGraphics,
-                mouseX,
-                mouseY,
-                partialTick
-        );
-
-        renderButton(
-                refreshButton,
-                guiGraphics,
-                mouseX,
-                mouseY,
-                partialTick
-        );
-
-        renderButton(
-                closeButton,
-                guiGraphics,
-                mouseX,
-                mouseY,
-                partialTick
-        );
-
-        renderButton(
-                debugButton,
-                guiGraphics,
-                mouseX,
-                mouseY,
-                partialTick
-        );
-    }
-
-    private static void renderButton(
+    private void renderWidget(
             Button button,
             GuiGraphics guiGraphics,
             int mouseX,
             int mouseY,
             float partialTick
     ) {
-        if (button == null) {
+        if (button == null || !button.visible) {
             return;
         }
 
@@ -1079,442 +1722,6 @@ public final class RecognitionProgressScreen extends Screen {
                 mouseX,
                 mouseY,
                 partialTick
-        );
-    }
-
-    private void renderHoveredTooltip(
-            GuiGraphics guiGraphics,
-            int mouseX,
-            int mouseY
-    ) {
-        if (hoveredPath != null) {
-            renderTooltipPanel(
-                    guiGraphics,
-                    buildPathTooltip(hoveredPath),
-                    mouseX,
-                    mouseY,
-                    hoveredPath.color()
-            );
-            return;
-        }
-
-        if (hoveredGuidance != null) {
-            renderTooltipPanel(
-                    guiGraphics,
-                    buildGuidanceTooltip(
-                            hoveredGuidance
-                    ),
-                    mouseX,
-                    mouseY,
-                    hoveredGuidance.color()
-            );
-        }
-    }
-
-    private List<TooltipLine> buildPathTooltip(
-            OpenRecognitionProgressScreenPayload.PathEntry path
-    ) {
-        List<TooltipLine> lines =
-                new ArrayList<>();
-
-        lines.add(
-                new TooltipLine(
-                        path.displayName(),
-                        path.color()
-                )
-        );
-
-        for (String descriptionLine :
-                wrapText(
-                        getPathDescription(path.pathId()),
-                        210,
-                        3
-                )) {
-
-            lines.add(
-                    new TooltipLine(
-                            descriptionLine,
-                            0xB0B0B0
-                    )
-            );
-        }
-
-        lines.add(
-                new TooltipLine(
-                        "Stage: " + path.stageLabel(),
-                        0xD0D0D0
-                )
-        );
-
-        if (path.primary()) {
-            lines.add(
-                    new TooltipLine(
-                            payload.pureRecognition()
-                                    ? "Primary path • Pure recognition"
-                                    : "Primary recognition path",
-                            0xFFD36A
-                    )
-            );
-        } else if (path.secondary()) {
-            lines.add(
-                    new TooltipLine(
-                            "Secondary recognition path",
-                            0xA9B8FF
-                    )
-            );
-        }
-
-        if (payload.recognitionCommitted()
-                && (path.primary()
-                || path.secondary())) {
-
-            lines.add(
-                    new TooltipLine(
-                            "Locked for this incarnation",
-                            0xFFD36A
-                    )
-            );
-        }
-
-        if (payload.debugDetailsAvailable()
-                && debugDetailsVisible) {
-
-            lines.add(
-                    new TooltipLine(
-                            "",
-                            0xFFFFFF
-                    )
-            );
-
-            lines.add(
-                    new TooltipLine(
-                            "Final score: "
-                                    + format(path.finalScore()),
-                            0x7EE7FF
-                    )
-            );
-
-            lines.add(
-                    new TooltipLine(
-                            "Raw affinity: "
-                                    + format(path.rawScore()),
-                            0x7EE7FF
-                    )
-            );
-
-            lines.add(
-                    new TooltipLine(
-                            "Identity contribution: "
-                                    + format(path.identityBoost()),
-                            0x7EE7FF
-                    )
-            );
-
-            lines.add(
-                    new TooltipLine(
-                            "Established / Pure: "
-                                    + format(
-                                    payload.establishedThreshold()
-                            )
-                                    + " / "
-                                    + format(
-                                    payload.pureThreshold()
-                            ),
-                            0x9FA7B3
-                    )
-            );
-
-            lines.add(
-                    new TooltipLine(
-                            "Raw Pure requirement: "
-                                    + format(
-                                    payload.rawPureThreshold()
-                            ),
-                            0x9FA7B3
-                    )
-            );
-        }
-
-        return List.copyOf(lines);
-    }
-
-    private List<TooltipLine> buildGuidanceTooltip(
-            OpenRecognitionProgressScreenPayload.GuidanceEntry entry
-    ) {
-        List<TooltipLine> lines =
-                new ArrayList<>();
-
-        lines.add(
-                new TooltipLine(
-                        entry.displayName(),
-                        entry.color()
-                )
-        );
-
-        for (String guidanceLine :
-                wrapText(
-                        entry.guidanceText(),
-                        220,
-                        4
-                )) {
-
-            lines.add(
-                    new TooltipLine(
-                            guidanceLine,
-                            0xB0B0B0
-                    )
-            );
-        }
-
-        lines.add(
-                new TooltipLine(
-                        "Stage: " + entry.stageLabel(),
-                        0xD0D0D0
-                )
-        );
-
-        if (payload.debugDetailsAvailable()
-                && debugDetailsVisible) {
-
-            lines.add(
-                    new TooltipLine(
-                            "Debug value: "
-                                    + format(entry.debugValue()),
-                            0x7EE7FF
-                    )
-            );
-        }
-
-        return List.copyOf(lines);
-    }
-
-    private void renderTooltipPanel(
-            GuiGraphics guiGraphics,
-            List<TooltipLine> lines,
-            int mouseX,
-            int mouseY,
-            int borderColor
-    ) {
-        if (lines == null || lines.isEmpty()) {
-            return;
-        }
-
-        int contentWidth = 0;
-
-        for (TooltipLine line : lines) {
-            contentWidth = Math.max(
-                    contentWidth,
-                    this.font.width(line.text())
-            );
-        }
-
-        int panelWidth =
-                contentWidth + 10;
-
-        int panelHeight =
-                lines.size() * 10 + 6;
-
-        int left = mouseX + 10;
-        int top = mouseY + 10;
-
-        if (left + panelWidth
-                > this.width - 4) {
-            left = Math.max(
-                    4,
-                    mouseX - panelWidth - 10
-            );
-        }
-
-        if (top + panelHeight
-                > this.height - 4) {
-            top = Math.max(
-                    4,
-                    this.height - panelHeight - 4
-            );
-        }
-
-        drawBorderedPanel(
-                guiGraphics,
-                left,
-                top,
-                left + panelWidth,
-                top + panelHeight,
-                opaque(borderColor),
-                0xF0101116,
-                1
-        );
-
-        for (int index = 0;
-             index < lines.size();
-             index++) {
-
-            TooltipLine line = lines.get(index);
-
-            guiGraphics.drawString(
-                    this.font,
-                    line.text(),
-                    left + 5,
-                    top + 4 + index * 10,
-                    opaque(line.color()),
-                    false
-            );
-        }
-    }
-
-    private void toggleView() {
-        guidanceView = !guidanceView;
-
-        if (viewButton != null) {
-            viewButton.setMessage(
-                    getViewButtonText()
-            );
-        }
-    }
-
-    private void toggleDebugDetails() {
-        if (payload == null
-                || !payload.debugDetailsAvailable()) {
-            debugDetailsVisible = false;
-            return;
-        }
-
-        debugDetailsVisible =
-                !debugDetailsVisible;
-
-        if (debugButton != null) {
-            debugButton.setMessage(
-                    getDebugButtonText()
-            );
-        }
-    }
-
-    private void requestRefresh() {
-        if (!canRequestRefresh()) {
-            setNotice("Refresh is cooling down.");
-            return;
-        }
-
-        lastRefreshRequestNanos =
-                System.nanoTime();
-
-        setNotice("Refresh requested...");
-        updateButtonStates();
-
-        PacketDistributor.sendToServer(
-                RequestRecognitionProgressScreenPayload
-                        .INSTANCE
-        );
-    }
-
-    private boolean canRequestRefresh() {
-        if (lastRefreshRequestNanos == 0L) {
-            return true;
-        }
-
-        return System.nanoTime()
-                - lastRefreshRequestNanos
-                >= CLIENT_REFRESH_COOLDOWN_NANOS;
-    }
-
-    private void updateButtonStates() {
-        if (refreshButton != null) {
-            refreshButton.active = canRequestRefresh();
-        }
-
-        if (viewButton != null) {
-            viewButton.setMessage(
-                    getViewButtonText()
-            );
-        }
-
-        if (debugButton != null) {
-            boolean available =
-                    payload != null
-                            && payload
-                            .debugDetailsAvailable();
-
-            debugButton.active = available;
-            debugButton.setMessage(
-                    getDebugButtonText()
-            );
-        }
-    }
-
-    private Component getViewButtonText() {
-        return Component.literal(
-                guidanceView
-                        ? "Paths"
-                        : "Guidance"
-        );
-    }
-
-    private Component getDebugButtonText() {
-        return Component.literal(
-                debugDetailsVisible
-                        ? "Debug: ON"
-                        : "Debug: OFF"
-        );
-    }
-
-    private void setNotice(
-            String text
-    ) {
-        noticeText = text == null
-                ? ""
-                : text.trim();
-
-        noticeExpiresNanos =
-                noticeText.isBlank()
-                        ? 0L
-                        : System.nanoTime()
-                          + NOTICE_DURATION_NANOS;
-    }
-
-    private void drawCenteredText(
-            GuiGraphics guiGraphics,
-            Component text,
-            int centerX,
-            int y,
-            int color
-    ) {
-        Component safeText =
-                text == null
-                        ? Component.empty()
-                        : text;
-
-        int left =
-                centerX
-                        - this.font.width(
-                        safeText
-                ) / 2;
-
-        guiGraphics.drawString(
-                this.font,
-                safeText,
-                left,
-                y,
-                opaque(color),
-                false
-        );
-    }
-
-    private void drawCenteredText(
-            GuiGraphics guiGraphics,
-            String text,
-            int centerX,
-            int y,
-            int color
-    ) {
-        drawCenteredText(
-                guiGraphics,
-                Component.literal(
-                        text == null
-                                ? ""
-                                : text
-                ),
-                centerX,
-                y,
-                color
         );
     }
 
@@ -1531,9 +1738,7 @@ public final class RecognitionProgressScreen extends Screen {
             return payload.recognitionColor();
         }
 
-        return switch (
-                payload.eligibilityStatusId()
-                ) {
+        return switch (payload.eligibilityStatusId()) {
             case "ready" -> 0x71E0B8;
             case "not_enough_level" -> 0xFFD36A;
             case "already_named" -> 0xFF8A8A;
@@ -1541,119 +1746,89 @@ public final class RecognitionProgressScreen extends Screen {
         };
     }
 
-    private List<String> wrapText(
-            String text,
-            int maximumPixelWidth,
-            int maximumLines
+    private static int stageColor(
+            String stage
     ) {
-        if (text == null
-                || text.isBlank()
-                || maximumLines <= 0) {
-            return List.of();
-        }
-
-        String[] words =
-                text.trim().split("\\s+");
-
-        List<String> lines =
-                new ArrayList<>();
-
-        StringBuilder currentLine =
-                new StringBuilder();
-
-        for (String word : words) {
-            if (word.isBlank()) {
-                continue;
-            }
-
-            String candidate =
-                    currentLine.isEmpty()
-                            ? word
-                            : currentLine
-                              + " "
-                              + word;
-
-            if (!currentLine.isEmpty()
-                    && this.font.width(candidate)
-                    > maximumPixelWidth) {
-
-                lines.add(currentLine.toString());
-                currentLine.setLength(0);
-                currentLine.append(word);
-
-                if (lines.size()
-                        >= maximumLines) {
-                    break;
-                }
-            } else {
-                if (!currentLine.isEmpty()) {
-                    currentLine.append(' ');
-                }
-
-                currentLine.append(word);
-            }
-        }
-
-        if (!currentLine.isEmpty()
-                && lines.size() < maximumLines) {
-            lines.add(currentLine.toString());
-        }
-
-        return List.copyOf(lines);
-    }
-
-    private static String getPathDescription(
-            String pathId
-    ) {
-        if (pathId == null) {
-            return "This path has no description.";
-        }
-
-        return switch (pathId) {
-            case "lawful_good" ->
-                    "Protection guided by duty, structure and responsibility.";
-
-            case "neutral_good" ->
-                    "Compassion and protection without strict allegiance to order.";
-
-            case "chaotic_good" ->
-                    "Freedom used to protect others and reject oppressive control.";
-
-            case "lawful_neutral" ->
-                    "Authority, hierarchy and stability without a moral extreme.";
-
-            case "true_neutral" ->
-                    "Balance, growth and identity beyond moral or behavioural extremes.";
-
-            case "chaotic_neutral" ->
-                    "Independence, self-direction and rejection of imposed limits.";
-
-            case "lawful_evil" ->
-                    "Domination and control imposed through disciplined order.";
-
-            case "neutral_evil" ->
-                    "Ambition and self-interest unconstrained by duty or chaos.";
-
-            case "chaotic_evil" ->
-                    "Destruction, cruelty and freedom pursued without restraint.";
-
-            default ->
-                    "A developing expression of this incarnation's identity.";
+        return switch (safeText(stage)) {
+            case "Defining", "Dominant" -> 0xFFD36A;
+            case "Strong", "Established" -> 0x71E0B8;
+            case "Developing" -> 0x73DCE8;
+            case "Faint" -> 0xA98CFF;
+            default -> 0x777E89;
         };
     }
 
-    private static boolean isMouseInside(
-            int mouseX,
-            int mouseY,
-            int left,
-            int top,
-            int right,
-            int bottom
+    private static int benefitsStateColor(
+            String stateId
     ) {
-        return mouseX >= left
-                && mouseX < right
-                && mouseY >= top
-                && mouseY < bottom;
+        return switch (
+                stateId == null
+                        ? ""
+                        : stateId
+                ) {
+            case "invalid" -> 0xFF8A8A;
+            case "future_profile" -> 0x73DCE8;
+            case "synchronizing" -> 0xFFD36A;
+            default -> 0xA9AFB8;
+        };
+    }
+
+    private static String formatPercent(
+            double fraction
+    ) {
+        double safe = Double.isFinite(fraction)
+                ? Math.max(
+                0.0D,
+                fraction
+        )
+                : 0.0D;
+
+        return String.format(
+                Locale.US,
+                "+%.1f%%",
+                safe * 100.0D
+        );
+    }
+
+    private static String formatDecimal(
+            double value
+    ) {
+        double safe = Double.isFinite(value)
+                ? Math.max(
+                0.0D,
+                value
+        )
+                : 0.0D;
+
+        return String.format(
+                Locale.US,
+                "%.2f",
+                safe
+        );
+    }
+
+    private static double clampProgress(
+            double value
+    ) {
+        if (!Double.isFinite(value)) {
+            return 0.0D;
+        }
+
+        return Math.max(
+                0.0D,
+                Math.min(
+                        1.0D,
+                        value
+                )
+        );
+    }
+
+    private static String safeText(
+            String value
+    ) {
+        return value == null
+                ? ""
+                : value;
     }
 
     private static void drawBorderedPanel(
@@ -1666,11 +1841,14 @@ public final class RecognitionProgressScreen extends Screen {
             int fillColor,
             int borderThickness
     ) {
-        int safeThickness =
-                Math.max(
-                        1,
-                        borderThickness
-                );
+        if (right <= left || bottom <= top) {
+            return;
+        }
+
+        int safeThickness = Math.max(
+                1,
+                borderThickness
+        );
 
         guiGraphics.fill(
                 left,
@@ -1696,51 +1874,6 @@ public final class RecognitionProgressScreen extends Screen {
         );
     }
 
-    private static void drawOutline(
-            GuiGraphics guiGraphics,
-            int left,
-            int top,
-            int right,
-            int bottom,
-            int color
-    ) {
-        if (right <= left || bottom <= top) {
-            return;
-        }
-
-        guiGraphics.fill(
-                left,
-                top,
-                right,
-                top + 1,
-                color
-        );
-
-        guiGraphics.fill(
-                left,
-                bottom - 1,
-                right,
-                bottom,
-                color
-        );
-
-        guiGraphics.fill(
-                left,
-                top,
-                left + 1,
-                bottom,
-                color
-        );
-
-        guiGraphics.fill(
-                right - 1,
-                top,
-                right,
-                bottom,
-                color
-        );
-    }
-
     private static int opaque(
             int rgb
     ) {
@@ -1749,42 +1882,59 @@ public final class RecognitionProgressScreen extends Screen {
                 & 0xFFFFFF;
     }
 
-    private static String format(
-            double value
-    ) {
-        return String.format(
-                Locale.US,
-                "%.1f",
-                Double.isFinite(value)
-                        ? Math.max(0.0D, value)
-                        : 0.0D
-        );
-    }
-
     @Override
     public boolean isPauseScreen() {
         return false;
     }
 
-    private record MatrixLayout(
-            int matrixLeft,
-            int matrixWidth,
-            int cellWidth,
-            int matrixBottom
+    private enum View {
+        OVERVIEW,
+        PATHS,
+        BENEFITS
+    }
+
+    private record OverviewLayout(
+            PanelRect statusPanel,
+            PanelRect guidancePanel,
+            int columns,
+            int cardWidth,
+            int cardHeight,
+            int visibleRows,
+            int totalRows
     ) {
     }
 
-    private record TooltipLine(
-            String text,
-            int color
+    private record PanelRect(
+            int left,
+            int top,
+            int width,
+            int height
     ) {
 
-        private TooltipLine {
-            text = text == null
-                    ? ""
-                    : text;
+        private int right() {
+            return left
+                    + Math.max(
+                    0,
+                    width
+            );
+        }
 
-            color &= 0xFFFFFF;
+        private int bottom() {
+            return top
+                    + Math.max(
+                    0,
+                    height
+            );
+        }
+
+        private boolean contains(
+                double x,
+                double y
+        ) {
+            return x >= left
+                    && x < right()
+                    && y >= top
+                    && y < bottom();
         }
     }
 }

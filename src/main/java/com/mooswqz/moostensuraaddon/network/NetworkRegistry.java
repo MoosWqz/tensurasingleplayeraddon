@@ -15,7 +15,7 @@ public final class NetworkRegistry {
         PayloadRegistrar registrar = event.registrar(
                         MoosTensuraAddon.MODID
                 )
-                .versioned("10");
+                .versioned("11");
 
         registrar.playToServer(
                 SelectSkillPayload.TYPE,
@@ -50,8 +50,7 @@ public final class NetworkRegistry {
         registrar.playToClient(
                 OpenGranterScreenPayload.TYPE,
                 OpenGranterScreenPayload.STREAM_CODEC,
-                ClientboundPayloadHandlers
-                        ::handleOpenGranterScreen
+                ClientboundPayloadHandlers::handleOpenGranterScreen
         );
 
         registrar.playToClient(
@@ -101,6 +100,13 @@ public final class NetworkRegistry {
                 SyncRecognitionDisplayNamePayload.STREAM_CODEC,
                 ClientboundPayloadHandlers
                         ::handleRecognitionDisplayNameSync
+        );
+
+        registrar.playToClient(
+                SyncRecognitionBenefitsPayload.TYPE,
+                SyncRecognitionBenefitsPayload.STREAM_CODEC,
+                ClientboundPayloadHandlers
+                        ::handleRecognitionBenefitsSync
         );
     }
 }

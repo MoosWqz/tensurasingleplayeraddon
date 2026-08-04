@@ -3,9 +3,9 @@ package com.mooswqz.moostensuraaddon.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
-import com.mooswqz.moostensuraaddon.debug.DebugModeService;
 import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
 import com.mooswqz.moostensuraaddon.lifecycle.AddonPlayerDataResetService;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionBenefitsService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionProgressScreenService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionUnnameService;
 import io.github.manasmods.tensura.storage.TensuraStorages;
@@ -15,6 +15,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Locale;
@@ -32,7 +33,7 @@ public final class MoosTensuraCommand {
                         .requires(source ->
                                 source.hasPermission(0)
                         )
-                        .executes(context -> sendHelp(
+                        .executes(context -> sendGuide(
                                 context.getSource()
                         ))
 
@@ -50,15 +51,15 @@ public final class MoosTensuraCommand {
                         )
 
                         .then(
-                                Commands.literal("paths")
-                                        .executes(context -> openRecognitionPaths(
+                                Commands.literal("help")
+                                        .executes(context -> sendHelp(
                                                 context.getSource()
                                         ))
                         )
 
                         .then(
-                                Commands.literal("help")
-                                        .executes(context -> sendHelp(
+                                Commands.literal("paths")
+                                        .executes(context -> openRecognitionPaths(
                                                 context.getSource()
                                         ))
                         )
@@ -180,10 +181,10 @@ public final class MoosTensuraCommand {
     private static int openRecognitionPaths(
             CommandSourceStack source
     ) throws CommandSyntaxException {
-        RecognitionProgressScreenService.open(
-                source.getPlayerOrException()
-        );
+        ServerPlayer player = source.getPlayerOrException();
 
+        RecognitionBenefitsService.send(player);
+        RecognitionProgressScreenService.open(player);
         return 1;
     }
 
@@ -306,91 +307,11 @@ public final class MoosTensuraCommand {
 
     private static int sendGuide(
             CommandSourceStack source
-    ) {
-        source.sendSuccess(
-                () -> Component.literal(
-                                "Moos Tensura Addon Guide"
-                        )
-                        .withStyle(
-                                ChatFormatting.LIGHT_PURPLE,
-                                ChatFormatting.BOLD
-                        ),
-                false
+    ) throws CommandSyntaxException {
+        return PlayerGuidanceService.sendGuide(
+                source,
+                source.getPlayerOrException()
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "1. Become named or endowed to anchor your soul."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
-                false
-        );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "2. Obtain Sage and listen for the pull of crystallized soul data."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
-                false
-        );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "3. Craft a Soul Resonator and attune it to a Great Crystal Shrine."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
-                false
-        );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "4. Follow the resonator needle, meet the altar requirements, and begin the ritual."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
-                false
-        );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "5. Awaken Great Sage, then continue mastering skills and gathering subordinates."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
-                false
-        );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "6. If your authority matures, the Unique Skill Granter may awaken."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
-                false
-        );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "7. Granter can bestow mastered skills, reclaim what was granted, and eventually evolve into an Ultimate Skill path."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
-                false
-        );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "Use /moostensura guide sage for detailed Sage -> Great Sage guidance."
-                        )
-                        .withStyle(ChatFormatting.DARK_AQUA),
-                false
-        );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "Hint: Some awakenings do not reveal themselves through exact numbers. Experiment, grow, and guide your subordinates."
-                        )
-                        .withStyle(ChatFormatting.DARK_AQUA),
-                false
-        );
-
-        return 1;
     }
 
     private static int sendSageGuide(
@@ -432,426 +353,168 @@ public final class MoosTensuraCommand {
                         ritualDurationTicks / 20
                 );
 
-        source.sendSuccess(
-                () -> Component.literal(
-                                "Sage Progression"
-                        )
-                        .withStyle(
-                                ChatFormatting.AQUA,
-                                ChatFormatting.BOLD
-                        ),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.header",
+                ChatFormatting.AQUA,
+                true
+        );
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.goal",
+                ChatFormatting.GRAY,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "Goal: evolve Sage into Great Sage through a Great Crystal Altar ritual."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.step.obtain",
+                ChatFormatting.GRAY,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "1. Obtain Sage."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.step.craft",
+                ChatFormatting.GRAY,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "2. Craft a Soul Resonator:"
-                        )
-                        .withStyle(ChatFormatting.GRAY),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.recipe.corners",
+                ChatFormatting.DARK_AQUA,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "   Corners: medium quality magic crystals"
-                        )
-                        .withStyle(ChatFormatting.DARK_AQUA),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.recipe.edges",
+                ChatFormatting.DARK_AQUA,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "   Edges: magic stones"
-                        )
-                        .withStyle(ChatFormatting.DARK_AQUA),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.recipe.center",
+                ChatFormatting.DARK_AQUA,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "   Center: compass"
-                        )
-                        .withStyle(ChatFormatting.DARK_AQUA),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.step.attune",
+                ChatFormatting.GRAY,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "3. Right-click the Soul Resonator while you have Sage."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.step.follow",
+                ChatFormatting.GRAY,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "4. If a shrine answers, follow the needle to the Great Crystal Shrine."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.step.interact",
+                ChatFormatting.GRAY,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "5. Meet the ritual requirements and interact with the Great Crystal Altar."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.step.endure",
+                ChatFormatting.GRAY,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "6. Endure the ritual while Sage analyzes the altar, deciphers its data, and petitions for evolution."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.step.complete",
+                ChatFormatting.GRAY,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "7. If the ritual completes, Sage awakens into Great Sage."
-                        )
-                        .withStyle(ChatFormatting.GRAY),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.requirements",
+                ChatFormatting.GOLD,
                 false
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "Current ritual requirements:"
-                        )
-                        .withStyle(ChatFormatting.GOLD),
-                false
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.requirement.level",
+                ChatFormatting.YELLOW,
+                false,
+                requiredXpLevel
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "   XP level: "
-                                        + requiredXpLevel
-                        )
-                        .withStyle(ChatFormatting.YELLOW),
-                false
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.requirement.xp_cost",
+                ChatFormatting.YELLOW,
+                false,
+                relativeLevelDeduction
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "   XP cost on success: "
-                                        + relativeLevelDeduction
-                                        + " relative levels"
-                        )
-                        .withStyle(ChatFormatting.YELLOW),
-                false
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.requirement.ep",
+                ChatFormatting.YELLOW,
+                false,
+                formatWholeNumber(requiredEp)
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "   EP: "
-                                        + formatWholeNumber(
-                                        requiredEp
-                                )
-                        )
-                        .withStyle(ChatFormatting.YELLOW),
-                false
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.requirement.mastered",
+                ChatFormatting.YELLOW,
+                false,
+                requiredMasteredSkills
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "   Mastered skills: "
-                                        + requiredMasteredSkills
-                        )
-                        .withStyle(ChatFormatting.YELLOW),
-                false
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.requirement.named",
+                ChatFormatting.YELLOW,
+                false,
+                Component.translatable(
+                        requireNamed
+                                ? "gui.yes"
+                                : "gui.no"
+                )
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "   Named/endowed required: "
-                                        + (
-                                        requireNamed
-                                                ? "yes"
-                                                : "no"
-                                )
-                        )
-                        .withStyle(ChatFormatting.YELLOW),
-                false
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.requirement.duration",
+                ChatFormatting.YELLOW,
+                false,
+                ritualDurationSeconds
         );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "   Ritual duration: about "
-                                        + ritualDurationSeconds
-                                        + " seconds"
-                        )
-                        .withStyle(ChatFormatting.YELLOW),
-                false
-        );
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "Tip: Normal progression happens through the shrine ritual. Direct Sage upgrade tools are available only to authorized administrators in debug mode."
-                        )
-                        .withStyle(ChatFormatting.DARK_AQUA),
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.sage.tip",
+                ChatFormatting.DARK_AQUA,
                 false
         );
 
         return 1;
+    }
+
+    private static void sendTranslatedLine(
+            CommandSourceStack source,
+            String translationKey,
+            ChatFormatting color,
+            boolean bold,
+            Object... arguments
+    ) {
+        MutableComponent line = Component.translatable(
+                translationKey,
+                arguments
+        );
+
+        if (bold) {
+            line.withStyle(
+                    color,
+                    ChatFormatting.BOLD
+            );
+        } else {
+            line.withStyle(color);
+        }
+
+        source.sendSuccess(() -> line, false);
     }
 
     private static int sendHelp(
             CommandSourceStack source
     ) {
-        source.sendSuccess(
-                () -> Component.literal(
-                                "Moos Tensura Addon Commands"
-                        )
-                        .withStyle(
-                                ChatFormatting.LIGHT_PURPLE,
-                                ChatFormatting.BOLD
-                        ),
-                false
-        );
-
-        sendHelpLine(
-                source,
-                "/moostensura guide",
-                "Shows the intended progression path without exact spoilers.",
-                ChatFormatting.AQUA
-        );
-
-        sendHelpLine(
-                source,
-                "/moostensura guide sage",
-                "Shows Sage -> Great Sage progression guidance.",
-                ChatFormatting.AQUA
-        );
-
-        sendHelpLine(
-                source,
-                "/moostensura paths",
-                "Opens your soul-recognition progress screen.",
-                ChatFormatting.AQUA
-        );
-
-        sendHelpLine(
-                source,
-                "/moostensura help",
-                "Shows this command list.",
-                ChatFormatting.AQUA
-        );
-
-        sendHelpLine(
-                source,
-                "/getnamed",
-                "Attempts legacy self-endowment progression when enabled in the server config.",
-                ChatFormatting.AQUA
-        );
-
-        if (source.hasPermission(2)) {
-            sendHelpLine(
-                    source,
-                    "/moostensura lifecycle [player]",
-                    "Admin-only. Shows incarnation, reset-guard, endowment and Granter transition state.",
-                    ChatFormatting.YELLOW
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura unname",
-                    "Admin-only. Arms native unname confirmation for 30 seconds.",
-                    ChatFormatting.RED
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura unname confirm",
-                    "Admin-only. Requires /moostensura unname first.",
-                    ChatFormatting.RED
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura resetconfig",
-                    "Admin-only. Arms config reset confirmation for 30 seconds.",
-                    ChatFormatting.RED
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura resetconfig confirm",
-                    "Admin-only. Requires /moostensura resetconfig first.",
-                    ChatFormatting.RED
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura reset <player>",
-                    "Admin-only. Arms player-data reset for that player.",
-                    ChatFormatting.RED
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura reset <player> confirm",
-                    "Admin-only. Requires the matching reset request first.",
-                    ChatFormatting.RED
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura debug status",
-                    "Shows whether server debug mode is enabled.",
-                    ChatFormatting.YELLOW
-            );
-        }
-
-        if (source.hasPermission(
-                DebugModeService
-                        .DANGEROUS_DEBUG_PERMISSION_LEVEL
-        )) {
-            sendHelpLine(
-                    source,
-                    "/moostensura debug enable",
-                    "Arms the confirmation required to enable server debug mode.",
-                    ChatFormatting.YELLOW
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura debug disable",
-                    "Immediately disables server debug mode.",
-                    ChatFormatting.YELLOW
-            );
-        }
-
-        if (DebugModeService.isEnabled()
-                && source.hasPermission(
-                DebugModeService
-                        .STANDARD_DEBUG_PERMISSION_LEVEL
-        )) {
-            source.sendSuccess(
-                    () -> Component.literal(
-                                    "Enabled Debug Tools"
-                            )
-                            .withStyle(
-                                    ChatFormatting.LIGHT_PURPLE,
-                                    ChatFormatting.BOLD
-                            ),
-                    false
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura debug recognition [player]",
-                    "Shows recognition scores, selection and naming eligibility.",
-                    ChatFormatting.LIGHT_PURPLE
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura debug recognition probe [player]",
-                    "Shows detailed TH/TDL detection evidence.",
-                    ChatFormatting.LIGHT_PURPLE
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura debug named",
-                    "Shows native naming and Granter awakening diagnostics.",
-                    ChatFormatting.LIGHT_PURPLE
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura debug sage upgrade",
-                    "Attempts the normal Sage -> Great Sage upgrade directly.",
-                    ChatFormatting.LIGHT_PURPLE
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura debug namecolors",
-                    "Previews all recognition-name colors and pure styling.",
-                    ChatFormatting.LIGHT_PURPLE
-            );
-
-            sendHelpLine(
-                    source,
-                    "/moostensura debug namecolors crossings <primaryPath>",
-                    "Previews all 70/30 crossings for one primary path.",
-                    ChatFormatting.LIGHT_PURPLE
-            );
-
-            if (source.hasPermission(
-                    DebugModeService
-                            .DANGEROUS_DEBUG_PERMISSION_LEVEL
-            )) {
-                sendHelpLine(
-                        source,
-                        "/moostensura debug sage force confirm",
-                        "Dangerous debug tool. Forces Great Sage for testing.",
-                        ChatFormatting.RED
-                );
-            }
-
-            source.sendSuccess(
-                    () -> Component.literal(
-                                    "Temporary aliases /checkrecognition, /checknamed and /upgradesage are also active while debug mode is enabled."
-                            )
-                            .withStyle(
-                                    ChatFormatting.DARK_GRAY
-                            ),
-                    false
-            );
-        }
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "Tip: Use /moostensura guide if you want progression hints instead of command details."
-                        )
-                        .withStyle(
-                                ChatFormatting.DARK_AQUA
-                        ),
-                false
-        );
-
-        return 1;
-    }
-
-    private static void sendHelpLine(
-            CommandSourceStack source,
-            String command,
-            String description,
-            ChatFormatting commandColor
-    ) {
-        source.sendSuccess(
-                () -> Component.literal(command)
-                        .withStyle(commandColor)
-                        .append(
-                                Component.literal(
-                                                " - "
-                                                        + description
-                                        )
-                                        .withStyle(
-                                                ChatFormatting.GRAY
-                                        )
-                        ),
-                false
-        );
+        return PlayerGuidanceService.sendHelp(source);
     }
 
     private static int requestUnname(
@@ -1171,7 +834,6 @@ public final class MoosTensuraCommand {
                             )
                             .withStyle(ChatFormatting.RED)
             );
-
             return 0;
         }
 
@@ -1188,8 +850,7 @@ public final class MoosTensuraCommand {
                     source,
                     confirmation,
                     "/moostensura reset "
-                            + target.getGameProfile()
-                            .getName()
+                            + target.getGameProfile().getName()
             );
         }
 
@@ -1207,13 +868,11 @@ public final class MoosTensuraCommand {
             return 0;
         }
 
-        String targetName =
-                target.getGameProfile()
-                        .getName();
+        String targetName = target.getGameProfile().getName();
 
         source.sendSuccess(
                 () -> Component.literal(
-                                "Reset Moos Tensura Addon data for "
+                                "Reset Moos Tensura Addon life-bound data for "
                                         + targetName
                                         + ". The addon configuration was not changed."
                         )
@@ -1223,7 +882,7 @@ public final class MoosTensuraCommand {
 
         target.sendSystemMessage(
                 Component.literal(
-                                "Your Moos Tensura Addon data was reset by an administrator."
+                                "Your Moos Tensura Addon life-bound data was reset by an administrator."
                         )
                         .withStyle(ChatFormatting.YELLOW)
         );

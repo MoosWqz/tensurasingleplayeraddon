@@ -1,6 +1,7 @@
 package com.mooswqz.moostensuraaddon.network;
 
 import com.mooswqz.moostensuraaddon.client.ClientPayloadHandler;
+import com.mooswqz.moostensuraaddon.client.ClientRecognitionBenefitsCache;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public final class ClientboundPayloadHandlers {
@@ -13,9 +14,7 @@ public final class ClientboundPayloadHandlers {
             IPayloadContext context
     ) {
         context.enqueueWork(() ->
-                ClientPayloadHandler.openGranterScreen(
-                        payload
-                )
+                ClientPayloadHandler.openGranterScreen(payload)
         );
     }
 
@@ -24,10 +23,7 @@ public final class ClientboundPayloadHandlers {
             IPayloadContext context
     ) {
         context.enqueueWork(() ->
-                ClientPayloadHandler
-                        .openUltimateMultiGrantScreen(
-                                payload
-                        )
+                ClientPayloadHandler.openUltimateMultiGrantScreen(payload)
         );
     }
 
@@ -37,9 +33,7 @@ public final class ClientboundPayloadHandlers {
     ) {
         context.enqueueWork(() ->
                 ClientPayloadHandler
-                        .openUltimateSubordinateSkillScreen(
-                                payload
-                        )
+                        .openUltimateSubordinateSkillScreen(payload)
         );
     }
 
@@ -49,9 +43,7 @@ public final class ClientboundPayloadHandlers {
     ) {
         context.enqueueWork(() ->
                 ClientPayloadHandler
-                        .openSubordinateOverviewScreen(
-                                payload
-                        )
+                        .openSubordinateOverviewScreen(payload)
         );
     }
 
@@ -61,9 +53,7 @@ public final class ClientboundPayloadHandlers {
     ) {
         context.enqueueWork(() ->
                 ClientPayloadHandler
-                        .removeSubordinateOverviewEntry(
-                                payload
-                        )
+                        .removeSubordinateOverviewEntry(payload)
         );
     }
 
@@ -73,9 +63,7 @@ public final class ClientboundPayloadHandlers {
     ) {
         context.enqueueWork(() ->
                 ClientPayloadHandler
-                        .openUltimateConfirmationScreen(
-                                payload
-                        )
+                        .openUltimateConfirmationScreen(payload)
         );
     }
 
@@ -85,9 +73,7 @@ public final class ClientboundPayloadHandlers {
     ) {
         context.enqueueWork(() ->
                 ClientPayloadHandler
-                        .openRecognitionProgressScreen(
-                                payload
-                        )
+                        .openRecognitionProgressScreen(payload)
         );
     }
 
@@ -97,9 +83,16 @@ public final class ClientboundPayloadHandlers {
     ) {
         context.enqueueWork(() ->
                 ClientPayloadHandler
-                        .syncRecognitionDisplayName(
-                                payload
-                        )
+                        .syncRecognitionDisplayName(payload)
+        );
+    }
+
+    public static void handleRecognitionBenefitsSync(
+            SyncRecognitionBenefitsPayload payload,
+            IPayloadContext context
+    ) {
+        context.enqueueWork(() ->
+                ClientRecognitionBenefitsCache.apply(payload)
         );
     }
 }
