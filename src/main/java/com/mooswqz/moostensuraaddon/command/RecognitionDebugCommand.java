@@ -1,16 +1,16 @@
 package com.mooswqz.moostensuraaddon.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.CommandNode;
 import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
 import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
 import com.mooswqz.moostensuraaddon.debug.DebugModeService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionAuthorityProgress;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionBalanceSnapshot;
-import com.mooswqz.moostensuraaddon.recognition.RecognitionBalanceValidationHarness;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionDimensions;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionEvaluation;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionEvidenceBreakdown;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionNamingCandidate;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionNamingEligibility;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionNamingService;
@@ -22,7 +22,6 @@ import com.mooswqz.moostensuraaddon.recognition.TensuraRecognitionStateHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,15 +37,53 @@ public final class RecognitionDebugCommand {
     }
 
     /**
+     * Registers the nested debug inspector and the temporary legacy alias.
+     *
+     * <p>This method intentionally supports both command-registration layouts
+     * used during the recognition development line. When the canonical
+     * {@code /moostensura debug} node already exists, the recognition branch is
+     * attached once. The legacy {@code /checkrecognition} alias is also
+     * registered once and remains protected by the normal debug-mode and
+     * permission checks.</p>
+     */
+    public static void register(
+            CommandDispatcher<CommandSourceStack> dispatcher
+    ) {
+        if (dispatcher == null) {
+            throw new IllegalArgumentException(
+                    "A command dispatcher is required."
+            );
+        }
+
+        CommandNode<CommandSourceStack> moosTensuraRoot =
+                dispatcher.getRoot()
+                        .getChild("moostensura");
+
+        if (moosTensuraRoot != null) {
+            CommandNode<CommandSourceStack> debugRoot =
+                    moosTensuraRoot.getChild("debug");
+
+            if (debugRoot != null
+                    && debugRoot.getChild("recognition") == null) {
+                debugRoot.addChild(
+                        createDebugNode().build()
+                );
+            }
+        }
+
+        if (dispatcher.getRoot()
+                .getChild("checkrecognition") == null) {
+            registerLegacyAlias(dispatcher);
+        }
+    }
+
+    /**
      * Creates the canonical nested debug branch:
      *
      * /moostensura debug recognition
      * /moostensura debug recognition <player>
      * /moostensura debug recognition probe
      * /moostensura debug recognition probe <player>
-     * /moostensura debug recognition validate
-     * /moostensura debug recognition simulate <path>
-     * /moostensura debug recognition simulate-cross <primary> <secondary>
      */
     public static LiteralArgumentBuilder<CommandSourceStack>
     createDebugNode() {
@@ -108,87 +145,49 @@ public final class RecognitionDebugCommand {
                                 )
                 )
                 .then(
-                        Commands.literal("validate")
-                                .executes(context ->
-                                        validateBalance(
-                                                context.getSource()
-                                        )
-                                )
-                )
-                .then(
-                        Commands.literal("simulate")
+                        Commands.literal("evidence")
+                                .executes(context -> inspectEvidence(
+                                        context.getSource(),
+                                        context.getSource()
+                                                .getPlayerOrException(),
+                                        false
+                                ))
                                 .then(
-                                        Commands.argument(
-                                                        "path",
-                                                        StringArgumentType.word()
-                                                )
-                                                .suggests(
-                                                        (context, builder) ->
-                                                                SharedSuggestionProvider
-                                                                        .suggest(
-                                                                                RecognitionBalanceValidationHarness
-                                                                                        .pathIds(),
-                                                                                builder
-                                                                        )
-                                                )
-                                                .executes(context ->
-                                                        simulatePure(
-                                                                context.getSource(),
-                                                                StringArgumentType
-                                                                        .getString(
-                                                                                context,
-                                                                                "path"
-                                                                        )
-                                                        )
-                                                )
-                                )
-                )
-                .then(
-                        Commands.literal("simulate-cross")
-                                .then(
-                                        Commands.argument(
-                                                        "primary",
-                                                        StringArgumentType.word()
-                                                )
-                                                .suggests(
-                                                        (context, builder) ->
-                                                                SharedSuggestionProvider
-                                                                        .suggest(
-                                                                                RecognitionBalanceValidationHarness
-                                                                                        .pathIds(),
-                                                                                builder
-                                                                        )
-                                                )
+                                        Commands.literal("full")
+                                                .executes(context -> inspectEvidence(
+                                                        context.getSource(),
+                                                        context.getSource()
+                                                                .getPlayerOrException(),
+                                                        true
+                                                ))
                                                 .then(
                                                         Commands.argument(
-                                                                        "secondary",
-                                                                        StringArgumentType.word()
+                                                                        "player",
+                                                                        EntityArgument.player()
                                                                 )
-                                                                .suggests(
-                                                                        (context, builder) ->
-                                                                                SharedSuggestionProvider
-                                                                                        .suggest(
-                                                                                                RecognitionBalanceValidationHarness
-                                                                                                        .pathIds(),
-                                                                                                builder
-                                                                                        )
-                                                                )
-                                                                .executes(context ->
-                                                                        simulateCross(
-                                                                                context.getSource(),
-                                                                                StringArgumentType
-                                                                                        .getString(
-                                                                                                context,
-                                                                                                "primary"
-                                                                                        ),
-                                                                                StringArgumentType
-                                                                                        .getString(
-                                                                                                context,
-                                                                                                "secondary"
-                                                                                        )
-                                                                        )
-                                                                )
+                                                                .executes(context -> inspectEvidence(
+                                                                        context.getSource(),
+                                                                        EntityArgument.getPlayer(
+                                                                                context,
+                                                                                "player"
+                                                                        ),
+                                                                        true
+                                                                ))
                                                 )
+                                )
+                                .then(
+                                        Commands.argument(
+                                                        "player",
+                                                        EntityArgument.player()
+                                                )
+                                                .executes(context -> inspectEvidence(
+                                                        context.getSource(),
+                                                        EntityArgument.getPlayer(
+                                                                context,
+                                                                "player"
+                                                        ),
+                                                        false
+                                                ))
                                 )
                 )
                 .then(
@@ -204,611 +203,6 @@ public final class RecognitionDebugCommand {
                                         )
                                 ))
                 );
-    }
-
-    private static int validateBalance(
-            CommandSourceStack source
-    ) {
-        RecognitionBalanceValidationHarness.Report report =
-                RecognitionBalanceValidationHarness.validate();
-
-        sendHeader(
-                source,
-                "Recognition Balance Validation",
-                ChatFormatting.LIGHT_PURPLE
-        );
-
-        sendValue(
-                source,
-                "Balance source",
-                report.balanceSource()
-        );
-
-        sendValue(
-                source,
-                "Balance revision",
-                Long.toString(
-                        report.balanceRevision()
-                )
-        );
-
-        sendValue(
-                source,
-                "Coarse profiles evaluated",
-                Integer.toString(
-                        report.coarseProfilesEvaluated()
-                )
-        );
-
-        sendValue(
-                source,
-                "Refined profiles evaluated",
-                Integer.toString(
-                        report.refinedProfilesEvaluated()
-                )
-        );
-
-        sendValue(
-                source,
-                "Total synthetic profiles",
-                Integer.toString(
-                        report.evaluatedProfiles()
-                )
-        );
-
-        sendValue(
-                source,
-                "Pure paths on coarse grid",
-                report.exactPureCoarse()
-                        + " / "
-                        + report.totalPurePaths()
-        );
-
-        sendValue(
-                source,
-                "Pure paths after refinement",
-                report.exactPurePaths()
-                        + " / "
-                        + report.totalPurePaths()
-        );
-
-        sendValue(
-                source,
-                "Required adjacent crosses on coarse grid",
-                report.exactAdjacentCoarse()
-                        + " / "
-                        + report.totalAdjacentPairs()
-        );
-
-        sendValue(
-                source,
-                "Required adjacent crosses after refinement",
-                report.exactAdjacentPairs()
-                        + " / "
-                        + report.totalAdjacentPairs()
-        );
-
-        sendValue(
-                source,
-                "All exact ordered crosses",
-                report.exactCrossPairs()
-                        + " / "
-                        + report.totalCrossPairs()
-                        + " (observational)"
-        );
-
-        sendHeader(
-                source,
-                "Cross-pair classes",
-                ChatFormatting.GOLD
-        );
-
-        for (RecognitionBalanceValidationHarness.CrossClassSummary summary :
-                report.crossClassSummaries()) {
-
-            RecognitionBalanceValidationHarness.CrossClass pairClass =
-                    summary.pairClass();
-
-            String suffix =
-                    pairClass.required()
-                            ? " [required]"
-                            : pairClass.contradictory()
-                              ? " [contradiction]"
-                              : " [optional]";
-
-            sendValue(
-                    source,
-                    pairClass.displayName(),
-                    summary.exactPairs()
-                            + " / "
-                            + summary.totalPairs()
-                            + suffix
-            );
-        }
-
-        sendHeader(
-                source,
-                "Pure-path results",
-                ChatFormatting.GOLD
-        );
-
-        for (RecognitionBalanceValidationHarness.PathResult pathResult :
-                report.paths()) {
-
-            RecognitionBalanceValidationHarness.Result result =
-                    pathResult.result();
-
-            RecognitionPath path =
-                    pathResult.path();
-
-            String marker;
-            ChatFormatting color;
-
-            if (!result.exact()) {
-                marker = "[MISS] ";
-                color = ChatFormatting.YELLOW;
-            } else if (result.searchStage()
-                    == RecognitionBalanceValidationHarness
-                    .SearchStage.REFINED) {
-                marker = "[REFINED] ";
-                color = ChatFormatting.AQUA;
-            } else {
-                marker = "[COARSE] ";
-                color = ChatFormatting.GREEN;
-            }
-
-            String line =
-                    marker
-                            + path.getId()
-                            + " -> "
-                            + result.actualSelection()
-                            + " | final "
-                            + format(
-                            result.evaluation()
-                                    .getPathScore(path)
-                    )
-                            + ", raw "
-                            + format(
-                            result.evaluation()
-                                    .getRawPathScore(path)
-                    )
-                            + ", identity "
-                            + format(
-                            result.evaluation()
-                                    .getIdentityBoost(path)
-                    )
-                            + (
-                            pathResult.identityHeavy()
-                                    ? " [identity-heavy]"
-                                    : ""
-                    );
-
-            source.sendSuccess(
-                    () -> Component.literal(line)
-                            .withStyle(color),
-                    false
-            );
-
-            source.sendSuccess(
-                    () -> Component.literal(
-                                    "  Morality: "
-                                            + result.components()
-                                            .moralitySummary()
-                            )
-                            .withStyle(
-                                    ChatFormatting.GRAY
-                            ),
-                    false
-            );
-
-            source.sendSuccess(
-                    () -> Component.literal(
-                                    "  Temperament: "
-                                            + result.components()
-                                            .temperamentSummary()
-                            )
-                            .withStyle(
-                                    ChatFormatting.GRAY
-                            ),
-                    false
-            );
-
-            if (!result.exact()) {
-                source.sendSuccess(
-                        () -> Component.literal(
-                                        "  Diagnosis: "
-                                                + result.diagnosis()
-                                )
-                                .withStyle(
-                                        ChatFormatting.DARK_GRAY
-                                ),
-                        false
-                );
-            }
-        }
-
-        sendHeader(
-                source,
-                "Validation notes",
-                ChatFormatting.GOLD
-        );
-
-        for (String warning : report.warnings()) {
-            source.sendSuccess(
-                    () -> Component.literal(
-                                    "- " + warning
-                            )
-                            .withStyle(
-                                    ChatFormatting.YELLOW
-                            ),
-                    false
-            );
-        }
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "All simulations were temporary; no player data was modified."
-                        )
-                        .withStyle(
-                                ChatFormatting.DARK_GRAY
-                        ),
-                false
-        );
-
-        return 1;
-    }
-
-    private static int simulatePure(
-            CommandSourceStack source,
-            String rawPath
-    ) {
-        RecognitionPath path =
-                parsePath(
-                        source,
-                        rawPath
-                );
-
-        if (path == null) {
-            return 0;
-        }
-
-        RecognitionBalanceValidationHarness.Result result =
-                RecognitionBalanceValidationHarness
-                        .simulatePure(path);
-
-        sendSimulation(
-                source,
-                result
-        );
-
-        return 1;
-    }
-
-    private static int simulateCross(
-            CommandSourceStack source,
-            String rawPrimary,
-            String rawSecondary
-    ) {
-        RecognitionPath primary =
-                parsePath(
-                        source,
-                        rawPrimary
-                );
-
-        RecognitionPath secondary =
-                parsePath(
-                        source,
-                        rawSecondary
-                );
-
-        if (primary == null
-                || secondary == null) {
-            return 0;
-        }
-
-        if (primary == secondary) {
-            source.sendFailure(
-                    Component.literal(
-                                    "Primary and secondary paths must differ."
-                            )
-                            .withStyle(
-                                    ChatFormatting.RED
-                            )
-            );
-
-            return 0;
-        }
-
-        RecognitionBalanceValidationHarness.Result result =
-                RecognitionBalanceValidationHarness
-                        .simulateCross(
-                                primary,
-                                secondary
-                        );
-
-        sendSimulation(
-                source,
-                result
-        );
-
-        return 1;
-    }
-
-    private static RecognitionPath parsePath(
-            CommandSourceStack source,
-            String rawPath
-    ) {
-        RecognitionPath path =
-                RecognitionPath.byId(
-                                rawPath
-                        )
-                        .orElse(null);
-
-        if (path != null) {
-            return path;
-        }
-
-        source.sendFailure(
-                Component.literal(
-                                "Unknown recognition path '"
-                                        + rawPath
-                                        + "'. Valid paths: "
-                                        + String.join(
-                                        ", ",
-                                        RecognitionBalanceValidationHarness
-                                                .pathIds()
-                                )
-                        )
-                        .withStyle(
-                                ChatFormatting.RED
-                        )
-        );
-
-        return null;
-    }
-
-    private static void sendSimulation(
-            CommandSourceStack source,
-            RecognitionBalanceValidationHarness.Result result
-    ) {
-        RecognitionPath primary =
-                result.requestedPrimary();
-
-        RecognitionPath secondary =
-                result.requestedSecondary();
-
-        String requested =
-                secondary == null
-                        ? "Pure "
-                          + primary.getId()
-                        : primary.getId()
-                          + " / "
-                          + secondary.getId();
-
-        sendHeader(
-                source,
-                "Recognition Simulation: " + requested,
-                ChatFormatting.LIGHT_PURPLE
-        );
-
-        sendValue(
-                source,
-                "Exact requested result",
-                Boolean.toString(
-                        result.exact()
-                )
-        );
-
-        sendValue(
-                source,
-                "Search result",
-                result.exact()
-                        ? result.searchStage()
-                        .displayName()
-                        : "not found; best candidate from "
-                          + result.searchStage()
-                        .displayName()
-        );
-
-        if (result.mode()
-                == RecognitionBalanceValidationHarness.Mode.CROSS) {
-            sendValue(
-                    source,
-                    "Pair class",
-                    result.pairClass()
-                            .displayName()
-                            + (
-                            result.pairClass()
-                                    .required()
-                                    ? " [required]"
-                                    : result.pairClass()
-                                    .contradictory()
-                                      ? " [contradiction]"
-                                      : " [optional]"
-                    )
-            );
-        }
-
-        sendValue(
-                source,
-                "Actual selection",
-                result.actualSelection()
-        );
-
-        sendValue(
-                source,
-                "Diagnosis",
-                result.diagnosis()
-        );
-
-        sendValue(
-                source,
-                "Balance",
-                result.balanceSource()
-                        + " (revision "
-                        + result.balanceRevision()
-                        + ")"
-        );
-
-        sendValue(
-                source,
-                "Coarse profiles searched",
-                Integer.toString(
-                        result.coarseProfilesEvaluated()
-                )
-        );
-
-        sendValue(
-                source,
-                "Refined profiles searched",
-                Integer.toString(
-                        result.refinedProfilesEvaluated()
-                )
-        );
-
-        sendValue(
-                source,
-                "Total profiles searched",
-                Integer.toString(
-                        result.evaluatedProfiles()
-                )
-        );
-
-        sendValue(
-                source,
-                "Synthetic profile",
-                result.profile()
-                        .describe()
-        );
-
-        RecognitionEvaluation evaluation =
-                result.evaluation();
-
-        RecognitionDimensions dimensions =
-                evaluation.getDimensions();
-
-        sendValue(
-                source,
-                "Dimensions",
-                "good "
-                        + format(dimensions.good())
-                        + ", evil "
-                        + format(dimensions.evil())
-                        + ", order "
-                        + format(dimensions.order())
-                        + ", freedom "
-                        + format(dimensions.freedom())
-                        + ", mastery "
-                        + format(dimensions.mastery())
-                        + ", discovery "
-                        + format(dimensions.discovery())
-                        + ", identity "
-                        + format(
-                        dimensions.identityStrength()
-                )
-        );
-
-        sendValue(
-                source,
-                "Morality components",
-                result.components()
-                        .moralitySummary()
-        );
-
-        sendValue(
-                source,
-                "Temperament components",
-                result.components()
-                        .temperamentSummary()
-        );
-
-        sendValue(
-                source,
-                "Neutral evidence breakdown",
-                result.components()
-                        .neutralBreakdown()
-        );
-
-        sendSimulationPathScore(
-                source,
-                "Requested primary",
-                primary,
-                evaluation
-        );
-
-        if (secondary != null) {
-            sendSimulationPathScore(
-                    source,
-                    "Requested secondary",
-                    secondary,
-                    evaluation
-            );
-        }
-
-        if (result.blockers().isEmpty()) {
-            source.sendSuccess(
-                    () -> Component.literal(
-                                    "No selection blockers were detected."
-                            )
-                            .withStyle(
-                                    ChatFormatting.GREEN
-                            ),
-                    false
-            );
-        } else {
-            sendHeader(
-                    source,
-                    "Blocking conditions",
-                    ChatFormatting.GOLD
-            );
-
-            for (String blocker : result.blockers()) {
-                source.sendSuccess(
-                        () -> Component.literal(
-                                        "- " + blocker
-                                )
-                                .withStyle(
-                                        ChatFormatting.YELLOW
-                                ),
-                        false
-                );
-            }
-        }
-
-        source.sendSuccess(
-                () -> Component.literal(
-                                "Simulation only; stored recognition data was not changed."
-                        )
-                        .withStyle(
-                                ChatFormatting.DARK_GRAY
-                        ),
-                false
-        );
-    }
-
-    private static void sendSimulationPathScore(
-            CommandSourceStack source,
-            String label,
-            RecognitionPath path,
-            RecognitionEvaluation evaluation
-    ) {
-        sendValue(
-                source,
-                label,
-                path.getId()
-                        + ": final "
-                        + format(
-                        evaluation.getPathScore(path)
-                )
-                        + " = raw "
-                        + format(
-                        evaluation.getRawPathScore(path)
-                )
-                        + " + identity "
-                        + format(
-                        evaluation.getIdentityBoost(path)
-                )
-        );
     }
 
     private static int inspect(
@@ -1206,6 +600,454 @@ public final class RecognitionDebugCommand {
         );
 
         return 1;
+    }
+
+    private static int inspectEvidence(
+            CommandSourceStack source,
+            ServerPlayer target,
+            boolean full
+    ) {
+        if (target == null) {
+            source.sendFailure(
+                    Component.literal(
+                                    "Target player could not be found."
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
+            return 0;
+        }
+
+        RecognitionData data = target.getData(
+                AttachmentRegistry.RECOGNITION_DATA
+        );
+
+        /*
+         * Refresh only the same authoritative snapshots already used by the
+         * normal recognition debug command. The inspector never changes deed
+         * counters, collections, committed paths or titles.
+         */
+        TensuraRecognitionStateHelper.synchronize(
+                target,
+                data
+        );
+
+        RecognitionAuthorityProgress.synchronize(
+                target,
+                data
+        );
+
+        RecognitionEvaluation evaluation =
+                RecognitionPathEvaluator.evaluate(data);
+
+        RecognitionEvidenceBreakdown breakdown =
+                RecognitionEvidenceBreakdown.calculate(
+                        data,
+                        evaluation.getBalance()
+                );
+
+        sendHeader(
+                source,
+                "Recognition Evidence: "
+                        + target.getGameProfile().getName(),
+                ChatFormatting.LIGHT_PURPLE
+        );
+
+        source.sendSuccess(
+                () -> Component.literal(
+                                "Read-only developer inspection. No recognition data is modified."
+                        )
+                        .withStyle(ChatFormatting.DARK_GRAY),
+                false
+        );
+
+        sendHeader(
+                source,
+                "Incarnation and committed result",
+                ChatFormatting.GOLD
+        );
+
+        sendValue(
+                source,
+                "Data version",
+                Integer.toString(
+                        data.getDataVersion()
+                )
+        );
+
+        sendValue(
+                source,
+                "Recognition incarnation",
+                emptyAsNone(
+                        data.getString(
+                                RecognitionStatKeys.INCARNATION_ID
+                        )
+                )
+        );
+
+        sendValue(
+                source,
+                "Committed",
+                Boolean.toString(
+                        data.isNamingCommitted()
+                )
+        );
+
+        sendValue(
+                source,
+                "Pure",
+                Boolean.toString(
+                        data.isPureRecognition()
+                )
+        );
+
+        sendValue(
+                source,
+                "Reveal pending",
+                Boolean.toString(
+                        data.isRevealPending()
+                )
+        );
+
+        sendValue(
+                source,
+                "Committed primary",
+                data.getCommittedPrimaryPath()
+                        .map(RecognitionPath::getId)
+                        .orElse("none")
+        );
+
+        sendValue(
+                source,
+                "Committed secondary",
+                data.getCommittedSecondaryPath()
+                        .map(RecognitionPath::getId)
+                        .orElse("none")
+        );
+
+        sendValue(
+                source,
+                "Bestowed title",
+                emptyAsNone(
+                        data.getBestowedTitle()
+                )
+        );
+
+        sendValue(
+                source,
+                "Balance source",
+                evaluation.getBalance()
+                        .sourceId()
+        );
+
+        sendValue(
+                source,
+                "Balance revision",
+                Long.toString(
+                        evaluation.getBalanceRevision()
+                )
+        );
+
+        sendEvidenceDimension(
+                source,
+                breakdown.good(),
+                ChatFormatting.GREEN,
+                true
+        );
+
+        sendEvidenceDimension(
+                source,
+                breakdown.evil(),
+                ChatFormatting.RED,
+                true
+        );
+
+        if (full) {
+            sendEvidenceDimension(
+                    source,
+                    breakdown.order(),
+                    ChatFormatting.GOLD,
+                    true
+            );
+
+            sendEvidenceDimension(
+                    source,
+                    breakdown.freedom(),
+                    ChatFormatting.AQUA,
+                    true
+            );
+
+            sendEvidenceDimension(
+                    source,
+                    breakdown.mastery(),
+                    ChatFormatting.LIGHT_PURPLE,
+                    true
+            );
+
+            sendEvidenceDimension(
+                    source,
+                    breakdown.discovery(),
+                    ChatFormatting.BLUE,
+                    true
+            );
+
+            sendEvidenceDimension(
+                    source,
+                    breakdown.identityStrength(),
+                    ChatFormatting.WHITE,
+                    true
+            );
+        } else {
+            sendHeader(
+                    source,
+                    "Calculated dimension totals",
+                    ChatFormatting.GOLD
+            );
+
+            sendValue(
+                    source,
+                    "Good",
+                    format(
+                            breakdown.good().total()
+                    )
+            );
+
+            sendValue(
+                    source,
+                    "Evil",
+                    format(
+                            breakdown.evil().total()
+                    )
+            );
+
+            sendValue(
+                    source,
+                    "Order",
+                    format(
+                            breakdown.order().total()
+                    )
+            );
+
+            sendValue(
+                    source,
+                    "Freedom",
+                    format(
+                            breakdown.freedom().total()
+                    )
+            );
+
+            sendValue(
+                    source,
+                    "Mastery",
+                    format(
+                            breakdown.mastery().total()
+                    )
+            );
+
+            sendValue(
+                    source,
+                    "Discovery",
+                    format(
+                            breakdown.discovery().total()
+                    )
+            );
+
+            sendValue(
+                    source,
+                    "Identity strength",
+                    format(
+                            breakdown.identityStrength().total()
+                    )
+            );
+        }
+
+        RecognitionEvidenceBreakdown.Consistency consistency =
+                breakdown.compare(
+                        evaluation.getDimensions()
+                );
+
+        if (!consistency.matches()) {
+            source.sendFailure(
+                    Component.literal(
+                                    "Evidence breakdown mismatch: "
+                                            + consistency.dimensionId()
+                                            + " differs by "
+                                            + format(
+                                            consistency.difference()
+                                    )
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
+        } else {
+            source.sendSuccess(
+                    () -> Component.literal(
+                                    "Breakdown matches the active evaluator dimensions."
+                            )
+                            .withStyle(ChatFormatting.DARK_GREEN),
+                    false
+            );
+        }
+
+        sendTopPathCandidates(
+                source,
+                evaluation,
+                3
+        );
+
+        sendCurrentSelection(
+                source,
+                evaluation,
+                evaluation.getBalance()
+        );
+
+        if (!full) {
+            source.sendSuccess(
+                    () -> Component.literal(
+                                    "Use /moostensura debug recognition evidence full for every weighted source."
+                            )
+                            .withStyle(ChatFormatting.AQUA),
+                    false
+            );
+        }
+
+        return 1;
+    }
+
+    private static void sendEvidenceDimension(
+            CommandSourceStack source,
+            RecognitionEvidenceBreakdown.Dimension dimension,
+            ChatFormatting color,
+            boolean includeZeroEntries
+    ) {
+        sendHeader(
+                source,
+                dimension.displayName()
+                        + " evidence — total "
+                        + format(dimension.total()),
+                color
+        );
+
+        for (RecognitionEvidenceBreakdown.Entry entry :
+                dimension.entries()) {
+
+            if (!includeZeroEntries
+                    && entry.contribution() <= 0.0D) {
+                continue;
+            }
+
+            StringBuilder value = new StringBuilder();
+
+            value.append(entry.rawValue())
+                    .append(" -> +")
+                    .append(
+                            format(entry.contribution())
+                    );
+
+            if (entry.maximum() > 0.0D) {
+                value.append(" / ")
+                        .append(
+                                format(entry.maximum())
+                        );
+            }
+
+            source.sendSuccess(
+                    () -> Component.literal("- ")
+                            .withStyle(ChatFormatting.DARK_GRAY)
+                            .append(
+                                    Component.literal(
+                                                    entry.label()
+                                            )
+                                            .withStyle(
+                                                    ChatFormatting.GRAY
+                                            )
+                            )
+                            .append(
+                                    Component.literal(
+                                                    " ["
+                                                            + entry.statKey()
+                                                            + "]: "
+                                            )
+                                            .withStyle(
+                                                    ChatFormatting.DARK_GRAY
+                                            )
+                            )
+                            .append(
+                                    Component.literal(
+                                                    value.toString()
+                                            )
+                                            .withStyle(color)
+                            ),
+                    false
+            );
+        }
+    }
+
+    private static void sendTopPathCandidates(
+            CommandSourceStack source,
+            RecognitionEvaluation evaluation,
+            int maximumEntries
+    ) {
+        sendHeader(
+                source,
+                "Top path candidates",
+                ChatFormatting.GOLD
+        );
+
+        List<Map.Entry<RecognitionPath, Double>> rankedPaths =
+                new ArrayList<>(
+                        evaluation.getPathScores()
+                                .entrySet()
+                );
+
+        rankedPaths.sort(
+                Map.Entry.<RecognitionPath, Double>comparingByValue()
+                        .reversed()
+                        .thenComparing(
+                                entry -> entry.getKey().ordinal()
+                        )
+        );
+
+        int count = Math.min(
+                Math.max(1, maximumEntries),
+                rankedPaths.size()
+        );
+
+        for (int index = 0;
+             index < count;
+             index++) {
+
+            Map.Entry<RecognitionPath, Double> entry =
+                    rankedPaths.get(index);
+
+            RecognitionPath path = entry.getKey();
+
+            String value =
+                    format(entry.getValue())
+                            + " (raw "
+                            + format(
+                            evaluation.getRawPathScore(path)
+                    )
+                            + " + identity "
+                            + format(
+                            evaluation.getIdentityBoost(path)
+                    )
+                            + ")";
+
+            sendValue(
+                    source,
+                    (index + 1)
+                            + ". "
+                            + path.getId(),
+                    value
+            );
+        }
+    }
+
+    private static String emptyAsNone(
+            String value
+    ) {
+        return value == null || value.isBlank()
+                ? "none"
+                : value.trim();
     }
 
     private static void sendActiveBalance(
