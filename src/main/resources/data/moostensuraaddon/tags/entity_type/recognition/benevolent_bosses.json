@@ -1,17 +1,4 @@
 {
   "replace": false,
-  "values": [
-    {
-      "id": "tensura:shizu",
-      "required": false
-    },
-    {
-      "id": "tensura:hinata_sakaguchi",
-      "required": false
-    },
-    {
-      "id": "tensura:gazel_dwargo",
-      "required": false
-    }
-  ]
+  "values": []
 }

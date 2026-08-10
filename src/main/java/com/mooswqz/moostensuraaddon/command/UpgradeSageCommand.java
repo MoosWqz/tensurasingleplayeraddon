@@ -55,7 +55,7 @@ public final class UpgradeSageCommand {
     }
 
     /**
-     * Temporary compatibility alias for /upgradesage.
+     * Deprecated standalone compatibility alias for /upgradesage; not registered for release.
      */
     public static void registerLegacyAlias(
             CommandDispatcher<CommandSourceStack> dispatcher

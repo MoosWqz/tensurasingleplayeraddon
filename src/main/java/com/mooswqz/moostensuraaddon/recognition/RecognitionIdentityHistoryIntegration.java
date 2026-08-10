@@ -4,7 +4,7 @@ import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
 
 /**
  * Converts already-confirmed gameplay deeds into the versioned identity
- * history introduced by Packet 6G.6A.
+ * history maintained by the recognition identity-history system.
  *
  * <p>This class never changes normal recognition scores and never rewrites a
  * frozen committed contradiction modifier. It applies semantic momentum,

@@ -2,14 +2,24 @@
   "path": "lawful_good",
   "standard": [
     "the Steadfast Guardian",
-    "Shield of the Innocent",
-    "Keeper of the Dawn",
+    "the Shield of Justice",
+    "the Righteous Sentinel",
     "the Oathbound Protector",
-    "Warden of Hope"
+    "the Keeper of Mercy",
+    "the Honorable Warden",
+    "the Beacon of Order",
+    "the Valiant Custodian",
+    "the Just Hand",
+    "the Faithful Bulwark",
+    "the Lawful Defender",
+    "the Watcher of the Innocent"
   ],
   "pure": [
     "the Radiant Sovereign",
-    "the Crown of Mercy",
-    "the Unbroken Beacon"
+    "the Paragon of Justice",
+    "the Aegis of the Innocent",
+    "the Crown of Righteousness",
+    "the Unbroken Law",
+    "the Eternal Guardian"
   ]
 }

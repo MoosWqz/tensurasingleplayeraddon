@@ -16,44 +16,24 @@ public final class ModCommandRegistry {
             RegisterCommandsEvent event
     ) {
         /*
-         * Register the canonical /moostensura root first.
+         * Register the canonical player/admin command root first.
          */
         MoosTensuraCommand.register(
                 event.getDispatcher()
         );
 
         /*
-         * Attach /moostensura debug directly to the root that was just
-         * registered.
-         *
-         * Registering a second independent /moostensura literal proved
-         * unreliable in the current command layout.
+         * Attach permission-gated developer tooling below the canonical root.
+         * No standalone development aliases are registered for release.
          */
         DebugCommand.attachToMoosTensuraRoot(
                 event.getDispatcher()
         );
 
         /*
-         * Keep the old development roots as temporary compatibility aliases.
-         * Their own requirements make them invisible and unusable whenever
-         * debug mode is disabled.
-         */
-        UpgradeSageCommand.registerLegacyAlias(
-                event.getDispatcher()
-        );
-
-        CheckNamedCommand.registerLegacyAlias(
-                event.getDispatcher()
-        );
-
-        RecognitionDebugCommand.registerLegacyAlias(
-                event.getDispatcher()
-        );
-
-        /*
-         * /getnamed remains a normal player-facing legacy progression command.
-         * It is controlled by its existing server config and requirements, not
-         * by developer debug mode.
+         * Legacy self-endowment remains available for compatibility while its
+         * save/migration policy is audited separately. It is intentionally not
+         * advertised by the normal guide/help surface.
          */
         GetNamedCommand.register(
                 event.getDispatcher()

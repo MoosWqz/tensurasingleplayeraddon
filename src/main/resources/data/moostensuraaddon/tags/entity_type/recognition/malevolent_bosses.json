@@ -1,24 +1,9 @@
 {
   "replace": false,
   "values": [
-    "minecraft:ender_dragon",
     "minecraft:wither",
-    "minecraft:elder_guardian",
-    {
-      "id": "tensura:orc_disaster",
-      "required": false
-    },
-    {
-      "id": "tensura:charybdis",
-      "required": false
-    },
-    {
-      "id": "tensura:supermassive_slime",
-      "required": false
-    },
-    {
-      "id": "tensura:ifrit",
-      "required": false
-    }
+    "tensura:charybdis",
+    "tensura:orc_disaster",
+    "tensura:orc_lord"
   ]
 }

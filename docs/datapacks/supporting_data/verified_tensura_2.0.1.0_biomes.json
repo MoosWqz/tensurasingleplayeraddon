@@ -1,0 +1,27 @@
+{
+  "jar": "tensura-neoforge-2.0.1.0.jar",
+  "sha256": "efe5133a60fc2f079cb17d9f9c6f869dc3111ec9e65d3541b44839103acf4925",
+  "custom_biomes": [
+    "ancient_forest",
+    "barren_land",
+    "desert_of_death",
+    "miasmic_plains",
+    "underworld_barrens",
+    "underworld_red_sands",
+    "underworld_sands",
+    "underworld_spikes"
+  ],
+  "required_tensura_biomes": [
+    "ancient_forest"
+  ],
+  "required_tensura_biome_tags": [
+    "is_desert",
+    "is_cold",
+    "is_cave"
+  ],
+  "minecraft_tag_refs_observed_in_tensura_jar": [
+    "minecraft:is_forest",
+    "minecraft:is_badlands",
+    "minecraft:is_savanna"
+  ]
+}

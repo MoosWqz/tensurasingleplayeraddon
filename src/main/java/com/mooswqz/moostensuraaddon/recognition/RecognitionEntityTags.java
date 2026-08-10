@@ -6,23 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 
-/**
- * Central tag keys used by the recognition deed trackers.
- *
- * <p>Classification priority is intentionally conservative:</p>
- *
- * <ol>
- *     <li>{@link #IGNORED} overrides every other recognition tag.</li>
- *     <li>{@link #CIVILIANS} identifies protected non-combatants.</li>
- *     <li>{@link #HOSTILE_TO_CIVILIANS} is only meaningful for entities that
- *     are neither ignored nor civilians.</li>
- *     <li>Boss and major-enemy tags describe combat significance and morality,
- *     while the event tracker still decides which single deed category wins.</li>
- * </ol>
- *
- * <p>All tag files are datapack-driven and therefore reload through the
- * normal Minecraft {@code /reload} pipeline.</p>
- */
 public final class RecognitionEntityTags {
 
     public static final TagKey<EntityType<?>> CIVILIANS =
@@ -49,46 +32,7 @@ public final class RecognitionEntityTags {
     private RecognitionEntityTags() {
     }
 
-    public static boolean isIgnored(EntityType<?> entityType) {
-        return isInTag(
-                entityType,
-                IGNORED
-        );
-    }
-
-    public static boolean isTaggedCivilian(
-            EntityType<?> entityType
-    ) {
-        return !isIgnored(entityType)
-                && isInTag(
-                entityType,
-                CIVILIANS
-        );
-    }
-
-    public static boolean isTaggedHostileToCivilians(
-            EntityType<?> entityType
-    ) {
-        return !isIgnored(entityType)
-                && !isTaggedCivilian(entityType)
-                && isInTag(
-                entityType,
-                HOSTILE_TO_CIVILIANS
-        );
-    }
-
-    private static boolean isInTag(
-            EntityType<?> entityType,
-            TagKey<EntityType<?>> tag
-    ) {
-        return entityType != null
-                && tag != null
-                && entityType.is(tag);
-    }
-
-    private static TagKey<EntityType<?>> create(
-            String path
-    ) {
+    private static TagKey<EntityType<?>> create(String path) {
         return TagKey.create(
                 Registries.ENTITY_TYPE,
                 ResourceLocation.fromNamespaceAndPath(

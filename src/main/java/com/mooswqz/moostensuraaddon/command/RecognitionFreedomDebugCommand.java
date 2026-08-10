@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Debug-only, read-only diagnostics for Packet 6G.5 Freedom progression.
+ * Debug-only, read-only diagnostics for recognition Freedom progression.
  */
 public final class RecognitionFreedomDebugCommand {
 

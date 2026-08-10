@@ -577,18 +577,34 @@ public final class RecognitionProgressScreen extends Screen {
 
         if (layout.totalRows()
                 > layout.visibleRows()) {
-            int page = Math.min(
+            int firstVisibleRow = Math.min(
                     layout.totalRows(),
                     overviewFirstRow + 1
             );
 
+            int lastVisibleRow = Math.min(
+                    layout.totalRows(),
+                    overviewFirstRow
+                            + layout.visibleRows()
+            );
+
+            Component rowIndicator =
+                    firstVisibleRow == lastVisibleRow
+                            ? Component.translatable(
+                            "screen.moostensuraaddon.recognition.page",
+                            firstVisibleRow,
+                            layout.totalRows()
+                    )
+                            : Component.translatable(
+                            "screen.moostensuraaddon.recognition.rows",
+                            firstVisibleRow,
+                            lastVisibleRow,
+                            layout.totalRows()
+                    );
+
             drawCenteredClipped(
                     guiGraphics,
-                    Component.translatable(
-                            "screen.moostensuraaddon.recognition.page",
-                            page,
-                            layout.totalRows()
-                    ),
+                    rowIndicator,
                     panel.left() + panel.width() / 2,
                     panel.bottom() - 10,
                     Math.max(1, panel.width() - 180),
@@ -1765,7 +1781,7 @@ public final class RecognitionProgressScreen extends Screen {
                 stateId == null
                         ? ""
                         : stateId
-                ) {
+        ) {
             case "invalid" -> 0xFF8A8A;
             case "future_profile" -> 0x73DCE8;
             case "synchronizing" -> 0xFFD36A;

@@ -992,7 +992,7 @@ public final class RecognitionProgressScreenService {
                     "This incarnation has been recognized.";
 
             case ALREADY_NAMED ->
-                    "Tensura already recognizes another name.";
+                    "A native Tensura name is already present.";
 
             case NOT_ENOUGH_LEVEL ->
                     "Your identity is still maturing.";
@@ -1022,7 +1022,7 @@ public final class RecognitionProgressScreenService {
                               + data.getBestowedTitle();
 
             case ALREADY_NAMED ->
-                    "Recognition naming cannot begin while a native name is active.";
+                    "Soul Recognition remains available independently of the native name.";
 
             case NOT_ENOUGH_LEVEL ->
                     "Continue developing this incarnation before seeking the altar.";

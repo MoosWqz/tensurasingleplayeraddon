@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Deterministic debug-only validation for the 6G.8 runtime hardening rules.
+ * Deterministic debug-only validation for the recognition runtime hardening rules.
  */
 public final class RecognitionTechnicalHardeningValidationHarness {
 

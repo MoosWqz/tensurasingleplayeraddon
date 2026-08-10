@@ -2,41 +2,17 @@
   "replace": false,
   "values": [
     "#moostensuraaddon:recognition/malevolent_bosses",
-    "minecraft:zombie",
-    "minecraft:zombie_villager",
-    "minecraft:husk",
     "minecraft:drowned",
-    "minecraft:pillager",
-    "minecraft:vindicator",
     "minecraft:evoker",
+    "minecraft:husk",
     "minecraft:illusioner",
+    "minecraft:pillager",
     "minecraft:ravager",
     "minecraft:vex",
-    "minecraft:witch",
-    "minecraft:zoglin",
-    {
-      "id": "tensura:orc",
-      "required": false
-    },
-    {
-      "id": "tensura:high_orc",
-      "required": false
-    },
-    {
-      "id": "tensura:orc_disaster",
-      "required": false
-    },
-    {
-      "id": "tensura:charybdis",
-      "required": false
-    },
-    {
-      "id": "tensura:megalodon",
-      "required": false
-    },
-    {
-      "id": "tensura:daemon",
-      "required": false
-    }
+    "minecraft:vindicator",
+    "minecraft:zombie",
+    "minecraft:zombie_villager",
+    "tensura:direwolf",
+    "tensura:hound_dog"
   ]
 }

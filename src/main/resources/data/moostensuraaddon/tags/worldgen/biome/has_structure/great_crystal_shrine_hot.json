@@ -1,12 +1,8 @@
 {
   "replace": false,
   "values": [
-    "minecraft:desert",
-    "minecraft:savanna",
-    "minecraft:savanna_plateau",
-    "minecraft:windswept_savanna",
-    "minecraft:badlands",
-    "minecraft:eroded_badlands",
-    "minecraft:wooded_badlands"
+    "#tensura:is_desert",
+    "#minecraft:is_badlands",
+    "#minecraft:is_savanna"
   ]
 }

@@ -126,10 +126,6 @@ public final class RecognitionNamingService {
             status =
                     RecognitionNamingEligibility.Status
                             .ALREADY_COMMITTED;
-        } else if (nativeNamed) {
-            status =
-                    RecognitionNamingEligibility.Status
-                            .ALREADY_NAMED;
         } else if (recognizedLevel
                 < REQUIRED_EXPERIENCE_LEVEL) {
             status =

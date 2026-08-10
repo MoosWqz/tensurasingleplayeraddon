@@ -3,6 +3,17 @@
   "values": [
     "#moostensuraaddon:recognition/malevolent_bosses",
     "#moostensuraaddon:recognition/benevolent_bosses",
-    "minecraft:warden"
+    "minecraft:elder_guardian",
+    "minecraft:ender_dragon",
+    "minecraft:warden",
+    "tensura:akash",
+    "tensura:elemental_colossus",
+    "tensura:gazel_dwargo",
+    "tensura:hinata_sakaguchi",
+    "tensura:ifrit",
+    "tensura:supermassive_slime",
+    "tensura:sylphide",
+    "tensura:undine",
+    "tensura:war_gnome"
   ]
 }

@@ -37,7 +37,7 @@ public final class RecognitionDebugCommand {
     }
 
     /**
-     * Registers the nested debug inspector and the temporary legacy alias.
+     * Registers the canonical nested debug inspector; the old standalone alias is not registered.
      *
      * <p>This method intentionally supports both command-registration layouts
      * used during the recognition development line. When the canonical
@@ -93,7 +93,7 @@ public final class RecognitionDebugCommand {
     }
 
     /**
-     * Temporary compatibility alias for the old development command.
+     * Deprecated standalone compatibility alias retained for source compatibility.
      *
      * The root is always registered server-side, but its requirement hides it
      * from command suggestions and rejects execution unless debug mode is on

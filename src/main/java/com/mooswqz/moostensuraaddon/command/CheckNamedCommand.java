@@ -43,7 +43,7 @@ public class CheckNamedCommand {
     }
 
     /**
-     * Temporary compatibility alias for /checknamed.
+     * Deprecated standalone compatibility alias for /checknamed; not registered for release.
      */
     public static void registerLegacyAlias(
             CommandDispatcher<CommandSourceStack> dispatcher

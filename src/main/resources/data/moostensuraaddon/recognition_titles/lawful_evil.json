@@ -2,14 +2,24 @@
   "path": "lawful_evil",
   "standard": [
     "the Dread Sovereign",
-    "the Iron Tyrant",
-    "Master of the Black Throne",
-    "the Unyielding Despot",
-    "Lord of Absolute Order"
+    "the Iron Magistrate",
+    "the Ruthless Regent",
+    "the Tyrant's Hand",
+    "the Cold Lawgiver",
+    "the Chainbound Crown",
+    "the Merciless Warden",
+    "the Architect of Dominion",
+    "the Iron Hierarch",
+    "the Master of Obedience",
+    "the Black Decree",
+    "the Ordered Scourge"
   ],
   "pure": [
     "the Eternal Tyrant",
-    "the Crown of Dread",
-    "the Final Authority"
+    "the Absolute Emperor",
+    "the Crown of Chains",
+    "the Sovereign of Dominion",
+    "the Law of Fear",
+    "the Iron Despot"
   ]
 }

@@ -1,13 +1,6 @@
 {
   "replace": false,
   "values": [
-    "minecraft:snowy_plains",
-    "minecraft:snowy_taiga",
-    "minecraft:ice_spikes",
-    "minecraft:grove",
-    "minecraft:snowy_slopes",
-    "minecraft:frozen_peaks",
-    "minecraft:jagged_peaks",
-    "minecraft:snowy_beach"
+    "#tensura:is_cold"
   ]
 }

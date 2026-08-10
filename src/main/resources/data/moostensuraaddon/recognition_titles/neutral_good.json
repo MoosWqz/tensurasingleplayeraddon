@@ -2,14 +2,24 @@
   "path": "neutral_good",
   "standard": [
     "the Gentle Hand",
-    "Friend to Every Soul",
+    "the Compassionate Guide",
+    "the Merciful Wanderer",
     "the Quiet Benefactor",
-    "Bearer of Compassion",
-    "the Kindly Wanderer"
+    "the Kindred Protector",
+    "the Healing Presence",
+    "the Benevolent Soul",
+    "the Open Hand",
+    "the Hearthkeeper",
+    "the Friend of the Many",
+    "the Voice of Mercy",
+    "the Selfless Wayfarer"
   ],
   "pure": [
     "the Benevolent Saint",
-    "the Heart of Grace",
-    "the Mercy Without End"
+    "the Heart of Mercy",
+    "the Wellspring of Grace",
+    "the Light Without Judgment",
+    "the Boundless Compassion",
+    "the Hand That Heals"
   ]
 }

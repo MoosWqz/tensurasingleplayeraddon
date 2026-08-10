@@ -2,14 +2,24 @@
   "path": "chaotic_evil",
   "standard": [
     "the Unchained Calamity",
-    "the Ruin Unbound",
-    "Breaker of All Restraint",
+    "the Frenzied Scourge",
+    "the Ruinous Tempest",
+    "the Howling Terror",
+    "the Unbound Destroyer",
+    "the Mad Flame",
+    "the Ravager Unrestrained",
+    "the Harbinger of Ruin",
+    "the Wild Catastrophe",
+    "the Shattered Law",
     "the Devouring Storm",
-    "the Lawless End"
+    "the Unbridled Menace"
   ],
   "pure": [
     "the End of Order",
-    "the Calamity Incarnate",
-    "the Ruin Without Chains"
+    "the Incarnate Ruin",
+    "the Worldbreaker",
+    "the Sovereign of Chaos",
+    "the Endless Cataclysm",
+    "the Unbound Annihilation"
   ]
 }

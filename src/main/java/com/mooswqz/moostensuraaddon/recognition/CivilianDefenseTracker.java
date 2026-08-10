@@ -66,6 +66,15 @@ public final class CivilianDefenseTracker {
         );
     }
 
+    public static boolean isHostileToCivilians(
+            LivingEntity entity
+    ) {
+        return entity != null
+                && entity.getType().is(
+                RecognitionEntityTags.HOSTILE_TO_CIVILIANS
+        );
+    }
+
     public static void recordTargetChange(
             LivingEntity aggressor,
             LivingEntity newTarget
@@ -85,6 +94,19 @@ public final class CivilianDefenseTracker {
          * This encounter tracker is for hostile NPCs and creatures.
          */
         if (aggressor instanceof Player) {
+            removeAggressorEverywhere(
+                    state,
+                    aggressor.getUUID()
+            );
+            return;
+        }
+
+        /*
+         * The datapack decides which entity types are eligible civilian
+         * threats. Real target/damage evidence is still required below, so
+         * this does not introduce proximity-only morality.
+         */
+        if (!isHostileToCivilians(aggressor)) {
             removeAggressorEverywhere(
                     state,
                     aggressor.getUUID()
@@ -150,6 +172,19 @@ public final class CivilianDefenseTracker {
         }
 
         MinecraftServer server = serverLevel.getServer();
+
+        if (!isHostileToCivilians(aggressor)) {
+            TrackerState state = existingState(server);
+
+            if (state != null) {
+                removeAggressorEverywhere(
+                        state,
+                        aggressor.getUUID()
+                );
+            }
+            return;
+        }
+
         long gameTime = getServerGameTime(
                 server,
                 serverLevel
@@ -359,7 +394,6 @@ public final class CivilianDefenseTracker {
                 serverStateCount()
         );
     }
-
 
     static boolean shouldRunCleanup(
             long lastCleanupGameTime,

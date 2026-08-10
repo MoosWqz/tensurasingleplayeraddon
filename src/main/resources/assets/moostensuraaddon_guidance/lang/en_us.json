@@ -84,5 +84,6 @@
   "screen.moostensuraaddon.recognition.overview.empty": "No explanatory recognition data is available.",
   "screen.moostensuraaddon.recognition.previous": "Previous",
   "screen.moostensuraaddon.recognition.next": "Next",
-  "screen.moostensuraaddon.recognition.page": "Row %s of %s"
+  "screen.moostensuraaddon.recognition.page": "Row %s of %s",
+  "screen.moostensuraaddon.recognition.rows": "Rows %s–%s of %s"
 }

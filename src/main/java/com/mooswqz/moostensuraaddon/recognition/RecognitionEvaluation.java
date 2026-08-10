@@ -97,7 +97,7 @@ public final class RecognitionEvaluation {
     }
 
     /**
-     * Compatibility constructor for Packet 6F/6G.2 call sites.
+     * Compatibility constructor for legacy recognition call sites.
      */
     public RecognitionEvaluation(
             RecognitionDimensions dimensions,

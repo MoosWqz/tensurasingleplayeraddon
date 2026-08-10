@@ -11,7 +11,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
-/** Debug-only runtime-state inspector for Packet 6G.8. */
+/** Debug-only runtime-state inspector for recognition runtime hardening. */
 public final class RecognitionTechnicalHardeningDebugCommand {
 
     private RecognitionTechnicalHardeningDebugCommand() {

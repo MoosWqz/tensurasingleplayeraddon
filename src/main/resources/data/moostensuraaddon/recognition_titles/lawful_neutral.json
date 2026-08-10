@@ -2,14 +2,24 @@
   "path": "lawful_neutral",
   "standard": [
     "the Crowned Will",
+    "the Impartial Arbiter",
+    "the Keeper of Measure",
+    "the Disciplined Warden",
+    "the Unyielding Judge",
+    "the Steward of Order",
+    "the Voice of Law",
+    "the Keeper of Accord",
     "the Ordered Hand",
-    "Keeper of the Covenant",
-    "the Resolute Sovereign",
-    "Architect of Dominion"
+    "the Vigilant Magistrate",
+    "the Bound Sentinel",
+    "the Measure Unbroken"
   ],
   "pure": [
     "the Absolute Crown",
-    "the Perfect Sovereign",
-    "the Throne Incarnate"
+    "the Pillar of Law",
+    "the Eternal Arbiter",
+    "the Perfect Measure",
+    "the Sovereign of Order",
+    "the Unbending Decree"
   ]
 }

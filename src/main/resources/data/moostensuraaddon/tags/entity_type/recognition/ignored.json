@@ -1,8 +1,14 @@
 {
   "replace": false,
   "values": [
+    "minecraft:armor_stand",
     "minecraft:iron_golem",
     "minecraft:snow_golem",
-    "minecraft:armor_stand"
+    "tensura:bone_golem",
+    "tensura:clone",
+    "tensura:evil_centipede_body",
+    "tensura:ifrit_clone",
+    "tensura:tempest_serpent_body",
+    "tensura:training_dummy"
   ]
 }
