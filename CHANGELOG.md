@@ -74,8 +74,8 @@
 ### Release Notes
 
 - Network protocol remains `11`.
-- Runtime/mod metadata remains `1.4.0b4` until the Java 21 runtime regression
-  gate is accepted.
+- Runtime/mod metadata is `1.4.0b5`, the stable baseline for the remaining RC1
+  migration, retry, attribution, and smoke-test gates.
 
 ## 1.3.1
 
