@@ -35,6 +35,10 @@ public final class RecognitionCommittedMetadataService {
                         AttachmentRegistry.RECOGNITION_DATA
                 );
 
+        if (data.isWriteBlockedByFutureVersion()) {
+            return CompletionResult.FUTURE_VERSION_PRESERVED;
+        }
+
         if (!data.isNamingCommitted()) {
             return CompletionResult.NOT_COMMITTED;
         }
@@ -167,6 +171,7 @@ public final class RecognitionCommittedMetadataService {
 
     public enum CompletionResult {
         INVALID_PLAYER,
+        FUTURE_VERSION_PRESERVED,
         NOT_COMMITTED,
         ALREADY_COMPLETE,
         COMPLETED,

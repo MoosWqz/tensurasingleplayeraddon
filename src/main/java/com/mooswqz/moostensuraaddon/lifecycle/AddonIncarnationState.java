@@ -283,6 +283,44 @@ public final class AddonIncarnationState {
         save();
     }
 
+    /**
+     * Installs a real bounded retry deadline for the permission-level-four
+     * migration fixture. Production failure handling continues to use
+     * {@link #recordNativeEndowmentFailure(long)}.
+     */
+    public void prepareNativeEndowmentRetryFixture(
+            int failedAttempts,
+            long nowEpochMillis
+    ) {
+        int safeAttempts = Math.max(
+                1,
+                Math.min(1_000, failedAttempts)
+        );
+
+        lifecycleTag.remove(ENDOWMENT_INCARNATION_KEY);
+        lifecycleTag.putInt(
+                ENDOWMENT_ATTEMPTS_KEY,
+                safeAttempts
+        );
+        lifecycleTag.putLong(
+                ENDOWMENT_NEXT_ATTEMPT_KEY,
+                AddonLifecyclePolicy.nextEndowmentAttemptEpochMillis(
+                        nowEpochMillis,
+                        safeAttempts
+                )
+        );
+        save();
+    }
+
+    /** Makes an installed debug retry immediately eligible to run. */
+    public void makeNativeEndowmentRetryDueForFixture() {
+        lifecycleTag.putLong(
+                ENDOWMENT_NEXT_ATTEMPT_KEY,
+                0L
+        );
+        save();
+    }
+
     public void updateAuthorityObservation(
             GranterAcquisitionPolicy.Observation observation
     ) {

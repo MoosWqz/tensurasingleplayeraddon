@@ -34,11 +34,16 @@ public final class RecognitionNativeEndowmentService {
         }
 
         long now = System.currentTimeMillis();
-        AddonIncarnationState state =
-                AddonIncarnationState.load(player);
         RecognitionData recognition = player.getData(
                 AttachmentRegistry.RECOGNITION_DATA
         );
+
+        if (recognition.isWriteBlockedByFutureVersion()) {
+            return;
+        }
+
+        AddonIncarnationState state =
+                AddonIncarnationState.load(player);
         boolean committed = recognition.isNamingCommitted();
         boolean revealPending = committed
                 && recognition.getFlag(

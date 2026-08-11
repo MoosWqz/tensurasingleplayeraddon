@@ -287,6 +287,25 @@ public final class MoosTensuraCommand {
                         .withStyle(ChatFormatting.GRAY),
                 false
         );
+        long retryRemainingMillis = Math.max(
+                0L,
+                snapshot.nativeEndowmentNextAttemptEpochMillis()
+                        - now
+        );
+        source.sendSuccess(
+                () -> Component.literal(
+                                "Native retry deadline: "
+                                        + (retryRemainingMillis > 0L
+                                        ? String.format(
+                                                Locale.US,
+                                                "about %.1f seconds",
+                                                retryRemainingMillis / 1_000.0D
+                                        )
+                                        : "none / due")
+                        )
+                        .withStyle(ChatFormatting.GRAY),
+                false
+        );
         source.sendSuccess(
                 () -> Component.literal(
                                 "Authority observation: "

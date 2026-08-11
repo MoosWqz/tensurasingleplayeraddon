@@ -107,6 +107,16 @@ public class RecognitionData {
 
     private int dataVersion;
 
+    /**
+     * Debug-fixture-only guard that preserves an artificial raw legacy
+     * payload until it has passed through the real attachment codec once.
+     *
+     * <p>The field is deliberately not part of {@link #CODEC}. A normal
+     * version-1 save therefore loads with this guard disabled and immediately
+     * follows the production v1-to-v2 migration path.</p>
+     */
+    private final boolean preserveRawLegacyUntilCodecReload;
+
     private final Map<String, Integer> counters;
     private final Map<String, Double> measurements;
     private final Map<String, Boolean> flags;
@@ -132,11 +142,36 @@ public class RecognitionData {
             Map<String, String> strings,
             Map<String, List<String>> collections
     ) {
+        this(
+                dataVersion,
+                counters,
+                measurements,
+                flags,
+                strings,
+                collections,
+                true
+        );
+    }
+
+    RecognitionData(
+            int dataVersion,
+            Map<String, Integer> counters,
+            Map<String, Double> measurements,
+            Map<String, Boolean> flags,
+            Map<String, String> strings,
+            Map<String, List<String>> collections,
+            boolean migrateOnLoad
+    ) {
         this.dataVersion =
                 Math.max(
                         LEGACY_DATA_VERSION,
                         dataVersion
                 );
+
+        this.preserveRawLegacyUntilCodecReload =
+                !migrateOnLoad
+                        && this.dataVersion
+                        < CURRENT_DATA_VERSION;
 
         this.counters =
                 sanitizeIntegerMap(
@@ -163,16 +198,45 @@ public class RecognitionData {
                         collections
                 );
 
-        migrateToCurrentVersion();
+        if (migrateOnLoad
+                && !isWriteBlockedByFutureVersion()) {
+            migrateToCurrentVersion();
+        }
 
-        if (this.dataVersion
-                <= CURRENT_DATA_VERSION) {
+        if (migrateOnLoad
+                && !isWriteBlockedByFutureVersion()) {
             repairCurrentCommittedRecordDefaults();
         }
     }
 
     public int getDataVersion() {
         return dataVersion;
+    }
+
+    /**
+     * Returns whether this payload was written by recognition semantics newer
+     * than this build understands.
+     *
+     * <p>Unknown future schema, result, rules and reward-profile versions are
+     * read-only. Older builds may inspect and re-save them, but must not
+     * reinterpret, repair, reset or append progression to their maps.</p>
+     */
+    public boolean isWriteBlockedByFutureVersion() {
+        return dataVersion > CURRENT_DATA_VERSION
+                || getCounter(
+                RecognitionStatKeys.RECOGNITION_RESULT_VERSION
+        ) > RecognitionCommitRecord.CURRENT_RESULT_VERSION
+                || getCounter(
+                RecognitionStatKeys.RECOGNITION_RULES_VERSION
+        ) > RecognitionCommitRecord.CURRENT_RULES_VERSION
+                || getCounter(
+                RecognitionStatKeys.REWARD_PROFILE_VERSION
+                ) > RecognitionCommitRecord.CURRENT_REWARD_PROFILE_VERSION;
+    }
+
+    private boolean isMutationWriteBlocked() {
+        return preserveRawLegacyUntilCodecReload
+                || isWriteBlockedByFutureVersion();
     }
 
     public int getCounter(
@@ -195,7 +259,8 @@ public class RecognitionData {
             String key,
             int value
     ) {
-        if (!isValidKey(key)) {
+        if (!isValidKey(key)
+                || isMutationWriteBlocked()) {
             return;
         }
 
@@ -214,7 +279,8 @@ public class RecognitionData {
             String key,
             int value
     ) {
-        if (!isValidKey(key)) {
+        if (!isValidKey(key)
+                || isMutationWriteBlocked()) {
             return;
         }
 
@@ -248,7 +314,8 @@ public class RecognitionData {
             int amount
     ) {
         if (!isValidKey(key)
-                || amount == 0) {
+                || amount == 0
+                || isMutationWriteBlocked()) {
             return getCounter(key);
         }
 
@@ -304,7 +371,8 @@ public class RecognitionData {
             String key,
             double value
     ) {
-        if (!isValidKey(key)) {
+        if (!isValidKey(key)
+                || isMutationWriteBlocked()) {
             return;
         }
 
@@ -322,7 +390,8 @@ public class RecognitionData {
             String key,
             double value
     ) {
-        if (!isValidKey(key)) {
+        if (!isValidKey(key)
+                || isMutationWriteBlocked()) {
             return;
         }
 
@@ -358,7 +427,8 @@ public class RecognitionData {
             String key,
             boolean value
     ) {
-        if (!isValidKey(key)) {
+        if (!isValidKey(key)
+                || isMutationWriteBlocked()) {
             return;
         }
 
@@ -389,7 +459,8 @@ public class RecognitionData {
             String key,
             String value
     ) {
-        if (!isValidKey(key)) {
+        if (!isValidKey(key)
+                || isMutationWriteBlocked()) {
             return;
         }
 
@@ -407,7 +478,8 @@ public class RecognitionData {
     ) {
         if (!isValidKey(collectionKey)
                 || value == null
-                || value.isBlank()) {
+                || value.isBlank()
+                || isMutationWriteBlocked()) {
             return false;
         }
 
@@ -504,7 +576,8 @@ public class RecognitionData {
     ) {
         if (!isValidKey(collectionKey)
                 || value == null
-                || value.isBlank()) {
+                || value.isBlank()
+                || isMutationWriteBlocked()) {
             return false;
         }
 
@@ -685,7 +758,8 @@ public class RecognitionData {
         if (selection == null
                 || bestowedTitle == null
                 || bestowedTitle.isBlank()
-                || isNamingCommitted()) {
+                || isNamingCommitted()
+                || isMutationWriteBlocked()) {
             return false;
         }
 
@@ -723,7 +797,8 @@ public class RecognitionData {
             RecognitionCommitRecord record
     ) {
         if (record == null
-                || isNamingCommitted()) {
+                || isNamingCommitted()
+                || isMutationWriteBlocked()) {
             return false;
         }
 
@@ -917,7 +992,8 @@ public class RecognitionData {
             String frozenDisplayName,
             String incarnationId
     ) {
-        if (!isNamingCommitted()) {
+        if (!isNamingCommitted()
+                || isMutationWriteBlocked()) {
             return false;
         }
 
@@ -1093,6 +1169,10 @@ public class RecognitionData {
      * and exists for the protected administrator unname/retest route.</p>
      */
     public void clearNamingCommitPreservingLifeProgress() {
+        if (isMutationWriteBlocked()) {
+            return;
+        }
+
         counters.remove(
                 RecognitionStatKeys.RECOGNITION_RESULT_VERSION
         );
@@ -1172,6 +1252,10 @@ public class RecognitionData {
     public void resetForNewIncarnation(
             String incarnationId
     ) {
+        if (isMutationWriteBlocked()) {
+            return;
+        }
+
         counters.clear();
         measurements.clear();
         flags.clear();
@@ -1456,6 +1540,27 @@ public class RecognitionData {
         );
 
         return result;
+    }
+
+    PersistentState persistentStateForFixture() {
+        return new PersistentState(
+                dataVersion,
+                Map.copyOf(counters),
+                Map.copyOf(measurements),
+                Map.copyOf(flags),
+                Map.copyOf(strings),
+                getCollectionsForCodec()
+        );
+    }
+
+    record PersistentState(
+            int dataVersion,
+            Map<String, Integer> counters,
+            Map<String, Double> measurements,
+            Map<String, Boolean> flags,
+            Map<String, String> strings,
+            Map<String, List<String>> collections
+    ) {
     }
 
     private void markCurrentVersion() {

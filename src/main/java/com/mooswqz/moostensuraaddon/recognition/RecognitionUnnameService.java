@@ -30,6 +30,18 @@ public final class RecognitionUnnameService {
             );
         }
 
+        RecognitionData recognitionData =
+                player.getData(
+                        AttachmentRegistry.RECOGNITION_DATA
+                );
+
+        if (recognitionData.isWriteBlockedByFutureVersion()) {
+            return Result.failed(
+                    "",
+                    "A future recognition version is preserved read-only. Use the newer addon version that created it."
+            );
+        }
+
         IExistence existence =
                 TensuraStorages.getExistenceFrom(player);
 
@@ -63,11 +75,6 @@ public final class RecognitionUnnameService {
                     nativeClearResult.errorMessage()
             );
         }
-
-        RecognitionData recognitionData =
-                player.getData(
-                        AttachmentRegistry.RECOGNITION_DATA
-                );
 
         recognitionData
                 .clearNamingCommitPreservingLifeProgress();

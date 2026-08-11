@@ -54,6 +54,10 @@ public final class RecognitionDisplayNameService {
             return Optional.empty();
         }
 
+        if (data.isWriteBlockedByFutureVersion()) {
+            return Optional.empty();
+        }
+
         boolean committed =
                 data.getFlag(
                         RecognitionStatKeys.NAMING_COMMITTED

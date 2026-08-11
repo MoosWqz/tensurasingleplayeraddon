@@ -51,12 +51,21 @@ public final class RecognitionEndowmentEffortRewardService {
                         AttachmentRegistry.RECOGNITION_DATA
                 );
 
+        if (data.isWriteBlockedByFutureVersion()) {
+            return new ReconcileResult(
+                    false,
+                    false,
+                    false,
+                    0.0D,
+                    "Future recognition version preserved without mutation."
+            );
+        }
+
         RecognitionCommittedResult committed =
                 data.getCommittedResult();
 
         boolean futureProfile =
-                data.getRewardProfileVersion()
-                        > RecognitionStrengthRewardFormula.PROFILE_VERSION;
+                data.isWriteBlockedByFutureVersion();
 
         boolean metadataInitialized =
                 data.getFlag(
@@ -188,8 +197,7 @@ public final class RecognitionEndowmentEffortRewardService {
                 data.getCommittedResult();
 
         boolean futureProfile =
-                data.getRewardProfileVersion()
-                        > RecognitionStrengthRewardFormula.PROFILE_VERSION;
+                data.isWriteBlockedByFutureVersion();
 
         boolean initialized =
                 data.getFlag(

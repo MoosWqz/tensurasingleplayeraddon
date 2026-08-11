@@ -165,7 +165,9 @@ public final class AdminConfirmationTracker {
         UNNAME,
         RESET_CONFIG,
         RESET_PLAYER_DATA,
-        ENABLE_DEBUG_MODE
+        ENABLE_DEBUG_MODE,
+        INSTALL_LEGACY_MIGRATION_FIXTURE,
+        INSTALL_FUTURE_MIGRATION_FIXTURE
     }
 
     public enum Status {

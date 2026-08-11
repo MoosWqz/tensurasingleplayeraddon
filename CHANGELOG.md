@@ -20,6 +20,8 @@
   capacity, split between maximum magicules and aura.
 - Added Character Reset lifecycle integration and persistent incarnation state.
 - Added bounded native-endowment retry state and legacy save migration support.
+- Added confirmed permission-level-4 migration/retry fixtures for controlled
+  legacy, future-version, reload, exactly-once, and Character Reset testing.
 
 ### Changed
 
@@ -70,6 +72,10 @@
   clear addon data.
 - Hardened committed-result persistence, display-name synchronization, reward
   reconciliation, and native-endowment recovery across lifecycle events.
+- Fixed unknown future recognition schema, result, rules, and reward versions
+  being diagnosable but still writable through ordinary progression hooks.
+- Fixed the artificial raw-v1 migration fixture being upgraded by live
+  synchronization before its first save/reload cycle.
 
 ### Release Notes
 

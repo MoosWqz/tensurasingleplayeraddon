@@ -30,6 +30,16 @@ public final class AddonPlayerDataResetService {
         }
 
         long now = System.currentTimeMillis();
+        RecognitionData recognitionData = player.getData(
+                AttachmentRegistry.RECOGNITION_DATA
+        );
+
+        if (recognitionData.isWriteBlockedByFutureVersion()) {
+            return ResetResult.failed(
+                    "A future recognition version is preserved read-only. Use the newer addon version that created it before resetting this incarnation."
+            );
+        }
+
         AddonIncarnationState state =
                 AddonIncarnationState.load(player);
 
@@ -46,9 +56,6 @@ public final class AddonPlayerDataResetService {
                 now
         );
 
-        RecognitionData recognitionData = player.getData(
-                AttachmentRegistry.RECOGNITION_DATA
-        );
         recognitionData.resetForNewIncarnation(
                 state.getLifeToken()
         );

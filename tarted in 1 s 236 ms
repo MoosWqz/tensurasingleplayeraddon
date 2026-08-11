@@ -1,0 +1,18 @@
+ CHANGELOG.md                                       |   6 [32m+[m
+ .../attachment/RecognitionData.java                | 135 [32m+++[m[31m-[m
+ .../attachment/RecognitionDataFixtureFactory.java  | 580 [32m+++++++++++++++[m
+ .../command/AdminConfirmationTracker.java          |   6 [32m+[m[31m-[m
+ .../moostensuraaddon/command/DebugCommand.java     |   8 [32m+[m[31m-[m
+ .../command/MoosTensuraCommand.java                |  19 [32m+[m
+ .../command/RecognitionMigrationDebugCommand.java  | 802 [32m+++++++++++++++++++++[m
+ .../lifecycle/AddonIncarnationState.java           |  38 [32m+[m
+ .../lifecycle/AddonPlayerDataResetService.java     |  15 [32m+[m[31m-[m
+ .../RecognitionNativeEndowmentService.java         |   9 [32m+[m[31m-[m
+ .../RecognitionCommittedMetadataService.java       |   7 [32m+[m[31m-[m
+ .../recognition/RecognitionDisplayNameService.java |   6 [32m+[m[31m-[m
+ .../RecognitionEndowmentEffortRewardService.java   |  16 [32m+[m[31m-[m
+ .../RecognitionStrengthRewardService.java          |  12 [32m+[m[31m-[m
+ .../recognition/RecognitionUnnameService.java      |  17 [32m+[m[31m-[m
+ .../validate_migration_retry_fixtures.py           | 187 [32m+++++[m
+ .../release_validation/validate_release_hygiene.py |   2 [32m+[m[31m-[m
+ 17 files changed, 1826 insertions(+), 39 deletions(-)

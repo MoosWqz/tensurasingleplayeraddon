@@ -98,6 +98,15 @@ public final class RecognitionStrengthRewardService {
                 AttachmentRegistry.RECOGNITION_DATA
         );
 
+        if (data.isWriteBlockedByFutureVersion()) {
+            return new ReconcileResult(
+                    false,
+                    false,
+                    false,
+                    "Future recognition version preserved without mutation."
+            );
+        }
+
         RecognitionCommittedResult committed =
                 data.getCommittedResult();
 
@@ -218,8 +227,7 @@ public final class RecognitionStrengthRewardService {
                 data.getCommittedResult();
 
         int version = data.getRewardProfileVersion();
-        boolean future = version
-                > RecognitionStrengthRewardFormula.PROFILE_VERSION;
+        boolean future = data.isWriteBlockedByFutureVersion();
 
         boolean initialized = data.getFlag(
                 RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED
