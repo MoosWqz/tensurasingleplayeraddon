@@ -22,6 +22,8 @@
 - Added bounded native-endowment retry state and legacy save migration support.
 - Added confirmed permission-level-4 migration/retry fixtures for controlled
   legacy, future-version, reload, exactly-once, and Character Reset testing.
+- Added deterministic attribution validation and a confirmed Character Reset
+  fixture for life-bound recognition and runtime combat-credit isolation.
 
 ### Changed
 
@@ -76,12 +78,16 @@
   being diagnosable but still writable through ordinary progression hooks.
 - Fixed the artificial raw-v1 migration fixture being upgraded by live
   synchronization before its first save/reload cycle.
+- Fixed environmental deaths losing recent direct, projectile, tame, or
+  Tensura-subordinate player attribution.
+- Added bounded recent-combat credit, explicit duplicate-death suppression,
+  and lifecycle cleanup for subordinate participation caches.
 
 ### Release Notes
 
 - Network protocol remains `11`.
-- Runtime/mod metadata is `1.4.0b5`, the stable baseline for the remaining RC1
-  migration, retry, attribution, and smoke-test gates.
+- Runtime/mod metadata is `1.4.0b7`, the attribution and reincarnation
+  hardening candidate before the final RC1 smoke-test gate.
 
 ## 1.3.1
 

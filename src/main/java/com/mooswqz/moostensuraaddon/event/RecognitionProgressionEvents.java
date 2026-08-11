@@ -6,8 +6,9 @@ import com.mooswqz.moostensuraaddon.attachment.CureAttributionData;
 import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
 import com.mooswqz.moostensuraaddon.recognition.CivilianDefenseTracker;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionAuthorityProgress;
-import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatAttribution;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionAttributionPolicy;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatAttribution.CombatCredit;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatCreditTracker;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionEntityTags;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionIdentityHistoryIntegration;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionIndependenceProgress;
@@ -29,12 +30,13 @@ import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -180,6 +182,10 @@ public final class RecognitionProgressionEvents {
 
         RecognitionSubordinateCombatTracker.cleanup(
                 getOverworldGameTime(player)
+        );
+
+        RecognitionCombatCreditTracker.cleanup(
+                player.getServer()
         );
 
         CivilianDefenseTracker.cleanup(
@@ -376,30 +382,36 @@ public final class RecognitionProgressionEvents {
         );
     }
 
+    /** Records only damage that actually reduced health. */
     @SubscribeEvent
-    public static void onLivingIncomingDamage(
-            LivingIncomingDamageEvent event
+    public static void onLivingDamageApplied(
+            LivingDamageEvent.Post event
     ) {
+        if (event.getNewDamage() <= 0.0F) {
+            return;
+        }
+
         LivingEntity victim = event.getEntity();
+
+        RecognitionCombatCreditTracker.recordIncomingDamage(
+                victim,
+                event.getSource()
+        );
 
         RecognitionSubordinateCombatTracker.recordIncomingDamage(
                 victim,
                 event.getSource()
         );
 
-        if (!CivilianDefenseTracker.isCivilian(
-                victim
-        )) {
-            return;
+        if (CivilianDefenseTracker.isCivilian(victim)) {
+            CivilianDefenseTracker.recordCivilianDamage(
+                    victim,
+                    event.getSource()
+            );
         }
-
-        CivilianDefenseTracker.recordCivilianDamage(
-                victim,
-                event.getSource()
-        );
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingDeath(
             LivingDeathEvent event
     ) {
@@ -418,10 +430,19 @@ public final class RecognitionProgressionEvents {
                 RecognitionSubordinateCombatTracker
                         .consumeParticipants(victim);
 
-        Optional<CombatCredit> optionalCredit =
-                RecognitionCombatAttribution.resolve(
+        RecognitionCombatCreditTracker.DeathResolution
+                deathResolution =
+                RecognitionCombatCreditTracker.consumeDeath(
+                        victim,
                         event.getSource()
                 );
+
+        if (deathResolution.duplicateSuppressed()) {
+            return;
+        }
+
+        Optional<CombatCredit> optionalCredit =
+                deathResolution.credit();
 
         if (optionalCredit.isEmpty()) {
             RecognitionSubordinateCombatTracker.forget(
@@ -555,17 +576,30 @@ public final class RecognitionProgressionEvents {
                 }
             }
 
-            /*
-             * Only one negative deed category is applied to a death.
-             *
-             * Betrayal of a Tensura subordinate takes highest priority,
-             * followed by owned companions, civilians, benevolent bosses
-             * and passive baby animals.
-             */
-            if (victimSubordinateOwner != null
-                    && victimSubordinateOwner.getUUID().equals(
-                    responsiblePlayer.getUUID()
-            )) {
+            RecognitionAttributionPolicy.NegativeDeed negativeDeed =
+                    RecognitionAttributionPolicy.classifyNegativeDeed(
+                            victimSubordinateOwner != null
+                                    && victimSubordinateOwner.getUUID().equals(
+                                    responsiblePlayer.getUUID()
+                            ),
+                            isOwnedCompanion(
+                                    victim,
+                                    responsiblePlayer
+                            ),
+                            CivilianDefenseTracker.isCivilian(victim),
+                            victim.getType().is(
+                                    RecognitionEntityTags.BENEVOLENT_BOSSES
+                            ),
+                            victim.isBaby()
+                                    && victim.getType().is(
+                                    RecognitionEntityTags.BABY_KILL_MORALITY
+                            )
+                    );
+
+            /* Exactly one highest-priority negative deed is applied. */
+            if (negativeDeed
+                    == RecognitionAttributionPolicy.NegativeDeed
+                    .OWNED_SUBORDINATE_KILLED) {
                 data.incrementCounter(
                         RecognitionStatKeys
                                 .OWNED_SUBORDINATE_KILLS
@@ -584,10 +618,9 @@ public final class RecognitionProgressionEvents {
                 return;
             }
 
-            if (isOwnedCompanion(
-                    victim,
-                    responsiblePlayer
-            )) {
+            if (negativeDeed
+                    == RecognitionAttributionPolicy.NegativeDeed
+                    .OWNED_COMPANION_KILLED) {
                 data.incrementCounter(
                         RecognitionStatKeys
                                 .OWNED_COMPANION_KILLS
@@ -606,9 +639,9 @@ public final class RecognitionProgressionEvents {
                 return;
             }
 
-            if (CivilianDefenseTracker.isCivilian(
-                    victim
-            )) {
+            if (negativeDeed
+                    == RecognitionAttributionPolicy.NegativeDeed
+                    .CIVILIAN_KILLED) {
                 data.incrementCounter(
                         RecognitionStatKeys.CIVILIAN_KILLS
                 );
@@ -626,10 +659,9 @@ public final class RecognitionProgressionEvents {
                 return;
             }
 
-            if (victim.getType().is(
-                    RecognitionEntityTags
-                            .BENEVOLENT_BOSSES
-            )) {
+            if (negativeDeed
+                    == RecognitionAttributionPolicy.NegativeDeed
+                    .BENEVOLENT_BOSS_KILLED) {
                 boolean newBenevolentBossType =
                         data.addUniqueValue(
                                 RecognitionStatKeys
@@ -652,11 +684,9 @@ public final class RecognitionProgressionEvents {
                 return;
             }
 
-            if (victim.isBaby()
-                    && victim.getType().is(
-                    RecognitionEntityTags
-                            .BABY_KILL_MORALITY
-            )) {
+            if (negativeDeed
+                    == RecognitionAttributionPolicy.NegativeDeed
+                    .PASSIVE_BABY_KILLED) {
                 data.incrementCounter(
                         RecognitionStatKeys
                                 .PASSIVE_BABY_KILLS

@@ -362,6 +362,35 @@ public final class CivilianDefenseTracker {
         }
     }
 
+    /** Installs one synthetic encounter used only by the reset fixture. */
+    public static void installResetFixture(
+            MinecraftServer server
+    ) {
+        if (server == null || server.overworld() == null) {
+            return;
+        }
+
+        long gameTime = server.overworld().getGameTime();
+        ResourceKey<Level> dimension =
+                server.overworld().dimension();
+
+        stateFor(server).activeAggressors().put(
+                new EntityKey(
+                        dimension,
+                        UUID.randomUUID()
+                ),
+                new AggressionRecord(
+                        new EntityKey(
+                                dimension,
+                                UUID.randomUUID()
+                        ),
+                        gameTime,
+                        gameTime + DAMAGE_CONFIRMED_WINDOW_TICKS,
+                        true
+                )
+        );
+    }
+
     public static RuntimeSnapshot inspect(
             MinecraftServer server
     ) {

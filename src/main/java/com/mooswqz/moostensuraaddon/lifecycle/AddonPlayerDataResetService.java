@@ -5,9 +5,12 @@ import com.mooswqz.moostensuraaddon.attachment.BorrowedSkillData;
 import com.mooswqz.moostensuraaddon.attachment.GrantedSkillData;
 import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
 import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+import com.mooswqz.moostensuraaddon.recognition.CivilianDefenseTracker;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatCreditTracker;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionDisplayNameSyncService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionProgressScreenService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionStrengthRewardService;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionSubordinateCombatTracker;
 import com.mooswqz.moostensuraaddon.util.SubordinateOverviewService;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -76,6 +79,19 @@ public final class AddonPlayerDataResetService {
                 AttachmentRegistry.RECOGNITION_DATA,
                 recognitionData
         );
+
+        RecognitionCombatCreditTracker.clearForPlayer(player);
+        RecognitionSubordinateCombatTracker.forgetOwner(
+                player.getUUID()
+        );
+
+        /*
+         * Civilian encounter windows are short-lived server state and do not
+         * have an owner until a defender lands the killing blow. Clearing the
+         * server table prevents an encounter from the old incarnation being
+         * claimed by the new one.
+         */
+        CivilianDefenseTracker.clearServer(player.getServer());
 
         RecognitionStrengthRewardService.reconcile(player);
         RecognitionProgressScreenService.clear(player.getUUID());

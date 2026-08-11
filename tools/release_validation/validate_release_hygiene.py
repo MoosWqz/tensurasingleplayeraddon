@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
-EXPECTED_HARDENING_VERSION = "1.4.0b6"
+EXPECTED_HARDENING_VERSION = "1.4.0b7"
 
 FAILURES: list[str] = []
 WARNINGS: list[str] = []
@@ -33,6 +33,11 @@ DEV_PATH_PATTERNS = [
 ]
 
 SOURCE_DEBT_MARKERS = re.compile(r"\b(TODO|FIXME|XXX|HACK)\b", re.I)
+
+FORBIDDEN_ROOT_ARTIFACTS = (
+    "Core 4.0.0.2 (manascore)",
+    "tarted in 1 s 236 ms",
+)
 
 
 def iter_text_files(base: Path):
@@ -63,6 +68,14 @@ def line_matches(path: Path, text: str, regex, label: str, sink: list[str]):
 def get_property(text: str, key: str) -> str | None:
     match = re.search(rf"(?m)^\s*{re.escape(key)}\s*=\s*(.*?)\s*$", text)
     return match.group(1).strip() if match else None
+
+
+for artifact in FORBIDDEN_ROOT_ARTIFACTS:
+    if (ROOT / artifact).exists():
+        FAILURES.append(f"Accidental terminal-output artifact at repository root: {artifact}")
+
+if not any("Accidental terminal-output artifact" in item for item in FAILURES):
+    PASSES.append("No known terminal-output artifacts at repository root")
 
 
 gradle_props = ROOT / "gradle.properties"

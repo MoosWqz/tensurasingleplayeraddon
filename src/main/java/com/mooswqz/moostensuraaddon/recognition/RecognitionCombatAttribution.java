@@ -25,38 +25,19 @@ public final class RecognitionCombatAttribution {
         Entity causingEntity = damageSource.getEntity();
         Entity directEntity = damageSource.getDirectEntity();
 
-        if (causingEntity instanceof ServerPlayer player) {
-            CombatCreditType type =
-                    directEntity instanceof Projectile
-                            ? CombatCreditType.PLAYER_PROJECTILE
-                            : CombatCreditType.DIRECT_PLAYER;
-
-            return Optional.of(
-                    new CombatCredit(player, type)
-            );
-        }
+        ServerPlayer directPlayer =
+                causingEntity instanceof ServerPlayer causingPlayer
+                        ? causingPlayer
+                        : directEntity instanceof ServerPlayer directPlayerActor
+                        ? directPlayerActor
+                        : null;
 
         ServerPlayer projectileOwner =
                 resolveProjectileOwner(directEntity);
 
-        if (projectileOwner != null) {
-            return Optional.of(
-                    new CombatCredit(
-                            projectileOwner,
-                            CombatCreditType.PLAYER_PROJECTILE
-                    )
-            );
-        }
-
-        projectileOwner =
-                resolveProjectileOwner(causingEntity);
-
-        if (projectileOwner != null) {
-            return Optional.of(
-                    new CombatCredit(
-                            projectileOwner,
-                            CombatCreditType.PLAYER_PROJECTILE
-                    )
+        if (projectileOwner == null) {
+            projectileOwner = resolveProjectileOwner(
+                    causingEntity
             );
         }
 
@@ -75,15 +56,6 @@ public final class RecognitionCombatAttribution {
                     );
         }
 
-        if (subordinateOwner != null) {
-            return Optional.of(
-                    new CombatCredit(
-                            subordinateOwner,
-                            CombatCreditType.TENSURA_SUBORDINATE
-                    )
-            );
-        }
-
         ServerPlayer tameOwner =
                 resolveTamableOwner(causingEntity);
 
@@ -91,25 +63,43 @@ public final class RecognitionCombatAttribution {
             tameOwner = resolveTamableOwner(directEntity);
         }
 
-        if (tameOwner != null) {
-            return Optional.of(
-                    new CombatCredit(
-                            tameOwner,
-                            CombatCreditType.OWNED_COMPANION
-                    )
-            );
+        RecognitionAttributionPolicy.ActorKind actorKind =
+                RecognitionAttributionPolicy.classifyActor(
+                        projectileOwner != null,
+                        directPlayer != null,
+                        subordinateOwner != null,
+                        tameOwner != null
+                );
+
+        ServerPlayer creditedPlayer = switch (actorKind) {
+            case PLAYER_PROJECTILE -> projectileOwner;
+            case DIRECT_PLAYER -> directPlayer;
+            case TENSURA_SUBORDINATE -> subordinateOwner;
+            case OWNED_COMPANION -> tameOwner;
+            case NONE -> null;
+        };
+
+        if (creditedPlayer == null) {
+            return Optional.empty();
         }
 
-        if (directEntity instanceof ServerPlayer player) {
-            return Optional.of(
-                    new CombatCredit(
-                            player,
-                            CombatCreditType.DIRECT_PLAYER
-                    )
-            );
-        }
+        CombatCreditType creditType = switch (actorKind) {
+            case PLAYER_PROJECTILE ->
+                    CombatCreditType.PLAYER_PROJECTILE;
+            case TENSURA_SUBORDINATE ->
+                    CombatCreditType.TENSURA_SUBORDINATE;
+            case OWNED_COMPANION ->
+                    CombatCreditType.OWNED_COMPANION;
+            case NONE, DIRECT_PLAYER ->
+                    CombatCreditType.DIRECT_PLAYER;
+        };
 
-        return Optional.empty();
+        return Optional.of(
+                new CombatCredit(
+                        creditedPlayer,
+                        creditType
+                )
+        );
     }
 
     private static ServerPlayer resolveProjectileOwner(

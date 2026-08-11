@@ -7,9 +7,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,8 +16,13 @@ public final class RecognitionSubordinateCombatTracker {
     private static final long PARTICIPATION_WINDOW_TICKS =
             20L * 120L;
 
-    private static final Map<UUID, ParticipationRecord>
-            ACTIVE_MAJOR_ENEMIES = new HashMap<>();
+    private static final int MAX_ACTIVE_MAJOR_ENEMIES = 4096;
+
+    private static final RecognitionRuntimeCapTable<UUID, ParticipationRecord>
+            ACTIVE_MAJOR_ENEMIES = new RecognitionRuntimeCapTable<>(
+            MAX_ACTIVE_MAJOR_ENEMIES,
+            ParticipationRecord::firstObservedGameTime
+    );
 
     private RecognitionSubordinateCombatTracker() {
     }
@@ -67,6 +70,9 @@ public final class RecognitionSubordinateCombatTracker {
                 new ParticipationRecord(
                         victim.level().dimension(),
                         Set.copyOf(participatingOwners),
+                        existing == null
+                                ? gameTime
+                                : existing.firstObservedGameTime(),
                         gameTime + PARTICIPATION_WINDOW_TICKS
                 )
         );
@@ -115,10 +121,93 @@ public final class RecognitionSubordinateCombatTracker {
     public static synchronized void cleanup(
             long currentGameTime
     ) {
-        ACTIVE_MAJOR_ENEMIES.entrySet().removeIf(
+        ACTIVE_MAJOR_ENEMIES.removeIf(
                 entry -> currentGameTime
                         > entry.getValue()
                         .expirationGameTime()
+        );
+    }
+
+    public static synchronized void forgetOwner(
+            UUID ownerUuid
+    ) {
+        if (ownerUuid == null) {
+            return;
+        }
+
+        for (var entry : ACTIVE_MAJOR_ENEMIES.snapshotEntries()) {
+            ParticipationRecord record = entry.getValue();
+
+            if (!record.participatingOwners().contains(ownerUuid)) {
+                continue;
+            }
+
+            Set<UUID> remainingOwners = new HashSet<>(
+                    record.participatingOwners()
+            );
+            remainingOwners.remove(ownerUuid);
+
+            if (remainingOwners.isEmpty()) {
+                ACTIVE_MAJOR_ENEMIES.remove(entry.getKey());
+            } else {
+                ACTIVE_MAJOR_ENEMIES.put(
+                        entry.getKey(),
+                        new ParticipationRecord(
+                                record.dimension(),
+                                remainingOwners,
+                                record.firstObservedGameTime(),
+                                record.expirationGameTime()
+                        )
+                );
+            }
+        }
+    }
+
+    public static synchronized void clearAll() {
+        ACTIVE_MAJOR_ENEMIES.clear();
+    }
+
+    public static synchronized RuntimeSnapshot inspect(
+            UUID selectedOwner
+    ) {
+        int selectedOwnerRecords = 0;
+
+        if (selectedOwner != null) {
+            for (var entry :
+                    ACTIVE_MAJOR_ENEMIES.snapshotEntries()) {
+                if (entry.getValue()
+                        .participatingOwners()
+                        .contains(selectedOwner)) {
+                    selectedOwnerRecords++;
+                }
+            }
+        }
+
+        return new RuntimeSnapshot(
+                ACTIVE_MAJOR_ENEMIES.size(),
+                selectedOwnerRecords,
+                MAX_ACTIVE_MAJOR_ENEMIES
+        );
+    }
+
+    /** Installs one synthetic participant used only by the reset fixture. */
+    public static synchronized void installResetFixture(
+            ServerPlayer owner
+    ) {
+        if (owner == null) {
+            return;
+        }
+
+        long gameTime = owner.level().getGameTime();
+
+        ACTIVE_MAJOR_ENEMIES.put(
+                UUID.randomUUID(),
+                new ParticipationRecord(
+                        owner.level().dimension(),
+                        Set.of(owner.getUUID()),
+                        gameTime,
+                        gameTime + PARTICIPATION_WINDOW_TICKS
+                )
         );
     }
 
@@ -145,6 +234,7 @@ public final class RecognitionSubordinateCombatTracker {
     private record ParticipationRecord(
             ResourceKey<Level> dimension,
             Set<UUID> participatingOwners,
+            long firstObservedGameTime,
             long expirationGameTime
     ) {
 
@@ -154,5 +244,12 @@ public final class RecognitionSubordinateCombatTracker {
                             ? Set.of()
                             : Set.copyOf(participatingOwners);
         }
+    }
+
+    public record RuntimeSnapshot(
+            int activeMajorEnemies,
+            int selectedOwnerRecords,
+            int maximumActiveMajorEnemies
+    ) {
     }
 }

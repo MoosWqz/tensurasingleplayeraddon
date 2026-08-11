@@ -1,8 +1,11 @@
 package com.mooswqz.moostensuraaddon.event;
 
 import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+import com.mooswqz.moostensuraaddon.command.RecognitionAttributionDebugCommand;
 import com.mooswqz.moostensuraaddon.recognition.CivilianDefenseTracker;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatCreditTracker;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionProgressScreenService;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionSubordinateCombatTracker;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -39,6 +42,9 @@ public final class RecognitionRuntimeStateEvents {
             RecognitionProgressScreenService.clear(
                     player
             );
+            RecognitionAttributionDebugCommand.forgetResetFixture(
+                    player.getUUID()
+            );
         }
     }
 
@@ -47,6 +53,9 @@ public final class RecognitionRuntimeStateEvents {
             ServerStoppedEvent event
     ) {
         CivilianDefenseTracker.clearServer(
+                event.getServer()
+        );
+        RecognitionCombatCreditTracker.clearServer(
                 event.getServer()
         );
 
@@ -59,6 +68,9 @@ public final class RecognitionRuntimeStateEvents {
 
     private static void clearRuntimeState() {
         CivilianDefenseTracker.clearAll();
+        RecognitionCombatCreditTracker.clearAll();
+        RecognitionSubordinateCombatTracker.clearAll();
         RecognitionProgressScreenService.clearAll();
+        RecognitionAttributionDebugCommand.clearResetFixtures();
     }
 }
