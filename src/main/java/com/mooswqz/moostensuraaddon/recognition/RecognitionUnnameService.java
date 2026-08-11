@@ -2,12 +2,10 @@ package com.mooswqz.moostensuraaddon.recognition;
 
 import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
 import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
 import io.github.manasmods.tensura.storage.TensuraStorages;
 import io.github.manasmods.tensura.storage.ep.IExistence;
 import net.minecraft.server.level.ServerPlayer;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public final class RecognitionUnnameService {
 
@@ -47,8 +45,12 @@ public final class RecognitionUnnameService {
                         existence.getName()
                 );
 
-        NativeNameClearResult nativeClearResult =
-                clearNativeName(existence);
+        RecognitionNativeNameStorageService.Result nativeClearResult =
+                RecognitionNativeNameStorageService.write(
+                        player,
+                        existence,
+                        ""
+                );
 
         /*
          * Do not clear the addon's commitment data unless the native Tensura
@@ -67,9 +69,16 @@ public final class RecognitionUnnameService {
                         AttachmentRegistry.RECOGNITION_DATA
                 );
 
-        clearRecognitionNamingState(
-                recognitionData
-        );
+        recognitionData
+                .clearNamingCommitPreservingLifeProgress();
+
+        /*
+         * The protected unname route deliberately permits another native
+         * endowment in the same life. Keeping the old marker would suppress
+         * Tensura's naming request after the next recognition commitment.
+         */
+        AddonIncarnationState.load(player)
+                .clearNativeEndowmentState();
 
         /*
          * Reassigning the mutable attachment makes the changed state explicit
@@ -79,6 +88,15 @@ public final class RecognitionUnnameService {
         player.setData(
                 AttachmentRegistry.RECOGNITION_DATA,
                 recognitionData
+        );
+
+        /*
+         * Remove both the permanent recognition attributes and the
+         * effort-scaled native-endowment capacity immediately. The service
+         * also clamps magicules and aura to their restored maxima.
+         */
+        RecognitionStrengthRewardService.reconcile(
+                player
         );
 
         /*
@@ -93,202 +111,12 @@ public final class RecognitionUnnameService {
         );
     }
 
-    private static void clearRecognitionNamingState(
-            RecognitionData data
-    ) {
-        if (data == null) {
-            return;
-        }
-
-        data.setFlag(
-                RecognitionStatKeys.NAMING_COMMITTED,
-                false
-        );
-
-        data.setFlag(
-                RecognitionStatKeys.PURE_RECOGNITION,
-                false
-        );
-
-        data.setFlag(
-                RecognitionStatKeys.REVEAL_PENDING,
-                false
-        );
-
-        data.setString(
-                RecognitionStatKeys.PRIMARY_PATH,
-                ""
-        );
-
-        data.setString(
-                RecognitionStatKeys.SECONDARY_PATH,
-                ""
-        );
-
-        data.setString(
-                RecognitionStatKeys.BESTOWED_TITLE,
-                ""
-        );
-
-        /*
-         * INCARNATION_ID is intentionally preserved.
-         *
-         * This keeps deterministic title generation stable while repeatedly
-         * testing the naming ritual in the same incarnation.
-         */
-    }
-
-    /**
-     * Uses Tensura's runtime name setter without hard-linking this debug
-     * utility to a potentially changing concrete existence implementation.
-     *
-     * IExistence#getName remains the verification source. The operation is
-     * considered successful only when the stored name is blank afterward.
-     */
-    private static NativeNameClearResult clearNativeName(
-            IExistence existence
-    ) {
-        String currentName =
-                sanitizeName(
-                        existence.getName()
-                );
-
-        if (currentName.isBlank()) {
-            return NativeNameClearResult.succeeded();
-        }
-
-        Method setter =
-                findStringNameSetter(
-                        existence.getClass()
-                );
-
-        if (setter == null) {
-            return NativeNameClearResult.failed(
-                    "The current Tensura existence implementation does not expose setName(String)."
-            );
-        }
-
-        try {
-            if (!setter.canAccess(existence)) {
-                setter.setAccessible(true);
-            }
-
-            setter.invoke(
-                    existence,
-                    ""
-            );
-
-            existence.markDirty();
-
-            String nameAfterClearing =
-                    sanitizeName(
-                            existence.getName()
-                    );
-
-            if (!nameAfterClearing.isBlank()) {
-                return NativeNameClearResult.failed(
-                        "Tensura accepted the operation but the stored name remained '"
-                                + nameAfterClearing
-                                + "'."
-                );
-            }
-
-            return NativeNameClearResult.succeeded();
-        } catch (IllegalAccessException exception) {
-            return NativeNameClearResult.failed(
-                    "The Tensura name setter could not be accessed: "
-                            + exception.getMessage()
-            );
-        } catch (InvocationTargetException exception) {
-            Throwable cause =
-                    exception.getCause() == null
-                            ? exception
-                            : exception.getCause();
-
-            return NativeNameClearResult.failed(
-                    "Tensura rejected the name change: "
-                            + cause.getClass().getSimpleName()
-                            + formatMessage(cause.getMessage())
-            );
-        } catch (RuntimeException exception) {
-            return NativeNameClearResult.failed(
-                    "The native name could not be cleared: "
-                            + exception.getClass().getSimpleName()
-                            + formatMessage(exception.getMessage())
-            );
-        }
-    }
-
-    private static Method findStringNameSetter(
-            Class<?> implementationClass
-    ) {
-        Class<?> currentClass =
-                implementationClass;
-
-        while (currentClass != null) {
-            for (Method method :
-                    currentClass.getDeclaredMethods()) {
-
-                if (isStringNameSetter(method)) {
-                    return method;
-                }
-            }
-
-            currentClass =
-                    currentClass.getSuperclass();
-        }
-
-        /*
-         * Public inherited/interface methods are checked separately because
-         * they may not appear in a concrete class's declared-method array.
-         */
-        for (Method method :
-                implementationClass.getMethods()) {
-
-            if (isStringNameSetter(method)) {
-                return method;
-            }
-        }
-
-        return null;
-    }
-
-    private static boolean isStringNameSetter(
-            Method method
-    ) {
-        if (method == null) {
-            return false;
-        }
-
-        if (!method.getName().equals("setName")) {
-            return false;
-        }
-
-        if (method.getParameterCount() != 1) {
-            return false;
-        }
-
-        return method.getParameterTypes()[0]
-                == String.class;
-    }
-
     private static String sanitizeName(
             String value
     ) {
         return value == null
                 ? ""
                 : value.trim();
-    }
-
-    private static String formatMessage(
-            String message
-    ) {
-        if (message == null
-                || message.isBlank()) {
-            return "";
-        }
-
-        return ": " + message;
     }
 
     public record Result(
@@ -335,27 +163,4 @@ public final class RecognitionUnnameService {
         }
     }
 
-    private record NativeNameClearResult(
-            boolean success,
-            String errorMessage
-    ) {
-
-        private static NativeNameClearResult succeeded() {
-            return new NativeNameClearResult(
-                    true,
-                    ""
-            );
-        }
-
-        private static NativeNameClearResult failed(
-                String errorMessage
-        ) {
-            return new NativeNameClearResult(
-                    false,
-                    errorMessage == null
-                            ? ""
-                            : errorMessage
-            );
-        }
-    }
 }

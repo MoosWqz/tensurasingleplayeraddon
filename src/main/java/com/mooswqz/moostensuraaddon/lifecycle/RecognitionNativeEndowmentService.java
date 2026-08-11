@@ -2,12 +2,18 @@ package com.mooswqz.moostensuraaddon.lifecycle;
 
 import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
 import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionDisplayNameService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionDisplayNameSyncService;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionEndowmentEffortRewardService;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionNativeNameStorageService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionProgressScreenService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionStatKeys;
 import com.mooswqz.moostensuraaddon.util.AddonAdvancementHelper;
 import com.mooswqz.moostensuraaddon.util.TensuraPlayerStateHelper;
 import io.github.manasmods.tensura.network.c2s.RequestNamingMenuPacket;
+import io.github.manasmods.tensura.storage.TensuraStorages;
+import io.github.manasmods.tensura.storage.ep.IExistence;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -34,6 +40,10 @@ public final class RecognitionNativeEndowmentService {
                 AttachmentRegistry.RECOGNITION_DATA
         );
         boolean committed = recognition.isNamingCommitted();
+        boolean revealPending = committed
+                && recognition.getFlag(
+                RecognitionStatKeys.REVEAL_PENDING
+        );
         String recognitionIncarnation = recognition.getString(
                 RecognitionStatKeys.INCARNATION_ID
         );
@@ -50,14 +60,109 @@ public final class RecognitionNativeEndowmentService {
         );
         boolean guardActive = state.isResetGuardActive(now);
 
-        if (committed && nativeNamed && !markerMatches) {
-            state.markNativeEndowmentApplied(
-                    recognitionIncarnation
-            );
-            RecognitionDisplayNameSyncService
-                    .refreshAndBroadcast(player);
-            RecognitionProgressScreenService.invalidate(player);
-            AddonAdvancementHelper.awardNameAnchor(player);
+        /*
+         * Reconcile on every lifecycle synchronization. This repairs a missing
+         * capacity modifier without rewriting current energy when the stable
+         * modifiers already match.
+         */
+        RecognitionEndowmentEffortRewardService.reconcile(
+                player
+        );
+
+        /*
+         * Commitment is intentionally earlier than presentation so an
+         * interrupted ritual cannot reroll. Native naming must observe the
+         * opposite boundary: neither Tensura's stored name nor Minecraft's
+         * custom-name field may reveal the frozen title until presentation
+         * actually finishes.
+         */
+        if (revealPending) {
+            return;
+        }
+
+        String nativeRecognitionName =
+                RecognitionDisplayNameService
+                        .buildNativeTensuraName(
+                                player.getGameProfile()
+                                        .getName(),
+                                recognition.getString(
+                                        RecognitionStatKeys.BESTOWED_TITLE
+                                )
+                        );
+
+        if (committed && nativeNamed) {
+            IExistence existence =
+                    TensuraStorages.getExistenceFrom(
+                            player
+                    );
+
+            String storedNativeName =
+                    existence == null
+                            || existence.getName() == null
+                            ? ""
+                            : existence.getName().trim();
+
+            Component customName =
+                    player.getCustomName();
+
+            String storedCustomName =
+                    customName == null
+                            ? ""
+                            : customName.getString().trim();
+
+            boolean nativeNameMatches =
+                    storedNativeName.equals(
+                            nativeRecognitionName
+                    );
+
+            boolean customNameMatches =
+                    storedCustomName.equals(
+                            nativeRecognitionName
+                    );
+
+            if (!nativeNameMatches
+                    || !customNameMatches) {
+                boolean retryBlocked =
+                        guardActive
+                                || now < state
+                                .getNativeEndowmentNextAttemptEpochMillis();
+
+                if (retryBlocked) {
+                    return;
+                }
+
+                RecognitionNativeNameStorageService.Result
+                        nameSync =
+                        RecognitionNativeNameStorageService.write(
+                                player,
+                                existence,
+                                nativeRecognitionName
+                        );
+
+                if (!nameSync.success()) {
+                    state.recordNativeEndowmentFailure(now);
+                    return;
+                }
+            }
+
+            boolean stateChanged =
+                    !markerMatches
+                            || !nativeNameMatches
+                            || !customNameMatches;
+
+            if (!markerMatches) {
+                state.markNativeEndowmentApplied(
+                        recognitionIncarnation
+                );
+            }
+
+            if (stateChanged) {
+                RecognitionDisplayNameSyncService
+                        .refreshAndBroadcast(player);
+                RecognitionProgressScreenService.invalidate(player);
+                AddonAdvancementHelper.awardNameAnchor(player);
+            }
+
             return;
         }
 
@@ -77,7 +182,7 @@ public final class RecognitionNativeEndowmentService {
                     player,
                     null,
                     RequestNamingMenuPacket.NamingType.HIGH,
-                    player.getGameProfile().getName()
+                    nativeRecognitionName
             );
         } catch (RuntimeException exception) {
             state.recordNativeEndowmentFailure(now);
@@ -89,8 +194,29 @@ public final class RecognitionNativeEndowmentService {
             return;
         }
 
+        IExistence refreshedExistence =
+                TensuraStorages.getExistenceFrom(
+                        player
+                );
+
+        RecognitionNativeNameStorageService.Result
+                nameSync =
+                RecognitionNativeNameStorageService.write(
+                        player,
+                        refreshedExistence,
+                        nativeRecognitionName
+                );
+
+        if (!nameSync.success()) {
+            state.recordNativeEndowmentFailure(now);
+            return;
+        }
+
         state.markNativeEndowmentApplied(
                 recognitionIncarnation
+        );
+        RecognitionEndowmentEffortRewardService.reconcile(
+                player
         );
         RecognitionDisplayNameSyncService
                 .refreshAndBroadcast(player);

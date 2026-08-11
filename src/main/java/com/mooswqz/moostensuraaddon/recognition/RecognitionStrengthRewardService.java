@@ -177,13 +177,26 @@ public final class RecognitionStrengthRewardService {
                 reward
         );
 
+        RecognitionEndowmentEffortRewardService.ReconcileResult
+                endowmentResult =
+                RecognitionEndowmentEffortRewardService.reconcile(
+                        player
+                );
+
+        boolean endowmentChanged =
+                endowmentResult.supported()
+                        && endowmentResult.changed();
+
         return new ReconcileResult(
                 true,
-                metadataChanged || attributesChanged,
+                metadataChanged
+                        || attributesChanged
+                        || endowmentChanged,
                 true,
                 metadataChanged
                         ? "Recognition reward metadata migrated and modifiers reconciled."
                         : attributesChanged
+                                || endowmentChanged
                           ? "Recognition reward modifiers repaired."
                           : "Recognition reward already current."
         );
@@ -282,11 +295,15 @@ public final class RecognitionStrengthRewardService {
         changed |= remove(player.getAttribute(Attributes.ATTACK_SPEED), ATTACK_SPEED_MODIFIER_ID);
         changed |= remove(player.getAttribute(Attributes.KNOCKBACK_RESISTANCE), KNOCKBACK_RESISTANCE_MODIFIER_ID);
 
+        boolean endowmentChanged =
+                RecognitionEndowmentEffortRewardService
+                        .removeAllModifiers(player);
+
         if (changed) {
             preserveHealthRatio(player, oldHealth, oldMaximum);
         }
 
-        return changed;
+        return changed || endowmentChanged;
     }
 
     private static void storeReward(

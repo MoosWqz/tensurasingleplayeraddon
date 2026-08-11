@@ -21,7 +21,7 @@ import java.util.Locale;
 public class GetNamedCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("getnamed")
-                .requires(source -> source.hasPermission(0))
+                .requires(source -> source.hasPermission(2))
                 .executes(context -> execute(context.getSource()))
         );
     }

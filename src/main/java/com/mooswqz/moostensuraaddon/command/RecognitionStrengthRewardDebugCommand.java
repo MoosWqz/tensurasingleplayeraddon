@@ -2,6 +2,8 @@ package com.mooswqz.moostensuraaddon.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionEndowmentEffortRewardSnapshot;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionEndowmentEffortRewardService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionStrengthRewardSnapshot;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionStrengthRewardService;
 import com.mooswqz.moostensuraaddon.recognition.RecognitionStrengthRewardValidationHarness;
@@ -50,6 +52,11 @@ public final class RecognitionStrengthRewardDebugCommand {
         RecognitionStrengthRewardSnapshot snapshot =
                 RecognitionStrengthRewardService.inspect(target);
 
+        RecognitionEndowmentEffortRewardSnapshot endowment =
+                RecognitionEndowmentEffortRewardService.inspect(
+                        target
+                );
+
         sendHeader(source, "Recognition Strength: "
                 + target.getGameProfile().getName(), ChatFormatting.LIGHT_PURPLE);
 
@@ -69,6 +76,12 @@ public final class RecognitionStrengthRewardDebugCommand {
         sendValue(source, "Knockback resistance",
                 "+" + formatPercent(snapshot.expectedReward().knockbackResistanceAddition()));
         sendValue(source, "Attribute state matches", yesNo(snapshot.attributeStateMatches()));
+        sendValue(source, "Endowment effort extension",
+                formatWhole(endowment.expectedReward().extraEpAllowance()) + " EP");
+        sendValue(source, "Magicule / aura capacity",
+                "+" + formatWhole(endowment.expectedReward().energyIncreasePerPool()) + " each");
+        sendValue(source, "Endowment attributes match",
+                yesNoTitle(endowment.attributeStateMatches()));
 
         if (snapshot.futureProfilePreserved()) {
             source.sendSuccess(
@@ -81,6 +94,14 @@ public final class RecognitionStrengthRewardDebugCommand {
         for (String mismatch : snapshot.mismatchedAttributes()) {
             source.sendSuccess(
                     () -> Component.literal("- " + mismatch)
+                            .withStyle(ChatFormatting.YELLOW),
+                    false
+            );
+        }
+
+        for (String mismatch : endowment.mismatchedAttributes()) {
+            source.sendSuccess(
+                    () -> Component.literal("- endowment " + mismatch)
                             .withStyle(ChatFormatting.YELLOW),
                     false
             );
@@ -152,11 +173,19 @@ public final class RecognitionStrengthRewardDebugCommand {
         return value ? "yes" : "no";
     }
 
+    private static String yesNoTitle(boolean value) {
+        return value ? "Yes" : "No";
+    }
+
     private static String format(double value) {
         return String.format(Locale.ROOT, "%.2f", value);
     }
 
     private static String formatPercent(double value) {
         return String.format(Locale.ROOT, "%.2f%%", value * 100.0D);
+    }
+
+    private static String formatWhole(double value) {
+        return String.format(Locale.ROOT, "%,.0f", value);
     }
 }

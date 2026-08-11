@@ -243,6 +243,25 @@ public final class AddonIncarnationState {
         save();
     }
 
+    /**
+     * Clears only the exactly-once native-endowment anchor and retry state.
+     * The life token and all other incarnation observations remain intact.
+     */
+    public void clearNativeEndowmentState() {
+        lifecycleTag.remove(
+                ENDOWMENT_INCARNATION_KEY
+        );
+        lifecycleTag.putInt(
+                ENDOWMENT_ATTEMPTS_KEY,
+                0
+        );
+        lifecycleTag.putLong(
+                ENDOWMENT_NEXT_ATTEMPT_KEY,
+                0L
+        );
+        save();
+    }
+
     public void recordNativeEndowmentFailure(
             long nowEpochMillis
     ) {

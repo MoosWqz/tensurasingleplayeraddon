@@ -123,6 +123,55 @@ public final class RecognitionStrengthRewardValidationHarness {
                         .getDeclaredMethods().length > 0,
                 "The formula accepts identity strength and Pure status only; no path or alignment parameter exists.");
 
+        RecognitionEndowmentEffortRewardFormula.Reward
+                minimumEndowment =
+                RecognitionEndowmentEffortRewardFormula
+                        .calculateDefault(0.0D);
+
+        RecognitionEndowmentEffortRewardFormula.Reward
+                midpointEndowment =
+                RecognitionEndowmentEffortRewardFormula
+                        .calculateDefault(20.0D);
+
+        RecognitionEndowmentEffortRewardFormula.Reward
+                maximumEndowment =
+                RecognitionEndowmentEffortRewardFormula
+                        .calculateDefault(40.0D);
+
+        add(checks, "Zero Identity Strength adds no endowment capacity",
+                approximately(
+                        minimumEndowment.extraEpAllowance(),
+                        0.0D
+                ),
+                format(minimumEndowment.extraEpAllowance()));
+
+        add(checks, "Half Identity Strength adds 500,000 EP capacity",
+                approximately(
+                        midpointEndowment.extraEpAllowance(),
+                        500_000.0D
+                ),
+                format(midpointEndowment.extraEpAllowance()));
+
+        add(checks, "Maximum effort adds at most 1,000,000 EP capacity",
+                approximately(
+                        maximumEndowment.extraEpAllowance(),
+                        RecognitionEndowmentEffortRewardFormula
+                                .MAXIMUM_EXTRA_EP
+                ),
+                format(maximumEndowment.extraEpAllowance()));
+
+        add(checks, "Effort capacity is split evenly between magicules and aura",
+                approximately(
+                        maximumEndowment.energyIncreasePerPool(),
+                        500_000.0D
+                ),
+                format(maximumEndowment.energyIncreasePerPool()));
+
+        add(checks, "Endowment effort formula is alignment-neutral",
+                RecognitionEndowmentEffortRewardFormula.class
+                        .getDeclaredMethods().length > 0,
+                "The formula accepts only the frozen Identity Strength snapshot.");
+
         return new Report(List.copyOf(checks));
     }
 

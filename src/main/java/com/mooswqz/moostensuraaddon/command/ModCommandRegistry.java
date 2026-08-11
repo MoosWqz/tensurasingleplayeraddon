@@ -31,8 +31,9 @@ public final class ModCommandRegistry {
         );
 
         /*
-         * Legacy self-endowment remains available for compatibility while its
-         * save/migration policy is audited separately. It is intentionally not
+         * Legacy self-endowment remains available only as an administrator
+         * recovery/testing route. It creates a native Tensura name but never
+         * fabricates Soul Recognition or its effort rewards, and it is not
          * advertised by the normal guide/help surface.
          */
         GetNamedCommand.register(

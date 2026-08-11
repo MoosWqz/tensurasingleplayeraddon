@@ -67,10 +67,15 @@ if root:
     if "/getnamed" in root or 'Commands.literal("getnamed")' in root:
         ERRORS.append("/getnamed is being advertised/embedded by the canonical root")
 
-# The standalone GetNamed command intentionally remains until migration review.
+    if "/checkrecognition" in root:
+        ERRORS.append("removed /checkrecognition is still advertised by the canonical root")
+
+# The standalone GetNamed command intentionally remains administrator-only.
 getnamed = read("GetNamedCommand.java")
 if getnamed and 'Commands.literal("getnamed")' not in getnamed:
     WARNINGS.append("GetNamedCommand no longer defines /getnamed; migration review may already have changed it")
+elif getnamed and ".hasPermission(2)" not in getnamed:
+    ERRORS.append("/getnamed is not locked behind administrator permission level 2")
 
 # This package intentionally does not touch protocol, GUI, datapack or lifecycle.
 network = ROOT / "src/main/java/com/mooswqz/moostensuraaddon/network/NetworkRegistry.java"
@@ -92,7 +97,7 @@ else:
     print("[PASS] no standalone development compatibility aliases registered")
     print("[PASS] bare /moostensura routes to guide")
     print("[PASS] guide / paths / help branches present")
-    print("[PASS] /getnamed retained but not advertised by canonical root")
+    print("[PASS] /getnamed retained as administrator-only and not advertised by canonical root")
 if WARNINGS:
     print("")
     print("WARNINGS")

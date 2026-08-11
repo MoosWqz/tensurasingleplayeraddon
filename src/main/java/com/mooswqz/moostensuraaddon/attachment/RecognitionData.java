@@ -1085,6 +1085,90 @@ public class RecognitionData {
         );
     }
 
+    /**
+     * Clears the complete frozen naming result while preserving this life's
+     * deeds, progression counters, identity history and incarnation ID.
+     *
+     * <p>This is intentionally narrower than {@link #resetForNewIncarnation}
+     * and exists for the protected administrator unname/retest route.</p>
+     */
+    public void clearNamingCommitPreservingLifeProgress() {
+        counters.remove(
+                RecognitionStatKeys.RECOGNITION_RESULT_VERSION
+        );
+        counters.remove(
+                RecognitionStatKeys.RECOGNITION_RULES_VERSION
+        );
+        counters.remove(
+                RecognitionStatKeys.REWARD_PROFILE_VERSION
+        );
+
+        measurements.remove(
+                RecognitionStatKeys.PRIMARY_SCORE_AT_COMMIT
+        );
+        measurements.remove(
+                RecognitionStatKeys.SECONDARY_SCORE_AT_COMMIT
+        );
+        measurements.remove(
+                RecognitionStatKeys.IDENTITY_STRENGTH_AT_COMMIT
+        );
+        measurements.remove(
+                RecognitionStatKeys.IDENTITY_STRENGTH_MAXIMUM_AT_COMMIT
+        );
+        measurements.remove(
+                RecognitionStatKeys.RECOGNITION_STRENGTH_REWARD
+        );
+
+        flags.remove(
+                RecognitionStatKeys.NAMING_COMMITTED
+        );
+        flags.remove(
+                RecognitionStatKeys.PURE_RECOGNITION
+        );
+        flags.remove(
+                RecognitionStatKeys.REVEAL_PENDING
+        );
+        flags.remove(
+                RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED
+        );
+
+        strings.remove(
+                RecognitionStatKeys.PRIMARY_PATH
+        );
+        strings.remove(
+                RecognitionStatKeys.SECONDARY_PATH
+        );
+        strings.remove(
+                RecognitionStatKeys.BESTOWED_TITLE
+        );
+        strings.remove(
+                RecognitionStatKeys.FROZEN_DISPLAY_NAME
+        );
+        strings.remove(
+                RecognitionStatKeys.CONTRADICTION_MODIFIER
+        );
+        strings.remove(
+                RecognitionStatKeys.BALANCE_SOURCE_AT_COMMIT
+        );
+        strings.remove(
+                RecognitionStatKeys.BALANCE_REVISION_AT_COMMIT
+        );
+        strings.remove(
+                RecognitionStatKeys.COMMIT_TIMESTAMP_EPOCH_MILLIS
+        );
+        strings.remove(
+                RecognitionStatKeys.RECOGNITION_MIGRATION_SOURCE
+        );
+        strings.remove(
+                RecognitionStatKeys.RECOGNITION_REWARD_MIGRATION_SOURCE
+        );
+        strings.remove(
+                RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER
+        );
+
+        dataVersion = CURRENT_DATA_VERSION;
+    }
+
     public void resetForNewIncarnation(
             String incarnationId
     ) {

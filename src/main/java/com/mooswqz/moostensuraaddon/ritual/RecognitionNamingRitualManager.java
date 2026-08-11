@@ -4,9 +4,9 @@ import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
 import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
 import com.mooswqz.moostensuraaddon.block.BlockRegistry;
 import com.mooswqz.moostensuraaddon.block.GreatCrystalAltarBlock;
+import com.mooswqz.moostensuraaddon.lifecycle.RecognitionNativeEndowmentService;
 import com.mooswqz.moostensuraaddon.recognition.*;
 import com.mooswqz.moostensuraaddon.util.AddonAdvancementHelper;
-import io.github.manasmods.tensura.network.c2s.RequestNamingMenuPacket;
 import io.github.manasmods.tensura.storage.TensuraStorages;
 import io.github.manasmods.tensura.storage.ep.IExistence;
 import net.minecraft.ChatFormatting;
@@ -81,15 +81,33 @@ public final class RecognitionNamingRitualManager {
                         AttachmentRegistry.RECOGNITION_DATA
                 );
 
-        if (data.getFlag(
-                RecognitionStatKeys.NAMING_COMMITTED
-        ) && data.getFlag(
-                RecognitionStatKeys.REVEAL_PENDING
-        )) {
+        if (hasPendingReveal(player)) {
             return true;
         }
 
-        return !isNativeNamed(player);
+        return !data.isNamingCommitted();
+    }
+
+    /**
+     * A committed reveal is resumed before either normal altar flow. This
+     * preserves the already-fixed result across updates and interruptions.
+     */
+    public static boolean hasPendingReveal(
+            ServerPlayer player
+    ) {
+        if (player == null) {
+            return false;
+        }
+
+        RecognitionData data =
+                player.getData(
+                        AttachmentRegistry.RECOGNITION_DATA
+                );
+
+        return data.isNamingCommitted()
+                && data.getFlag(
+                RecognitionStatKeys.REVEAL_PENDING
+        );
     }
 
     public static void tryStartRitual(
@@ -451,6 +469,27 @@ public final class RecognitionNamingRitualManager {
             return CommitmentResult.failed();
         }
 
+        /*
+         * Atomic commitment point.
+         *
+         * Use the authoritative service so the full frozen result, reward
+         * profile, identity-strength snapshot and incarnation metadata are
+         * written before the visual ritual begins.
+         */
+        if (!RecognitionNamingService.commitRecognition(
+                player,
+                eligibility
+        )) {
+            player.sendSystemMessage(
+                    Component.literal(
+                                    "The crystal could not preserve its answer. Try the altar again."
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
+
+            return CommitmentResult.failed();
+        }
+
         String primaryPathId =
                 candidate.primaryPath()
                         .getId();
@@ -463,47 +502,6 @@ public final class RecognitionNamingRitualManager {
 
         String bestowedTitle =
                 candidate.bestowedTitle();
-
-        /*
-         * Atomic commitment point.
-         *
-         * Everything required to reproduce and finish the result is written
-         * before the visual ritual begins.
-         */
-        data.setFlag(
-                RecognitionStatKeys.NAMING_COMMITTED,
-                true
-        );
-
-        data.setFlag(
-                RecognitionStatKeys.PURE_RECOGNITION,
-                candidate.pure()
-        );
-
-        data.setFlag(
-                RecognitionStatKeys.REVEAL_PENDING,
-                true
-        );
-
-        data.setString(
-                RecognitionStatKeys.PRIMARY_PATH,
-                primaryPathId
-        );
-
-        data.setString(
-                RecognitionStatKeys.SECONDARY_PATH,
-                secondaryPathId
-        );
-
-        data.setString(
-                RecognitionStatKeys.BESTOWED_TITLE,
-                bestowedTitle
-        );
-
-        player.setData(
-                AttachmentRegistry.RECOGNITION_DATA,
-                data
-        );
 
         RecognitionDisplayNameSyncService.refreshAndBroadcast(player);
 
@@ -573,41 +571,6 @@ public final class RecognitionNamingRitualManager {
 
         clearRitualPose(player);
 
-        /*
-         * The native Tensura name remains the Minecraft username.
-         *
-         * The recognition title is stored separately by this addon.
-         */
-        String assignedName =
-                RecognitionDisplayNameService
-                        .buildNativeTensuraName(
-                                player.getGameProfile()
-                                        .getName(),
-                                state.bestowedTitle
-                        );
-
-        RequestNamingMenuPacket.name(
-                player,
-                null,
-                RequestNamingMenuPacket.NamingType.HIGH,
-                assignedName
-        );
-
-        if (!isNativeNamed(player)) {
-            /*
-             * The committed result remains pending. The player can interact
-             * with the altar again and resume the exact same result.
-             */
-            player.sendSystemMessage(
-                    Component.literal(
-                                    "The recognition was fixed, but Tensura did not accept the native naming operation. Interact with the altar to try presenting the same result again."
-                            )
-                            .withStyle(ChatFormatting.RED)
-            );
-
-            return;
-        }
-
         RecognitionData data =
                 player.getData(
                         AttachmentRegistry.RECOGNITION_DATA
@@ -622,6 +585,58 @@ public final class RecognitionNamingRitualManager {
                 AttachmentRegistry.RECOGNITION_DATA,
                 data
         );
+
+        /*
+         * The reveal guard is cleared only at the presentation boundary.
+         * Periodic lifecycle reconciliation therefore cannot publish the
+         * frozen title during the 15-second ritual or after an interruption.
+         *
+         * The lifecycle service owns the exactly-once native HIGH endowment.
+         * If a compatible native name already exists, it updates the stored
+         * and custom names without sending another HIGH request.
+         */
+        RecognitionNativeEndowmentService.synchronize(
+                player
+        );
+
+        if (!isNativeIdentityPublished(
+                player,
+                data
+        )) {
+            /*
+             * Restore the pending guard if Tensura rejected the native naming
+             * operation. The same committed result can then be presented
+             * again without a reroll.
+             */
+            data.setFlag(
+                    RecognitionStatKeys.REVEAL_PENDING,
+                    true
+            );
+
+            player.setData(
+                    AttachmentRegistry.RECOGNITION_DATA,
+                    data
+            );
+
+            player.sendSystemMessage(
+                    Component.literal(
+                                    "The recognition was fixed, but Tensura did not accept the complete native name. Interact with the altar to try presenting the same result again."
+                            )
+                            .withStyle(ChatFormatting.RED)
+            );
+
+            return;
+        }
+
+        /*
+         * Refresh after the native identity is coherent so chat, tab-list,
+         * client nametag and Tensura menu consumers publish the same frozen
+         * name at the completed reveal boundary.
+         */
+        RecognitionDisplayNameSyncService
+                .refreshAndBroadcast(
+                        player
+                );
 
         spawnCompletionParticles(
                 level,
@@ -1105,9 +1120,14 @@ public final class RecognitionNamingRitualManager {
         );
     }
 
-    private static boolean isNativeNamed(
-            ServerPlayer player
+    private static boolean isNativeIdentityPublished(
+            ServerPlayer player,
+            RecognitionData data
     ) {
+        if (player == null || data == null) {
+            return false;
+        }
+
         IExistence existence =
                 TensuraStorages.getExistenceFrom(
                         player
@@ -1120,8 +1140,32 @@ public final class RecognitionNamingRitualManager {
         String nativeName =
                 existence.getName();
 
-        return nativeName != null
-                && !nativeName.isBlank();
+        String expectedName =
+                RecognitionDisplayNameService
+                        .buildNativeTensuraName(
+                                player.getGameProfile()
+                                        .getName(),
+                                data.getString(
+                                        RecognitionStatKeys.BESTOWED_TITLE
+                                )
+                        );
+
+        Component customName =
+                player.getCustomName();
+
+        String storedNativeName =
+                nativeName == null
+                        ? ""
+                        : nativeName.trim();
+
+        String storedCustomName =
+                customName == null
+                        ? ""
+                        : customName.getString().trim();
+
+        return !expectedName.isBlank()
+                && storedNativeName.equals(expectedName)
+                && storedCustomName.equals(expectedName);
     }
 
     private static BlockPos getLowerAltarPos(

@@ -63,6 +63,7 @@ reset_service = read("lifecycle/AddonPlayerDataResetService.java")
 lifecycle_events = read("event/AddonLifecycleEvents.java")
 lifecycle_policy = read("lifecycle/AddonLifecyclePolicy.java")
 endowment = read("lifecycle/RecognitionNativeEndowmentService.java")
+effort_endowment = read("recognition/RecognitionEndowmentEffortRewardService.java")
 acquisition_policy = read("lifecycle/GranterAcquisitionPolicy.java")
 acquisition_tracker = read("lifecycle/GranterAcquisitionTracker.java")
 lifecycle_harness = read("lifecycle/AddonLifecycleValidationHarness.java")
@@ -88,6 +89,11 @@ if incarnation:
         incarnation,
         ("getNativeEndowmentIncarnation", "nativeEndowmentIncarnation"),
         "Native endowment is keyed to incarnation state",
+    )
+    require(
+        incarnation,
+        "clearNativeEndowmentState",
+        "Protected unname can clear the native-endowment anchor without changing incarnation",
     )
     require_any(
         incarnation,
@@ -204,6 +210,28 @@ if endowment:
         endowment,
         ("markNativeEndowmentApplied", "nativeEndowmentIncarnation"),
         "Successful/already-native endowment is anchored per incarnation",
+    )
+    require(
+        endowment,
+        "RecognitionEndowmentEffortRewardService.reconcile",
+        "Native endowment reconciles the effort-scaled capacity extension",
+    )
+
+if effort_endowment:
+    require(
+        effort_endowment,
+        "MAX_MAGICULE_MODIFIER_ID",
+        "Effort endowment has a stable maximum-magicule modifier",
+    )
+    require(
+        effort_endowment,
+        "MAX_AURA_MODIFIER_ID",
+        "Effort endowment has a stable maximum-aura modifier",
+    )
+    require(
+        effort_endowment,
+        "applyOnlyNewEnergyCapacity",
+        "Effort endowment grants current energy only for newly added capacity",
     )
 
 # ---------------------------------------------------------------------------
@@ -372,11 +400,16 @@ if root_command:
 
 # Decision emitted only when static evidence is strong.
 if getnamed and not writes_addon_persistent_data and native_only:
-    INFO.append(
-        "STATIC /getnamed DECISION: safe candidate to unregister for release; "
-        "old named-only saves should rely on native Tensura naming state, not this command. "
-        "Runtime old-save smoke test is still required before removal."
-    )
+    if ".hasPermission(2)" in getnamed:
+        INFO.append(
+            "STATIC /getnamed DECISION: retained as an administrator-only "
+            "native recovery/testing route and excluded from normal progression. "
+            "Runtime old-save smoke testing is still required."
+        )
+    else:
+        WARN.append(
+            "/getnamed is retained without the agreed administrator permission gate"
+        )
 
 # ---------------------------------------------------------------------------
 # 7. Old/future save matrix summary
@@ -384,7 +417,7 @@ if getnamed and not writes_addon_persistent_data and native_only:
 matrix = [
     ("Brand-new player", "runtime test"),
     ("Old unrecognized player", "runtime test"),
-    ("Legacy /getnamed player", "runtime test before unregistering"),
+    ("Legacy /getnamed player", "runtime compatibility test"),
     ("Natively named but addon-unrecognized player", "runtime test"),
     ("Current committed recognition", "static + runtime"),
     ("Legacy committed recognition", "static migration + runtime"),

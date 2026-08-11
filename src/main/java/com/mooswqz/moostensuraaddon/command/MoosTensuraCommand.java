@@ -659,7 +659,7 @@ public final class MoosTensuraCommand {
 
         source.sendSuccess(
                 () -> Component.literal(
-                                "Run /checkrecognition to verify that naming eligibility is now ready."
+                                "Run /moostensura debug recognition to verify that naming eligibility is now ready."
                         )
                         .withStyle(ChatFormatting.AQUA),
                 false
