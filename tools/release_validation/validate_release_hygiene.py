@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
-EXPECTED_HARDENING_VERSION = "1.4.0b8"
+EXPECTED_HARDENING_VERSION = "1.4.0-rc1"
 
 FAILURES: list[str] = []
 WARNINGS: list[str] = []

@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
 JAVA = ROOT / "src/main/java/com/mooswqz/moostensuraaddon"
 RESOURCES = ROOT / "src/main/resources"
-EXPECTED_VERSION = "1.4.0b8"
+EXPECTED_VERSION = "1.4.0-rc1"
 
 CHECKS: list[tuple[str, bool, str]] = []
 WARNINGS: list[str] = []
@@ -40,11 +40,11 @@ workflow = read(".github/workflows/build.yml")
 wrapper_properties = read("gradle/wrapper/gradle-wrapper.properties")
 
 expect(
-    "Gradle metadata is the b8 RC1 candidate",
+    "Gradle metadata is the RC1 candidate",
     property_value(gradle, "mod_version") == EXPECTED_VERSION,
 )
 expect(
-    "NeoForge metadata matches the b8 RC1 candidate",
+    "NeoForge metadata matches the RC1 candidate",
     f'version="{EXPECTED_VERSION}"' in mods_toml,
 )
 expect(
@@ -70,8 +70,8 @@ if wrapper_jar.is_file() and wrapper_jar.stat().st_size > 10_000:
 else:
     WARNINGS.append(
         "gradle/wrapper/gradle-wrapper.jar is not present in this checkout. "
-        "It must be staged from the working local wrapper before the b8 push; "
-        "the GitHub build intentionally fails without it."
+        "It must be present and tracked for the RC1 push; the GitHub build "
+        "intentionally fails without it."
     )
 
 expect(

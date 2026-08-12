@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.0 — Soul Recognition Update (release hardening)
+## 1.4.0-rc1 — Soul Recognition Update
 
 ### Added
 
@@ -100,8 +100,8 @@
 ### Release Notes
 
 - Network protocol remains `11`.
-- Runtime/mod metadata is `1.4.0b8`, the portable, translation-complete
-  candidate for the final RC1 smoke-test gate.
+- Runtime/mod metadata is `1.4.0-rc1`, the first release candidate for the
+  Soul Recognition Update.
 
 ## 1.3.1
 

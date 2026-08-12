@@ -4,7 +4,7 @@ license="All rights reserved"
 
 [[mods]]
 modId="moostensuraaddon"
-version="1.4.0b8"
+version="1.4.0-rc1"
 displayName="Moos Tensura Addon"
 
 description='''
