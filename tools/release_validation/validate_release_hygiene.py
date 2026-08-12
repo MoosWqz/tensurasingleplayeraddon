@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
-EXPECTED_HARDENING_VERSION = "1.4.0b7"
+EXPECTED_HARDENING_VERSION = "1.4.0b8"
 
 FAILURES: list[str] = []
 WARNINGS: list[str] = []
@@ -28,6 +28,7 @@ INTERNAL_LABEL_PATTERNS = [
 DEV_PATH_PATTERNS = [
     re.compile(r"[A-Za-z]:\\Users\\", re.I),
     re.compile(r"[A-Za-z]:\\Programme\\", re.I),
+    re.compile(r"[A-Za-z]:/Program Files/", re.I),
     re.compile(r"/mnt/data/", re.I),
     re.compile(r"/home/oai/", re.I),
 ]
@@ -82,7 +83,7 @@ gradle_props = ROOT / "gradle.properties"
 if not gradle_props.is_file():
     FAILURES.append("Missing gradle.properties")
 else:
-    props = gradle_props.read_text(encoding="utf-8")
+    props = gradle_props.read_text(encoding="utf-8-sig")
     mod_version = get_property(props, "mod_version")
     if mod_version == EXPECTED_HARDENING_VERSION:
         PASSES.append(f"gradle.properties mod_version = {EXPECTED_HARDENING_VERSION}")
@@ -103,6 +104,22 @@ else:
         PASSES.append("NeoForge version = 21.1.234")
     else:
         WARNINGS.append(f"NeoForge property expected '21.1.234', found {neo_version!r}")
+
+    local_java_properties = (
+        "org.gradle.java.home",
+        "org.gradle.java.installations.paths",
+    )
+    configured_local_java = [
+        key for key in local_java_properties
+        if get_property(props, key) is not None
+    ]
+    if configured_local_java:
+        FAILURES.append(
+            "Developer-local Java discovery is tracked in gradle.properties: "
+            + ", ".join(configured_local_java)
+        )
+    else:
+        PASSES.append("Tracked Gradle configuration is machine-independent")
 
 mods_toml = ROOT / "src/main/resources/META-INF/neoforge.mods.toml"
 if not mods_toml.is_file():

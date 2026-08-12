@@ -5,7 +5,7 @@ import sys
 
 root = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
 screen_path = root / "src/main/java/com/mooswqz/moostensuraaddon/client/screen/RecognitionProgressScreen.java"
-lang_path = root / "src/main/resources/assets/moostensuraaddon_guidance/lang/en_us.json"
+lang_path = root / "src/main/resources/assets/moostensuraaddon/lang/en_us.json"
 
 errors = []
 

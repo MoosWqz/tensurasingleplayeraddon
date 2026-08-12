@@ -8,7 +8,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import java.util.List;
 
 public final class MoosTensuraConfig {
-    public static final int CURRENT_CONFIG_VERSION = 3;
+    public static final int CURRENT_CONFIG_VERSION = 4;
 
     public static final ModConfigSpec SPEC;
 
@@ -169,7 +169,7 @@ public final class MoosTensuraConfig {
 
         GREAT_SAGE_RITUAL_REQUIRED_EP = builder
                 .comment("Current EP required to start the Great Crystal Altar ritual.")
-                .defineInRange("requiredEp", 100_000.0D, 0.0D, Double.MAX_VALUE);
+                .defineInRange("requiredEp", 60_000.0D, 0.0D, Double.MAX_VALUE);
 
         GREAT_SAGE_RITUAL_REQUIRED_MASTERED_SKILLS = builder
                 .comment("Amount of mastered skills required to start the Great Crystal Altar ritual.")
@@ -404,6 +404,10 @@ public final class MoosTensuraConfig {
             migrateToVersion3();
         }
 
+        if (version < 4) {
+            migrateToVersion4();
+        }
+
         CONFIG_VERSION.set(
                 CURRENT_CONFIG_VERSION
         );
@@ -437,6 +441,19 @@ public final class MoosTensuraConfig {
         DEBUG_MODE.set(false);
     }
 
+    private static void migrateToVersion4() {
+        /*
+         * Lower only the former built-in ritual requirement. Server owners
+         * who deliberately configured a different value keep their choice.
+         */
+        if (Double.compare(
+                GREAT_SAGE_RITUAL_REQUIRED_EP.get(),
+                100_000.0D
+        ) == 0) {
+            GREAT_SAGE_RITUAL_REQUIRED_EP.set(60_000.0D);
+        }
+    }
+
     public static void resetToAddonDefaults() {
         CONFIG_VERSION.set(
                 CURRENT_CONFIG_VERSION
@@ -458,7 +475,7 @@ public final class MoosTensuraConfig {
 
         GREAT_SAGE_RITUAL_ENABLED.set(true);
         GREAT_SAGE_RITUAL_DURATION_TICKS.set(300);
-        GREAT_SAGE_RITUAL_REQUIRED_EP.set(100_000.0D);
+        GREAT_SAGE_RITUAL_REQUIRED_EP.set(60_000.0D);
         GREAT_SAGE_RITUAL_REQUIRED_MASTERED_SKILLS.set(1);
         GREAT_SAGE_RITUAL_REQUIRE_NAMED.set(false);
 

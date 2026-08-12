@@ -24,9 +24,14 @@
   legacy, future-version, reload, exactly-once, and Character Reset testing.
 - Added deterministic attribution validation and a confirmed Character Reset
   fixture for life-bound recognition and runtime combat-credit isolation.
+- Added release validation for player-facing translations, Gradle portability,
+  repository wrapper setup, metadata, resources, and the final RC1 surface.
 
 ### Changed
 
+- Lowered the default Sage to Great Sage altar requirement from 100,000 EP to
+  60,000 EP while leaving `/getnamed` unchanged at 200,000 EP. Existing
+  default configurations migrate automatically; custom EP values are kept.
 - The Great Crystal Altar now resolves Sage to Great Sage before beginning a
   new Soul Recognition ritual. An already-committed interrupted recognition
   reveal still resumes first so its frozen result cannot be stranded.
@@ -82,12 +87,21 @@
   Tensura-subordinate player attribution.
 - Added bounded recent-combat credit, explicit duplicate-death suppression,
   and lifecycle cleanup for subordinate participation caches.
+- Consolidated the canonical guide, Great Sage guide, Soul Recognition screen,
+  and recognition-benefit notice translations into the addon's real asset
+  namespace instead of relying on a separate guidance namespace.
+- Removed developer-machine Java paths from tracked Gradle configuration and
+  restored the Gradle wrapper JAR to clean-checkout and CI packaging.
+- Updated stale NeoForge mod metadata that still described retired survival
+  commands instead of Soul Recognition and altar-based progression.
+- Clarified that the altar's level-50 eligibility message belongs to Soul
+  Recognition, while Sage to Great Sage keeps its separate level-45 gate.
 
 ### Release Notes
 
 - Network protocol remains `11`.
-- Runtime/mod metadata is `1.4.0b7`, the attribution and reincarnation
-  hardening candidate before the final RC1 smoke-test gate.
+- Runtime/mod metadata is `1.4.0b8`, the portable, translation-complete
+  candidate for the final RC1 smoke-test gate.
 
 ## 1.3.1
 

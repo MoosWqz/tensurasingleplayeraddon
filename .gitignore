@@ -26,8 +26,11 @@ runs/
 logs/
 crash-reports/
 
-# Generated jars
+# Generated JARs
 *.jar
+
+# The Gradle wrapper JAR is required for clean checkouts and CI builds
+!gradle/wrapper/gradle-wrapper.jar
 
 # OS files
 .DS_Store
@@ -37,6 +40,5 @@ Thumbs.db
 *.tmp
 *.bak
 
-# Local dependency jars should not be committed
+# Local dependency JARs
 libs/
-*.jar

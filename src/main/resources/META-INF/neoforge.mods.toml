@@ -4,11 +4,11 @@ license="All rights reserved"
 
 [[mods]]
 modId="moostensuraaddon"
-version="1.4.0b7"
+version="1.4.0b8"
 displayName="Moos Tensura Addon"
 
 description='''
-A small companion addon for Tensura: Reincarnated that adds quality-of-life features for singleplayer progression. It introduces the Unique Skill Granter, allowing players to grant mastered skills to their subordinates, take them back, and inspect subordinate skills. The addon also adds survival-friendly commands to evolve Sage into Great Sage and perform a self-endowment ritual without needing another player.
+An unofficial companion addon for Tensura: Reincarnated that brings multiplayer-style progression into a meaningful singleplayer journey. Live out your incarnation through Soul Recognition, discover Great Crystal Shrines, awaken Sage into Great Sage, master the Unique Skill Granter, and evolve your authority into Benevolent Empowerment or Absolute Governance.
 '''
 
 [[dependencies.moostensuraaddon]]

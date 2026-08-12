@@ -521,10 +521,9 @@ public final class RecognitionNamingRitualManager {
         MutableComponent message =
                 switch (eligibility.status()) {
                     case NOT_ENOUGH_LEVEL ->
-                            Component.literal(
-                                    "The crystal senses potential, but your existence lacks maturity. Reach level "
-                                            + eligibility.requiredLevel()
-                                            + "."
+                            Component.translatable(
+                                    "message.moostensuraaddon.recognition.eligibility.not_enough_level",
+                                    eligibility.requiredLevel()
                             );
 
                     case NO_RECOGNITION_SELECTION ->

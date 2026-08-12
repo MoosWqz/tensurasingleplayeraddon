@@ -21,5 +21,16 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Run release validators
+        shell: bash
+        run: |
+          for validator in tools/release_validation/validate_*.py; do
+            python3 "$validator"
+          done
+          for validator in tools/datapack_validation/*/validate_*.py; do
+            python3 "$validator"
+          done
+
       - name: Build with Gradle
-        run: ./gradlew build
+        shell: bash
+        run: bash ./gradlew clean build --stacktrace
