@@ -58,6 +58,9 @@ if root:
         if f'Commands.literal("{literal}")' not in root:
             ERRORS.append(f"missing canonical public branch: /moostensura {literal}")
 
+    if 'Commands.literal("mastery")' not in root or "sendMasteryGuide(" not in root:
+        ERRORS.append("missing public /moostensura guide mastery branch")
+
     # These old standalone roots must never be embedded in the canonical
     # survival root.
     for literal in ("upgradesage", "checknamed", "checkrecognition"):
@@ -81,8 +84,8 @@ elif getnamed and ".hasPermission(2)" not in getnamed:
 network = ROOT / "src/main/java/com/mooswqz/moostensuraaddon/network/NetworkRegistry.java"
 if network.is_file():
     net = network.read_text(encoding="utf-8")
-    if '.versioned("11")' not in net:
-        WARNINGS.append("NetworkRegistry does not show protocol 11; verify current source before release")
+    if '.versioned("12")' not in net:
+        WARNINGS.append("NetworkRegistry does not show protocol 12; verify current source before release")
 
 print("Release command-surface validation")
 print("==================================")
@@ -97,6 +100,7 @@ else:
     print("[PASS] no standalone development compatibility aliases registered")
     print("[PASS] bare /moostensura routes to guide")
     print("[PASS] guide / paths / help branches present")
+    print("[PASS] dynamic mastery guide branch present")
     print("[PASS] /getnamed retained as administrator-only and not advertised by canonical root")
 if WARNINGS:
     print("")

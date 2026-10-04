@@ -3,6 +3,7 @@ package com.mooswqz.moostensuraaddon.recognition;
 import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
 import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
 import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -75,7 +76,10 @@ public final class RecognitionStrengthRewardService {
         storeReward(
                 data,
                 reward,
-                MIGRATION_SOURCE_NATIVE
+                MIGRATION_SOURCE_NATIVE,
+                MoosTensuraConfig
+                        .RECOGNITION_MAXIMUM_EXTRA_EP
+                        .get()
         );
 
         return true;
@@ -167,7 +171,13 @@ public final class RecognitionStrengthRewardService {
                     ? MIGRATION_SOURCE_LEGACY
                     : MIGRATION_SOURCE_INTERRUPTED;
 
-            storeReward(data, reward, source);
+            storeReward(
+                    data,
+                    reward,
+                    source,
+                    RecognitionEndowmentEffortRewardFormula
+                            .DEFAULT_MAXIMUM_EXTRA_EP
+            );
             metadataChanged = true;
         } else if (profileVersion
                 < RecognitionStrengthRewardFormula.PROFILE_VERSION) {
@@ -317,7 +327,8 @@ public final class RecognitionStrengthRewardService {
     private static void storeReward(
             RecognitionData data,
             RecognitionStrengthRewardFormula.Reward reward,
-            String migrationSource
+            String migrationSource,
+            double maximumExtraEp
     ) {
         data.setMeasurement(
                 RecognitionStatKeys.IDENTITY_STRENGTH_AT_COMMIT,
@@ -331,6 +342,13 @@ public final class RecognitionStrengthRewardService {
                 RecognitionStatKeys.RECOGNITION_STRENGTH_REWARD,
                 reward.totalStrength()
         );
+        data.setMeasurement(
+                RecognitionStatKeys.ENDOWMENT_MAXIMUM_EXTRA_EP_AT_COMMIT,
+                RecognitionEndowmentEffortRewardFormula
+                        .sanitizeMaximumExtraEp(
+                                maximumExtraEp
+                        )
+        );
         data.setString(
                 RecognitionStatKeys.RECOGNITION_REWARD_MIGRATION_SOURCE,
                 migrationSource
@@ -341,6 +359,10 @@ public final class RecognitionStrengthRewardService {
         );
         data.setFlag(
                 RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED,
+                true
+        );
+        data.setFlag(
+                RecognitionStatKeys.ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED,
                 true
         );
     }

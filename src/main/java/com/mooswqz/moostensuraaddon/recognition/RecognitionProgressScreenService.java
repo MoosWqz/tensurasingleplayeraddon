@@ -637,6 +637,20 @@ public final class RecognitionProgressScreenService {
         RecognitionPathComponents components =
                 evaluation.getComponents();
 
+        double masteryMaximum =
+                RecognitionEvidenceBreakdown
+                        .calculate(
+                                data,
+                                evaluation.getBalance()
+                        )
+                        .mastery()
+                        .entries()
+                        .stream()
+                        .mapToDouble(
+                                RecognitionEvidenceBreakdown.Entry::maximum
+                        )
+                        .sum();
+
         RecognitionFreedomProgressSnapshot freedomProgress =
                 RecognitionFreedomProgressSnapshot.inspect(
                         data,
@@ -757,9 +771,9 @@ public final class RecognitionProgressScreenService {
                 entries,
                 "mastery",
                 "Mastery",
-                "Mastered skills, broad experience and powerful victories deepen this aspect.",
+                "Skills, categories, highest EP and major enemies build Mastery. Run /moostensura guide mastery.",
                 dimensions.mastery(),
-                80.0D,
+                masteryMaximum,
                 0x5DD9E8,
                 debugDetailsAvailable
         );

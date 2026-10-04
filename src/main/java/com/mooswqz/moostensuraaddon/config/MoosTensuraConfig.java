@@ -8,7 +8,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import java.util.List;
 
 public final class MoosTensuraConfig {
-    public static final int CURRENT_CONFIG_VERSION = 4;
+    public static final int CURRENT_CONFIG_VERSION = 5;
 
     public static final ModConfigSpec SPEC;
 
@@ -43,6 +43,8 @@ public final class MoosTensuraConfig {
     public static final ModConfigSpec.IntValue SAGE_WHISPER_MIN_INTERVAL_TICKS;
     public static final ModConfigSpec.IntValue SAGE_WHISPER_RANDOM_INTERVAL_TICKS;
     public static final ModConfigSpec.DoubleValue SAGE_WHISPER_CHANCE;
+
+    public static final ModConfigSpec.DoubleValue RECOGNITION_MAXIMUM_EXTRA_EP;
 
     public static final ModConfigSpec.BooleanValue GRANTER_AWAKENING_ENABLED;
     public static final ModConfigSpec.DoubleValue GRANTER_AWAKENING_REQUIRED_EP;
@@ -222,6 +224,24 @@ public final class MoosTensuraConfig {
         SAGE_WHISPER_CHANCE = builder
                 .comment("Chance for a whisper to actually appear when the cooldown finishes. 1.0 = always, 0.5 = 50%.")
                 .defineInRange("chance", 0.75D, 0.0D, 1.0D);
+
+        builder.pop();
+
+        builder.push("recognition_rewards");
+
+        RECOGNITION_MAXIMUM_EXTRA_EP = builder
+                .comment(
+                        "Maximum additional EP-equivalent capacity Soul Recognition can grant from Identity Strength.",
+                        "The actual reward scales from 0 up to this value and is split evenly between maximum magicules and maximum aura.",
+                        "This value is frozen when a recognition ritual commits; changing it affects only future recognitions and new incarnations.",
+                        "Set this to 0 to disable the addon's additional capacity reward without changing Tensura's native HIGH endowment."
+                )
+                .defineInRange(
+                        "maximumExtraEp",
+                        1_000_000.0D,
+                        0.0D,
+                        Double.MAX_VALUE
+                );
 
         builder.pop();
 
@@ -408,6 +428,10 @@ public final class MoosTensuraConfig {
             migrateToVersion4();
         }
 
+        if (version < 5) {
+            migrateToVersion5();
+        }
+
         CONFIG_VERSION.set(
                 CURRENT_CONFIG_VERSION
         );
@@ -454,6 +478,21 @@ public final class MoosTensuraConfig {
         }
     }
 
+    private static void migrateToVersion5() {
+        /*
+         * NeoForge's config spec supplies the default when the new key is
+         * absent. Preserve every valid value a server owner may already have
+         * added manually and repair only an invalid value defensively.
+         */
+        double configuredMaximum =
+                RECOGNITION_MAXIMUM_EXTRA_EP.get();
+
+        if (!Double.isFinite(configuredMaximum)
+                || configuredMaximum < 0.0D) {
+            RECOGNITION_MAXIMUM_EXTRA_EP.set(1_000_000.0D);
+        }
+    }
+
     public static void resetToAddonDefaults() {
         CONFIG_VERSION.set(
                 CURRENT_CONFIG_VERSION
@@ -489,6 +528,8 @@ public final class MoosTensuraConfig {
         SAGE_WHISPER_MIN_INTERVAL_TICKS.set(2400);
         SAGE_WHISPER_RANDOM_INTERVAL_TICKS.set(2400);
         SAGE_WHISPER_CHANCE.set(0.75D);
+
+        RECOGNITION_MAXIMUM_EXTRA_EP.set(1_000_000.0D);
 
         GRANTER_AWAKENING_ENABLED.set(true);
         GRANTER_AWAKENING_REQUIRED_EP.set(200_000.0D);

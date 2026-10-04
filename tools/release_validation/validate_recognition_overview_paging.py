@@ -5,6 +5,7 @@ import sys
 
 root = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
 screen_path = root / "src/main/java/com/mooswqz/moostensuraaddon/client/screen/RecognitionProgressScreen.java"
+payload_path = root / "src/main/java/com/mooswqz/moostensuraaddon/network/OpenRecognitionProgressScreenPayload.java"
 lang_path = root / "src/main/resources/assets/moostensuraaddon/lang/en_us.json"
 
 errors = []
@@ -32,6 +33,13 @@ else:
                     )"""
     if old_pattern in screen:
         errors.append("Old misleading single-row indicator block is still present")
+
+if not payload_path.is_file():
+    errors.append(f"Missing {payload_path}")
+else:
+    payload = payload_path.read_text(encoding="utf-8")
+    if "MAX_GUIDANCE_ENTRIES = 12" not in payload:
+        errors.append("Overview payload cannot carry all eleven guidance cards")
 
 if not lang_path.is_file():
     errors.append(f"Missing {lang_path}")
@@ -78,4 +86,5 @@ print("[PASS] 2-row viewport at first position reports rows 1–2 of 3")
 print("[PASS] 2-row viewport at final position reports rows 2–3 of 3")
 print("[PASS] single-row viewport retains Row X of Y wording")
 print("[PASS] navigation math remains unchanged")
+print("[PASS] payload carries every Overview guidance card")
 print("[PASS] language JSON parses successfully")

@@ -39,7 +39,11 @@ public record OpenRecognitionProgressScreenPayload(
 
     private static final int MAX_TEXT_LENGTH = 256;
     private static final int MAX_PATH_ENTRIES = 9;
-    private static final int MAX_GUIDANCE_ENTRIES = 6;
+    /*
+     * The Overview currently publishes eleven cards. Keep one bounded spare
+     * slot so the codec does not silently discard the final five entries.
+     */
+    private static final int MAX_GUIDANCE_ENTRIES = 12;
 
     public static final CustomPacketPayload.Type<
             OpenRecognitionProgressScreenPayload

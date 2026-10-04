@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
 JAVA = ROOT / "src/main/java/com/mooswqz/moostensuraaddon"
 RESOURCES = ROOT / "src/main/resources"
-EXPECTED_VERSION = "1.4.0"
+EXPECTED_VERSION = "1.4.1"
 
 CHECKS: list[tuple[str, bool, str]] = []
 WARNINGS: list[str] = []
@@ -40,11 +40,11 @@ workflow = read(".github/workflows/build.yml")
 wrapper_properties = read("gradle/wrapper/gradle-wrapper.properties")
 
 expect(
-    "Gradle metadata is the RC1 candidate",
+    "Gradle metadata is the 1.4.1 candidate",
     property_value(gradle, "mod_version") == EXPECTED_VERSION,
 )
 expect(
-    "NeoForge metadata matches the RC1 candidate",
+    "NeoForge metadata matches the 1.4.1 candidate",
     f'version="{EXPECTED_VERSION}"' in mods_toml,
 )
 expect(
@@ -240,7 +240,7 @@ network = read(
 )
 expect(
     "Network protocol and core client/server payloads remain registered",
-    '.versioned("11")' in network
+    '.versioned("12")' in network
     and all(
         marker in network
         for marker in (
@@ -287,7 +287,7 @@ migration_v4_match = re.search(
 migration_v4 = migration_v4_match.group(1) if migration_v4_match else ""
 expect(
     "Great Sage altar uses the 60,000 EP release balance",
-    "CURRENT_CONFIG_VERSION = 4" in config
+    "CURRENT_CONFIG_VERSION = 5" in config
     and '.defineInRange("requiredEp", 60_000.0D' in config
     and "GREAT_SAGE_RITUAL_REQUIRED_EP.set(60_000.0D);" in config
     and "migrateToVersion4();" in config,
@@ -382,7 +382,7 @@ expect(
     ),
 )
 
-print("Release Hardening RC1 — Final Readiness Validation")
+print("Release Hardening 1.4.1 — Final Readiness Validation")
 print("================================================")
 
 failed = 0

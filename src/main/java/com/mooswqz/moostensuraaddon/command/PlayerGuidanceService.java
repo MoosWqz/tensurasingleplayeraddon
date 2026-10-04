@@ -5,6 +5,11 @@ import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
 import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
 import com.mooswqz.moostensuraaddon.debug.DebugModeService;
 import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionBalanceSnapshot;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionEvaluation;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionEvidenceBreakdown;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionNamingEligibility;
+import com.mooswqz.moostensuraaddon.recognition.RecognitionNamingService;
 import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
 import com.mooswqz.moostensuraaddon.util.GranterActions;
 import com.mooswqz.moostensuraaddon.util.GreatSageAwakeningHelper;
@@ -17,6 +22,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Builds a compact guide from the player's authoritative progression state.
@@ -140,6 +149,13 @@ public final class PlayerGuidanceService {
                 "message.moostensuraaddon.guide.link.paths.hover"
         );
 
+        sendCommandLink(
+                source,
+                "message.moostensuraaddon.guide.link.mastery",
+                "/moostensura guide mastery",
+                "message.moostensuraaddon.guide.link.mastery.hover"
+        );
+
         if (hasGranter || hasBenevolent || hasGovernance) {
             int grants = Math.max(
                     0,
@@ -172,6 +188,125 @@ public final class PlayerGuidanceService {
         return 1;
     }
 
+    /**
+     * Rebuilds the authoritative recognition snapshot and explains the live
+     * Mastery total source by source. The values therefore reflect the
+     * server's current recognition-balance datapack rather than duplicated
+     * documentation constants.
+     */
+    public static int sendMasteryGuide(
+            CommandSourceStack source,
+            ServerPlayer player
+    ) {
+        if (source == null || player == null) {
+            return 0;
+        }
+
+        RecognitionNamingEligibility eligibility =
+                RecognitionNamingService.evaluate(player);
+
+        RecognitionEvaluation evaluation =
+                eligibility.evaluation();
+
+        RecognitionEvidenceBreakdown.Dimension mastery =
+                RecognitionEvidenceBreakdown
+                        .calculate(
+                                player.getData(
+                                        AttachmentRegistry.RECOGNITION_DATA
+                                ),
+                                evaluation.getBalance()
+                        )
+                        .mastery();
+
+        double maximum = mastery.entries()
+                .stream()
+                .mapToDouble(
+                        RecognitionEvidenceBreakdown.Entry::maximum
+                )
+                .sum();
+
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.mastery.header",
+                ChatFormatting.AQUA,
+                true
+        );
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.mastery.role",
+                ChatFormatting.GRAY,
+                false
+        );
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.mastery.total",
+                ChatFormatting.GOLD,
+                true,
+                formatScore(mastery.total()),
+                formatScore(maximum)
+        );
+
+        for (RecognitionEvidenceBreakdown.Entry entry :
+                mastery.entries()) {
+
+            sendTranslatedLine(
+                    source,
+                    "message.moostensuraaddon.guide.mastery.component",
+                    ChatFormatting.YELLOW,
+                    false,
+                    entry.label(),
+                    entry.rawValue(),
+                    formatScore(entry.contribution()),
+                    formatScore(entry.maximum())
+            );
+        }
+
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.mastery.skills_not_total",
+                ChatFormatting.DARK_AQUA,
+                false
+        );
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.mastery.skill_tiers",
+                ChatFormatting.GRAY,
+                false,
+                buildSkillTierSummary(
+                        evaluation.getBalance().mastery()
+                )
+        );
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.mastery.skill_rules",
+                ChatFormatting.GRAY,
+                false
+        );
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.mastery.category_rules",
+                ChatFormatting.GRAY,
+                false
+        );
+        sendTranslatedLine(
+                source,
+                "message.moostensuraaddon.guide.mastery.identity_rule",
+                ChatFormatting.LIGHT_PURPLE,
+                false
+        );
+
+        if (eligibility.recognitionCommitted()) {
+            sendTranslatedLine(
+                    source,
+                    "message.moostensuraaddon.guide.mastery.committed",
+                    ChatFormatting.DARK_GRAY,
+                    false
+            );
+        }
+
+        return 1;
+    }
+
     public static int sendHelp(
             CommandSourceStack source
     ) {
@@ -194,6 +329,12 @@ public final class PlayerGuidanceService {
                 source,
                 "/moostensura guide",
                 "message.moostensuraaddon.help.guide",
+                ChatFormatting.AQUA
+        );
+        sendHelpLine(
+                source,
+                "/moostensura guide mastery",
+                "message.moostensuraaddon.help.mastery",
                 ChatFormatting.AQUA
         );
         sendHelpLine(
@@ -278,6 +419,99 @@ public final class PlayerGuidanceService {
                 && SkillAPI.getSkillsFrom(player)
                 .getSkill(skillId)
                 .isPresent();
+    }
+
+    private static String buildSkillTierSummary(
+            RecognitionBalanceSnapshot.Mastery mastery
+    ) {
+        if (mastery == null || mastery.skillTiers().isEmpty()) {
+            return "none";
+        }
+
+        List<String> tiers = new ArrayList<>();
+        int firstSkill = 1;
+
+        for (RecognitionBalanceSnapshot.SkillTier tier :
+                mastery.skillTiers()) {
+
+            int entries = Math.max(0, tier.entries());
+
+            if (entries <= 0) {
+                continue;
+            }
+
+            int lastSkill = firstSkill + entries - 1;
+
+            tiers.add(
+                    "#"
+                            + firstSkill
+                            + "–"
+                            + lastSkill
+                            + ": +"
+                            + formatScore(tier.pointsPerEntry())
+                            + " each"
+            );
+
+            firstSkill = lastSkill + 1;
+        }
+
+        if (tiers.isEmpty()) {
+            return "none";
+        }
+
+        return String.join("; ", tiers)
+                + "; after #"
+                + (firstSkill - 1)
+                + ": +0";
+    }
+
+    private static String formatScore(
+            double value
+    ) {
+        double safeValue = Double.isFinite(value)
+                ? Math.max(0.0D, value)
+                : 0.0D;
+
+        if (Math.abs(safeValue - Math.rint(safeValue))
+                < 0.000_001D) {
+            return String.format(
+                    Locale.US,
+                    "%.0f",
+                    safeValue
+            );
+        }
+
+        return String.format(
+                        Locale.US,
+                        "%.2f",
+                        safeValue
+                )
+                .replaceAll("0+$", "")
+                .replaceAll("\\.$", "");
+    }
+
+    private static void sendTranslatedLine(
+            CommandSourceStack source,
+            String translationKey,
+            ChatFormatting color,
+            boolean bold,
+            Object... arguments
+    ) {
+        MutableComponent line = Component.translatable(
+                translationKey,
+                arguments
+        );
+
+        if (bold) {
+            line.withStyle(
+                    color,
+                    ChatFormatting.BOLD
+            );
+        } else {
+            line.withStyle(color);
+        }
+
+        source.sendSuccess(() -> line, false);
     }
 
     private static void sendCommandLink(

@@ -48,6 +48,12 @@ public final class MoosTensuraCommand {
                                                                 context.getSource()
                                                         ))
                                         )
+                                        .then(
+                                                Commands.literal("mastery")
+                                                        .executes(context -> sendMasteryGuide(
+                                                                context.getSource()
+                                                        ))
+                                        )
                         )
 
                         .then(
@@ -504,6 +510,15 @@ public final class MoosTensuraCommand {
         );
 
         return 1;
+    }
+
+    private static int sendMasteryGuide(
+            CommandSourceStack source
+    ) throws CommandSyntaxException {
+        return PlayerGuidanceService.sendMasteryGuide(
+                source,
+                source.getPlayerOrException()
+        );
     }
 
     private static void sendTranslatedLine(

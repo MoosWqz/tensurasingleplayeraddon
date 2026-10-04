@@ -138,6 +138,22 @@ public final class RecognitionStrengthRewardValidationHarness {
                 RecognitionEndowmentEffortRewardFormula
                         .calculateDefault(40.0D);
 
+        RecognitionEndowmentEffortRewardFormula.Reward
+                configuredEndowment =
+                RecognitionEndowmentEffortRewardFormula.calculate(
+                        40.0D,
+                        40.0D,
+                        250_000.0D
+                );
+
+        RecognitionEndowmentEffortRewardFormula.Reward
+                disabledEndowment =
+                RecognitionEndowmentEffortRewardFormula.calculate(
+                        40.0D,
+                        40.0D,
+                        0.0D
+                );
+
         add(checks, "Zero Identity Strength adds no endowment capacity",
                 approximately(
                         minimumEndowment.extraEpAllowance(),
@@ -166,6 +182,61 @@ public final class RecognitionStrengthRewardValidationHarness {
                         500_000.0D
                 ),
                 format(maximumEndowment.energyIncreasePerPool()));
+
+        add(checks, "Configured endowment maximum controls the reward ceiling",
+                approximately(
+                        configuredEndowment.extraEpAllowance(),
+                        250_000.0D
+                ) && approximately(
+                        configuredEndowment.energyIncreasePerPool(),
+                        125_000.0D
+                ),
+                format(configuredEndowment.extraEpAllowance()));
+
+        add(checks, "A zero configured maximum disables extra capacity",
+                approximately(
+                        disabledEndowment.extraEpAllowance(),
+                        0.0D
+                ) && approximately(
+                        disabledEndowment.energyIncreasePerPool(),
+                        0.0D
+                ),
+                format(disabledEndowment.extraEpAllowance()));
+
+        add(checks, "Legacy saves retain the original endowment maximum",
+                approximately(
+                        RecognitionEndowmentEffortRewardFormula
+                                .resolveFrozenMaximumExtraEp(
+                                        false,
+                                        0.0D
+                                ),
+                        RecognitionEndowmentEffortRewardFormula
+                                .DEFAULT_MAXIMUM_EXTRA_EP
+                ),
+                format(
+                        RecognitionEndowmentEffortRewardFormula
+                                .resolveFrozenMaximumExtraEp(
+                                        false,
+                                        0.0D
+                                )
+                ));
+
+        add(checks, "An explicitly frozen zero maximum remains disabled",
+                approximately(
+                        RecognitionEndowmentEffortRewardFormula
+                                .resolveFrozenMaximumExtraEp(
+                                        true,
+                                        0.0D
+                                ),
+                        0.0D
+                ),
+                format(
+                        RecognitionEndowmentEffortRewardFormula
+                                .resolveFrozenMaximumExtraEp(
+                                        true,
+                                        0.0D
+                                )
+                ));
 
         add(checks, "Endowment effort formula is alignment-neutral",
                 RecognitionEndowmentEffortRewardFormula.class

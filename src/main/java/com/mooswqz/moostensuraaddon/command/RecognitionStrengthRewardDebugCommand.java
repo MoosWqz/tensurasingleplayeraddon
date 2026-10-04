@@ -76,6 +76,8 @@ public final class RecognitionStrengthRewardDebugCommand {
         sendValue(source, "Knockback resistance",
                 "+" + formatPercent(snapshot.expectedReward().knockbackResistanceAddition()));
         sendValue(source, "Attribute state matches", yesNo(snapshot.attributeStateMatches()));
+        sendValue(source, "Frozen endowment maximum",
+                formatWhole(endowment.expectedReward().maximumExtraEp()) + " EP");
         sendValue(source, "Endowment effort extension",
                 formatWhole(endowment.expectedReward().extraEpAllowance()) + " EP");
         sendValue(source, "Magicule / aura capacity",

@@ -282,13 +282,27 @@ public final class RecognitionEndowmentEffortRewardService {
     rewardFromStoredData(
             RecognitionData data
     ) {
+        double maximumExtraEp =
+                RecognitionEndowmentEffortRewardFormula
+                        .resolveFrozenMaximumExtraEp(
+                                data.getFlag(
+                                        RecognitionStatKeys
+                                                .ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED
+                                ),
+                                data.getMeasurement(
+                                        RecognitionStatKeys
+                                                .ENDOWMENT_MAXIMUM_EXTRA_EP_AT_COMMIT
+                                )
+                        );
+
         return RecognitionEndowmentEffortRewardFormula.calculate(
                 data.getMeasurement(
                         RecognitionStatKeys.IDENTITY_STRENGTH_AT_COMMIT
                 ),
                 data.getMeasurement(
                         RecognitionStatKeys.IDENTITY_STRENGTH_MAXIMUM_AT_COMMIT
-                )
+                ),
+                maximumExtraEp
         );
     }
 
@@ -584,6 +598,7 @@ public final class RecognitionEndowmentEffortRewardService {
     private static RecognitionEndowmentEffortRewardFormula.Reward
     zeroReward() {
         return new RecognitionEndowmentEffortRewardFormula.Reward(
+                0.0D,
                 0.0D,
                 0.0D,
                 0.0D,

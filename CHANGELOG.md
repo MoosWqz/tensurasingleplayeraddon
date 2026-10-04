@@ -1,6 +1,32 @@
 # Changelog
 
-## 1.4.0-rc1 — Soul Recognition Update
+## 1.4.1 — Server Balance and Guidance
+
+### Added
+
+- Added `recognition_rewards.maximumExtraEp` so server owners can configure
+  the additional Soul Recognition capacity ceiling. The selected value is
+  frozen with each new recognition and does not rewrite existing rewards.
+- Added `/moostensura guide mastery`, which recalculates the player's live
+  recognition state and shows every Mastery source, its current contribution,
+  the active server skill tiers, and the relationship between Mastery,
+  Identity Strength, and recognition paths.
+
+### Changed
+
+- The Mastery card now names all four contributing sources and measures
+  progress against the complete active-server maximum instead of a fixed
+  display value.
+- Player guidance now states explicitly that mastered skills are only one
+  part of Mastery and cannot fill the complete meter by themselves.
+- Shortened the Mastery Overview description so its complete guidance command
+  remains readable on compact GUI layouts.
+- The Soul Recognition Overview now carries all eleven guidance cards instead
+  of silently dropping the final five at the network boundary.
+- Network protocol advanced to `12` so 1.4.1 client/server mismatches are
+  rejected cleanly after the expanded guidance payload.
+
+## 1.4.0 — Soul Recognition Update
 
 ### Added
 
@@ -100,8 +126,8 @@
 ### Release Notes
 
 - Network protocol remains `11`.
-- Runtime/mod metadata is `1.4.0-rc1`, the first release candidate for the
-  Soul Recognition Update.
+- Runtime/mod metadata is `1.4.0`, the first stable release of the Soul
+  Recognition Update.
 
 ## 1.3.1
 

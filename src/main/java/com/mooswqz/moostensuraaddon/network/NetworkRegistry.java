@@ -15,7 +15,7 @@ public final class NetworkRegistry {
         PayloadRegistrar registrar = event.registrar(
                         MoosTensuraAddon.MODID
                 )
-                .versioned("11");
+                .versioned("12");
 
         registrar.playToServer(
                 SelectSkillPayload.TYPE,

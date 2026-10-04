@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
-EXPECTED_HARDENING_VERSION = "1.4.0"
+EXPECTED_HARDENING_VERSION = "1.4.1"
 
 FAILURES: list[str] = []
 WARNINGS: list[str] = []
@@ -199,15 +199,15 @@ if not network_candidates:
     WARNINGS.append("NetworkRegistry.java not found; protocol version not checked")
 else:
     network_text = network_candidates[0].read_text(encoding="utf-8")
-    protocol_11 = bool(
-        re.search(r'versioned\s*\(\s*"11"\s*\)', network_text)
-        or re.search(r'PROTOCOL(?:_VERSION)?\s*=\s*"11"', network_text)
-        or re.search(r'PROTOCOL(?:_VERSION)?\s*=\s*11\b', network_text)
+    protocol_12 = bool(
+        re.search(r'versioned\s*\(\s*"12"\s*\)', network_text)
+        or re.search(r'PROTOCOL(?:_VERSION)?\s*=\s*"12"', network_text)
+        or re.search(r'PROTOCOL(?:_VERSION)?\s*=\s*12\b', network_text)
     )
-    if protocol_11:
-        PASSES.append("Network protocol 11 detected")
+    if protocol_12:
+        PASSES.append("Network protocol 12 detected")
     else:
-        WARNINGS.append(f"Could not prove protocol 11 from {rel(network_candidates[0])}")
+        WARNINGS.append(f"Could not prove protocol 12 from {rel(network_candidates[0])}")
 
 version_literal = re.compile(r"\b1\.4\.0b(?:\d+)?\b")
 for path, text in production_files:

@@ -41,12 +41,62 @@ Recognition grants:
 - An effort-scaled extension to Tensura's native HIGH endowment capacity.
   Tensura's own 900% calculation and 1,000,000 EP cap remain untouched; Soul
   Recognition can add 0–1,000,000 more EP capacity from the same frozen effort
-  snapshot, split evenly between maximum magicules and aura.
+  snapshot by default, split evenly between maximum magicules and aura. Server
+  owners can change this additional ceiling with
+  `recognition_rewards.maximumExtraEp`; the configured value is frozen when
+  the ritual commits.
 - A curated title and synchronized display identity.
 - Continued access to the addon's recognition-dependent progression.
 
 The capacity reward is applied once. Reconciliation can repair a missing
 modifier, but it does not periodically refill spent magicules or aura.
+
+### Server reward configuration
+
+NeoForge writes the base server configuration to
+`config/moostensuraaddon-server.toml`. In a development client this is
+`run/client/config/moostensuraaddon-server.toml`; on a dedicated server it is
+`<server>/config/moostensuraaddon-server.toml`. A world can optionally override
+the base file through `saves/<world>/serverconfig` in singleplayer or
+`<server>/world/serverconfig` on a dedicated server. Stop the world or server
+before editing the active file, then change:
+
+```toml
+[recognition_rewards]
+maximumExtraEp = 1000000.0
+```
+
+This is the maximum additional EP-equivalent capacity the addon can grant.
+The actual reward still scales with the player's frozen recognition effort and
+is split evenly between maximum magicules and maximum aura. `0` disables this
+addon reward without changing Tensura's native HIGH endowment. A change affects
+only recognitions committed afterward; it does not rewrite existing rewards.
+
+### What contributes to Mastery
+
+Mastery is an input to **Identity Strength**, not a tenth recognition path. It
+cannot replace the Good/Evil and Lawful/Chaotic evidence needed to establish a
+path. It strengthens the identity resonance around paths the player's actions
+already support.
+
+With the default recognition balance, Mastery has four sources:
+
+- Non-intrinsic learned skills that Tensura currently reports as mastered:
+  up to 40 points. The first 5 grant 2 each, skills 6–8 grant 3 each, skills
+  9–12 grant 2 each, skills 13–20 grant 1 each, and skills 21–40 grant 0.25
+  each. Further skills add no skill-count points.
+- Mastered skill-category variety: 4 points each, up to 16. The recognized
+  categories are Unique, Extra, Basic/Common, and Resistance; Other does not
+  add category-variety points.
+- Highest EP reached during the incarnation: 2.5 points per 100,000 EP, up to
+  20 points at 800,000 EP.
+- Distinct major-enemy types defeated: 2 points each, up to 20 points across
+  10 types.
+
+The total default maximum is 96 points, which is why mastering more skills
+alone cannot fill the complete Mastery meter. Run
+`/moostensura guide mastery` for a live breakdown using the server's active
+recognition balance.
 
 ## Great Crystal Shrines and the Soul Resonator
 
@@ -107,6 +157,7 @@ The supported player-facing command surface is:
 
 - `/moostensura`
 - `/moostensura guide`
+- `/moostensura guide mastery`
 - `/moostensura paths`
 - `/moostensura help`
 

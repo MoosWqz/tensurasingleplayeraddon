@@ -125,6 +125,9 @@ public final class RecognitionStatKeys {
     public static final String RECOGNITION_STRENGTH_REWARD =
             "recognition_strength_reward";
 
+    public static final String ENDOWMENT_MAXIMUM_EXTRA_EP_AT_COMMIT =
+            "endowment_maximum_extra_ep_at_commit";
+
     /*
      * Lazy contradiction-history momentum and historical peaks
      */
@@ -177,6 +180,9 @@ public final class RecognitionStatKeys {
 
     public static final String RECOGNITION_REWARD_INITIALIZED =
             "recognition_reward_initialized";
+
+    public static final String ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED =
+            "endowment_reward_snapshot_initialized";
 
     /*
      * String values

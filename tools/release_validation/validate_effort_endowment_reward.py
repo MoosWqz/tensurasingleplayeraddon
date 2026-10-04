@@ -29,6 +29,8 @@ def require(text: str, marker: str, label: str) -> None:
 formula = read("recognition/RecognitionEndowmentEffortRewardFormula.java")
 service = read("recognition/RecognitionEndowmentEffortRewardService.java")
 strength = read("recognition/RecognitionStrengthRewardService.java")
+config = read("config/MoosTensuraConfig.java")
+stat_keys = read("recognition/RecognitionStatKeys.java")
 native = read("lifecycle/RecognitionNativeEndowmentService.java")
 incarnation = read("lifecycle/AddonIncarnationState.java")
 unname = read("recognition/RecognitionUnnameService.java")
@@ -39,7 +41,10 @@ debug = read("command/RecognitionStrengthRewardDebugCommand.java")
 root_command = read("command/MoosTensuraCommand.java")
 
 if formula:
-    require(formula, "1_000_000.0D", "Maximum extra EP allowance is exactly 1,000,000")
+    require(formula, "DEFAULT_MAXIMUM_EXTRA_EP", "Legacy/default maximum extra EP allowance remains stable")
+    require(formula, "double maximumExtraEp", "Effort formula accepts a server-configured maximum")
+    require(formula, "sanitizeMaximumExtraEp", "Configured maximum is sanitized")
+    require(formula, "resolveFrozenMaximumExtraEp", "Legacy and explicit-zero reward snapshots resolve separately")
     require(formula, "extraEp / 2.0D", "Extra capacity is split evenly between magicules and aura")
     require(formula, "identityStrength", "Effort formula derives from frozen Identity Strength")
     if (
@@ -64,6 +69,9 @@ if service:
     ):
         require(service, marker, label)
 
+    require(service, "ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED", "Reconciliation distinguishes frozen zero from legacy missing data")
+    require(service, "ENDOWMENT_MAXIMUM_EXTRA_EP_AT_COMMIT", "Reconciliation uses the frozen configured maximum")
+
     if "setMagicule(maximumMagicule.getValue())" in service or "setAura(maximumAura.getValue())" in service:
         FAILURES.append("A synchronization path refills an energy pool directly to maximum")
     else:
@@ -72,6 +80,19 @@ if service:
 if strength:
     require(strength, "RecognitionEndowmentEffortRewardService.reconcile", "Normal reward synchronization repairs effort capacity")
     require(strength, "RecognitionEndowmentEffortRewardService", "Normal reward cleanup removes effort modifiers")
+    require(strength, "RECOGNITION_MAXIMUM_EXTRA_EP", "New commitments snapshot the server-configured maximum")
+    require(strength, "ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED", "New commitments mark the endowment snapshot initialized")
+
+if config:
+    require(config, 'builder.push("recognition_rewards")', "Server config has a recognition reward section")
+    require(config, '"maximumExtraEp"', "Server config exposes the maximum extra EP reward")
+    require(config, "migrateToVersion5", "Config schema migration includes the recognition reward setting")
+    require(config, "configuredMaximum < 0.0D", "Migration preserves valid custom reward ceilings")
+    require(config, "RECOGNITION_MAXIMUM_EXTRA_EP.set(1_000_000.0D)", "Config reset restores the release default")
+
+if stat_keys:
+    require(stat_keys, "ENDOWMENT_MAXIMUM_EXTRA_EP_AT_COMMIT", "Frozen maximum has a stable recognition-data key")
+    require(stat_keys, "ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED", "Frozen maximum has an initialization marker")
 
 if native:
     require(native, "RecognitionEndowmentEffortRewardService.reconcile", "Native endowment applies the extension after naming")
@@ -104,6 +125,7 @@ if getnamed:
         PASSES.append("/getnamed remains native-only and cannot grant the effort extension")
 
 if debug:
+    require(debug, '"Frozen endowment maximum"', "Debug strength output reports the frozen configured ceiling")
     require(debug, '"Endowment attributes match"', "Debug strength output reports effort modifier state")
 
 print("Soul Recognition — Effort-Scaled Native Endowment Validation")

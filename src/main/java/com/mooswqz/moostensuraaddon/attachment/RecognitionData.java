@@ -1198,6 +1198,9 @@ public class RecognitionData {
         measurements.remove(
                 RecognitionStatKeys.RECOGNITION_STRENGTH_REWARD
         );
+        measurements.remove(
+                RecognitionStatKeys.ENDOWMENT_MAXIMUM_EXTRA_EP_AT_COMMIT
+        );
 
         flags.remove(
                 RecognitionStatKeys.NAMING_COMMITTED
@@ -1210,6 +1213,9 @@ public class RecognitionData {
         );
         flags.remove(
                 RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED
+        );
+        flags.remove(
+                RecognitionStatKeys.ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED
         );
 
         strings.remove(
