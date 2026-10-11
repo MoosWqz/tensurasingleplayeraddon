@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PlayerGuidancePolicy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: PlayerGuidancePolicy (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PlayerGuidancePolicy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PlayerGuidancePolicy$Stage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;/**
+&nbsp; * Pure progression-stage selection for the player-facing guide.
+&nbsp; */
+&nbsp;public final class PlayerGuidancePolicy {
+&nbsp;
+&nbsp;    private PlayerGuidancePolicy() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Stage resolve(
+&nbsp;            boolean resetGuardActive,
+&nbsp;            boolean namedOrRecognized,
+&nbsp;            boolean hasSage,
+&nbsp;            boolean hasGreatSage,
+&nbsp;            boolean hasGranter,
+&nbsp;            boolean hasBenevolentEmpowerment,
+&nbsp;            boolean hasAbsoluteGovernance
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (resetGuardActive) {</b>
+<b class="nc">&nbsp;            return Stage.INCARNATION_REBUILDING;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (hasAbsoluteGovernance) {</b>
+<b class="nc">&nbsp;            return Stage.ABSOLUTE_GOVERNANCE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (hasBenevolentEmpowerment) {</b>
+<b class="nc">&nbsp;            return Stage.BENEVOLENT_EMPOWERMENT;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (hasGranter) {</b>
+<b class="nc">&nbsp;            return Stage.EVOLVE_AUTHORITY;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!namedOrRecognized) {</b>
+<b class="nc">&nbsp;            return Stage.FORM_IDENTITY;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (hasGreatSage) {</b>
+<b class="nc">&nbsp;            return Stage.AWAKEN_GRANTER;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (hasSage) {</b>
+<b class="nc">&nbsp;            return Stage.AWAKEN_GREAT_SAGE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Stage.SEEK_SAGE;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum Stage {</b>
+<b class="nc">&nbsp;        INCARNATION_REBUILDING(&quot;incarnation_rebuilding&quot;),</b>
+<b class="nc">&nbsp;        FORM_IDENTITY(&quot;form_identity&quot;),</b>
+<b class="nc">&nbsp;        SEEK_SAGE(&quot;seek_sage&quot;),</b>
+<b class="nc">&nbsp;        AWAKEN_GREAT_SAGE(&quot;awaken_great_sage&quot;),</b>
+<b class="nc">&nbsp;        AWAKEN_GRANTER(&quot;awaken_granter&quot;),</b>
+<b class="nc">&nbsp;        EVOLVE_AUTHORITY(&quot;evolve_authority&quot;),</b>
+<b class="nc">&nbsp;        BENEVOLENT_EMPOWERMENT(&quot;benevolent_empowerment&quot;),</b>
+<b class="nc">&nbsp;        ABSOLUTE_GOVERNANCE(&quot;absolute_governance&quot;);</b>
+&nbsp;
+&nbsp;        private final String id;
+&nbsp;
+<b class="nc">&nbsp;        Stage(String id) {</b>
+<b class="nc">&nbsp;            this.id = id;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String id() {
+<b class="nc">&nbsp;            return id;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,6 +1,5 @@
 package com.mooswqz.moostensuraaddon.ritual;
 
-import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
 import com.mooswqz.moostensuraaddon.util.GreatSageAwakeningHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -69,10 +68,10 @@ public final class GreatCrystalAltarInteractionRouter {
         }
 
         /*
-         * When Sage is still present, its Great Sage evolution is the first
-         * altar milestone. Soul Recognition follows on a later interaction.
-         * Disabling either Great Sage progression or its altar ritual leaves
-         * Soul Recognition available instead of deadlocking the altar.
+         * When Sage is still present and every Great Sage ritual requirement
+         * is met, its evolution is the first altar milestone. If the ritual
+         * cannot currently begin, Soul Recognition remains available instead
+         * of being blocked by an ineligible Great Sage attempt.
          */
         if (shouldPrioritizeGreatSage(player)) {
             GreatSageRitualManager.tryStartRitual(
@@ -112,10 +111,10 @@ public final class GreatCrystalAltarInteractionRouter {
     private static boolean shouldPrioritizeGreatSage(
             ServerPlayer player
     ) {
-        return MoosTensuraConfig.SAGE_UPGRADE_ENABLED.get()
-                && MoosTensuraConfig.GREAT_SAGE_RITUAL_ENABLED.get()
-                && !GreatSageAwakeningHelper.hasGreatSage(player)
-                && GreatSageAwakeningHelper.findSage(player)
-                .isPresent();
+        return GreatSageAwakeningHelper.findSage(player)
+                .isPresent()
+                && GreatSageAwakeningHelper
+                .checkAltarRequirements(player)
+                .successful();
     }
 }

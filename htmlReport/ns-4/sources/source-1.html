@@ -1,0 +1,195 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ClientItemPropertyEvents</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client</a>
+</div>
+
+<h1>Coverage Summary for Class: ClientItemPropertyEvents (com.mooswqz.moostensuraaddon.client)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClientItemPropertyEvents</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.4%
+  </span>
+  <span class="absValue">
+    (4/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.item.ItemRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.item.SoulResonatorItem;
+&nbsp;import net.minecraft.client.multiplayer.ClientLevel;
+&nbsp;import net.minecraft.client.renderer.item.ItemProperties;
+&nbsp;import net.minecraft.core.GlobalPos;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.util.Mth;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;import net.minecraft.world.item.ItemStack;
+&nbsp;import net.minecraft.world.level.Level;
+&nbsp;import net.neoforged.bus.api.IEventBus;
+&nbsp;import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+&nbsp;
+&nbsp;public final class ClientItemPropertyEvents {
+&nbsp;    private ClientItemPropertyEvents() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void register(IEventBus modEventBus) {
+<b class="fc">&nbsp;        modEventBus.addListener(ClientItemPropertyEvents::onClientSetup);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void onClientSetup(FMLClientSetupEvent event) {
+<b class="fc">&nbsp;        event.enqueueWork(() -&gt; ItemProperties.register(</b>
+<b class="fc">&nbsp;                ItemRegistry.SOUL_RESONATOR.get(),</b>
+<b class="fc">&nbsp;                ResourceLocation.withDefaultNamespace(&quot;angle&quot;),</b>
+&nbsp;                ClientItemPropertyEvents::getSoulResonatorAngle
+&nbsp;        ));
+&nbsp;    }
+&nbsp;
+&nbsp;    private static float getSoulResonatorAngle(ItemStack stack, ClientLevel clientLevel, LivingEntity entity, int seed) {
+<b class="nc">&nbsp;        if (entity == null) {</b>
+<b class="nc">&nbsp;            return 0.0F;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Level level = clientLevel != null ? clientLevel : entity.level();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (level == null) {</b>
+<b class="nc">&nbsp;            return 0.0F;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        GlobalPos target = SoulResonatorItem.getCompassTarget(level, stack, entity);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (target == null) {</b>
+<b class="nc">&nbsp;            return 0.0F;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!target.dimension().equals(level.dimension())) {</b>
+<b class="nc">&nbsp;            return 0.0F;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double targetX = target.pos().getX() + 0.5D;</b>
+<b class="nc">&nbsp;        double targetZ = target.pos().getZ() + 0.5D;</b>
+&nbsp;
+<b class="nc">&nbsp;        double deltaX = targetX - entity.getX();</b>
+<b class="nc">&nbsp;        double deltaZ = targetZ - entity.getZ();</b>
+&nbsp;
+<b class="nc">&nbsp;        double horizontalDistanceSqr = deltaX * deltaX + deltaZ * deltaZ;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (horizontalDistanceSqr &lt; 0.25D) {</b>
+<b class="nc">&nbsp;            return 0.0F;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double targetAngle = Math.atan2(deltaZ, deltaX) / (Math.PI * 2.0D);</b>
+<b class="nc">&nbsp;        double playerAngle = Mth.positiveModulo(entity.getYRot() / 360.0D, 1.0D);</b>
+&nbsp;
+<b class="nc">&nbsp;        double compassAngle = 0.5D - (playerAngle - 0.25D - targetAngle);</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * The Soul Resonator textures are compass-frame based, but the needle
+&nbsp;         * currently points away from the shrine with the raw compass angle.
+&nbsp;         * Adding 0.5 rotates the result by 180 degrees.
+&nbsp;         */
+<b class="nc">&nbsp;        compassAngle += 0.5D;</b>
+&nbsp;
+<b class="nc">&nbsp;        return Mth.positiveModulo((float) compassAngle, 1.0F);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

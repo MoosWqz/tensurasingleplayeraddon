@@ -1,0 +1,800 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionCommittedResultCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionCommittedResultCommand (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionCommittedResultCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    5%
+  </span>
+  <span class="absValue">
+    (1/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/87)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.9%
+  </span>
+  <span class="absValue">
+    (7/244)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionCommittedResultCommand$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    4.8%
+  </span>
+  <span class="absValue">
+    (1/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/87)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.9%
+  </span>
+  <span class="absValue">
+    (7/245)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCommitRecord;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCommittedResult;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionPath;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.commands.Commands;
+&nbsp;import net.minecraft.commands.arguments.EntityArgument;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.time.DateTimeException;
+&nbsp;import java.time.Instant;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;/**
+&nbsp; * Read-only debug inspector for the recognition result frozen into player data.
+&nbsp; *
+&nbsp; * &lt;p&gt;This command deliberately does not synchronize live Tensura state, run
+&nbsp; * recognition evaluation, invoke naming eligibility, perform migration, repair
+&nbsp; * metadata, or write any attachment value. It only asks RecognitionData for an
+&nbsp; * immutable diagnostic snapshot and renders that snapshot to the command
+&nbsp; * source.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionCommittedResultCommand {
+&nbsp;
+&nbsp;    private RecognitionCommittedResultCommand() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates the canonical debug branch:
+&nbsp;     *
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * /moostensura debug committed
+&nbsp;     * /moostensura debug committed &amp;lt;player&amp;gt;
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     */
+&nbsp;    public static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createDebugNode() {
+<b class="fc">&nbsp;        return Commands.literal(&quot;committed&quot;)</b>
+<b class="fc">&nbsp;                .requires(</b>
+&nbsp;                        DebugModeService
+&nbsp;                                ::canUseDebugTools
+&nbsp;                )
+<b class="fc">&nbsp;                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                        context.getSource(),</b>
+<b class="nc">&nbsp;                        context.getSource()</b>
+<b class="nc">&nbsp;                                .getPlayerOrException()</b>
+&nbsp;                ))
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.argument(</b>
+&nbsp;                                        &quot;player&quot;,
+<b class="fc">&nbsp;                                        EntityArgument.player()</b>
+&nbsp;                                )
+<b class="fc">&nbsp;                                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                                        context.getSource(),</b>
+<b class="nc">&nbsp;                                        EntityArgument.getPlayer(</b>
+&nbsp;                                                context,
+&nbsp;                                                &quot;player&quot;
+&nbsp;                                        )
+&nbsp;                                ))
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int inspect(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer target
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data =</b>
+<b class="nc">&nbsp;                target.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * getCommittedResult() is a read-only snapshot operation. Do not add
+&nbsp;         * synchronize(), evaluate(), completeCommittedPlayerMetadata(), or any
+&nbsp;         * repair call here; this command is intended to prove what is already
+&nbsp;         * stored, not to improve it while it is being inspected.
+&nbsp;         */
+<b class="nc">&nbsp;        RecognitionCommittedResult result =</b>
+<b class="nc">&nbsp;                data.getCommittedResult();</b>
+&nbsp;
+<b class="nc">&nbsp;        String accountName =</b>
+<b class="nc">&nbsp;                target.getGameProfile()</b>
+<b class="nc">&nbsp;                        .getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Committed Recognition Record: &quot;
+&nbsp;                        + accountName,
+&nbsp;                ChatFormatting.LIGHT_PURPLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Read-only inspection. No recognition data was synchronized, migrated, repaired, or recalculated.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.DARK_GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Record state&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Committed&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        result.committed()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                result.committed()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.GRAY</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Valid frozen result&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        result.valid()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                result.valid()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : result.committed()</b>
+<b class="nc">&nbsp;                          ? ChatFormatting.RED</b>
+<b class="nc">&nbsp;                          : ChatFormatting.GRAY</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCommittedResult.MigrationState migrationState =</b>
+<b class="nc">&nbsp;                result.migrationState();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Migration state&quot;,
+<b class="nc">&nbsp;                migrationState.displayName(),</b>
+<b class="nc">&nbsp;                migrationColor(</b>
+&nbsp;                        migrationState
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Reveal pending&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        data.isRevealPending()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                data.isRevealPending()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.YELLOW</b>
+<b class="nc">&nbsp;                        : ChatFormatting.GRAY</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Stored versions&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendVersion(</b>
+&nbsp;                source,
+&nbsp;                &quot;Data schema&quot;,
+<b class="nc">&nbsp;                result.dataVersion(),</b>
+&nbsp;                RecognitionData.CURRENT_DATA_VERSION
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendVersion(</b>
+&nbsp;                source,
+&nbsp;                &quot;Result format&quot;,
+<b class="nc">&nbsp;                result.resultVersion(),</b>
+&nbsp;                RecognitionCommitRecord
+&nbsp;                        .CURRENT_RESULT_VERSION
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendVersion(</b>
+&nbsp;                source,
+&nbsp;                &quot;Recognition rules&quot;,
+<b class="nc">&nbsp;                result.rulesVersion(),</b>
+&nbsp;                RecognitionCommitRecord
+&nbsp;                        .CURRENT_RULES_VERSION
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendVersion(</b>
+&nbsp;                source,
+&nbsp;                &quot;Reward profile&quot;,
+<b class="nc">&nbsp;                result.rewardProfileVersion(),</b>
+&nbsp;                RecognitionCommitRecord
+&nbsp;                        .CURRENT_REWARD_PROFILE_VERSION
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Frozen paths&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Path summary&quot;,
+<b class="nc">&nbsp;                result.pathSummary(),</b>
+<b class="nc">&nbsp;                result.committed()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.AQUA</b>
+<b class="nc">&nbsp;                        : ChatFormatting.GRAY</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Raw primary path ID&quot;,
+<b class="nc">&nbsp;                displayStoredText(</b>
+<b class="nc">&nbsp;                        result.primaryPathId()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                pathIdColor(</b>
+<b class="nc">&nbsp;                        result.primaryPathId(),</b>
+<b class="nc">&nbsp;                        result.committed()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Resolved primary path&quot;,
+<b class="nc">&nbsp;                resolvedPath(</b>
+<b class="nc">&nbsp;                        result.primaryPathId()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                resolvedPathColor(</b>
+<b class="nc">&nbsp;                        result.primaryPathId(),</b>
+<b class="nc">&nbsp;                        result.committed()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Raw secondary path ID&quot;,
+<b class="nc">&nbsp;                displayStoredText(</b>
+<b class="nc">&nbsp;                        result.secondaryPathId()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                pathIdColor(</b>
+<b class="nc">&nbsp;                        result.secondaryPathId(),</b>
+<b class="nc">&nbsp;                        !result.pure()</b>
+<b class="nc">&nbsp;                                &amp;&amp; result.committed()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Resolved secondary path&quot;,
+<b class="nc">&nbsp;                resolvedPath(</b>
+<b class="nc">&nbsp;                        result.secondaryPathId()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                resolvedPathColor(</b>
+<b class="nc">&nbsp;                        result.secondaryPathId(),</b>
+<b class="nc">&nbsp;                        !result.pure()</b>
+<b class="nc">&nbsp;                                &amp;&amp; result.committed()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Pure recognition&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        result.pure()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                result.pure()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.LIGHT_PURPLE</b>
+<b class="nc">&nbsp;                        : ChatFormatting.WHITE</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Contradiction modifier&quot;,
+<b class="nc">&nbsp;                displayStoredText(</b>
+<b class="nc">&nbsp;                        result.contradictionModifier()</b>
+&nbsp;                ),
+&nbsp;                RecognitionCommitRecord.NO_CONTRADICTION
+<b class="nc">&nbsp;                        .equals(</b>
+<b class="nc">&nbsp;                                result.contradictionModifier()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        ? ChatFormatting.GRAY</b>
+<b class="nc">&nbsp;                        : ChatFormatting.LIGHT_PURPLE</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Frozen identity&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Bestowed title&quot;,
+<b class="nc">&nbsp;                displayStoredText(</b>
+<b class="nc">&nbsp;                        result.bestowedTitle()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                result.bestowedTitle().isBlank()</b>
+<b class="nc">&nbsp;                        &amp;&amp; result.committed()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.RED</b>
+<b class="nc">&nbsp;                        : ChatFormatting.WHITE</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Frozen display name&quot;,
+<b class="nc">&nbsp;                displayStoredText(</b>
+<b class="nc">&nbsp;                        result.frozenDisplayName()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                result.frozenDisplayName().isBlank()</b>
+<b class="nc">&nbsp;                        &amp;&amp; result.committed()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.YELLOW</b>
+<b class="nc">&nbsp;                        : ChatFormatting.WHITE</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Primary score at commitment&quot;,
+<b class="nc">&nbsp;                formatScore(</b>
+<b class="nc">&nbsp;                        result.primaryScore()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Secondary score at commitment&quot;,
+<b class="nc">&nbsp;                result.pure()</b>
+<b class="nc">&nbsp;                        ? &quot;0.0 (Pure result)&quot;</b>
+<b class="nc">&nbsp;                        : formatScore(</b>
+<b class="nc">&nbsp;                        result.secondaryScore()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Commit provenance&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Balance source&quot;,
+<b class="nc">&nbsp;                displayStoredText(</b>
+<b class="nc">&nbsp;                        result.balanceSource()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Balance revision&quot;,
+<b class="nc">&nbsp;                Long.toString(</b>
+<b class="nc">&nbsp;                        result.balanceRevision()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Committed at&quot;,
+<b class="nc">&nbsp;                formatTimestamp(</b>
+<b class="nc">&nbsp;                        result.committedAtEpochMillis()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                result.committedAtEpochMillis() &gt; 0L</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.WHITE</b>
+<b class="nc">&nbsp;                        : ChatFormatting.GRAY</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Commit timestamp millis&quot;,
+<b class="nc">&nbsp;                Long.toString(</b>
+<b class="nc">&nbsp;                        result.committedAtEpochMillis()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.DARK_GRAY
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Incarnation ID&quot;,
+<b class="nc">&nbsp;                displayStoredText(</b>
+<b class="nc">&nbsp;                        result.incarnationId()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                result.incarnationId().isBlank()</b>
+<b class="nc">&nbsp;                        &amp;&amp; result.committed()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.YELLOW</b>
+<b class="nc">&nbsp;                        : ChatFormatting.WHITE</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Migration source&quot;,
+<b class="nc">&nbsp;                displayStoredText(</b>
+<b class="nc">&nbsp;                        result.migrationSource()</b>
+&nbsp;                ),
+&nbsp;                migrationState
+<b class="nc">&nbsp;                        == RecognitionCommittedResult</b>
+&nbsp;                        .MigrationState.LEGACY_BACKFILLED
+<b class="nc">&nbsp;                        ? ChatFormatting.AQUA</b>
+<b class="nc">&nbsp;                        : ChatFormatting.WHITE</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Validation&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (result.validationIssues().isEmpty()) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                    result.committed()</b>
+<b class="nc">&nbsp;                                            ? &quot;No frozen-record validation issues detected.&quot;</b>
+<b class="nc">&nbsp;                                            : &quot;No committed recognition record is stored.&quot;</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+<b class="nc">&nbsp;                                    result.committed()</b>
+<b class="nc">&nbsp;                                            ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                            : ChatFormatting.GRAY</b>
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        } else {
+&nbsp;            for (String issue :
+<b class="nc">&nbsp;                    result.validationIssues()) {</b>
+&nbsp;
+<b class="nc">&nbsp;                source.sendSuccess(</b>
+<b class="nc">&nbsp;                        () -&gt; Component.literal(</b>
+&nbsp;                                        &quot;- &quot; + issue
+&nbsp;                                )
+<b class="nc">&nbsp;                                .withStyle(</b>
+&nbsp;                                        ChatFormatting.RED
+&nbsp;                                ),
+&nbsp;                        false
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Inspection complete; the attachment was not modified.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.DARK_GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendVersion(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String label,
+&nbsp;            int stored,
+&nbsp;            int current
+&nbsp;    ) {
+&nbsp;        ChatFormatting color;
+&nbsp;        String suffix;
+&nbsp;
+<b class="nc">&nbsp;        if (stored &gt; current) {</b>
+<b class="nc">&nbsp;            color = ChatFormatting.YELLOW;</b>
+<b class="nc">&nbsp;            suffix = &quot; [future]&quot;;</b>
+<b class="nc">&nbsp;        } else if (stored &lt; current) {</b>
+<b class="nc">&nbsp;            color = ChatFormatting.AQUA;</b>
+<b class="nc">&nbsp;            suffix = &quot; [legacy]&quot;;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            color = ChatFormatting.GREEN;</b>
+<b class="nc">&nbsp;            suffix = &quot; [current]&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                label,
+&nbsp;                stored
+&nbsp;                        + &quot; / current &quot;
+&nbsp;                        + current
+&nbsp;                        + suffix,
+&nbsp;                color
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String resolvedPath(
+&nbsp;            String rawPathId
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (rawPathId == null</b>
+<b class="nc">&nbsp;                || rawPathId.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;none&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return RecognitionPath.byId(</b>
+&nbsp;                        rawPathId
+&nbsp;                )
+<b class="nc">&nbsp;                .map(RecognitionPath::getId)</b>
+<b class="nc">&nbsp;                .orElse(</b>
+&nbsp;                        &quot;unresolved; raw ID preserved&quot;
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ChatFormatting pathIdColor(
+&nbsp;            String rawPathId,
+&nbsp;            boolean required
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (rawPathId == null</b>
+<b class="nc">&nbsp;                || rawPathId.isBlank()) {</b>
+<b class="nc">&nbsp;            return required</b>
+<b class="nc">&nbsp;                    ? ChatFormatting.RED</b>
+<b class="nc">&nbsp;                    : ChatFormatting.GRAY;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return RecognitionPath.byId(rawPathId)</b>
+<b class="nc">&nbsp;                .isPresent()</b>
+<b class="nc">&nbsp;                ? ChatFormatting.WHITE</b>
+<b class="nc">&nbsp;                : ChatFormatting.YELLOW;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ChatFormatting resolvedPathColor(
+&nbsp;            String rawPathId,
+&nbsp;            boolean required
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (rawPathId == null</b>
+<b class="nc">&nbsp;                || rawPathId.isBlank()) {</b>
+<b class="nc">&nbsp;            return required</b>
+<b class="nc">&nbsp;                    ? ChatFormatting.RED</b>
+<b class="nc">&nbsp;                    : ChatFormatting.GRAY;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return RecognitionPath.byId(rawPathId)</b>
+<b class="nc">&nbsp;                .isPresent()</b>
+<b class="nc">&nbsp;                ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                : ChatFormatting.YELLOW;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ChatFormatting migrationColor(
+&nbsp;            RecognitionCommittedResult.MigrationState state
+&nbsp;    ) {
+<b class="nc">&nbsp;        return switch (state) {</b>
+&nbsp;            case CURRENT -&gt;
+<b class="nc">&nbsp;                    ChatFormatting.GREEN;</b>
+&nbsp;
+&nbsp;            case LEGACY_BACKFILLED -&gt;
+<b class="nc">&nbsp;                    ChatFormatting.AQUA;</b>
+&nbsp;
+&nbsp;            case FUTURE_VERSION -&gt;
+<b class="nc">&nbsp;                    ChatFormatting.YELLOW;</b>
+&nbsp;
+&nbsp;            case INCOMPLETE -&gt;
+<b class="nc">&nbsp;                    ChatFormatting.RED;</b>
+&nbsp;
+&nbsp;            case NOT_COMMITTED -&gt;
+<b class="nc">&nbsp;                    ChatFormatting.GRAY;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String displayStoredText(
+&nbsp;            String value
+&nbsp;    ) {
+&nbsp;        return value == null
+<b class="nc">&nbsp;                || value.isBlank()</b>
+<b class="nc">&nbsp;                ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                : value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatTimestamp(
+&nbsp;            long epochMillis
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (epochMillis &lt;= 0L) {</b>
+<b class="nc">&nbsp;            return &quot;unknown&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return DateTimeFormatter.ISO_INSTANT</b>
+<b class="nc">&nbsp;                    .format(</b>
+<b class="nc">&nbsp;                            Instant.ofEpochMilli(</b>
+&nbsp;                                    epochMillis
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;        } catch (DateTimeException exception) {
+<b class="nc">&nbsp;            return &quot;invalid timestamp&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatScore(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.1f&quot;,
+<b class="nc">&nbsp;                !Double.isFinite(value)</b>
+<b class="nc">&nbsp;                        || value &lt; 0.0D</b>
+<b class="nc">&nbsp;                        ? 0.0D</b>
+<b class="nc">&nbsp;                        : value</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendHeader(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String text,
+&nbsp;            ChatFormatting color
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(text)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                color,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendValue(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String label,
+&nbsp;            String value,
+&nbsp;            ChatFormatting valueColor
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent message =</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                label + &quot;: &quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GRAY
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        message.append(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                                value == null</b>
+<b class="nc">&nbsp;                                        ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                        : value</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                valueColor == null</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.WHITE</b>
+<b class="nc">&nbsp;                                        : valueColor</b>
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; message,</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

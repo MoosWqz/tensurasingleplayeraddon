@@ -1,0 +1,223 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionIdentityHistorySnapshot</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionIdentityHistorySnapshot (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionIdentityHistorySnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * Immutable, read-only view of the stored contradiction-history foundation.
+&nbsp; */
+<b class="nc">&nbsp;public record RecognitionIdentityHistorySnapshot(</b>
+&nbsp;        int storedVersion,
+&nbsp;        int currentVersion,
+&nbsp;        RecognitionIdentityHistoryService.MigrationState migrationState,
+&nbsp;        double goodMomentum,
+&nbsp;        double evilMomentum,
+&nbsp;        double orderMomentum,
+&nbsp;        double freedomMomentum,
+&nbsp;        double highestGoodCommitment,
+&nbsp;        double highestEvilCommitment,
+&nbsp;        double highestOrderCommitment,
+&nbsp;        double highestFreedomCommitment,
+&nbsp;        int moralReversalCount,
+&nbsp;        int temperamentReversalCount,
+&nbsp;        long lastGoodDeedGameTime,
+&nbsp;        long lastEvilDeedGameTime,
+&nbsp;        long lastOrderDeedGameTime,
+&nbsp;        long lastFreedomDeedGameTime,
+&nbsp;        String rawModifierId,
+&nbsp;        String migrationSource,
+&nbsp;        List&lt;String&gt; validationIssues
+&nbsp;) {
+&nbsp;
+<b class="nc">&nbsp;    public RecognitionIdentityHistorySnapshot {</b>
+<b class="nc">&nbsp;        storedVersion = Math.max(0, storedVersion);</b>
+<b class="nc">&nbsp;        currentVersion = Math.max(1, currentVersion);</b>
+<b class="nc">&nbsp;        migrationState = migrationState == null</b>
+<b class="nc">&nbsp;                ? RecognitionIdentityHistoryService.MigrationState.INVALID_DATA</b>
+<b class="nc">&nbsp;                : migrationState;</b>
+&nbsp;
+<b class="nc">&nbsp;        goodMomentum = sanitize(goodMomentum);</b>
+<b class="nc">&nbsp;        evilMomentum = sanitize(evilMomentum);</b>
+<b class="nc">&nbsp;        orderMomentum = sanitize(orderMomentum);</b>
+<b class="nc">&nbsp;        freedomMomentum = sanitize(freedomMomentum);</b>
+&nbsp;
+<b class="nc">&nbsp;        highestGoodCommitment = sanitize(highestGoodCommitment);</b>
+<b class="nc">&nbsp;        highestEvilCommitment = sanitize(highestEvilCommitment);</b>
+<b class="nc">&nbsp;        highestOrderCommitment = sanitize(highestOrderCommitment);</b>
+<b class="nc">&nbsp;        highestFreedomCommitment = sanitize(highestFreedomCommitment);</b>
+&nbsp;
+<b class="nc">&nbsp;        moralReversalCount = Math.max(0, moralReversalCount);</b>
+<b class="nc">&nbsp;        temperamentReversalCount = Math.max(0, temperamentReversalCount);</b>
+&nbsp;
+<b class="nc">&nbsp;        lastGoodDeedGameTime = Math.max(0L, lastGoodDeedGameTime);</b>
+<b class="nc">&nbsp;        lastEvilDeedGameTime = Math.max(0L, lastEvilDeedGameTime);</b>
+<b class="nc">&nbsp;        lastOrderDeedGameTime = Math.max(0L, lastOrderDeedGameTime);</b>
+<b class="nc">&nbsp;        lastFreedomDeedGameTime = Math.max(0L, lastFreedomDeedGameTime);</b>
+&nbsp;
+<b class="nc">&nbsp;        rawModifierId = rawModifierId == null || rawModifierId.isBlank()</b>
+<b class="nc">&nbsp;                ? RecognitionIdentityHistoryModifier.NONE.id()</b>
+<b class="nc">&nbsp;                : rawModifierId.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        migrationSource = migrationSource == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : migrationSource.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        validationIssues = validationIssues == null</b>
+<b class="nc">&nbsp;                ? List.of()</b>
+<b class="nc">&nbsp;                : List.copyOf(validationIssues);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;RecognitionIdentityHistoryModifier&gt; knownModifier() {
+<b class="nc">&nbsp;        return RecognitionIdentityHistoryModifier.byId(rawModifierId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean valid() {
+<b class="nc">&nbsp;        return validationIssues.isEmpty()</b>
+&nbsp;                &amp;&amp; migrationState != RecognitionIdentityHistoryService.MigrationState.INVALID_DATA;
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean initialized() {
+<b class="nc">&nbsp;        return storedVersion &gt; 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean futureVersion() {
+<b class="nc">&nbsp;        return storedVersion &gt; currentVersion;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double moralMomentumTotal() {
+<b class="nc">&nbsp;        return goodMomentum + evilMomentum;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double temperamentMomentumTotal() {
+<b class="nc">&nbsp;        return orderMomentum + freedomMomentum;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitize(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(value) || value &lt; 0.0D) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(</b>
+&nbsp;                RecognitionIdentityHistoryService.MAXIMUM_MOMENTUM,
+&nbsp;                value
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

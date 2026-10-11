@@ -1,0 +1,708 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GreatSageRitualManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.ritual</a>
+</div>
+
+<h1>Coverage Summary for Class: GreatSageRitualManager (com.mooswqz.moostensuraaddon.ritual)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GreatSageRitualManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    40.9%
+  </span>
+  <span class="absValue">
+    (9/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.2%
+  </span>
+  <span class="absValue">
+    (22/78)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    23.8%
+  </span>
+  <span class="absValue">
+    (39/164)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GreatSageRitualManager$RitualState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    39.1%
+  </span>
+  <span class="absValue">
+    (9/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.2%
+  </span>
+  <span class="absValue">
+    (22/78)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.7%
+  </span>
+  <span class="absValue">
+    (39/172)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.ritual;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.block.BlockRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.block.GreatCrystalAltarBlock;
+&nbsp;import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+&nbsp;import com.mooswqz.moostensuraaddon.util.AddonAdvancementHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.util.GreatSageAwakeningHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.util.GreatSageEvolutionService;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.core.BlockPos;
+&nbsp;import net.minecraft.core.particles.ParticleTypes;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.resources.ResourceKey;
+&nbsp;import net.minecraft.server.level.ServerLevel;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.sounds.SoundEvents;
+&nbsp;import net.minecraft.sounds.SoundSource;
+&nbsp;import net.minecraft.world.effect.MobEffectInstance;
+&nbsp;import net.minecraft.world.effect.MobEffects;
+&nbsp;import net.minecraft.world.entity.Pose;
+&nbsp;import net.minecraft.world.level.Level;
+&nbsp;import net.minecraft.world.level.block.state.BlockState;
+&nbsp;import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+&nbsp;import net.minecraft.world.phys.Vec3;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;public final class GreatSageRitualManager {
+<b class="fc">&nbsp;    private static final Map&lt;UUID, RitualState&gt; ACTIVE_RITUALS = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private static final int DEFAULT_RITUAL_DURATION_TICKS = 20 * 15;
+&nbsp;    private static final int DARKNESS_REFRESH_INTERVAL_TICKS = 20;
+&nbsp;
+<b class="fc">&nbsp;    private static final Component[] PHASE_MESSAGES = new Component[]{</b>
+<b class="fc">&nbsp;            Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.phase_0&quot;),</b>
+<b class="fc">&nbsp;            Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.phase_1&quot;),</b>
+<b class="fc">&nbsp;            Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.phase_2&quot;),</b>
+<b class="fc">&nbsp;            Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.phase_3&quot;),</b>
+<b class="fc">&nbsp;            Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.phase_4&quot;)</b>
+&nbsp;    };
+&nbsp;
+&nbsp;    private GreatSageRitualManager() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void tryStartRitual(ServerPlayer player, BlockPos altarPos) {
+<b class="pc">&nbsp;        if (player == null || altarPos == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!(player.level() instanceof ServerLevel serverLevel)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!MoosTensuraConfig.GREAT_SAGE_RITUAL_ENABLED.get()) {</b>
+<b class="nc">&nbsp;            player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(&quot;The Great Crystal Altar is dormant.&quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (isRitualActive(player)) {</b>
+<b class="nc">&nbsp;            player.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.already_active&quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                    true
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        BlockPos lowerAltarPos = getLowerAltarPos(serverLevel, altarPos);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (lowerAltarPos == null || !isValidAltar(serverLevel, lowerAltarPos)) {</b>
+<b class="nc">&nbsp;            player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                    Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.invalid_altar&quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        GreatSageAwakeningHelper.RequirementCheck check =</b>
+<b class="fc">&nbsp;                GreatSageAwakeningHelper.checkAltarRequirements(player);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!check.successful()) {</b>
+<b class="fc">&nbsp;            sendAltarFailure(player, Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.requirements_failed&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        awardAltarResonance(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        int configuredDuration = MoosTensuraConfig.GREAT_SAGE_RITUAL_DURATION_TICKS.get();</b>
+<b class="nc">&nbsp;        int durationTicks = Math.max(DEFAULT_RITUAL_DURATION_TICKS, configuredDuration);</b>
+&nbsp;
+<b class="nc">&nbsp;        RitualState state = new RitualState(</b>
+<b class="nc">&nbsp;                serverLevel.dimension(),</b>
+&nbsp;                lowerAltarPos,
+<b class="nc">&nbsp;                player.position(),</b>
+&nbsp;                durationTicks,
+<b class="nc">&nbsp;                player.getYRot()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        ACTIVE_RITUALS.put(player.getUUID(), state);</b>
+&nbsp;
+<b class="nc">&nbsp;        player.displayClientMessage(</b>
+<b class="nc">&nbsp;                Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.started&quot;)</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendPhaseMessage(player, state, 0);</b>
+<b class="nc">&nbsp;        playPhaseSound(serverLevel, lowerAltarPos, 0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void tick(ServerPlayer player) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RitualState state = ACTIVE_RITUALS.get(player.getUUID());</b>
+&nbsp;
+<b class="pc">&nbsp;        if (state == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!(player.level() instanceof ServerLevel serverLevel)) {</b>
+<b class="nc">&nbsp;            cancelRitual(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!player.level().dimension().equals(state.dimension)) {</b>
+<b class="nc">&nbsp;            cancelRitual(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!player.isAlive()) {</b>
+<b class="nc">&nbsp;            cancelRitual(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!isValidAltar(serverLevel, state.altarPos)) {</b>
+<b class="nc">&nbsp;            cancelRitual(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        applyRitualStasis(player, state);</b>
+<b class="nc">&nbsp;        spawnRitualParticles(serverLevel, player, state);</b>
+&nbsp;
+<b class="nc">&nbsp;        int phase = getPhase(state);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (phase != state.lastPhase) {</b>
+<b class="nc">&nbsp;            sendPhaseMessage(player, state, phase);</b>
+<b class="nc">&nbsp;            playPhaseSound(serverLevel, state.altarPos, phase);</b>
+<b class="nc">&nbsp;            state.lastPhase = phase;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        state.elapsedTicks++;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (state.elapsedTicks &gt;= state.durationTicks) {</b>
+<b class="nc">&nbsp;            completeRitual(player, serverLevel, state);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void tick(ServerLevel level) {
+<b class="nc">&nbsp;        if (level == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (ServerPlayer player : level.players()) {</b>
+<b class="nc">&nbsp;            tick(player);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isRitualActive(ServerPlayer player) {
+<b class="pc">&nbsp;        return player != null &amp;&amp; ACTIVE_RITUALS.containsKey(player.getUUID());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void cancelForLogout(ServerPlayer player) {
+<b class="fc">&nbsp;        cancelRitual(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void cancelForDeath(ServerPlayer player) {
+<b class="nc">&nbsp;        cancelRitual(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void cancelRitual(ServerPlayer player) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RitualState removed = ACTIVE_RITUALS.remove(player.getUUID());</b>
+&nbsp;
+<b class="pc">&nbsp;        if (removed != null) {</b>
+<b class="nc">&nbsp;            clearRitualPose(player);</b>
+&nbsp;
+<b class="nc">&nbsp;            player.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.cancelled&quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                    true
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void cancel(ServerPlayer player) {
+<b class="nc">&nbsp;        cancelRitual(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void completeRitual(ServerPlayer player, ServerLevel level, RitualState state) {
+<b class="nc">&nbsp;        ACTIVE_RITUALS.remove(player.getUUID());</b>
+&nbsp;
+<b class="nc">&nbsp;        clearRitualPose(player);</b>
+<b class="nc">&nbsp;        spawnCompletionParticles(level, player, state);</b>
+<b class="nc">&nbsp;        playCompletionSound(level, state.altarPos);</b>
+&nbsp;
+<b class="nc">&nbsp;        GreatSageEvolutionService.EvolutionResult result =</b>
+<b class="nc">&nbsp;                GreatSageEvolutionService.attemptNormalUpgrade(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (result.successful()) {</b>
+<b class="nc">&nbsp;            player.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.translatable(&quot;message.moostensuraaddon.great_sage_ritual.completed&quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.GOLD),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            player.sendSystemMessage(result.message());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void applyRitualStasis(ServerPlayer player, RitualState state) {
+<b class="nc">&nbsp;        Vec3 pos = state.stasisPos;</b>
+&nbsp;
+<b class="nc">&nbsp;        player.teleportTo(pos.x, pos.y, pos.z);</b>
+<b class="nc">&nbsp;        player.setDeltaMovement(Vec3.ZERO);</b>
+<b class="nc">&nbsp;        player.resetFallDistance();</b>
+<b class="nc">&nbsp;        player.setSprinting(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        player.setYRot(state.lockedYaw);</b>
+<b class="nc">&nbsp;        player.setYHeadRot(state.lockedYaw);</b>
+<b class="nc">&nbsp;        player.setYBodyRot(state.lockedYaw);</b>
+<b class="nc">&nbsp;        player.setXRot(0.0F);</b>
+&nbsp;
+<b class="nc">&nbsp;        player.setPose(Pose.SLEEPING);</b>
+&nbsp;
+<b class="nc">&nbsp;        player.addEffect(new MobEffectInstance(</b>
+&nbsp;                MobEffects.MOVEMENT_SLOWDOWN,
+&nbsp;                40,
+&nbsp;                255,
+&nbsp;                false,
+&nbsp;                false,
+&nbsp;                false
+&nbsp;        ));
+&nbsp;
+<b class="nc">&nbsp;        player.addEffect(new MobEffectInstance(</b>
+&nbsp;                MobEffects.WEAKNESS,
+&nbsp;                40,
+&nbsp;                255,
+&nbsp;                false,
+&nbsp;                false,
+&nbsp;                false
+&nbsp;        ));
+&nbsp;
+<b class="nc">&nbsp;        player.addEffect(new MobEffectInstance(</b>
+&nbsp;                MobEffects.DAMAGE_RESISTANCE,
+&nbsp;                40,
+&nbsp;                255,
+&nbsp;                false,
+&nbsp;                false,
+&nbsp;                false
+&nbsp;        ));
+&nbsp;
+<b class="nc">&nbsp;        if (state.elapsedTicks % DARKNESS_REFRESH_INTERVAL_TICKS == 0) {</b>
+<b class="nc">&nbsp;            player.addEffect(new MobEffectInstance(</b>
+&nbsp;                    MobEffects.DARKNESS,
+&nbsp;                    80,
+&nbsp;                    0,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    true
+&nbsp;            ));
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void clearRitualPose(ServerPlayer player) {
+<b class="nc">&nbsp;        player.setPose(Pose.STANDING);</b>
+<b class="nc">&nbsp;        player.setDeltaMovement(Vec3.ZERO);</b>
+<b class="nc">&nbsp;        player.resetFallDistance();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void spawnRitualParticles(ServerLevel level, ServerPlayer player, RitualState state) {
+<b class="nc">&nbsp;        double progress = Math.min(1.0D, (double) state.elapsedTicks / Math.max(1, state.durationTicks));</b>
+&nbsp;
+<b class="nc">&nbsp;        double playerX = player.getX();</b>
+<b class="nc">&nbsp;        double playerY = player.getY() + 0.25D;</b>
+<b class="nc">&nbsp;        double playerZ = player.getZ();</b>
+&nbsp;
+<b class="nc">&nbsp;        double altarX = state.altarPos.getX() + 0.5D;</b>
+<b class="nc">&nbsp;        double altarY = state.altarPos.getY() + 1.2D;</b>
+<b class="nc">&nbsp;        double altarZ = state.altarPos.getZ() + 0.5D;</b>
+&nbsp;
+<b class="nc">&nbsp;        int soulCount = progress &lt; 0.5D ? 3 : 6;</b>
+<b class="nc">&nbsp;        int flameCount = progress &lt; 0.5D ? 2 : 4;</b>
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL,
+&nbsp;                playerX,
+&nbsp;                playerY,
+&nbsp;                playerZ,
+&nbsp;                soulCount,
+&nbsp;                0.75D,
+&nbsp;                0.15D,
+&nbsp;                0.75D,
+&nbsp;                0.015D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL_FIRE_FLAME,
+&nbsp;                playerX,
+&nbsp;                playerY + 0.15D,
+&nbsp;                playerZ,
+&nbsp;                flameCount,
+&nbsp;                0.45D,
+&nbsp;                0.20D,
+&nbsp;                0.45D,
+&nbsp;                0.01D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL_FIRE_FLAME,
+&nbsp;                altarX,
+&nbsp;                altarY,
+&nbsp;                altarZ,
+&nbsp;                flameCount,
+&nbsp;                0.35D,
+&nbsp;                0.45D,
+&nbsp;                0.35D,
+&nbsp;                0.015D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (state.elapsedTicks % 10 == 0) {</b>
+<b class="nc">&nbsp;            level.sendParticles(</b>
+&nbsp;                    ParticleTypes.SOUL,
+&nbsp;                    altarX,
+&nbsp;                    altarY + 0.35D,
+&nbsp;                    altarZ,
+&nbsp;                    8,
+&nbsp;                    0.65D,
+&nbsp;                    0.35D,
+&nbsp;                    0.65D,
+&nbsp;                    0.02D
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void spawnCompletionParticles(ServerLevel level, ServerPlayer player, RitualState state) {
+<b class="nc">&nbsp;        double playerX = player.getX();</b>
+<b class="nc">&nbsp;        double playerY = player.getY() + 0.75D;</b>
+<b class="nc">&nbsp;        double playerZ = player.getZ();</b>
+&nbsp;
+<b class="nc">&nbsp;        double altarX = state.altarPos.getX() + 0.5D;</b>
+<b class="nc">&nbsp;        double altarY = state.altarPos.getY() + 1.4D;</b>
+<b class="nc">&nbsp;        double altarZ = state.altarPos.getZ() + 0.5D;</b>
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL_FIRE_FLAME,
+&nbsp;                playerX,
+&nbsp;                playerY,
+&nbsp;                playerZ,
+&nbsp;                48,
+&nbsp;                1.0D,
+&nbsp;                0.6D,
+&nbsp;                1.0D,
+&nbsp;                0.05D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL,
+&nbsp;                playerX,
+&nbsp;                playerY,
+&nbsp;                playerZ,
+&nbsp;                36,
+&nbsp;                1.1D,
+&nbsp;                0.7D,
+&nbsp;                1.1D,
+&nbsp;                0.04D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL_FIRE_FLAME,
+&nbsp;                altarX,
+&nbsp;                altarY,
+&nbsp;                altarZ,
+&nbsp;                40,
+&nbsp;                0.9D,
+&nbsp;                0.8D,
+&nbsp;                0.9D,
+&nbsp;                0.05D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL,
+&nbsp;                altarX,
+&nbsp;                altarY,
+&nbsp;                altarZ,
+&nbsp;                28,
+&nbsp;                0.8D,
+&nbsp;                0.7D,
+&nbsp;                0.8D,
+&nbsp;                0.04D
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int getPhase(RitualState state) {
+<b class="nc">&nbsp;        int phaseCount = PHASE_MESSAGES.length;</b>
+<b class="nc">&nbsp;        int phase = (int) ((long) state.elapsedTicks * phaseCount / Math.max(1, state.durationTicks));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (phase &lt; 0) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(phase, phaseCount - 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendPhaseMessage(ServerPlayer player, RitualState state, int phase) {
+<b class="nc">&nbsp;        if (phase &lt; 0 || phase &gt;= PHASE_MESSAGES.length) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        player.displayClientMessage(</b>
+<b class="nc">&nbsp;                PHASE_MESSAGES[phase].copy().withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                true
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void playPhaseSound(ServerLevel level, BlockPos altarPos, int phase) {
+<b class="nc">&nbsp;        float pitch = 0.8F + (phase * 0.12F);</b>
+&nbsp;
+<b class="nc">&nbsp;        level.playSound(</b>
+&nbsp;                null,
+&nbsp;                altarPos,
+&nbsp;                SoundEvents.AMETHYST_BLOCK_CHIME,
+&nbsp;                SoundSource.BLOCKS,
+&nbsp;                0.75F,
+&nbsp;                pitch
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (phase &gt;= 2) {</b>
+<b class="nc">&nbsp;            level.playSound(</b>
+&nbsp;                    null,
+&nbsp;                    altarPos,
+&nbsp;                    SoundEvents.BEACON_AMBIENT,
+&nbsp;                    SoundSource.BLOCKS,
+&nbsp;                    0.35F,
+&nbsp;                    1.0F
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void playCompletionSound(ServerLevel level, BlockPos altarPos) {
+<b class="nc">&nbsp;        level.playSound(</b>
+&nbsp;                null,
+&nbsp;                altarPos,
+&nbsp;                SoundEvents.BEACON_ACTIVATE,
+&nbsp;                SoundSource.BLOCKS,
+&nbsp;                0.9F,
+&nbsp;                1.25F
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.playSound(</b>
+&nbsp;                null,
+&nbsp;                altarPos,
+&nbsp;                SoundEvents.PLAYER_LEVELUP,
+&nbsp;                SoundSource.PLAYERS,
+&nbsp;                0.75F,
+&nbsp;                1.2F
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.playSound(</b>
+&nbsp;                null,
+&nbsp;                altarPos,
+&nbsp;                SoundEvents.AMETHYST_BLOCK_CHIME,
+&nbsp;                SoundSource.BLOCKS,
+&nbsp;                1.0F,
+&nbsp;                1.6F
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void awardAltarResonance(ServerPlayer player) {
+<b class="nc">&nbsp;        AddonAdvancementHelper.awardGreatCrystalResonance(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendAltarFailure(ServerPlayer player, Component message) {
+<b class="fc">&nbsp;        player.sendSystemMessage(message.copy().withStyle(ChatFormatting.RED));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static BlockPos getLowerAltarPos(ServerLevel level, BlockPos pos) {
+<b class="fc">&nbsp;        BlockState state = level.getBlockState(pos);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!state.is(BlockRegistry.GREAT_CRYSTAL_ALTAR.get())) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!state.hasProperty(GreatCrystalAltarBlock.HALF)) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (state.getValue(GreatCrystalAltarBlock.HALF) == DoubleBlockHalf.UPPER) {</b>
+<b class="nc">&nbsp;            return pos.below();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return pos;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isValidAltar(ServerLevel level, BlockPos lowerPos) {
+<b class="fc">&nbsp;        BlockState lowerState = level.getBlockState(lowerPos);</b>
+<b class="fc">&nbsp;        BlockState upperState = level.getBlockState(lowerPos.above());</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!lowerState.is(BlockRegistry.GREAT_CRYSTAL_ALTAR.get())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!upperState.is(BlockRegistry.GREAT_CRYSTAL_ALTAR.get())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!lowerState.hasProperty(GreatCrystalAltarBlock.HALF)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!upperState.hasProperty(GreatCrystalAltarBlock.HALF)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        return lowerState.getValue(GreatCrystalAltarBlock.HALF) == DoubleBlockHalf.LOWER</b>
+<b class="pc">&nbsp;                &amp;&amp; upperState.getValue(GreatCrystalAltarBlock.HALF) == DoubleBlockHalf.UPPER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class RitualState {
+&nbsp;        private final ResourceKey&lt;Level&gt; dimension;
+&nbsp;        private final BlockPos altarPos;
+&nbsp;        private final Vec3 stasisPos;
+&nbsp;        private final int durationTicks;
+&nbsp;        private final float lockedYaw;
+&nbsp;
+&nbsp;        private int elapsedTicks;
+&nbsp;        private int lastPhase;
+&nbsp;
+<b class="nc">&nbsp;        private RitualState(ResourceKey&lt;Level&gt; dimension, BlockPos altarPos, Vec3 stasisPos, int durationTicks, float lockedYaw) {</b>
+<b class="nc">&nbsp;            this.dimension = dimension;</b>
+<b class="nc">&nbsp;            this.altarPos = altarPos.immutable();</b>
+<b class="nc">&nbsp;            this.stasisPos = stasisPos;</b>
+<b class="nc">&nbsp;            this.durationTicks = durationTicks;</b>
+<b class="nc">&nbsp;            this.lockedYaw = lockedYaw;</b>
+<b class="nc">&nbsp;            this.elapsedTicks = 0;</b>
+<b class="nc">&nbsp;            this.lastPhase = -1;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

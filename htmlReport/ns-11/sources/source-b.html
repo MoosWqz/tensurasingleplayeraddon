@@ -1,0 +1,420 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CoreGuidanceValidationHarness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: CoreGuidanceValidationHarness (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CoreGuidanceValidationHarness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CoreGuidanceValidationHarness$Check</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CoreGuidanceValidationHarness$Report</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.command.PlayerGuidancePolicy;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionRewardNoticePolicy;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Deterministic checks for guide-stage and notice lifecycle policy.
+&nbsp; */
+&nbsp;public final class CoreGuidanceValidationHarness {
+&nbsp;
+&nbsp;    private CoreGuidanceValidationHarness() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Report validate() {
+<b class="nc">&nbsp;        List&lt;Check&gt; checks = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        checkStage(</b>
+&nbsp;                checks,
+&nbsp;                &quot;reset guard wins&quot;,
+&nbsp;                PlayerGuidancePolicy.Stage.INCARNATION_REBUILDING,
+&nbsp;                true, true, true, true, true, true, true
+&nbsp;        );
+<b class="nc">&nbsp;        checkStage(</b>
+&nbsp;                checks,
+&nbsp;                &quot;unformed identity&quot;,
+&nbsp;                PlayerGuidancePolicy.Stage.FORM_IDENTITY,
+&nbsp;                false, false, false, false, false, false, false
+&nbsp;        );
+<b class="nc">&nbsp;        checkStage(</b>
+&nbsp;                checks,
+&nbsp;                &quot;named player seeks Sage&quot;,
+&nbsp;                PlayerGuidancePolicy.Stage.SEEK_SAGE,
+&nbsp;                false, true, false, false, false, false, false
+&nbsp;        );
+<b class="nc">&nbsp;        checkStage(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Sage seeks Great Sage&quot;,
+&nbsp;                PlayerGuidancePolicy.Stage.AWAKEN_GREAT_SAGE,
+&nbsp;                false, true, true, false, false, false, false
+&nbsp;        );
+<b class="nc">&nbsp;        checkStage(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Great Sage seeks Granter&quot;,
+&nbsp;                PlayerGuidancePolicy.Stage.AWAKEN_GRANTER,
+&nbsp;                false, true, true, true, false, false, false
+&nbsp;        );
+<b class="nc">&nbsp;        checkStage(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Granter seeks evolution&quot;,
+&nbsp;                PlayerGuidancePolicy.Stage.EVOLVE_AUTHORITY,
+&nbsp;                false, true, true, true, true, false, false
+&nbsp;        );
+<b class="nc">&nbsp;        checkStage(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Benevolent authority&quot;,
+&nbsp;                PlayerGuidancePolicy.Stage.BENEVOLENT_EMPOWERMENT,
+&nbsp;                false, true, true, true, false, true, false
+&nbsp;        );
+<b class="nc">&nbsp;        checkStage(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Governance authority&quot;,
+&nbsp;                PlayerGuidancePolicy.Stage.ABSOLUTE_GOVERNANCE,
+&nbsp;                false, true, true, true, false, false, true
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String identity = RecognitionRewardNoticePolicy.createIdentity(</b>
+&nbsp;                &quot;life-a&quot;,
+&nbsp;                &quot;fallback&quot;,
+&nbsp;                2
+&nbsp;        );
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                &quot;notice identity uses recognition incarnation&quot;,
+<b class="nc">&nbsp;                identity.startsWith(&quot;life-a|&quot;)</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                &quot;notice identity is stable&quot;,
+<b class="nc">&nbsp;                identity.equals(</b>
+<b class="nc">&nbsp;                        RecognitionRewardNoticePolicy.createIdentity(</b>
+&nbsp;                                &quot;life-a&quot;,
+&nbsp;                                &quot;fallback&quot;,
+&nbsp;                                2
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                &quot;fallback lifecycle token&quot;,
+<b class="nc">&nbsp;                RecognitionRewardNoticePolicy.createIdentity(</b>
+&nbsp;                        &quot;&quot;,
+&nbsp;                        &quot;life-b&quot;,
+&nbsp;                        2
+<b class="nc">&nbsp;                ).startsWith(&quot;life-b|&quot;)</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                &quot;missing incarnation rejected&quot;,
+<b class="nc">&nbsp;                RecognitionRewardNoticePolicy.createIdentity(</b>
+&nbsp;                        &quot;&quot;,
+&nbsp;                        &quot;&quot;,
+&nbsp;                        2
+<b class="nc">&nbsp;                ).isBlank()</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                &quot;eligible notice shows&quot;,
+<b class="nc">&nbsp;                RecognitionRewardNoticePolicy.shouldShow(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        true,
+&nbsp;                        identity,
+&nbsp;                        &quot;&quot;
+&nbsp;                )
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                &quot;same notice does not repeat&quot;,
+<b class="nc">&nbsp;                !RecognitionRewardNoticePolicy.shouldShow(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        true,
+&nbsp;                        identity,
+&nbsp;                        identity
+&nbsp;                )
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                &quot;reset guard suppresses notice&quot;,
+<b class="nc">&nbsp;                !RecognitionRewardNoticePolicy.shouldShow(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        identity,
+&nbsp;                        &quot;&quot;
+&nbsp;                )
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                &quot;native marker required&quot;,
+<b class="nc">&nbsp;                !RecognitionRewardNoticePolicy.shouldShow(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        identity,
+&nbsp;                        &quot;&quot;
+&nbsp;                )
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                &quot;future profile stays quiet&quot;,
+<b class="nc">&nbsp;                !RecognitionRewardNoticePolicy.shouldShow(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        true,
+&nbsp;                        identity,
+&nbsp;                        &quot;&quot;
+&nbsp;                )
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                &quot;new incarnation can show&quot;,
+<b class="nc">&nbsp;                RecognitionRewardNoticePolicy.shouldShow(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        true,
+<b class="nc">&nbsp;                        RecognitionRewardNoticePolicy.createIdentity(</b>
+&nbsp;                                &quot;life-c&quot;,
+&nbsp;                                &quot;&quot;,
+&nbsp;                                2
+&nbsp;                        ),
+&nbsp;                        identity
+&nbsp;                )
+&nbsp;        ));
+&nbsp;
+<b class="nc">&nbsp;        return new Report(checks);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void checkStage(
+&nbsp;            List&lt;Check&gt; checks,
+&nbsp;            String name,
+&nbsp;            PlayerGuidancePolicy.Stage expected,
+&nbsp;            boolean reset,
+&nbsp;            boolean identity,
+&nbsp;            boolean sage,
+&nbsp;            boolean greatSage,
+&nbsp;            boolean granter,
+&nbsp;            boolean benevolent,
+&nbsp;            boolean governance
+&nbsp;    ) {
+<b class="nc">&nbsp;        checks.add(new Check(</b>
+&nbsp;                name,
+<b class="nc">&nbsp;                PlayerGuidancePolicy.resolve(</b>
+&nbsp;                        reset,
+&nbsp;                        identity,
+&nbsp;                        sage,
+&nbsp;                        greatSage,
+&nbsp;                        granter,
+&nbsp;                        benevolent,
+&nbsp;                        governance
+&nbsp;                ) == expected
+&nbsp;        ));
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Check(</b>
+&nbsp;            String name,
+&nbsp;            boolean passed
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Report(</b>
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        public Report {</b>
+<b class="nc">&nbsp;            checks = checks == null</b>
+<b class="nc">&nbsp;                    ? List.of()</b>
+<b class="nc">&nbsp;                    : List.copyOf(checks);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public long passedChecks() {
+<b class="nc">&nbsp;            return checks.stream().filter(Check::passed).count();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public long failedChecks() {
+<b class="nc">&nbsp;            return checks.size() - passedChecks();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean passed() {
+<b class="nc">&nbsp;            return failedChecks() == 0L;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1702 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UltimateConfirmationScreen</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen</a>
+</div>
+
+<h1>Coverage Summary for Class: UltimateConfirmationScreen (com.mooswqz.moostensuraaddon.client.screen)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UltimateConfirmationScreen</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/238)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/595)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UltimateConfirmationScreen$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UltimateConfirmationScreen$ConfirmationRequest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UltimateConfirmationScreen$Layout</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UltimateConfirmationScreen$SkillLine</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/280)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/707)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiButton;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiEntry;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiLayout;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiRenderHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiTheme;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiText;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.UltimateConfirmationPolicy;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.UltimateMultiGrantUiEntryFactory;
+&nbsp;import com.mooswqz.moostensuraaddon.network.ExecuteUltimateConfirmationPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.ExecuteUltimateMultiGrantPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.ExecuteUltimateSubordinateSkillPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenUltimateConfirmationScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenUltimateMultiGrantScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenUltimateSubordinateSkillScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.util.AuthorityActionMode;
+&nbsp;import com.mooswqz.moostensuraaddon.util.UltimateBorrowSeizePolicy;
+&nbsp;import net.minecraft.client.Minecraft;
+&nbsp;import net.minecraft.client.gui.GuiGraphics;
+&nbsp;import net.minecraft.client.gui.screens.Screen;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.neoforged.neoforge.network.PacketDistributor;
+&nbsp;import org.lwjgl.glfw.GLFW;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;public final class UltimateConfirmationScreen extends Screen {
+&nbsp;
+&nbsp;    private final Screen parent;
+&nbsp;    private final ConfirmationRequest request;
+&nbsp;
+&nbsp;    private Layout layout;
+&nbsp;    private SkillUiButton backButton;
+&nbsp;    private SkillUiButton confirmButton;
+&nbsp;    private boolean submitted;
+&nbsp;
+&nbsp;    private UltimateConfirmationScreen(
+&nbsp;            Screen parent,
+&nbsp;            ConfirmationRequest request
+&nbsp;    ) {
+<b class="nc">&nbsp;        super(</b>
+<b class="nc">&nbsp;                request == null</b>
+<b class="nc">&nbsp;                        ? SkillUiText.component(&quot;confirmation.default_title&quot;)</b>
+<b class="nc">&nbsp;                        : Component.literal(request.title())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        this.parent = parent;</b>
+<b class="nc">&nbsp;        this.request = request == null</b>
+<b class="nc">&nbsp;                ? ConfirmationRequest.empty()</b>
+<b class="nc">&nbsp;                : request;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public UltimateConfirmationScreen(
+&nbsp;            OpenUltimateConfirmationScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        this(</b>
+&nbsp;                null,
+<b class="nc">&nbsp;                legacyRequest(payload)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static UltimateConfirmationScreen forAuthorityAction(
+&nbsp;            Screen parent,
+&nbsp;            OpenUltimateMultiGrantScreenPayload payload,
+&nbsp;            AuthorityActionMode mode,
+&nbsp;            List&lt;SkillUiEntry&gt; selectedEntries,
+&nbsp;            Map&lt;String, UltimateMultiGrantUiEntryFactory.CostBreakdown&gt; costs,
+&nbsp;            boolean allEligible
+&nbsp;    ) {
+<b class="nc">&nbsp;        AuthorityActionMode safeMode = mode == null</b>
+<b class="nc">&nbsp;                ? AuthorityActionMode.BENEVOLENT_BESTOW</b>
+<b class="nc">&nbsp;                : mode;</b>
+<b class="nc">&nbsp;        OpenUltimateMultiGrantScreenPayload safePayload = payload == null</b>
+<b class="nc">&nbsp;                ? new OpenUltimateMultiGrantScreenPayload(</b>
+<b class="nc">&nbsp;                safeMode.id(),</b>
+&nbsp;                &quot;&quot;,
+<b class="nc">&nbsp;                SkillUiText.string(&quot;common.unknown_subordinate&quot;),</b>
+&nbsp;                0.0D,
+&nbsp;                0,
+&nbsp;                false,
+&nbsp;                false,
+<b class="nc">&nbsp;                List.of()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                : payload;</b>
+<b class="nc">&nbsp;        List&lt;SkillUiEntry&gt; safeEntries = selectedEntries == null</b>
+<b class="nc">&nbsp;                ? List.of()</b>
+<b class="nc">&nbsp;                : List.copyOf(selectedEntries);</b>
+&nbsp;        Map&lt;String, UltimateMultiGrantUiEntryFactory.CostBreakdown&gt;
+<b class="nc">&nbsp;                safeCosts = costs == null</b>
+<b class="nc">&nbsp;                ? Map.of()</b>
+<b class="nc">&nbsp;                : Map.copyOf(costs);</b>
+<b class="nc">&nbsp;        List&lt;String&gt; selectedIds = safeEntries.stream()</b>
+<b class="nc">&nbsp;                .map(SkillUiEntry::skillId)</b>
+<b class="nc">&nbsp;                .filter(skillId -&gt; skillId != null</b>
+<b class="nc">&nbsp;                        &amp;&amp; !skillId.isBlank())</b>
+<b class="nc">&nbsp;                .toList();</b>
+<b class="nc">&nbsp;        UltimateMultiGrantUiEntryFactory.SelectionSummary summary =</b>
+<b class="nc">&nbsp;                UltimateMultiGrantUiEntryFactory.summarizeSelection(</b>
+&nbsp;                        selectedIds,
+&nbsp;                        safeCosts
+&nbsp;                );
+<b class="nc">&nbsp;        int affectedTargets = safeMode.directGrant()</b>
+<b class="nc">&nbsp;                ? 1</b>
+<b class="nc">&nbsp;                : Math.max(0, summary.affectedTargets());</b>
+&nbsp;        String subjectLabel;
+&nbsp;        String subjectValue;
+&nbsp;
+<b class="nc">&nbsp;        if (safeMode.massGrant()) {</b>
+<b class="nc">&nbsp;            subjectLabel = SkillUiText.string(&quot;common.scope_label&quot;);</b>
+<b class="nc">&nbsp;            subjectValue = SkillUiText.string(</b>
+<b class="nc">&nbsp;                    affectedTargets == 1</b>
+<b class="nc">&nbsp;                            ? &quot;confirmation.eligible_subordinate_one&quot;</b>
+<b class="nc">&nbsp;                            : &quot;confirmation.eligible_subordinate_many&quot;,</b>
+<b class="nc">&nbsp;                    affectedTargets</b>
+&nbsp;            );
+<b class="nc">&nbsp;        } else if (safeMode.takeBack() &amp;&amp; allEligible) {</b>
+<b class="nc">&nbsp;            subjectLabel = SkillUiText.string(&quot;common.scope_label&quot;);</b>
+<b class="nc">&nbsp;            subjectValue = SkillUiText.string(</b>
+<b class="nc">&nbsp;                    affectedTargets == 1</b>
+<b class="nc">&nbsp;                            ? &quot;confirmation.eligible_grant_one&quot;</b>
+<b class="nc">&nbsp;                            : &quot;confirmation.eligible_grant_many&quot;,</b>
+<b class="nc">&nbsp;                    affectedTargets</b>
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            subjectLabel = SkillUiText.string(&quot;common.target_label&quot;);</b>
+<b class="nc">&nbsp;            subjectValue = safePayload.targetName().isBlank()</b>
+<b class="nc">&nbsp;                    ? SkillUiText.string(&quot;common.unknown_subordinate&quot;)</b>
+<b class="nc">&nbsp;                    : safePayload.targetName();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;SkillLine&gt; skillLines = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (SkillUiEntry entry : safeEntries) {</b>
+<b class="nc">&nbsp;            UltimateMultiGrantUiEntryFactory.CostBreakdown cost =</b>
+<b class="nc">&nbsp;                    safeCosts.get(entry.skillId());</b>
+&nbsp;            String secondary;
+&nbsp;
+<b class="nc">&nbsp;            if (safeMode.takeBack()) {</b>
+<b class="nc">&nbsp;                secondary = SkillUiText.string(</b>
+&nbsp;                        &quot;confirmation.affected_no_cost&quot;,
+<b class="nc">&nbsp;                        affectedTargets</b>
+&nbsp;                );
+<b class="nc">&nbsp;            } else if (cost != null &amp;&amp; !cost.mastered()) {</b>
+<b class="nc">&nbsp;                secondary = SkillUiText.string(</b>
+&nbsp;                        &quot;confirmation.unmastered_cost&quot;,
+<b class="nc">&nbsp;                        formatNumber(cost.finalCost())</b>
+&nbsp;                );
+&nbsp;            } else {
+<b class="nc">&nbsp;                secondary = SkillUiText.string(</b>
+&nbsp;                        &quot;confirmation.mastered_cost&quot;,
+<b class="nc">&nbsp;                        formatNumber(</b>
+<b class="nc">&nbsp;                                cost == null ? 0.0D : cost.finalCost()</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            skillLines.add(</b>
+&nbsp;                    new SkillLine(
+<b class="nc">&nbsp;                            entry.displayName().getString(),</b>
+&nbsp;                            secondary,
+<b class="nc">&nbsp;                            cost == null ? 0.0D : cost.finalCost(),</b>
+<b class="nc">&nbsp;                            cost != null &amp;&amp; !cost.mastered()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiTheme theme = resolveTheme(safeMode);</b>
+<b class="nc">&nbsp;        String warning = SkillUiText.string(</b>
+<b class="nc">&nbsp;                switch (safeMode) {</b>
+&nbsp;                    case BENEVOLENT_BESTOW -&gt;
+<b class="nc">&nbsp;                            &quot;confirmation.warning_bestow&quot;;</b>
+&nbsp;                    case GOVERNANCE_INVEST -&gt;
+<b class="nc">&nbsp;                            &quot;confirmation.warning_invest&quot;;</b>
+&nbsp;                    case BENEVOLENT_MASS_GRANT,
+&nbsp;                         GOVERNANCE_MASS_GRANT -&gt;
+<b class="nc">&nbsp;                            &quot;confirmation.warning_mass_grant&quot;;</b>
+&nbsp;                    case BENEVOLENT_TAKE_BACK,
+&nbsp;                         GOVERNANCE_TAKE_BACK -&gt;
+<b class="nc">&nbsp;                            &quot;confirmation.warning_take_back&quot;;</b>
+&nbsp;                    case GRANTER_GRANT,
+&nbsp;                         GRANTER_TAKE_BACK -&gt;
+<b class="nc">&nbsp;                            &quot;confirmation.warning_revalidate&quot;;</b>
+&nbsp;                }
+&nbsp;        );
+<b class="nc">&nbsp;        String outcome = summary.unmastered() &gt; 0</b>
+<b class="nc">&nbsp;                ? SkillUiText.string(</b>
+<b class="nc">&nbsp;                summary.unmastered() == 1</b>
+<b class="nc">&nbsp;                ? &quot;confirmation.outcome_unmastered_one&quot;</b>
+<b class="nc">&nbsp;                : &quot;confirmation.outcome_unmastered_many&quot;,</b>
+<b class="nc">&nbsp;                summary.unmastered()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                : SkillUiText.string(</b>
+&nbsp;                &quot;confirmation.outcome_standard_cost&quot;
+&nbsp;        );
+<b class="nc">&nbsp;        boolean ready = !safeEntries.isEmpty()</b>
+&nbsp;                &amp;&amp; affectedTargets &gt; 0
+<b class="nc">&nbsp;                &amp;&amp; safePayload.cooldownTicks() &lt;= 0</b>
+<b class="nc">&nbsp;                &amp;&amp; UltimateConfirmationPolicy.affordable(</b>
+<b class="nc">&nbsp;                safePayload.availableMagicules(),</b>
+<b class="nc">&nbsp;                summary.totalCost()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        Runnable confirmAction = () -&gt;</b>
+<b class="nc">&nbsp;                PacketDistributor.sendToServer(</b>
+&nbsp;                        new ExecuteUltimateMultiGrantPayload(
+<b class="nc">&nbsp;                                safeMode.id(),</b>
+<b class="nc">&nbsp;                                safePayload.targetUuid(),</b>
+&nbsp;                                allEligible,
+&nbsp;                                selectedIds
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return new UltimateConfirmationScreen(</b>
+&nbsp;                parent,
+&nbsp;                new ConfirmationRequest(
+<b class="nc">&nbsp;                        SkillUiText.string(</b>
+&nbsp;                                &quot;confirmation.confirm_action&quot;,
+<b class="nc">&nbsp;                                safeMode.titleComponent()</b>
+&nbsp;                        ),
+<b class="nc">&nbsp;                        safeMode.badge(),</b>
+<b class="nc">&nbsp;                        authorityName(safeMode),</b>
+&nbsp;                        subjectLabel,
+&nbsp;                        subjectValue,
+<b class="nc">&nbsp;                        List.copyOf(skillLines),</b>
+<b class="nc">&nbsp;                        safeEntries.size(),</b>
+&nbsp;                        affectedTargets,
+<b class="nc">&nbsp;                        summary.mastered(),</b>
+<b class="nc">&nbsp;                        summary.unmastered(),</b>
+<b class="nc">&nbsp;                        summary.standardCost(),</b>
+<b class="nc">&nbsp;                        summary.surcharge(),</b>
+<b class="nc">&nbsp;                        summary.totalCost(),</b>
+<b class="nc">&nbsp;                        safePayload.availableMagicules(),</b>
+&nbsp;                        outcome,
+&nbsp;                        warning,
+<b class="nc">&nbsp;                        confirmLabel(safeMode),</b>
+&nbsp;                        theme,
+&nbsp;                        false,
+&nbsp;                        ready,
+&nbsp;                        confirmAction
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static UltimateConfirmationScreen forBorrowOrSeize(
+&nbsp;            Screen parent,
+&nbsp;            OpenUltimateSubordinateSkillScreenPayload payload,
+&nbsp;            List&lt;SkillUiEntry&gt; selectedEntries,
+&nbsp;            Map&lt;String, Double&gt; borrowChances
+&nbsp;    ) {
+<b class="nc">&nbsp;        OpenUltimateSubordinateSkillScreenPayload safePayload = payload == null</b>
+<b class="nc">&nbsp;                ? new OpenUltimateSubordinateSkillScreenPayload(</b>
+&nbsp;                false,
+&nbsp;                &quot;&quot;,
+<b class="nc">&nbsp;                SkillUiText.string(&quot;common.unknown_subordinate&quot;),</b>
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+<b class="nc">&nbsp;                List.of()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                : payload;</b>
+<b class="nc">&nbsp;        List&lt;SkillUiEntry&gt; safeEntries = selectedEntries == null</b>
+<b class="nc">&nbsp;                ? List.of()</b>
+<b class="nc">&nbsp;                : List.copyOf(selectedEntries);</b>
+<b class="nc">&nbsp;        Map&lt;String, Double&gt; safeBorrowChances = borrowChances == null</b>
+<b class="nc">&nbsp;                ? Map.of()</b>
+<b class="nc">&nbsp;                : Map.copyOf(borrowChances);</b>
+<b class="nc">&nbsp;        List&lt;String&gt; selectedIds = safeEntries.stream()</b>
+<b class="nc">&nbsp;                .map(SkillUiEntry::skillId)</b>
+<b class="nc">&nbsp;                .filter(skillId -&gt; skillId != null</b>
+<b class="nc">&nbsp;                        &amp;&amp; !skillId.isBlank())</b>
+<b class="nc">&nbsp;                .toList();</b>
+<b class="nc">&nbsp;        double totalCost = UltimateConfirmationPolicy.totalCost(</b>
+<b class="nc">&nbsp;                safePayload.costPerSkill(),</b>
+<b class="nc">&nbsp;                selectedIds.size()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        double combinedRisk = safePayload.seize()</b>
+<b class="nc">&nbsp;                ? UltimateConfirmationPolicy.combinedSeizeRisk(</b>
+<b class="nc">&nbsp;                safePayload.seizeDeathChancePerSkill(),</b>
+<b class="nc">&nbsp;                safePayload.seizeDeathChanceMax(),</b>
+<b class="nc">&nbsp;                selectedIds.size()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                : 0.0D;</b>
+<b class="nc">&nbsp;        List&lt;Double&gt; selectedChances = selectedIds.stream()</b>
+<b class="nc">&nbsp;                .map(skillId -&gt; safeBorrowChances.getOrDefault(</b>
+&nbsp;                        skillId,
+<b class="nc">&nbsp;                        0.0D</b>
+&nbsp;                ))
+<b class="nc">&nbsp;                .toList();</b>
+<b class="nc">&nbsp;        UltimateConfirmationPolicy.ChanceRange chanceRange =</b>
+<b class="nc">&nbsp;                UltimateConfirmationPolicy.chanceRange(</b>
+&nbsp;                        selectedChances
+&nbsp;                );
+<b class="nc">&nbsp;        List&lt;SkillLine&gt; skillLines = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (SkillUiEntry entry : safeEntries) {</b>
+<b class="nc">&nbsp;            double chance = safeBorrowChances.getOrDefault(</b>
+<b class="nc">&nbsp;                    entry.skillId(),</b>
+<b class="nc">&nbsp;                    0.0D</b>
+&nbsp;            );
+<b class="nc">&nbsp;            String masteryLabel = SkillUiText.string(</b>
+<b class="nc">&nbsp;                    entry.mastered()</b>
+<b class="nc">&nbsp;                            ? &quot;confirmation.target_mastered&quot;</b>
+<b class="nc">&nbsp;                            : &quot;state.not_mastered&quot;</b>
+&nbsp;            );
+<b class="nc">&nbsp;            String secondary = safePayload.seize()</b>
+<b class="nc">&nbsp;                    ? SkillUiText.string(</b>
+&nbsp;                    &quot;confirmation.seize_skill_line&quot;,
+&nbsp;                    masteryLabel,
+<b class="nc">&nbsp;                    formatNumber(safePayload.costPerSkill())</b>
+&nbsp;            )
+<b class="nc">&nbsp;                    : SkillUiText.string(</b>
+&nbsp;                    &quot;confirmation.borrow_skill_line&quot;,
+&nbsp;                    masteryLabel,
+<b class="nc">&nbsp;                    UltimateBorrowSeizePolicy.formatPercent(chance),</b>
+<b class="nc">&nbsp;                    formatNumber(safePayload.costPerSkill())</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            skillLines.add(</b>
+&nbsp;                    new SkillLine(
+<b class="nc">&nbsp;                            entry.displayName().getString(),</b>
+&nbsp;                            secondary,
+<b class="nc">&nbsp;                            safePayload.costPerSkill(),</b>
+<b class="nc">&nbsp;                            safePayload.seize()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        String outcome;
+&nbsp;
+<b class="nc">&nbsp;        if (safePayload.seize()) {</b>
+<b class="nc">&nbsp;            outcome = SkillUiText.string(</b>
+&nbsp;                    &quot;confirmation.combined_death_risk&quot;,
+<b class="nc">&nbsp;                    UltimateBorrowSeizePolicy.formatPercent(combinedRisk)</b>
+&nbsp;            );
+<b class="nc">&nbsp;        } else if (chanceRange.minimum() == chanceRange.maximum()) {</b>
+<b class="nc">&nbsp;            outcome = SkillUiText.string(</b>
+&nbsp;                    &quot;confirmation.permanent_chance_single&quot;,
+<b class="nc">&nbsp;                    UltimateBorrowSeizePolicy.formatPercent(</b>
+<b class="nc">&nbsp;                            chanceRange.minimum()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            outcome = SkillUiText.string(</b>
+&nbsp;                    &quot;confirmation.permanent_chance_range&quot;,
+<b class="nc">&nbsp;                    UltimateBorrowSeizePolicy.formatPercent(</b>
+<b class="nc">&nbsp;                            chanceRange.minimum()</b>
+&nbsp;                    ),
+<b class="nc">&nbsp;                    UltimateBorrowSeizePolicy.formatPercent(</b>
+<b class="nc">&nbsp;                            chanceRange.maximum()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String warning = SkillUiText.string(</b>
+<b class="nc">&nbsp;                safePayload.seize()</b>
+<b class="nc">&nbsp;                        ? &quot;confirmation.warning_seize&quot;</b>
+<b class="nc">&nbsp;                        : &quot;confirmation.warning_borrow&quot;</b>
+&nbsp;        );
+<b class="nc">&nbsp;        boolean ready = !selectedIds.isEmpty()</b>
+<b class="nc">&nbsp;                &amp;&amp; UltimateConfirmationPolicy.affordable(</b>
+<b class="nc">&nbsp;                safePayload.availableMagicules(),</b>
+&nbsp;                totalCost
+&nbsp;        );
+<b class="nc">&nbsp;        Runnable confirmAction = () -&gt;</b>
+<b class="nc">&nbsp;                PacketDistributor.sendToServer(</b>
+&nbsp;                        new ExecuteUltimateSubordinateSkillPayload(
+<b class="nc">&nbsp;                                safePayload.seize(),</b>
+<b class="nc">&nbsp;                                safePayload.targetUuid(),</b>
+&nbsp;                                selectedIds
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return new UltimateConfirmationScreen(</b>
+&nbsp;                parent,
+&nbsp;                new ConfirmationRequest(
+<b class="nc">&nbsp;                        SkillUiText.string(</b>
+<b class="nc">&nbsp;                                safePayload.seize()</b>
+<b class="nc">&nbsp;                                        ? &quot;confirmation.title_seize&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;confirmation.title_borrow&quot;</b>
+&nbsp;                        ),
+<b class="nc">&nbsp;                        SkillUiText.string(</b>
+<b class="nc">&nbsp;                                safePayload.seize()</b>
+<b class="nc">&nbsp;                                        ? &quot;seize.badge&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;borrow.badge&quot;</b>
+&nbsp;                        ),
+<b class="nc">&nbsp;                        SkillUiText.string(</b>
+<b class="nc">&nbsp;                                safePayload.seize()</b>
+<b class="nc">&nbsp;                                        ? &quot;authority.governance&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;authority.benevolent&quot;</b>
+&nbsp;                        ),
+<b class="nc">&nbsp;                        SkillUiText.string(&quot;common.target_label&quot;),</b>
+<b class="nc">&nbsp;                        safePayload.targetName().isBlank()</b>
+<b class="nc">&nbsp;                                ? SkillUiText.string(&quot;common.unknown_subordinate&quot;)</b>
+<b class="nc">&nbsp;                                : safePayload.targetName(),</b>
+<b class="nc">&nbsp;                        List.copyOf(skillLines),</b>
+<b class="nc">&nbsp;                        safeEntries.size(),</b>
+<b class="nc">&nbsp;                        safeEntries.isEmpty() ? 0 : 1,</b>
+&nbsp;                        0,
+&nbsp;                        0,
+&nbsp;                        totalCost,
+&nbsp;                        0.0D,
+&nbsp;                        totalCost,
+<b class="nc">&nbsp;                        safePayload.availableMagicules(),</b>
+&nbsp;                        outcome,
+&nbsp;                        warning,
+<b class="nc">&nbsp;                        SkillUiText.string(</b>
+<b class="nc">&nbsp;                                safePayload.seize()</b>
+<b class="nc">&nbsp;                                        ? &quot;confirmation.confirm_seize&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;confirmation.confirm_borrow&quot;</b>
+&nbsp;                        ),
+<b class="nc">&nbsp;                        safePayload.seize()</b>
+<b class="nc">&nbsp;                                ? SkillUiTheme.SEIZE</b>
+<b class="nc">&nbsp;                                : SkillUiTheme.BENEVOLENT,</b>
+<b class="nc">&nbsp;                        safePayload.seize(),</b>
+&nbsp;                        ready,
+&nbsp;                        confirmAction
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void open(
+&nbsp;            OpenUltimateConfirmationScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        Minecraft.getInstance().setScreen(</b>
+&nbsp;                new UltimateConfirmationScreen(payload)
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void init() {
+<b class="nc">&nbsp;        layout = Layout.calculate(width, height);</b>
+<b class="nc">&nbsp;        int gap = 6;</b>
+<b class="nc">&nbsp;        int buttonWidth = Math.max(</b>
+&nbsp;                80,
+<b class="nc">&nbsp;                (layout.footer().width() - gap) / 2</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        backButton = addRenderableWidget(</b>
+&nbsp;                new SkillUiButton(
+<b class="nc">&nbsp;                        layout.footer().left(),</b>
+<b class="nc">&nbsp;                        layout.footer().top(),</b>
+&nbsp;                        buttonWidth,
+<b class="nc">&nbsp;                        layout.footer().height(),</b>
+<b class="nc">&nbsp;                        parent == null</b>
+<b class="nc">&nbsp;                                ? SkillUiText.component(&quot;common.cancel&quot;)</b>
+<b class="nc">&nbsp;                                : SkillUiText.component(&quot;common.back&quot;),</b>
+<b class="nc">&nbsp;                        request.theme(),</b>
+&nbsp;                        SkillUiButton.Tone.NORMAL,
+&nbsp;                        this::goBack
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        confirmButton = addRenderableWidget(</b>
+&nbsp;                new SkillUiButton(
+<b class="nc">&nbsp;                        layout.footer().right() - buttonWidth,</b>
+<b class="nc">&nbsp;                        layout.footer().top(),</b>
+&nbsp;                        buttonWidth,
+<b class="nc">&nbsp;                        layout.footer().height(),</b>
+<b class="nc">&nbsp;                        Component.literal(request.confirmLabel()),</b>
+<b class="nc">&nbsp;                        request.theme(),</b>
+<b class="nc">&nbsp;                        request.danger()</b>
+<b class="nc">&nbsp;                                ? SkillUiButton.Tone.DANGER</b>
+<b class="nc">&nbsp;                                : SkillUiButton.Tone.PRIMARY,</b>
+&nbsp;                        this::confirm
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        confirmButton.active = request.ready() &amp;&amp; !submitted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void confirm() {
+<b class="nc">&nbsp;        if (submitted || !request.ready()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        submitted = true;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (confirmButton != null) {</b>
+<b class="nc">&nbsp;            confirmButton.active = false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        request.confirmAction().run();</b>
+<b class="nc">&nbsp;        Minecraft.getInstance().setScreen(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void goBack() {
+<b class="nc">&nbsp;        Minecraft.getInstance().setScreen(parent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onClose() {
+<b class="nc">&nbsp;        goBack();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean keyPressed(
+&nbsp;            int keyCode,
+&nbsp;            int scanCode,
+&nbsp;            int modifiers
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (keyCode == GLFW.GLFW_KEY_ENTER</b>
+&nbsp;                || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
+<b class="nc">&nbsp;            confirm();</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {</b>
+<b class="nc">&nbsp;            goBack();</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return super.keyPressed(</b>
+&nbsp;                keyCode,
+&nbsp;                scanCode,
+&nbsp;                modifiers
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void render(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiTheme theme = request.theme();</b>
+<b class="nc">&nbsp;        SkillUiRenderHelper.fillBackground(</b>
+&nbsp;                guiGraphics,
+&nbsp;                width,
+&nbsp;                height,
+&nbsp;                theme
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                layout.panel(),</b>
+<b class="nc">&nbsp;                request.danger()</b>
+<b class="nc">&nbsp;                        ? theme.dangerColor()</b>
+<b class="nc">&nbsp;                        : theme.accentColor(),</b>
+<b class="nc">&nbsp;                theme.panelFillColor(),</b>
+&nbsp;                2
+&nbsp;        );
+<b class="nc">&nbsp;        renderHeader(guiGraphics);</b>
+<b class="nc">&nbsp;        renderSubject(guiGraphics);</b>
+<b class="nc">&nbsp;        renderSummary(guiGraphics);</b>
+<b class="nc">&nbsp;        renderSkills(guiGraphics);</b>
+<b class="nc">&nbsp;        renderWarning(guiGraphics);</b>
+<b class="nc">&nbsp;        renderButtonsWithoutParentBlur(</b>
+&nbsp;                guiGraphics,
+&nbsp;                mouseX,
+&nbsp;                mouseY,
+&nbsp;                partialTick
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderHeader(
+&nbsp;            GuiGraphics guiGraphics
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiTheme theme = request.theme();</b>
+<b class="nc">&nbsp;        SkillUiLayout.Rect header = layout.header();</b>
+<b class="nc">&nbsp;        int badgeLeft = SkillUiRenderHelper.drawModeBadge(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                Component.literal(request.badge()),</b>
+<b class="nc">&nbsp;                header.right() - 2,</b>
+<b class="nc">&nbsp;                header.top() + 2,</b>
+&nbsp;                theme
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                Component.literal(request.title()),</b>
+<b class="nc">&nbsp;                header.left() + 2,</b>
+<b class="nc">&nbsp;                header.top() + 3,</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        1,
+<b class="nc">&nbsp;                        badgeLeft - header.left() - 8</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                theme.primaryTextColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                Component.literal(request.authorityName()),</b>
+<b class="nc">&nbsp;                header.left() + 2,</b>
+<b class="nc">&nbsp;                header.top() + 17,</b>
+<b class="nc">&nbsp;                Math.max(1, header.width() - 4),</b>
+<b class="nc">&nbsp;                theme.secondaryTextColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawDivider(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                header.left(),</b>
+<b class="nc">&nbsp;                header.right(),</b>
+<b class="nc">&nbsp;                header.bottom() - 1,</b>
+<b class="nc">&nbsp;                theme.panelBorderColor()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderSubject(
+&nbsp;            GuiGraphics guiGraphics
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiTheme theme = request.theme();</b>
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                layout.subject(),</b>
+<b class="nc">&nbsp;                theme.panelBorderColor(),</b>
+<b class="nc">&nbsp;                theme.categoryFillColor(),</b>
+&nbsp;                1
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                Component.literal(request.subjectLabel()),</b>
+<b class="nc">&nbsp;                layout.subject().left() + 5,</b>
+<b class="nc">&nbsp;                layout.subject().top() + 4,</b>
+<b class="nc">&nbsp;                theme.accentColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                Component.literal(request.subjectValue()),</b>
+<b class="nc">&nbsp;                layout.subject().left() + 58,</b>
+<b class="nc">&nbsp;                layout.subject().top() + 4,</b>
+<b class="nc">&nbsp;                Math.max(1, layout.subject().width() - 64),</b>
+<b class="nc">&nbsp;                theme.primaryTextColor()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderSummary(
+&nbsp;            GuiGraphics guiGraphics
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiTheme theme = request.theme();</b>
+<b class="nc">&nbsp;        SkillUiLayout.Rect bounds = layout.summary();</b>
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+&nbsp;                bounds,
+<b class="nc">&nbsp;                theme.panelBorderColor(),</b>
+<b class="nc">&nbsp;                theme.rowFillColor(),</b>
+&nbsp;                1
+&nbsp;        );
+<b class="nc">&nbsp;        int x = bounds.left() + 6;</b>
+<b class="nc">&nbsp;        int y = bounds.top() + 5;</b>
+<b class="nc">&nbsp;        int lineHeight = layout.compact() ? 10 : 12;</b>
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.enableScissor(</b>
+<b class="nc">&nbsp;                bounds.left() + 2,</b>
+<b class="nc">&nbsp;                bounds.top() + 2,</b>
+<b class="nc">&nbsp;                bounds.right() - 2,</b>
+<b class="nc">&nbsp;                bounds.bottom() - 2</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (layout.compact()) {</b>
+<b class="nc">&nbsp;            SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    font,
+<b class="nc">&nbsp;                    SkillUiText.component(</b>
+&nbsp;                            &quot;confirmation.compact_selected_affected&quot;,
+<b class="nc">&nbsp;                            request.selectedSkills(),</b>
+<b class="nc">&nbsp;                            request.affectedTargets()</b>
+&nbsp;                    ),
+&nbsp;                    x,
+&nbsp;                    y,
+<b class="nc">&nbsp;                    Math.max(1, bounds.width() - 12),</b>
+<b class="nc">&nbsp;                    theme.primaryTextColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            y += lineHeight;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (request.unmasteredSkills() &gt; 0) {</b>
+<b class="nc">&nbsp;                SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                        guiGraphics,
+&nbsp;                        font,
+<b class="nc">&nbsp;                        SkillUiText.component(</b>
+&nbsp;                                &quot;confirmation.compact_unmastered&quot;,
+<b class="nc">&nbsp;                                request.unmasteredSkills()</b>
+&nbsp;                        ),
+&nbsp;                        x,
+&nbsp;                        y,
+<b class="nc">&nbsp;                        Math.max(1, bounds.width() - 12),</b>
+<b class="nc">&nbsp;                        theme.warningColor()</b>
+&nbsp;                );
+<b class="nc">&nbsp;                y += lineHeight;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String compactCostLine = request.availableMagicules() &gt;= 0.0D</b>
+<b class="nc">&nbsp;                    ? SkillUiText.string(</b>
+&nbsp;                    &quot;confirmation.compact_required_available&quot;,
+<b class="nc">&nbsp;                    formatNumber(request.totalCost()),</b>
+<b class="nc">&nbsp;                    formatNumber(request.availableMagicules())</b>
+&nbsp;            )
+<b class="nc">&nbsp;                    : SkillUiText.string(</b>
+&nbsp;                    &quot;confirmation.compact_required&quot;,
+<b class="nc">&nbsp;                    formatNumber(request.totalCost())</b>
+&nbsp;            );
+<b class="nc">&nbsp;            SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    font,
+<b class="nc">&nbsp;                    Component.literal(compactCostLine),</b>
+&nbsp;                    x,
+&nbsp;                    y,
+<b class="nc">&nbsp;                    Math.max(1, bounds.width() - 12),</b>
+<b class="nc">&nbsp;                    request.availableMagicules() &gt;= 0.0D</b>
+<b class="nc">&nbsp;                            &amp;&amp; request.totalCost()</b>
+<b class="nc">&nbsp;                            &gt; request.availableMagicules()</b>
+<b class="nc">&nbsp;                            ? theme.dangerColor()</b>
+<b class="nc">&nbsp;                            : theme.primaryTextColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            y += lineHeight;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (y &lt; bounds.bottom() - 8) {</b>
+<b class="nc">&nbsp;                SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                        guiGraphics,
+&nbsp;                        font,
+<b class="nc">&nbsp;                        Component.literal(request.outcomeLine()),</b>
+&nbsp;                        x,
+&nbsp;                        y,
+<b class="nc">&nbsp;                        Math.max(1, bounds.width() - 12),</b>
+<b class="nc">&nbsp;                        request.danger()</b>
+<b class="nc">&nbsp;                                ? theme.dangerColor()</b>
+<b class="nc">&nbsp;                                : theme.accentColor()</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            guiGraphics.disableScissor();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        drawSummaryLine(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                SkillUiText.string(&quot;confirmation.label_selected_skills&quot;),</b>
+<b class="nc">&nbsp;                Integer.toString(request.selectedSkills()),</b>
+&nbsp;                x,
+&nbsp;                y,
+<b class="nc">&nbsp;                bounds.width() - 12,</b>
+<b class="nc">&nbsp;                theme.primaryTextColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        y += lineHeight;</b>
+<b class="nc">&nbsp;        drawSummaryLine(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                SkillUiText.string(&quot;confirmation.label_affected&quot;),</b>
+<b class="nc">&nbsp;                Integer.toString(request.affectedTargets()),</b>
+&nbsp;                x,
+&nbsp;                y,
+<b class="nc">&nbsp;                bounds.width() - 12,</b>
+<b class="nc">&nbsp;                theme.primaryTextColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        y += lineHeight;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (request.unmasteredSkills() &gt; 0) {</b>
+<b class="nc">&nbsp;            drawSummaryLine(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;confirmation.label_unmastered&quot;),</b>
+<b class="nc">&nbsp;                    Integer.toString(request.unmasteredSkills()),</b>
+&nbsp;                    x,
+&nbsp;                    y,
+<b class="nc">&nbsp;                    bounds.width() - 12,</b>
+<b class="nc">&nbsp;                    theme.warningColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            y += lineHeight;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (request.surcharge() &gt; 0.0D) {</b>
+<b class="nc">&nbsp;            drawSummaryLine(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;confirmation.label_base_cost&quot;),</b>
+<b class="nc">&nbsp;                    formatNumber(request.standardCost()),</b>
+&nbsp;                    x,
+&nbsp;                    y,
+<b class="nc">&nbsp;                    bounds.width() - 12,</b>
+<b class="nc">&nbsp;                    theme.secondaryTextColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            y += lineHeight;</b>
+<b class="nc">&nbsp;            drawSummaryLine(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;confirmation.label_surcharge&quot;),</b>
+<b class="nc">&nbsp;                    &quot;+&quot; + formatNumber(request.surcharge()),</b>
+&nbsp;                    x,
+&nbsp;                    y,
+<b class="nc">&nbsp;                    bounds.width() - 12,</b>
+<b class="nc">&nbsp;                    theme.warningColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            y += lineHeight;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        drawSummaryLine(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                SkillUiText.string(&quot;confirmation.label_required&quot;),</b>
+<b class="nc">&nbsp;                formatNumber(request.totalCost()),</b>
+&nbsp;                x,
+&nbsp;                y,
+<b class="nc">&nbsp;                bounds.width() - 12,</b>
+<b class="nc">&nbsp;                request.availableMagicules() &gt;= 0.0D</b>
+<b class="nc">&nbsp;                        &amp;&amp; request.totalCost() &gt; request.availableMagicules()</b>
+<b class="nc">&nbsp;                        ? theme.dangerColor()</b>
+<b class="nc">&nbsp;                        : theme.primaryTextColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        y += lineHeight;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (request.availableMagicules() &gt;= 0.0D) {</b>
+<b class="nc">&nbsp;            drawSummaryLine(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;confirmation.label_available&quot;),</b>
+<b class="nc">&nbsp;                    formatNumber(request.availableMagicules()),</b>
+&nbsp;                    x,
+&nbsp;                    y,
+<b class="nc">&nbsp;                    bounds.width() - 12,</b>
+<b class="nc">&nbsp;                    theme.secondaryTextColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            y += lineHeight;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (y &lt; bounds.bottom() - 10) {</b>
+<b class="nc">&nbsp;            SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    font,
+<b class="nc">&nbsp;                    Component.literal(request.outcomeLine()),</b>
+&nbsp;                    x,
+&nbsp;                    y + 2,
+<b class="nc">&nbsp;                    Math.max(1, bounds.width() - 12),</b>
+<b class="nc">&nbsp;                    request.danger()</b>
+<b class="nc">&nbsp;                            ? theme.dangerColor()</b>
+<b class="nc">&nbsp;                            : theme.accentColor()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.disableScissor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void drawSummaryLine(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            String label,
+&nbsp;            String value,
+&nbsp;            int x,
+&nbsp;            int y,
+&nbsp;            int width,
+&nbsp;            int valueColor
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiTheme theme = request.theme();</b>
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                Component.literal(label + &quot;:&quot;),</b>
+&nbsp;                x,
+&nbsp;                y,
+<b class="nc">&nbsp;                Math.max(1, width / 2),</b>
+<b class="nc">&nbsp;                theme.mutedTextColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int valueX = x + width / 2;</b>
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                Component.literal(value),</b>
+&nbsp;                valueX,
+&nbsp;                y,
+<b class="nc">&nbsp;                Math.max(1, width - width / 2),</b>
+&nbsp;                valueColor
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderSkills(
+&nbsp;            GuiGraphics guiGraphics
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiTheme theme = request.theme();</b>
+<b class="nc">&nbsp;        SkillUiLayout.Rect bounds = layout.skills();</b>
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+&nbsp;                bounds,
+<b class="nc">&nbsp;                theme.panelBorderColor(),</b>
+<b class="nc">&nbsp;                theme.rowFillColor(),</b>
+&nbsp;                1
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                SkillUiText.component(&quot;confirmation.selected_skills_header&quot;),</b>
+<b class="nc">&nbsp;                bounds.left() + 5,</b>
+<b class="nc">&nbsp;                bounds.top() + 4,</b>
+<b class="nc">&nbsp;                theme.accentColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int top = bounds.top() + 17;</b>
+<b class="nc">&nbsp;        int availableHeight = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                bounds.bottom() - top - 4</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int visibleRows = UltimateConfirmationPolicy.visibleSkillRows(</b>
+&nbsp;                availableHeight,
+<b class="nc">&nbsp;                layout.compact()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int rowHeight = layout.compact() ? 11 : 13;</b>
+<b class="nc">&nbsp;        int displayed = Math.min(</b>
+&nbsp;                visibleRows,
+<b class="nc">&nbsp;                request.skills().size()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.enableScissor(</b>
+<b class="nc">&nbsp;                bounds.left() + 2,</b>
+&nbsp;                top,
+<b class="nc">&nbsp;                bounds.right() - 2,</b>
+<b class="nc">&nbsp;                bounds.bottom() - 2</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; displayed; index++) {</b>
+<b class="nc">&nbsp;            SkillLine skill = request.skills().get(index);</b>
+<b class="nc">&nbsp;            int y = top + index * rowHeight;</b>
+<b class="nc">&nbsp;            int nameWidth = Math.max(1, bounds.width() * 56 / 100);</b>
+<b class="nc">&nbsp;            int costWidth = Math.max(1, bounds.width() - nameWidth - 14);</b>
+&nbsp;
+<b class="nc">&nbsp;            SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    font,
+<b class="nc">&nbsp;                    Component.literal(skill.displayName()),</b>
+<b class="nc">&nbsp;                    bounds.left() + 6,</b>
+&nbsp;                    y,
+&nbsp;                    nameWidth,
+<b class="nc">&nbsp;                    skill.warning()</b>
+<b class="nc">&nbsp;                            ? theme.warningColor()</b>
+<b class="nc">&nbsp;                            : theme.primaryTextColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    font,
+<b class="nc">&nbsp;                    Component.literal(skill.secondary()),</b>
+<b class="nc">&nbsp;                    bounds.left() + 6 + nameWidth,</b>
+&nbsp;                    y,
+&nbsp;                    costWidth,
+<b class="nc">&nbsp;                    theme.mutedTextColor()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (request.skills().size() &gt; displayed) {</b>
+<b class="nc">&nbsp;            int remaining = request.skills().size() - displayed;</b>
+<b class="nc">&nbsp;            int y = top + displayed * rowHeight;</b>
+<b class="nc">&nbsp;            SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    font,
+<b class="nc">&nbsp;                    SkillUiText.component(</b>
+&nbsp;                            &quot;confirmation.more_selected&quot;,
+<b class="nc">&nbsp;                            remaining</b>
+&nbsp;                    ),
+<b class="nc">&nbsp;                    bounds.left() + 6,</b>
+&nbsp;                    y,
+<b class="nc">&nbsp;                    Math.max(1, bounds.width() - 12),</b>
+<b class="nc">&nbsp;                    theme.secondaryTextColor()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.disableScissor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderWarning(
+&nbsp;            GuiGraphics guiGraphics
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiTheme theme = request.theme();</b>
+<b class="nc">&nbsp;        SkillUiLayout.Rect bounds = layout.warning();</b>
+<b class="nc">&nbsp;        int borderColor = request.danger()</b>
+<b class="nc">&nbsp;                ? theme.dangerColor()</b>
+<b class="nc">&nbsp;                : request.unmasteredSkills() &gt; 0</b>
+<b class="nc">&nbsp;                  ? theme.warningColor()</b>
+<b class="nc">&nbsp;                  : theme.panelBorderColor();</b>
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+&nbsp;                bounds,
+&nbsp;                borderColor,
+<b class="nc">&nbsp;                theme.categoryFillColor(),</b>
+&nbsp;                1
+&nbsp;        );
+<b class="nc">&nbsp;        int textColor = request.danger()</b>
+<b class="nc">&nbsp;                ? theme.dangerColor()</b>
+<b class="nc">&nbsp;                : request.unmasteredSkills() &gt; 0</b>
+<b class="nc">&nbsp;                  ? theme.warningColor()</b>
+<b class="nc">&nbsp;                  : theme.secondaryTextColor();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; lines = wrapText(</b>
+<b class="nc">&nbsp;                request.warning(),</b>
+<b class="nc">&nbsp;                Math.max(1, bounds.width() - 12),</b>
+<b class="nc">&nbsp;                layout.compact() ? 2 : 3</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int y = bounds.top() + 5;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String line : lines) {</b>
+<b class="nc">&nbsp;            SkillUiRenderHelper.drawText(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    font,
+<b class="nc">&nbsp;                    Component.literal(line),</b>
+<b class="nc">&nbsp;                    bounds.left() + 6,</b>
+&nbsp;                    y,
+&nbsp;                    textColor
+&nbsp;            );
+<b class="nc">&nbsp;            y += 10;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; wrapText(
+&nbsp;            String text,
+&nbsp;            int maximumWidth,
+&nbsp;            int maximumLines
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (text == null || text.isBlank()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; lines = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        StringBuilder current = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String word : text.trim().split(&quot;\\s+&quot;)) {</b>
+<b class="nc">&nbsp;            String candidate = current.isEmpty()</b>
+<b class="nc">&nbsp;                    ? word</b>
+<b class="nc">&nbsp;                    : current + &quot; &quot; + word;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (font.width(candidate) &lt;= maximumWidth) {</b>
+<b class="nc">&nbsp;                current.setLength(0);</b>
+<b class="nc">&nbsp;                current.append(candidate);</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!current.isEmpty()) {</b>
+<b class="nc">&nbsp;                lines.add(current.toString());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            current.setLength(0);</b>
+<b class="nc">&nbsp;            current.append(word);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (lines.size() &gt;= maximumLines - 1) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!current.isEmpty() &amp;&amp; lines.size() &lt; maximumLines) {</b>
+<b class="nc">&nbsp;            lines.add(current.toString());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (lines.size() == maximumLines</b>
+<b class="nc">&nbsp;                &amp;&amp; font.width(lines.getLast()) &gt; maximumWidth) {</b>
+<b class="nc">&nbsp;            String clipped = font.plainSubstrByWidth(</b>
+<b class="nc">&nbsp;                    lines.getLast(),</b>
+<b class="nc">&nbsp;                    Math.max(0, maximumWidth - font.width(&quot;…&quot;))</b>
+&nbsp;            );
+<b class="nc">&nbsp;            lines.set(</b>
+<b class="nc">&nbsp;                    lines.size() - 1,</b>
+&nbsp;                    clipped + &quot;…&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return List.copyOf(lines);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderButtonsWithoutParentBlur(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (backButton != null) {</b>
+<b class="nc">&nbsp;            backButton.render(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    mouseX,
+&nbsp;                    mouseY,
+&nbsp;                    partialTick
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (confirmButton != null) {</b>
+<b class="nc">&nbsp;            confirmButton.render(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    mouseX,
+&nbsp;                    mouseY,
+&nbsp;                    partialTick
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ConfirmationRequest legacyRequest(
+&nbsp;            OpenUltimateConfirmationScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (payload == null) {</b>
+<b class="nc">&nbsp;            return ConfirmationRequest.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiTheme theme = payload.benevolent()</b>
+<b class="nc">&nbsp;                ? SkillUiTheme.BENEVOLENT</b>
+<b class="nc">&nbsp;                : SkillUiTheme.GOVERNANCE;</b>
+<b class="nc">&nbsp;        String action = SkillUiText.string(</b>
+<b class="nc">&nbsp;                payload.massGrant()</b>
+<b class="nc">&nbsp;                        ? &quot;action.legacy_mass_grant.title&quot;</b>
+<b class="nc">&nbsp;                        : payload.benevolent()</b>
+<b class="nc">&nbsp;                          ? &quot;action.benevolent_take_back.title&quot;</b>
+<b class="nc">&nbsp;                          : &quot;action.governance_take_back.title&quot;</b>
+&nbsp;        );
+<b class="nc">&nbsp;        Runnable confirmAction = () -&gt;</b>
+<b class="nc">&nbsp;                PacketDistributor.sendToServer(</b>
+&nbsp;                        new ExecuteUltimateConfirmationPayload(
+<b class="nc">&nbsp;                                payload.massGrant(),</b>
+<b class="nc">&nbsp;                                payload.benevolent()</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return new ConfirmationRequest(</b>
+<b class="nc">&nbsp;                SkillUiText.string(</b>
+&nbsp;                        &quot;confirmation.confirm_action&quot;,
+&nbsp;                        action
+&nbsp;                ),
+<b class="nc">&nbsp;                SkillUiText.string(</b>
+<b class="nc">&nbsp;                        payload.massGrant()</b>
+<b class="nc">&nbsp;                                ? &quot;action.legacy_mass_grant.badge&quot;</b>
+<b class="nc">&nbsp;                                : &quot;confirmation.take_back_badge&quot;</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                SkillUiText.string(</b>
+<b class="nc">&nbsp;                        payload.benevolent()</b>
+<b class="nc">&nbsp;                                ? &quot;authority.benevolent&quot;</b>
+<b class="nc">&nbsp;                                : &quot;authority.governance&quot;</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                SkillUiText.string(&quot;common.scope_label&quot;),</b>
+<b class="nc">&nbsp;                SkillUiText.string(</b>
+<b class="nc">&nbsp;                        payload.affectedTargets() == 1</b>
+<b class="nc">&nbsp;                                ? &quot;confirmation.affected_subordinate_one&quot;</b>
+<b class="nc">&nbsp;                                : &quot;confirmation.affected_subordinate_many&quot;,</b>
+<b class="nc">&nbsp;                        payload.affectedTargets()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                List.of(</b>
+&nbsp;                        new SkillLine(
+<b class="nc">&nbsp;                                payload.selectedSkillName(),</b>
+<b class="nc">&nbsp;                                SkillUiText.string(</b>
+<b class="nc">&nbsp;                                        payload.massGrant()</b>
+<b class="nc">&nbsp;                                                ? &quot;state.mastered&quot;</b>
+<b class="nc">&nbsp;                                                : &quot;overview.skill_granted_by_you&quot;</b>
+&nbsp;                                ),
+<b class="nc">&nbsp;                                payload.totalCost(),</b>
+&nbsp;                                false
+&nbsp;                        )
+&nbsp;                ),
+&nbsp;                1,
+<b class="nc">&nbsp;                payload.affectedTargets(),</b>
+<b class="nc">&nbsp;                payload.massGrant() ? 1 : 0,</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                payload.totalCost(),</b>
+&nbsp;                0.0D,
+<b class="nc">&nbsp;                payload.totalCost(),</b>
+&nbsp;                -1.0D,
+<b class="nc">&nbsp;                SkillUiText.string(</b>
+<b class="nc">&nbsp;                        payload.massGrant()</b>
+<b class="nc">&nbsp;                                ? &quot;confirmation.legacy_outcome_mass&quot;</b>
+<b class="nc">&nbsp;                                : &quot;confirmation.legacy_outcome_take_back&quot;</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                SkillUiText.string(</b>
+<b class="nc">&nbsp;                        payload.massGrant()</b>
+<b class="nc">&nbsp;                                ? &quot;confirmation.legacy_warning_mass&quot;</b>
+<b class="nc">&nbsp;                                : &quot;confirmation.legacy_warning_take_back&quot;</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                SkillUiText.string(</b>
+<b class="nc">&nbsp;                        payload.massGrant()</b>
+<b class="nc">&nbsp;                                ? &quot;confirmation.confirm_grant&quot;</b>
+<b class="nc">&nbsp;                                : &quot;confirmation.confirm_take_back&quot;</b>
+&nbsp;                ),
+&nbsp;                theme,
+&nbsp;                false,
+<b class="nc">&nbsp;                payload.affectedTargets() &gt; 0,</b>
+&nbsp;                confirmAction
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static SkillUiTheme resolveTheme(
+&nbsp;            AuthorityActionMode mode
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (mode == null || mode.granter()) {</b>
+<b class="nc">&nbsp;            return SkillUiTheme.GRANTER;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return mode.benevolent()</b>
+<b class="nc">&nbsp;                ? SkillUiTheme.BENEVOLENT</b>
+<b class="nc">&nbsp;                : SkillUiTheme.GOVERNANCE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String authorityName(
+&nbsp;            AuthorityActionMode mode
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (mode == null || mode.granter()) {</b>
+<b class="nc">&nbsp;            return SkillUiText.string(&quot;authority.granter&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return SkillUiText.string(</b>
+<b class="nc">&nbsp;                mode.benevolent()</b>
+<b class="nc">&nbsp;                        ? &quot;authority.benevolent&quot;</b>
+<b class="nc">&nbsp;                        : &quot;authority.governance&quot;</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String confirmLabel(
+&nbsp;            AuthorityActionMode mode
+&nbsp;    ) {
+<b class="nc">&nbsp;        return SkillUiText.string(</b>
+<b class="nc">&nbsp;                switch (mode) {</b>
+&nbsp;                    case BENEVOLENT_BESTOW -&gt;
+<b class="nc">&nbsp;                            &quot;confirmation.confirm_bestow&quot;;</b>
+&nbsp;                    case GOVERNANCE_INVEST -&gt;
+<b class="nc">&nbsp;                            &quot;confirmation.confirm_invest&quot;;</b>
+&nbsp;                    case BENEVOLENT_MASS_GRANT,
+&nbsp;                         GOVERNANCE_MASS_GRANT -&gt;
+<b class="nc">&nbsp;                            &quot;confirmation.confirm_mass_grant&quot;;</b>
+&nbsp;                    case BENEVOLENT_TAKE_BACK,
+&nbsp;                         GOVERNANCE_TAKE_BACK,
+&nbsp;                         GRANTER_TAKE_BACK -&gt;
+<b class="nc">&nbsp;                            &quot;confirmation.confirm_take_back&quot;;</b>
+&nbsp;                    case GRANTER_GRANT -&gt;
+<b class="nc">&nbsp;                            &quot;confirmation.confirm_grant&quot;;</b>
+&nbsp;                }
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatNumber(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%,.0f&quot;,
+<b class="nc">&nbsp;                Math.max(0.0D, value)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isPauseScreen() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record SkillLine(</b>
+&nbsp;            String displayName,
+&nbsp;            String secondary,
+&nbsp;            double cost,
+&nbsp;            boolean warning
+&nbsp;    ) {
+<b class="nc">&nbsp;        public SkillLine {</b>
+<b class="nc">&nbsp;            displayName = displayName == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : displayName.trim();</b>
+<b class="nc">&nbsp;            secondary = secondary == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : secondary.trim();</b>
+<b class="nc">&nbsp;            cost = UltimateConfirmationPolicy.sanitizeCost(cost);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record ConfirmationRequest(</b>
+&nbsp;            String title,
+&nbsp;            String badge,
+&nbsp;            String authorityName,
+&nbsp;            String subjectLabel,
+&nbsp;            String subjectValue,
+&nbsp;            List&lt;SkillLine&gt; skills,
+&nbsp;            int selectedSkills,
+&nbsp;            int affectedTargets,
+&nbsp;            int masteredSkills,
+&nbsp;            int unmasteredSkills,
+&nbsp;            double standardCost,
+&nbsp;            double surcharge,
+&nbsp;            double totalCost,
+&nbsp;            double availableMagicules,
+&nbsp;            String outcomeLine,
+&nbsp;            String warning,
+&nbsp;            String confirmLabel,
+&nbsp;            SkillUiTheme theme,
+&nbsp;            boolean danger,
+&nbsp;            boolean ready,
+&nbsp;            Runnable confirmAction
+&nbsp;    ) {
+<b class="nc">&nbsp;        public ConfirmationRequest {</b>
+<b class="nc">&nbsp;            title = clean(title, SkillUiText.string(&quot;confirmation.default_title&quot;));</b>
+<b class="nc">&nbsp;            badge = clean(badge, SkillUiText.string(&quot;confirmation.default_badge&quot;));</b>
+<b class="nc">&nbsp;            authorityName = clean(authorityName, SkillUiText.string(&quot;confirmation.default_authority&quot;));</b>
+<b class="nc">&nbsp;            subjectLabel = clean(subjectLabel, SkillUiText.string(&quot;common.target_label&quot;));</b>
+<b class="nc">&nbsp;            subjectValue = clean(subjectValue, SkillUiText.string(&quot;common.unknown&quot;));</b>
+<b class="nc">&nbsp;            skills = skills == null</b>
+<b class="nc">&nbsp;                    ? List.of()</b>
+<b class="nc">&nbsp;                    : List.copyOf(skills);</b>
+<b class="nc">&nbsp;            selectedSkills = Math.max(0, selectedSkills);</b>
+<b class="nc">&nbsp;            affectedTargets = Math.max(0, affectedTargets);</b>
+<b class="nc">&nbsp;            masteredSkills = Math.max(0, masteredSkills);</b>
+<b class="nc">&nbsp;            unmasteredSkills = Math.max(0, unmasteredSkills);</b>
+<b class="nc">&nbsp;            standardCost = UltimateConfirmationPolicy.sanitizeCost(</b>
+&nbsp;                    standardCost
+&nbsp;            );
+<b class="nc">&nbsp;            surcharge = UltimateConfirmationPolicy.sanitizeCost(surcharge);</b>
+<b class="nc">&nbsp;            totalCost = UltimateConfirmationPolicy.sanitizeCost(totalCost);</b>
+<b class="nc">&nbsp;            availableMagicules = availableMagicules &lt; 0.0D</b>
+<b class="nc">&nbsp;                    ? -1.0D</b>
+<b class="nc">&nbsp;                    : UltimateConfirmationPolicy.sanitizeCost(</b>
+&nbsp;                    availableMagicules
+&nbsp;            );
+<b class="nc">&nbsp;            outcomeLine = clean(outcomeLine, &quot;&quot;);</b>
+<b class="nc">&nbsp;            warning = clean(warning, &quot;&quot;);</b>
+<b class="nc">&nbsp;            confirmLabel = clean(confirmLabel, SkillUiText.string(&quot;common.confirm&quot;));</b>
+<b class="nc">&nbsp;            theme = theme == null</b>
+<b class="nc">&nbsp;                    ? SkillUiTheme.GOVERNANCE</b>
+<b class="nc">&nbsp;                    : theme;</b>
+<b class="nc">&nbsp;            confirmAction = confirmAction == null</b>
+<b class="nc">&nbsp;                    ? () -&gt; {</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;                    : confirmAction;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static ConfirmationRequest empty() {
+<b class="nc">&nbsp;            return new ConfirmationRequest(</b>
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;confirmation.default_title&quot;),</b>
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;confirmation.default_badge&quot;),</b>
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;confirmation.default_authority&quot;),</b>
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;common.target_label&quot;),</b>
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;common.unknown&quot;),</b>
+<b class="nc">&nbsp;                    List.of(),</b>
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    0.0D,
+&nbsp;                    0.0D,
+&nbsp;                    0.0D,
+&nbsp;                    0.0D,
+&nbsp;                    &quot;&quot;,
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;confirmation.no_valid_action&quot;),</b>
+<b class="nc">&nbsp;                    SkillUiText.string(&quot;common.confirm&quot;),</b>
+&nbsp;                    SkillUiTheme.GOVERNANCE,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    () -&gt; {
+<b class="nc">&nbsp;                    }</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private static String clean(
+&nbsp;                String value,
+&nbsp;                String fallback
+&nbsp;        ) {
+<b class="nc">&nbsp;            return value == null || value.isBlank()</b>
+<b class="nc">&nbsp;                    ? fallback</b>
+<b class="nc">&nbsp;                    : value.trim();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record Layout(</b>
+&nbsp;            SkillUiLayout.Rect panel,
+&nbsp;            SkillUiLayout.Rect header,
+&nbsp;            SkillUiLayout.Rect subject,
+&nbsp;            SkillUiLayout.Rect summary,
+&nbsp;            SkillUiLayout.Rect skills,
+&nbsp;            SkillUiLayout.Rect warning,
+&nbsp;            SkillUiLayout.Rect footer,
+&nbsp;            boolean compact
+&nbsp;    ) {
+&nbsp;        private static Layout calculate(
+&nbsp;                int screenWidth,
+&nbsp;                int screenHeight
+&nbsp;        ) {
+<b class="nc">&nbsp;            boolean compact = screenHeight &lt; 300;</b>
+<b class="nc">&nbsp;            int marginX = Math.max(</b>
+<b class="nc">&nbsp;                    compact ? 6 : 10,</b>
+&nbsp;                    screenWidth / 11
+&nbsp;            );
+<b class="nc">&nbsp;            int marginY = Math.max(</b>
+<b class="nc">&nbsp;                    compact ? 5 : 8,</b>
+&nbsp;                    screenHeight / 12
+&nbsp;            );
+<b class="nc">&nbsp;            int panelWidth = Math.max(</b>
+&nbsp;                    1,
+&nbsp;                    screenWidth - marginX * 2
+&nbsp;            );
+<b class="nc">&nbsp;            int panelHeight = Math.max(</b>
+&nbsp;                    1,
+&nbsp;                    screenHeight - marginY * 2
+&nbsp;            );
+<b class="nc">&nbsp;            int inset = compact ? 5 : 8;</b>
+<b class="nc">&nbsp;            int headerHeight = compact ? 31 : 39;</b>
+<b class="nc">&nbsp;            int subjectHeight = compact ? 19 : 23;</b>
+<b class="nc">&nbsp;            int footerHeight = compact ? 18 : 22;</b>
+<b class="nc">&nbsp;            int warningHeight = compact ? 29 : 39;</b>
+<b class="nc">&nbsp;            int gap = compact ? 3 : 5;</b>
+<b class="nc">&nbsp;            SkillUiLayout.Rect panel = new SkillUiLayout.Rect(</b>
+&nbsp;                    marginX,
+&nbsp;                    marginY,
+&nbsp;                    panelWidth,
+&nbsp;                    panelHeight
+&nbsp;            );
+<b class="nc">&nbsp;            SkillUiLayout.Rect header = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                    panel.left() + inset,</b>
+<b class="nc">&nbsp;                    panel.top() + inset,</b>
+<b class="nc">&nbsp;                    Math.max(1, panel.width() - inset * 2),</b>
+&nbsp;                    headerHeight
+&nbsp;            );
+<b class="nc">&nbsp;            SkillUiLayout.Rect subject = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                    header.left(),</b>
+<b class="nc">&nbsp;                    header.bottom() + gap,</b>
+<b class="nc">&nbsp;                    header.width(),</b>
+&nbsp;                    subjectHeight
+&nbsp;            );
+<b class="nc">&nbsp;            SkillUiLayout.Rect footer = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                    header.left(),</b>
+<b class="nc">&nbsp;                    panel.bottom() - inset - footerHeight,</b>
+<b class="nc">&nbsp;                    header.width(),</b>
+&nbsp;                    footerHeight
+&nbsp;            );
+<b class="nc">&nbsp;            SkillUiLayout.Rect warning = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                    header.left(),</b>
+<b class="nc">&nbsp;                    footer.top() - gap - warningHeight,</b>
+<b class="nc">&nbsp;                    header.width(),</b>
+&nbsp;                    warningHeight
+&nbsp;            );
+<b class="nc">&nbsp;            int bodyTop = subject.bottom() + gap;</b>
+<b class="nc">&nbsp;            int bodyHeight = Math.max(</b>
+&nbsp;                    1,
+<b class="nc">&nbsp;                    warning.top() - gap - bodyTop</b>
+&nbsp;            );
+<b class="nc">&nbsp;            boolean twoColumns = panelWidth &gt;= 520;</b>
+&nbsp;            SkillUiLayout.Rect summary;
+&nbsp;            SkillUiLayout.Rect skills;
+&nbsp;
+<b class="nc">&nbsp;            if (twoColumns) {</b>
+<b class="nc">&nbsp;                int summaryWidth = Math.max(</b>
+&nbsp;                        170,
+<b class="nc">&nbsp;                        header.width() * 36 / 100</b>
+&nbsp;                );
+<b class="nc">&nbsp;                summaryWidth = Math.min(</b>
+&nbsp;                        summaryWidth,
+<b class="nc">&nbsp;                        Math.max(1, header.width() - gap - 220)</b>
+&nbsp;                );
+<b class="nc">&nbsp;                summary = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                        header.left(),</b>
+&nbsp;                        bodyTop,
+&nbsp;                        summaryWidth,
+&nbsp;                        bodyHeight
+&nbsp;                );
+<b class="nc">&nbsp;                skills = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                        summary.right() + gap,</b>
+&nbsp;                        bodyTop,
+<b class="nc">&nbsp;                        Math.max(1, header.right() - summary.right() - gap),</b>
+&nbsp;                        bodyHeight
+&nbsp;                );
+&nbsp;            } else {
+<b class="nc">&nbsp;                int summaryHeight = Math.max(</b>
+<b class="nc">&nbsp;                        compact ? 50 : 72,</b>
+&nbsp;                        bodyHeight * 46 / 100
+&nbsp;                );
+<b class="nc">&nbsp;                summaryHeight = Math.min(</b>
+&nbsp;                        summaryHeight,
+<b class="nc">&nbsp;                        Math.max(</b>
+&nbsp;                                1,
+&nbsp;                                bodyHeight
+&nbsp;                                        - gap
+<b class="nc">&nbsp;                                        - (compact ? 30 : 38)</b>
+&nbsp;                        )
+&nbsp;                );
+<b class="nc">&nbsp;                summary = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                        header.left(),</b>
+&nbsp;                        bodyTop,
+<b class="nc">&nbsp;                        header.width(),</b>
+&nbsp;                        summaryHeight
+&nbsp;                );
+<b class="nc">&nbsp;                skills = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                        header.left(),</b>
+<b class="nc">&nbsp;                        summary.bottom() + gap,</b>
+<b class="nc">&nbsp;                        header.width(),</b>
+<b class="nc">&nbsp;                        Math.max(1, bodyHeight - summaryHeight - gap)</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return new Layout(</b>
+&nbsp;                    panel,
+&nbsp;                    header,
+&nbsp;                    subject,
+&nbsp;                    summary,
+&nbsp;                    skills,
+&nbsp;                    warning,
+&nbsp;                    footer,
+&nbsp;                    compact
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

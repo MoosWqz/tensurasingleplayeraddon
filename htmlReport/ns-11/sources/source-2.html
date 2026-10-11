@@ -1,0 +1,562 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AddonAdvancementHelper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: AddonAdvancementHelper (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AddonAdvancementHelper</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (14/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42%
+  </span>
+  <span class="absValue">
+    (37/88)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.1%
+  </span>
+  <span class="absValue">
+    (113/166)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.BorrowedSkillData;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.GranterAcquisitionTracker;
+&nbsp;import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
+&nbsp;import io.github.manasmods.manascore.skill.api.ManasSkillInstance;
+&nbsp;import io.github.manasmods.manascore.skill.api.SkillAPI;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import net.minecraft.advancements.AdvancementHolder;
+&nbsp;import net.minecraft.advancements.AdvancementProgress;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.MinecraftServer;
+&nbsp;import net.minecraft.server.PlayerAdvancements;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * Idempotent advancement awards with incarnation-reset suppression.
+&nbsp; */
+&nbsp;public final class AddonAdvancementHelper {
+&nbsp;
+<b class="fc">&nbsp;    public static final ResourceLocation ROOT = id(&quot;root&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation A_NAME_TO_ANCHOR_THE_SOUL =</b>
+<b class="fc">&nbsp;            id(&quot;a_name_to_anchor_the_soul&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation SAGES_FIRST_STEP =</b>
+<b class="fc">&nbsp;            id(&quot;sages_first_step&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation GREAT_CRYSTAL_RESONANCE =</b>
+<b class="fc">&nbsp;            id(&quot;great_crystal_resonance&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation THE_GREAT_SAGE_AWAKENS =</b>
+<b class="fc">&nbsp;            id(&quot;the_great_sage_awakens&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation AUTHORITY_TO_BESTOW =</b>
+<b class="fc">&nbsp;            id(&quot;authority_to_bestow&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation FIRST_GIFT =</b>
+<b class="fc">&nbsp;            id(&quot;first_gift&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation WHAT_WAS_GIVEN_CAN_RETURN =</b>
+<b class="fc">&nbsp;            id(&quot;what_was_given_can_return&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation GRANTER_MASTERED =</b>
+<b class="fc">&nbsp;            id(&quot;granter_mastered&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation PATH_OF_BENEVOLENCE =</b>
+<b class="fc">&nbsp;            id(&quot;path_of_benevolence&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation BORROWED_POWER =</b>
+<b class="fc">&nbsp;            id(&quot;borrowed_power&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation A_POWER_MADE_PERMANENT =</b>
+<b class="fc">&nbsp;            id(&quot;a_power_made_permanent&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation PATH_OF_GOVERNANCE =</b>
+<b class="fc">&nbsp;            id(&quot;path_of_governance&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation SEIZED_AUTHORITY =</b>
+<b class="fc">&nbsp;            id(&quot;seized_authority&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation SOUL_STRAIN =</b>
+<b class="fc">&nbsp;            id(&quot;soul_strain&quot;);</b>
+<b class="fc">&nbsp;    public static final ResourceLocation THE_PRICE_OF_POWER =</b>
+<b class="fc">&nbsp;            id(&quot;the_price_of_power&quot;);</b>
+&nbsp;
+&nbsp;    private AddonAdvancementHelper() {
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ResourceLocation id(
+&nbsp;            String path
+&nbsp;    ) {
+<b class="fc">&nbsp;        return ResourceLocation.fromNamespaceAndPath(</b>
+&nbsp;                MoosTensuraAddon.MODID,
+&nbsp;                path
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void award(
+&nbsp;            ServerPlayer player,
+&nbsp;            ResourceLocation advancementId
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null</b>
+&nbsp;                || advancementId == null
+<b class="pc">&nbsp;                || AddonIncarnationState.isResetGuardActive(player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        MinecraftServer server = player.getServer();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (server == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        AdvancementHolder holder = server.getAdvancements()</b>
+<b class="fc">&nbsp;                .get(advancementId);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (holder == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        PlayerAdvancements advancements = player.getAdvancements();</b>
+<b class="fc">&nbsp;        AdvancementProgress progress = advancements</b>
+<b class="fc">&nbsp;                .getOrStartProgress(holder);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (progress.isDone()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (String criterion : progress.getRemainingCriteria()) {</b>
+<b class="nc">&nbsp;            advancements.award(holder, criterion);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardRoot(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="fc">&nbsp;        award(player, ROOT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardNameAnchor(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="fc">&nbsp;        awardRoot(player);</b>
+<b class="fc">&nbsp;        award(player, A_NAME_TO_ANCHOR_THE_SOUL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardSageFirstStep(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="fc">&nbsp;        awardRoot(player);</b>
+<b class="fc">&nbsp;        award(player, SAGES_FIRST_STEP);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardGreatCrystalResonance(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        awardSageFirstStep(player);</b>
+<b class="nc">&nbsp;        award(player, GREAT_CRYSTAL_RESONANCE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardGreatSageAwakens(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="fc">&nbsp;        awardSageFirstStep(player);</b>
+<b class="fc">&nbsp;        award(player, THE_GREAT_SAGE_AWAKENS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compatibility entry point used by existing Granter acquisition code.
+&nbsp;     * The transition tracker decides whether this is a real acquisition,
+&nbsp;     * a harmless repeated call, or a repair of a confirmed life state.
+&nbsp;     */
+&nbsp;    public static void awardAuthorityToBestow(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        GranterAcquisitionTracker.observe(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Direct non-recursive award used only after the lifecycle tracker has
+&nbsp;     * confirmed acquisition for this incarnation.
+&nbsp;     */
+&nbsp;    public static void awardAuthorityToBestowConfirmed(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        awardGreatSageAwakens(player);</b>
+<b class="nc">&nbsp;        award(player, AUTHORITY_TO_BESTOW);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardFirstGift(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        GranterAcquisitionTracker.confirmFromAuthorityEvidence(player);</b>
+<b class="nc">&nbsp;        awardAuthorityToBestowConfirmed(player);</b>
+<b class="nc">&nbsp;        award(player, FIRST_GIFT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardWhatWasGivenCanReturn(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        awardFirstGift(player);</b>
+<b class="nc">&nbsp;        award(player, WHAT_WAS_GIVEN_CAN_RETURN);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardGranterMastered(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        GranterAcquisitionTracker.confirmFromAuthorityEvidence(player);</b>
+<b class="nc">&nbsp;        awardAuthorityToBestowConfirmed(player);</b>
+<b class="nc">&nbsp;        award(player, GRANTER_MASTERED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardPathOfBenevolence(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        awardGranterMastered(player);</b>
+<b class="nc">&nbsp;        award(player, PATH_OF_BENEVOLENCE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardBorrowedPower(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        awardPathOfBenevolence(player);</b>
+<b class="nc">&nbsp;        award(player, BORROWED_POWER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardPowerMadePermanent(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        awardBorrowedPower(player);</b>
+<b class="nc">&nbsp;        award(player, A_POWER_MADE_PERMANENT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardPathOfGovernance(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        awardGranterMastered(player);</b>
+<b class="nc">&nbsp;        award(player, PATH_OF_GOVERNANCE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardSeizedAuthority(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        awardPathOfGovernance(player);</b>
+<b class="nc">&nbsp;        award(player, SEIZED_AUTHORITY);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardSoulStrain(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        awardSeizedAuthority(player);</b>
+<b class="nc">&nbsp;        award(player, SOUL_STRAIN);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardPriceOfPower(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        awardSoulStrain(player);</b>
+<b class="nc">&nbsp;        award(player, THE_PRICE_OF_POWER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void awardStateBasedAdvancements(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null</b>
+<b class="pc">&nbsp;                || player.level().isClientSide()</b>
+<b class="pc">&nbsp;                || AddonIncarnationState.isResetGuardActive(player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        awardRoot(player);</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean named = isNamedOrEndowed(player);</b>
+<b class="fc">&nbsp;        boolean sage = hasExactSkill(</b>
+&nbsp;                player,
+&nbsp;                &quot;tensura:sage&quot;,
+&nbsp;                &quot;Sage&quot;
+&nbsp;        );
+<b class="fc">&nbsp;        boolean greatSage = GranterActions.hasGreatSage(player);</b>
+<b class="fc">&nbsp;        boolean granter = hasSkill(</b>
+&nbsp;                player,
+<b class="fc">&nbsp;                SkillRegistry.GRANTER.get().getRegistryName()</b>
+&nbsp;        );
+<b class="fc">&nbsp;        boolean benevolent = hasSkill(</b>
+&nbsp;                player,
+&nbsp;                SkillRegistry.BENEVOLENT_EMPOWERMENT
+<b class="fc">&nbsp;                        .get()</b>
+<b class="fc">&nbsp;                        .getRegistryName()</b>
+&nbsp;        );
+<b class="fc">&nbsp;        boolean governance = hasSkill(</b>
+&nbsp;                player,
+&nbsp;                SkillRegistry.ABSOLUTE_GOVERNANCE
+<b class="fc">&nbsp;                        .get()</b>
+<b class="fc">&nbsp;                        .getRegistryName()</b>
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (named) {</b>
+<b class="fc">&nbsp;            awardNameAnchor(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (sage) {</b>
+<b class="nc">&nbsp;            awardSageFirstStep(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (greatSage) {</b>
+<b class="fc">&nbsp;            awardGreatSageAwakens(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (granter || benevolent || governance) {</b>
+<b class="nc">&nbsp;            GranterAcquisitionTracker.observe(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (benevolent) {</b>
+<b class="nc">&nbsp;            awardPathOfBenevolence(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (governance) {</b>
+<b class="nc">&nbsp;            awardPathOfGovernance(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        awardGranterProgressAdvancements(player);</b>
+<b class="fc">&nbsp;        awardBorrowProgressAdvancements(player);</b>
+<b class="fc">&nbsp;        awardMasteryAdvancements(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void awardGranterProgressAdvancements(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="fc">&nbsp;        GranterProgressData progress = player.getData(</b>
+&nbsp;                AttachmentRegistry.GRANTER_PROGRESS_DATA
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (progress.getSuccessfulGrants() &gt; 0) {</b>
+<b class="nc">&nbsp;            awardFirstGift(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (progress.getSuccessfulTakeBacks() &gt; 0) {</b>
+<b class="nc">&nbsp;            awardWhatWasGivenCanReturn(player);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void awardBorrowProgressAdvancements(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="fc">&nbsp;        BorrowedSkillData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.BORROWED_SKILL_DATA
+&nbsp;        );
+<b class="fc">&nbsp;        Map&lt;String, Integer&gt; history = data.getBorrowHistory();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!history.isEmpty()) {</b>
+<b class="nc">&nbsp;            awardBorrowedPower(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        for (Map.Entry&lt;String, Integer&gt; entry : history.entrySet()) {</b>
+<b class="nc">&nbsp;            if (entry == null</b>
+<b class="nc">&nbsp;                    || entry.getKey() == null</b>
+<b class="nc">&nbsp;                    || entry.getKey().isBlank()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String skillId = entry.getKey();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!data.isBorrowedSkill(skillId)</b>
+<b class="nc">&nbsp;                    &amp;&amp; playerHasSkill(player, skillId)) {</b>
+<b class="nc">&nbsp;                awardPowerMadePermanent(player);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void awardMasteryAdvancements(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="fc">&nbsp;        Optional&lt;ManasSkillInstance&gt; granter =</b>
+<b class="fc">&nbsp;                SkillAPI.getSkillsFrom(player).getSkill(</b>
+<b class="fc">&nbsp;                        SkillRegistry.GRANTER.get().getRegistryName()</b>
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (granter.isPresent()</b>
+<b class="nc">&nbsp;                &amp;&amp; granter.orElseThrow().isMastered(player)) {</b>
+<b class="nc">&nbsp;            awardGranterMastered(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (hasSkill(</b>
+&nbsp;                player,
+&nbsp;                SkillRegistry.BENEVOLENT_EMPOWERMENT
+<b class="fc">&nbsp;                        .get()</b>
+<b class="fc">&nbsp;                        .getRegistryName()</b>
+<b class="pc">&nbsp;        ) || hasSkill(</b>
+&nbsp;                player,
+&nbsp;                SkillRegistry.ABSOLUTE_GOVERNANCE
+<b class="fc">&nbsp;                        .get()</b>
+<b class="fc">&nbsp;                        .getRegistryName()</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            awardGranterMastered(player);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isNamedOrEndowed(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        IExistence existence = TensuraStorages</b>
+<b class="fc">&nbsp;                .getExistenceFrom(player);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (existence == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String name = existence.getName();</b>
+<b class="pc">&nbsp;        return name != null &amp;&amp; !name.isBlank();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasSkill(
+&nbsp;            ServerPlayer player,
+&nbsp;            ResourceLocation skillId
+&nbsp;    ) {
+<b class="pc">&nbsp;        return player != null</b>
+&nbsp;                &amp;&amp; skillId != null
+<b class="fc">&nbsp;                &amp;&amp; SkillAPI.getSkillsFrom(player)</b>
+<b class="fc">&nbsp;                .getSkill(skillId)</b>
+<b class="fc">&nbsp;                .isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean playerHasSkill(
+&nbsp;            ServerPlayer player,
+&nbsp;            String rawSkillId
+&nbsp;    ) {
+<b class="nc">&nbsp;        ResourceLocation skillId = ResourceLocation.tryParse(rawSkillId);</b>
+<b class="nc">&nbsp;        return skillId != null &amp;&amp; hasSkill(player, skillId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasExactSkill(
+&nbsp;            ServerPlayer player,
+&nbsp;            String registryId,
+&nbsp;            String displayName
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        for (ManasSkillInstance instance :
+<b class="fc">&nbsp;                SkillAPI.getSkillsFrom(player).getLearnedSkills()) {</b>
+<b class="pc">&nbsp;            if (instance == null) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            ResourceLocation skillId = instance.getSkillId();</b>
+&nbsp;
+<b class="pc">&nbsp;            if (skillId != null</b>
+<b class="pc">&nbsp;                    &amp;&amp; registryId.equals(skillId.toString())) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            String actualName = instance.getDisplayName().getString();</b>
+&nbsp;
+<b class="pc">&nbsp;            if (actualName.equalsIgnoreCase(displayName)</b>
+<b class="pc">&nbsp;                    || actualName.equalsIgnoreCase(</b>
+&nbsp;                    &quot;The &quot; + displayName
+&nbsp;            )) {
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

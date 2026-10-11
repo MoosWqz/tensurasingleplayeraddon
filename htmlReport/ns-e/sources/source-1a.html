@@ -1,0 +1,380 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionFreedomProgressSnapshot</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionFreedomProgressSnapshot (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionFreedomProgressSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/105)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * Read-only breakdown of every source currently contributing to Freedom.
+&nbsp; *
+&nbsp; * &lt;p&gt;The snapshot never synchronizes advancements, backfills deeds or mutates
+&nbsp; * player data. It is shared by the progress GUI and debug diagnostics so both
+&nbsp; * surfaces describe the exact same production scoring sources.&lt;/p&gt;
+&nbsp; */
+<b class="nc">&nbsp;public record RecognitionFreedomProgressSnapshot(</b>
+&nbsp;        long balanceRevision,
+&nbsp;        String balanceSource,
+&nbsp;        long milestoneRevision,
+&nbsp;        String milestoneFingerprint,
+&nbsp;        String storedMilestoneFingerprint,
+&nbsp;        boolean milestoneFingerprintCurrent,
+&nbsp;        int milestoneSourceFileCount,
+&nbsp;        int configuredMilestoneCount,
+&nbsp;        int soloMajorVictoryCount,
+&nbsp;        double soloMajorVictoryScore,
+&nbsp;        double soloMajorVictoryMaximum,
+&nbsp;        int discoveryMilestoneCount,
+&nbsp;        double discoveryMilestoneScore,
+&nbsp;        double discoveryMilestoneMaximum,
+&nbsp;        int storedIndependenceMilestoneCount,
+&nbsp;        int activeIndependenceMilestoneCount,
+&nbsp;        int inactiveIndependenceMilestoneCount,
+&nbsp;        double activeIndependenceScore,
+&nbsp;        double activeIndependenceMaximum,
+&nbsp;        double totalFreedomScore,
+&nbsp;        double totalFreedomMaximum,
+&nbsp;        List&lt;String&gt; activeMilestoneIds,
+&nbsp;        List&lt;String&gt; inactiveMilestoneIds
+&nbsp;) {
+&nbsp;
+<b class="nc">&nbsp;    public RecognitionFreedomProgressSnapshot {</b>
+<b class="nc">&nbsp;        balanceSource = clean(balanceSource);</b>
+<b class="nc">&nbsp;        milestoneFingerprint = clean(milestoneFingerprint);</b>
+<b class="nc">&nbsp;        storedMilestoneFingerprint = clean(storedMilestoneFingerprint);</b>
+&nbsp;
+<b class="nc">&nbsp;        balanceRevision = Math.max(0L, balanceRevision);</b>
+<b class="nc">&nbsp;        milestoneRevision = Math.max(0L, milestoneRevision);</b>
+<b class="nc">&nbsp;        milestoneSourceFileCount = Math.max(0, milestoneSourceFileCount);</b>
+<b class="nc">&nbsp;        configuredMilestoneCount = Math.max(0, configuredMilestoneCount);</b>
+<b class="nc">&nbsp;        soloMajorVictoryCount = Math.max(0, soloMajorVictoryCount);</b>
+<b class="nc">&nbsp;        discoveryMilestoneCount = Math.max(0, discoveryMilestoneCount);</b>
+<b class="nc">&nbsp;        storedIndependenceMilestoneCount = Math.max(</b>
+&nbsp;                0,
+&nbsp;                storedIndependenceMilestoneCount
+&nbsp;        );
+<b class="nc">&nbsp;        activeIndependenceMilestoneCount = Math.max(</b>
+&nbsp;                0,
+&nbsp;                activeIndependenceMilestoneCount
+&nbsp;        );
+<b class="nc">&nbsp;        inactiveIndependenceMilestoneCount = Math.max(</b>
+&nbsp;                0,
+&nbsp;                inactiveIndependenceMilestoneCount
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        soloMajorVictoryScore = sanitizeScore(soloMajorVictoryScore);</b>
+<b class="nc">&nbsp;        soloMajorVictoryMaximum = sanitizeScore(soloMajorVictoryMaximum);</b>
+<b class="nc">&nbsp;        discoveryMilestoneScore = sanitizeScore(discoveryMilestoneScore);</b>
+<b class="nc">&nbsp;        discoveryMilestoneMaximum = sanitizeScore(discoveryMilestoneMaximum);</b>
+<b class="nc">&nbsp;        activeIndependenceScore = sanitizeScore(activeIndependenceScore);</b>
+<b class="nc">&nbsp;        activeIndependenceMaximum = sanitizeScore(activeIndependenceMaximum);</b>
+<b class="nc">&nbsp;        totalFreedomScore = sanitizeScore(totalFreedomScore);</b>
+<b class="nc">&nbsp;        totalFreedomMaximum = sanitizeScore(totalFreedomMaximum);</b>
+&nbsp;
+<b class="nc">&nbsp;        activeMilestoneIds = immutableSorted(activeMilestoneIds);</b>
+<b class="nc">&nbsp;        inactiveMilestoneIds = immutableSorted(inactiveMilestoneIds);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RecognitionFreedomProgressSnapshot inspect(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionEvaluation evaluation =</b>
+<b class="nc">&nbsp;                RecognitionPathEvaluator.evaluate(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        return inspect(</b>
+&nbsp;                data,
+&nbsp;                evaluation
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RecognitionFreedomProgressSnapshot inspect(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionEvaluation evaluation
+&nbsp;    ) {
+&nbsp;        RecognitionData safeData =
+<b class="nc">&nbsp;                data == null</b>
+<b class="nc">&nbsp;                        ? new RecognitionData()</b>
+<b class="nc">&nbsp;                        : data;</b>
+&nbsp;
+&nbsp;        RecognitionEvaluation safeEvaluation =
+<b class="nc">&nbsp;                evaluation == null</b>
+<b class="nc">&nbsp;                        ? RecognitionPathEvaluator.evaluate(safeData)</b>
+<b class="nc">&nbsp;                        : evaluation;</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot balance =</b>
+<b class="nc">&nbsp;                safeEvaluation.getBalance();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.Freedom freedom =</b>
+<b class="nc">&nbsp;                balance.freedom();</b>
+&nbsp;
+&nbsp;        RecognitionIndependenceMilestoneManager.State milestoneState =
+<b class="nc">&nbsp;                RecognitionIndependenceMilestoneManager.getState();</b>
+&nbsp;
+<b class="nc">&nbsp;        int soloCount =</b>
+<b class="nc">&nbsp;                safeData.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .SOLO_MAJOR_ENEMY_TYPES_DEFEATED
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        int discoveryCount =</b>
+<b class="nc">&nbsp;                safeData.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys.DISCOVERY_MILESTONES
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; storedMilestoneIds =</b>
+<b class="nc">&nbsp;                safeData.getUniqueValues(</b>
+&nbsp;                        RecognitionStatKeys.INDEPENDENCE_MILESTONES
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;String&gt; configuredIds =</b>
+&nbsp;                new HashSet&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; activeIds =</b>
+&nbsp;                new ArrayList&lt;&gt;();
+&nbsp;
+&nbsp;        for (RecognitionIndependenceMilestoneManager.Milestone milestone :
+<b class="nc">&nbsp;                milestoneState.milestones()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            String id = milestone.id().toString();</b>
+<b class="nc">&nbsp;            configuredIds.add(id);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (safeData.containsUniqueValue(</b>
+&nbsp;                    RecognitionStatKeys.INDEPENDENCE_MILESTONES,
+&nbsp;                    id
+&nbsp;            )) {
+<b class="nc">&nbsp;                activeIds.add(id);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; inactiveIds =</b>
+&nbsp;                new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;        for (String storedId : storedMilestoneIds) {</b>
+<b class="nc">&nbsp;            if (storedId != null</b>
+<b class="nc">&nbsp;                    &amp;&amp; !storedId.isBlank()</b>
+<b class="nc">&nbsp;                    &amp;&amp; !configuredIds.contains(storedId)) {</b>
+<b class="nc">&nbsp;                inactiveIds.add(storedId);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double soloScore = contribution(</b>
+&nbsp;                soloCount,
+<b class="nc">&nbsp;                freedom.soloMajorEnemyTypesDefeated()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double discoveryScore = contribution(</b>
+&nbsp;                discoveryCount,
+<b class="nc">&nbsp;                freedom.discoveryMilestones()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double independenceScore =</b>
+&nbsp;                RecognitionIndependenceMilestoneManager
+<b class="nc">&nbsp;                        .calculateScore(safeData);</b>
+&nbsp;
+<b class="nc">&nbsp;        String storedFingerprint =</b>
+<b class="nc">&nbsp;                safeData.getString(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .INDEPENDENCE_DEFINITION_FINGERPRINT
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionFreedomProgressSnapshot(</b>
+<b class="nc">&nbsp;                safeEvaluation.getBalanceRevision(),</b>
+<b class="nc">&nbsp;                balance.sourceId(),</b>
+<b class="nc">&nbsp;                milestoneState.revision(),</b>
+<b class="nc">&nbsp;                milestoneState.fingerprint(),</b>
+&nbsp;                storedFingerprint,
+<b class="nc">&nbsp;                milestoneState.fingerprint()</b>
+<b class="nc">&nbsp;                        .equals(storedFingerprint),</b>
+<b class="nc">&nbsp;                milestoneState.sourceFileCount(),</b>
+<b class="nc">&nbsp;                milestoneState.milestones().size(),</b>
+&nbsp;                soloCount,
+&nbsp;                soloScore,
+<b class="nc">&nbsp;                freedom.soloMajorEnemyTypesDefeated().maximum(),</b>
+&nbsp;                discoveryCount,
+&nbsp;                discoveryScore,
+<b class="nc">&nbsp;                freedom.discoveryMilestones().maximum(),</b>
+<b class="nc">&nbsp;                storedMilestoneIds.size(),</b>
+<b class="nc">&nbsp;                activeIds.size(),</b>
+<b class="nc">&nbsp;                inactiveIds.size(),</b>
+&nbsp;                independenceScore,
+<b class="nc">&nbsp;                milestoneState.maximumScore(),</b>
+<b class="nc">&nbsp;                safeEvaluation.getDimensions().freedom(),</b>
+<b class="nc">&nbsp;                freedom.soloMajorEnemyTypesDefeated().maximum()</b>
+<b class="nc">&nbsp;                        + freedom.discoveryMilestones().maximum()</b>
+<b class="nc">&nbsp;                        + milestoneState.maximumScore(),</b>
+&nbsp;                activeIds,
+&nbsp;                inactiveIds
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double contribution(
+&nbsp;            int count,
+&nbsp;            RecognitionBalanceSnapshot.Contribution contribution
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (count &lt;= 0</b>
+&nbsp;                || contribution == null
+<b class="nc">&nbsp;                || contribution.pointsPerEntry() &lt;= 0.0D</b>
+<b class="nc">&nbsp;                || contribution.maximum() &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(</b>
+<b class="nc">&nbsp;                contribution.maximum(),</b>
+<b class="nc">&nbsp;                count * contribution.pointsPerEntry()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; immutableSorted(
+&nbsp;            List&lt;String&gt; values
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (values == null || values.isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; result =</b>
+&nbsp;                new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;        for (String value : values) {</b>
+<b class="nc">&nbsp;            if (value != null &amp;&amp; !value.isBlank()) {</b>
+<b class="nc">&nbsp;                result.add(value.trim());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        result.sort(String::compareTo);</b>
+<b class="nc">&nbsp;        return List.copyOf(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String clean(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : value.trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeScore(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return !Double.isFinite(value) || value &lt; 0.0D</b>
+<b class="nc">&nbsp;                ? 0.0D</b>
+<b class="nc">&nbsp;                : value;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1121 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MoosTensuraCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: MoosTensuraCommand (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MoosTensuraCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.8%
+  </span>
+  <span class="absValue">
+    (6/61)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.5%
+  </span>
+  <span class="absValue">
+    (56/340)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MoosTensuraCommand$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    9.7%
+  </span>
+  <span class="absValue">
+    (6/62)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.4%
+  </span>
+  <span class="absValue">
+    (56/341)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mojang.brigadier.CommandDispatcher;
+&nbsp;import com.mojang.brigadier.exceptions.CommandSyntaxException;
+&nbsp;import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.AddonPlayerDataResetService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionBenefitsService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionProgressScreenService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionUnnameService;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.commands.Commands;
+&nbsp;import net.minecraft.commands.arguments.EntityArgument;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;public final class MoosTensuraCommand {
+&nbsp;
+&nbsp;    private MoosTensuraCommand() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void register(
+&nbsp;            CommandDispatcher&lt;CommandSourceStack&gt; dispatcher
+&nbsp;    ) {
+<b class="fc">&nbsp;        dispatcher.register(</b>
+<b class="fc">&nbsp;                Commands.literal(&quot;moostensura&quot;)</b>
+<b class="fc">&nbsp;                        .requires(source -&gt;</b>
+<b class="fc">&nbsp;                                source.hasPermission(0)</b>
+&nbsp;                        )
+<b class="fc">&nbsp;                        .executes(context -&gt; sendGuide(</b>
+<b class="nc">&nbsp;                                context.getSource()</b>
+&nbsp;                        ))
+&nbsp;
+<b class="fc">&nbsp;                        .then(</b>
+<b class="fc">&nbsp;                                Commands.literal(&quot;guide&quot;)</b>
+<b class="fc">&nbsp;                                        .executes(context -&gt; sendGuide(</b>
+<b class="nc">&nbsp;                                                context.getSource()</b>
+&nbsp;                                        ))
+<b class="fc">&nbsp;                                        .then(</b>
+<b class="fc">&nbsp;                                                Commands.literal(&quot;sage&quot;)</b>
+<b class="fc">&nbsp;                                                        .executes(context -&gt; sendSageGuide(</b>
+<b class="nc">&nbsp;                                                                context.getSource()</b>
+&nbsp;                                                        ))
+&nbsp;                                        )
+<b class="fc">&nbsp;                                        .then(</b>
+<b class="fc">&nbsp;                                                Commands.literal(&quot;mastery&quot;)</b>
+<b class="fc">&nbsp;                                                        .executes(context -&gt; sendMasteryGuide(</b>
+<b class="nc">&nbsp;                                                                context.getSource()</b>
+&nbsp;                                                        ))
+&nbsp;                                        )
+&nbsp;                        )
+&nbsp;
+<b class="fc">&nbsp;                        .then(</b>
+<b class="fc">&nbsp;                                Commands.literal(&quot;help&quot;)</b>
+<b class="fc">&nbsp;                                        .executes(context -&gt; sendHelp(</b>
+<b class="nc">&nbsp;                                                context.getSource()</b>
+&nbsp;                                        ))
+&nbsp;                        )
+&nbsp;
+<b class="fc">&nbsp;                        .then(</b>
+<b class="fc">&nbsp;                                Commands.literal(&quot;paths&quot;)</b>
+<b class="fc">&nbsp;                                        .executes(context -&gt; openRecognitionPaths(</b>
+<b class="nc">&nbsp;                                                context.getSource()</b>
+&nbsp;                                        ))
+&nbsp;                        )
+&nbsp;
+<b class="fc">&nbsp;                        .then(</b>
+<b class="fc">&nbsp;                                Commands.literal(&quot;lifecycle&quot;)</b>
+<b class="fc">&nbsp;                                        .requires(source -&gt;</b>
+<b class="fc">&nbsp;                                                source.hasPermission(2)</b>
+&nbsp;                                        )
+<b class="fc">&nbsp;                                        .executes(context -&gt; inspectLifecycle(</b>
+<b class="nc">&nbsp;                                                context.getSource(),</b>
+<b class="nc">&nbsp;                                                context.getSource()</b>
+<b class="nc">&nbsp;                                                        .getPlayerOrException()</b>
+&nbsp;                                        ))
+<b class="fc">&nbsp;                                        .then(</b>
+<b class="fc">&nbsp;                                                Commands.argument(</b>
+&nbsp;                                                                &quot;player&quot;,
+<b class="fc">&nbsp;                                                                EntityArgument.player()</b>
+&nbsp;                                                        )
+<b class="fc">&nbsp;                                                        .executes(context -&gt; inspectLifecycle(</b>
+<b class="nc">&nbsp;                                                                context.getSource(),</b>
+<b class="nc">&nbsp;                                                                EntityArgument.getPlayer(</b>
+&nbsp;                                                                        context,
+&nbsp;                                                                        &quot;player&quot;
+&nbsp;                                                                )
+&nbsp;                                                        ))
+&nbsp;                                        )
+&nbsp;                        )
+&nbsp;
+&nbsp;                        /*
+&nbsp;                         * Stage one:
+&nbsp;                         *
+&nbsp;                         * /moostensura unname
+&nbsp;                         *
+&nbsp;                         * Arms a one-use confirmation for 30 seconds.
+&nbsp;                         *
+&nbsp;                         * Stage two:
+&nbsp;                         *
+&nbsp;                         * /moostensura unname confirm
+&nbsp;                         *
+&nbsp;                         * Only succeeds if stage one was entered first by the
+&nbsp;                         * same administrator.
+&nbsp;                         */
+<b class="fc">&nbsp;                        .then(</b>
+<b class="fc">&nbsp;                                Commands.literal(&quot;unname&quot;)</b>
+<b class="fc">&nbsp;                                        .requires(source -&gt;</b>
+<b class="fc">&nbsp;                                                source.hasPermission(2)</b>
+&nbsp;                                        )
+<b class="fc">&nbsp;                                        .executes(context -&gt; requestUnname(</b>
+<b class="nc">&nbsp;                                                context.getSource()</b>
+&nbsp;                                        ))
+<b class="fc">&nbsp;                                        .then(</b>
+<b class="fc">&nbsp;                                                Commands.literal(&quot;confirm&quot;)</b>
+<b class="fc">&nbsp;                                                        .executes(context -&gt; confirmUnname(</b>
+<b class="nc">&nbsp;                                                                context.getSource()</b>
+&nbsp;                                                        ))
+&nbsp;                                        )
+&nbsp;                        )
+&nbsp;
+&nbsp;                        /*
+&nbsp;                         * Config reset uses the same real two-stage
+&nbsp;                         * confirmation system.
+&nbsp;                         */
+<b class="fc">&nbsp;                        .then(</b>
+<b class="fc">&nbsp;                                Commands.literal(&quot;resetconfig&quot;)</b>
+<b class="fc">&nbsp;                                        .requires(source -&gt;</b>
+<b class="fc">&nbsp;                                                source.hasPermission(2)</b>
+&nbsp;                                        )
+<b class="fc">&nbsp;                                        .executes(context -&gt; requestConfigReset(</b>
+<b class="nc">&nbsp;                                                context.getSource()</b>
+&nbsp;                                        ))
+<b class="fc">&nbsp;                                        .then(</b>
+<b class="fc">&nbsp;                                                Commands.literal(&quot;confirm&quot;)</b>
+<b class="fc">&nbsp;                                                        .executes(context -&gt; resetConfig(</b>
+<b class="nc">&nbsp;                                                                context.getSource()</b>
+&nbsp;                                                        ))
+&nbsp;                                        )
+&nbsp;                        )
+&nbsp;
+&nbsp;                        /*
+&nbsp;                         * Player-data reset is also bound to the selected
+&nbsp;                         * target UUID.
+&nbsp;                         *
+&nbsp;                         * Requesting a reset for one player cannot be used to
+&nbsp;                         * confirm a reset for another player.
+&nbsp;                         */
+<b class="fc">&nbsp;                        .then(</b>
+<b class="fc">&nbsp;                                Commands.literal(&quot;reset&quot;)</b>
+<b class="fc">&nbsp;                                        .requires(source -&gt;</b>
+<b class="fc">&nbsp;                                                source.hasPermission(2)</b>
+&nbsp;                                        )
+<b class="fc">&nbsp;                                        .then(</b>
+<b class="fc">&nbsp;                                                Commands.argument(</b>
+&nbsp;                                                                &quot;player&quot;,
+<b class="fc">&nbsp;                                                                EntityArgument.player()</b>
+&nbsp;                                                        )
+<b class="fc">&nbsp;                                                        .executes(context -&gt; requestAddonDataReset(</b>
+<b class="nc">&nbsp;                                                                context.getSource(),</b>
+<b class="nc">&nbsp;                                                                EntityArgument.getPlayer(</b>
+&nbsp;                                                                        context,
+&nbsp;                                                                        &quot;player&quot;
+&nbsp;                                                                )
+&nbsp;                                                        ))
+<b class="fc">&nbsp;                                                        .then(</b>
+<b class="fc">&nbsp;                                                                Commands.literal(&quot;confirm&quot;)</b>
+<b class="fc">&nbsp;                                                                        .executes(context -&gt; resetAddonData(</b>
+<b class="nc">&nbsp;                                                                                context.getSource(),</b>
+<b class="nc">&nbsp;                                                                                EntityArgument.getPlayer(</b>
+&nbsp;                                                                                        context,
+&nbsp;                                                                                        &quot;player&quot;
+&nbsp;                                                                                )
+&nbsp;                                                                        ))
+&nbsp;                                                        )
+&nbsp;                                        )
+&nbsp;                        )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int openRecognitionPaths(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBenefitsService.send(player);</b>
+<b class="nc">&nbsp;        RecognitionProgressScreenService.open(player);</b>
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int inspectLifecycle(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer target
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (target == null) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(&quot;Target player could not be found.&quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AddonIncarnationState.Snapshot snapshot =</b>
+<b class="nc">&nbsp;                AddonIncarnationState.inspect(target);</b>
+<b class="nc">&nbsp;        long now = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        long epochGuardRemainingMillis = Math.max(</b>
+&nbsp;                0L,
+<b class="nc">&nbsp;                snapshot.resetGuardUntilEpochMillis() - now</b>
+&nbsp;        );
+<b class="nc">&nbsp;        long tickGuardRemainingMillis = Math.max(</b>
+&nbsp;                0L,
+<b class="nc">&nbsp;                snapshot.resetGuardUntilGameTime()</b>
+<b class="nc">&nbsp;                        - target.serverLevel().getGameTime()</b>
+&nbsp;        ) * 50L;
+<b class="nc">&nbsp;        long guardRemainingMillis = Math.max(</b>
+&nbsp;                epochGuardRemainingMillis,
+&nbsp;                tickGuardRemainingMillis
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Addon Lifecycle: &quot;
+<b class="nc">&nbsp;                                        + target.getGameProfile().getName()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                &quot;State revision: &quot; + snapshot.revision()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                &quot;Life token: &quot; + snapshot.lifeToken()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Reset sequence: &quot;
+<b class="nc">&nbsp;                                        + snapshot.resetSequence()</b>
+&nbsp;                                        + &quot; | Last reason: &quot;
+<b class="nc">&nbsp;                                        + (snapshot.lastResetReason().isBlank()</b>
+<b class="nc">&nbsp;                                        ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                                        : snapshot.lastResetReason())</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Reset guard: &quot;
+<b class="nc">&nbsp;                                        + (snapshot.resetGuardActive()</b>
+&nbsp;                                        ? &quot;active for about &quot;
+<b class="nc">&nbsp;                                          + String.format(</b>
+&nbsp;                                        Locale.US,
+&nbsp;                                        &quot;%.1f&quot;,
+<b class="nc">&nbsp;                                        guardRemainingMillis / 1000.0D</b>
+&nbsp;                                )
+<b class="nc">&nbsp;                                          + &quot; seconds&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;inactive&quot;)</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                snapshot.resetGuardActive()</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.YELLOW</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.GREEN</b>
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Native endowment marker: &quot;
+<b class="nc">&nbsp;                                        + (snapshot.nativeEndowmentIncarnation()</b>
+<b class="nc">&nbsp;                                        .isBlank()</b>
+<b class="nc">&nbsp;                                        ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                                        : snapshot.nativeEndowmentIncarnation())</b>
+&nbsp;                                        + &quot; | Failed attempts: &quot;
+<b class="nc">&nbsp;                                        + snapshot.nativeEndowmentAttempts()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        long retryRemainingMillis = Math.max(</b>
+&nbsp;                0L,
+<b class="nc">&nbsp;                snapshot.nativeEndowmentNextAttemptEpochMillis()</b>
+&nbsp;                        - now
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Native retry deadline: &quot;
+<b class="nc">&nbsp;                                        + (retryRemainingMillis &gt; 0L</b>
+<b class="nc">&nbsp;                                        ? String.format(</b>
+&nbsp;                                                Locale.US,
+&nbsp;                                                &quot;about %.1f seconds&quot;,
+<b class="nc">&nbsp;                                                retryRemainingMillis / 1_000.0D</b>
+&nbsp;                                        )
+<b class="nc">&nbsp;                                        : &quot;none / due&quot;)</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Authority observation: &quot;
+<b class="nc">&nbsp;                                        + (snapshot.authorityObservationInitialized()</b>
+<b class="nc">&nbsp;                                        ? &quot;initialized&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;not initialized&quot;)</b>
+&nbsp;                                        + &quot; | Last owned: &quot;
+<b class="nc">&nbsp;                                        + snapshot.authorityLastOwned()</b>
+&nbsp;                                        + &quot; | Acquired this life: &quot;
+<b class="nc">&nbsp;                                        + snapshot.authorityAcquiredThisLife()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int sendGuide(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        return PlayerGuidanceService.sendGuide(</b>
+&nbsp;                source,
+<b class="nc">&nbsp;                source.getPlayerOrException()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int sendSageGuide(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        int requiredXpLevel =</b>
+&nbsp;                MoosTensuraConfig
+&nbsp;                        .SAGE_UPGRADE_REQUIRED_XP_LEVEL
+<b class="nc">&nbsp;                        .get();</b>
+&nbsp;
+<b class="nc">&nbsp;        int relativeLevelDeduction =</b>
+&nbsp;                MoosTensuraConfig
+&nbsp;                        .SAGE_UPGRADE_RELATIVE_LEVEL_DEDUCTION
+<b class="nc">&nbsp;                        .get();</b>
+&nbsp;
+<b class="nc">&nbsp;        double requiredEp =</b>
+&nbsp;                MoosTensuraConfig
+&nbsp;                        .GREAT_SAGE_RITUAL_REQUIRED_EP
+<b class="nc">&nbsp;                        .get();</b>
+&nbsp;
+<b class="nc">&nbsp;        int requiredMasteredSkills =</b>
+&nbsp;                MoosTensuraConfig
+&nbsp;                        .GREAT_SAGE_RITUAL_REQUIRED_MASTERED_SKILLS
+<b class="nc">&nbsp;                        .get();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean requireNamed =</b>
+&nbsp;                MoosTensuraConfig
+&nbsp;                        .GREAT_SAGE_RITUAL_REQUIRE_NAMED
+<b class="nc">&nbsp;                        .get();</b>
+&nbsp;
+<b class="nc">&nbsp;        int ritualDurationTicks =</b>
+&nbsp;                MoosTensuraConfig
+&nbsp;                        .GREAT_SAGE_RITUAL_DURATION_TICKS
+<b class="nc">&nbsp;                        .get();</b>
+&nbsp;
+<b class="nc">&nbsp;        int ritualDurationSeconds =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        1,
+&nbsp;                        ritualDurationTicks / 20
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.header&quot;,
+&nbsp;                ChatFormatting.AQUA,
+&nbsp;                true
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.goal&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.step.obtain&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.step.craft&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.recipe.corners&quot;,
+&nbsp;                ChatFormatting.DARK_AQUA,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.recipe.edges&quot;,
+&nbsp;                ChatFormatting.DARK_AQUA,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.recipe.center&quot;,
+&nbsp;                ChatFormatting.DARK_AQUA,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.step.attune&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.step.follow&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.step.interact&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.step.endure&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.step.complete&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.requirements&quot;,
+&nbsp;                ChatFormatting.GOLD,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.requirement.level&quot;,
+&nbsp;                ChatFormatting.YELLOW,
+&nbsp;                false,
+<b class="nc">&nbsp;                requiredXpLevel</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.requirement.xp_cost&quot;,
+&nbsp;                ChatFormatting.YELLOW,
+&nbsp;                false,
+<b class="nc">&nbsp;                relativeLevelDeduction</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.requirement.ep&quot;,
+&nbsp;                ChatFormatting.YELLOW,
+&nbsp;                false,
+<b class="nc">&nbsp;                formatWholeNumber(requiredEp)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.requirement.mastered&quot;,
+&nbsp;                ChatFormatting.YELLOW,
+&nbsp;                false,
+<b class="nc">&nbsp;                requiredMasteredSkills</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.requirement.named&quot;,
+&nbsp;                ChatFormatting.YELLOW,
+&nbsp;                false,
+<b class="nc">&nbsp;                Component.translatable(</b>
+<b class="nc">&nbsp;                        requireNamed</b>
+<b class="nc">&nbsp;                                ? &quot;gui.yes&quot;</b>
+<b class="nc">&nbsp;                                : &quot;gui.no&quot;</b>
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.requirement.duration&quot;,
+&nbsp;                ChatFormatting.YELLOW,
+&nbsp;                false,
+<b class="nc">&nbsp;                ritualDurationSeconds</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.sage.tip&quot;,
+&nbsp;                ChatFormatting.DARK_AQUA,
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int sendMasteryGuide(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        return PlayerGuidanceService.sendMasteryGuide(</b>
+&nbsp;                source,
+<b class="nc">&nbsp;                source.getPlayerOrException()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendTranslatedLine(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String translationKey,
+&nbsp;            ChatFormatting color,
+&nbsp;            boolean bold,
+&nbsp;            Object... arguments
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent line = Component.translatable(</b>
+&nbsp;                translationKey,
+&nbsp;                arguments
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (bold) {</b>
+<b class="nc">&nbsp;            line.withStyle(</b>
+&nbsp;                    color,
+&nbsp;                    ChatFormatting.BOLD
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            line.withStyle(color);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(() -&gt; line, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int sendHelp(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        return PlayerGuidanceService.sendHelp(source);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int requestUnname(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player =</b>
+<b class="nc">&nbsp;                source.getPlayerOrException();</b>
+&nbsp;
+<b class="nc">&nbsp;        IExistence existence =</b>
+<b class="nc">&nbsp;                TensuraStorages.getExistenceFrom(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+&nbsp;        String storedName =
+&nbsp;                existence == null
+<b class="nc">&nbsp;                        || existence.getName() == null</b>
+<b class="nc">&nbsp;                        || existence.getName().isBlank()</b>
+<b class="nc">&nbsp;                        ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                        : existence.getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        AdminConfirmationTracker.arm(</b>
+&nbsp;                source,
+&nbsp;                AdminConfirmationTracker.Action.UNNAME,
+<b class="nc">&nbsp;                player.getUUID()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Unname confirmation required&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Current native Tensura name: &quot;
+&nbsp;                                        + storedName
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;This will clear your native Tensura name and this addon&#39;s committed naming result.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Recognition deeds, TH/TDL status, skills, EP, magicules, mastery and subordinate progress will be preserved.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Run /moostensura unname confirm within &quot;
+&nbsp;                                        + AdminConfirmationTracker
+&nbsp;                                        .CONFIRMATION_WINDOW_SECONDS
+&nbsp;                                        + &quot; seconds to continue.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int confirmUnname(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player =</b>
+<b class="nc">&nbsp;                source.getPlayerOrException();</b>
+&nbsp;
+<b class="nc">&nbsp;        AdminConfirmationTracker.Result confirmation =</b>
+<b class="nc">&nbsp;                AdminConfirmationTracker.consume(</b>
+&nbsp;                        source,
+&nbsp;                        AdminConfirmationTracker.Action.UNNAME,
+<b class="nc">&nbsp;                        player.getUUID()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!confirmation.confirmed()) {</b>
+<b class="nc">&nbsp;            return sendConfirmationFailure(</b>
+&nbsp;                    source,
+&nbsp;                    confirmation,
+&nbsp;                    &quot;/moostensura unname&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionUnnameService.Result result =</b>
+<b class="nc">&nbsp;                RecognitionUnnameService.unname(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!result.success()) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;Could not unname the player: &quot;
+<b class="nc">&nbsp;                                            + result.errorMessage()</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        String previousName =
+<b class="nc">&nbsp;                result.previouslyNamed()</b>
+<b class="nc">&nbsp;                        ? result.previousNativeName()</b>
+<b class="nc">&nbsp;                        : &quot;none&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Native Tensura naming state cleared successfully.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GREEN,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Previous native name: &quot;
+&nbsp;                                        + previousName
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Run /moostensura debug recognition to verify that naming eligibility is now ready.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int requestConfigReset(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        AdminConfirmationTracker.arm(</b>
+&nbsp;                source,
+&nbsp;                AdminConfirmationTracker.Action.RESET_CONFIG
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Config reset confirmation required&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;This will restore every Moos Tensura Addon config value to its addon default.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Run /moostensura resetconfig confirm within &quot;
+&nbsp;                                        + AdminConfirmationTracker
+&nbsp;                                        .CONFIRMATION_WINDOW_SECONDS
+&nbsp;                                        + &quot; seconds to continue.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int resetConfig(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        AdminConfirmationTracker.Result confirmation =</b>
+<b class="nc">&nbsp;                AdminConfirmationTracker.consume(</b>
+&nbsp;                        source,
+&nbsp;                        AdminConfirmationTracker.Action.RESET_CONFIG
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!confirmation.confirmed()) {</b>
+<b class="nc">&nbsp;            return sendConfirmationFailure(</b>
+&nbsp;                    source,
+&nbsp;                    confirmation,
+&nbsp;                    &quot;/moostensura resetconfig&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MoosTensuraConfig.resetToAddonDefaults();</b>
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Moos Tensura Addon config was reset to addon defaults.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GREEN),</b>
+&nbsp;                true
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int requestAddonDataReset(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer target
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (target == null) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;Target player could not be found.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AdminConfirmationTracker.arm(</b>
+&nbsp;                source,
+&nbsp;                AdminConfirmationTracker.Action
+&nbsp;                        .RESET_PLAYER_DATA,
+<b class="nc">&nbsp;                target.getUUID()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String targetName =</b>
+<b class="nc">&nbsp;                target.getGameProfile()</b>
+<b class="nc">&nbsp;                        .getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Player-data reset confirmation required&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Target: &quot;
+&nbsp;                                        + targetName
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;This will reset the addon&#39;s stored Granter, borrowed-skill and recognition data for that player.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;The global addon configuration will not be changed.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Run /moostensura reset &quot;
+&nbsp;                                        + targetName
+&nbsp;                                        + &quot; confirm within &quot;
+&nbsp;                                        + AdminConfirmationTracker
+&nbsp;                                        .CONFIRMATION_WINDOW_SECONDS
+&nbsp;                                        + &quot; seconds to continue.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int resetAddonData(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer target
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (target == null) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;Target player could not be found.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AdminConfirmationTracker.Result confirmation =</b>
+<b class="nc">&nbsp;                AdminConfirmationTracker.consume(</b>
+&nbsp;                        source,
+&nbsp;                        AdminConfirmationTracker.Action
+&nbsp;                                .RESET_PLAYER_DATA,
+<b class="nc">&nbsp;                        target.getUUID()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!confirmation.confirmed()) {</b>
+<b class="nc">&nbsp;            return sendConfirmationFailure(</b>
+&nbsp;                    source,
+&nbsp;                    confirmation,
+&nbsp;                    &quot;/moostensura reset &quot;
+<b class="nc">&nbsp;                            + target.getGameProfile().getName()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AddonPlayerDataResetService.ResetResult result =</b>
+<b class="nc">&nbsp;                AddonPlayerDataResetService.resetForNewIncarnation(</b>
+&nbsp;                        target,
+&nbsp;                        AddonPlayerDataResetService.ResetReason.ADMIN_COMMAND
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!result.successful()) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(result.message())</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String targetName = target.getGameProfile().getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Reset Moos Tensura Addon life-bound data for &quot;
+&nbsp;                                        + targetName
+&nbsp;                                        + &quot;. The addon configuration was not changed.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GREEN),</b>
+&nbsp;                true
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        target.sendSystemMessage(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                &quot;Your Moos Tensura Addon life-bound data was reset by an administrator.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.YELLOW)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int sendConfirmationFailure(
+&nbsp;            CommandSourceStack source,
+&nbsp;            AdminConfirmationTracker.Result result,
+&nbsp;            String requestCommand
+&nbsp;    ) {
+<b class="nc">&nbsp;        String explanation = switch (result.status()) {</b>
+&nbsp;            case EXPIRED -&gt;
+<b class="nc">&nbsp;                    &quot;The confirmation expired.&quot;;</b>
+&nbsp;
+&nbsp;            case DIFFERENT_ACTION -&gt;
+<b class="nc">&nbsp;                    &quot;A different destructive action was awaiting confirmation.&quot;;</b>
+&nbsp;
+&nbsp;            case DIFFERENT_TARGET -&gt;
+<b class="nc">&nbsp;                    &quot;The pending confirmation was created for a different player.&quot;;</b>
+&nbsp;
+&nbsp;            case MISSING, CONFIRMED -&gt;
+<b class="nc">&nbsp;                    &quot;No matching confirmation request exists.&quot;;</b>
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        source.sendFailure(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                explanation
+&nbsp;                                        + &quot; Run &quot;
+&nbsp;                                        + requestCommand
+&nbsp;                                        + &quot; first, then use its confirm command within &quot;
+&nbsp;                                        + AdminConfirmationTracker
+&nbsp;                                        .CONFIRMATION_WINDOW_SECONDS
+&nbsp;                                        + &quot; seconds.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.RED)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatWholeNumber(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%,.0f&quot;,
+<b class="nc">&nbsp;                value</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

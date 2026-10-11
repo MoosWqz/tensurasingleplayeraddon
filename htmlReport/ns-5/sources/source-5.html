@@ -1,0 +1,1102 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UltimateMultiGrantScreen</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen</a>
+</div>
+
+<h1>Coverage Summary for Class: UltimateMultiGrantScreen (com.mooswqz.moostensuraaddon.client.screen)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UltimateMultiGrantScreen</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/182)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/430)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UltimateMultiGrantScreen$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/182)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/432)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillDetailsPanel;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillListWidget;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiButton;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiCategory;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiEntry;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiFilterState;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiLayout;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiListModel;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiRenderHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionMode;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionModel;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiTheme;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiText;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.UltimateMultiGrantUiEntryFactory;
+&nbsp;import com.mooswqz.moostensuraaddon.network.ExecuteUltimateMultiGrantPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenUltimateMultiGrantScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.util.AuthorityActionMode;
+&nbsp;import com.mooswqz.moostensuraaddon.util.UiTranslationToken;
+&nbsp;import net.minecraft.client.gui.GuiGraphics;
+&nbsp;import net.minecraft.client.gui.components.EditBox;
+&nbsp;import net.minecraft.client.gui.components.Tooltip;
+&nbsp;import net.minecraft.client.gui.screens.Screen;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.neoforged.neoforge.network.PacketDistributor;
+&nbsp;import org.lwjgl.glfw.GLFW;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.EnumMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;public final class UltimateMultiGrantScreen extends Screen {
+&nbsp;
+&nbsp;    private static final int FILTER_GAP = 4;
+&nbsp;    private static final int FOOTER_GAP = 4;
+&nbsp;
+&nbsp;    private final OpenUltimateMultiGrantScreenPayload payload;
+&nbsp;    private final AuthorityActionMode mode;
+&nbsp;    private final SkillUiTheme theme;
+<b class="nc">&nbsp;    private final SkillUiFilterState filterState =</b>
+&nbsp;            new SkillUiFilterState();
+&nbsp;    private final SkillUiSelectionModel selectionModel;
+<b class="nc">&nbsp;    private final EnumMap&lt;SkillUiCategory, SkillUiButton&gt;</b>
+&nbsp;            categoryButtons = new EnumMap&lt;&gt;(SkillUiCategory.class);
+<b class="nc">&nbsp;    private final List&lt;SkillUiButton&gt; footerButtons =</b>
+&nbsp;            new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;    private List&lt;SkillUiEntry&gt; entries = List.of();</b>
+<b class="nc">&nbsp;    private Map&lt;String, UltimateMultiGrantUiEntryFactory.CostBreakdown&gt;</b>
+<b class="nc">&nbsp;            costs = Map.of();</b>
+&nbsp;    private SkillUiLayout layout;
+&nbsp;    private SkillUiListModel listModel;
+&nbsp;    private SkillListWidget listWidget;
+&nbsp;    private EditBox searchBox;
+&nbsp;    private SkillUiButton selectShownButton;
+&nbsp;    private SkillUiButton clearButton;
+&nbsp;    private SkillUiButton allEligibleButton;
+&nbsp;    private SkillUiButton actionButton;
+&nbsp;    private SkillUiEntry focusedEntry;
+<b class="nc">&nbsp;    private String retainedQuery = &quot;&quot;;</b>
+&nbsp;    private boolean allEligible;
+<b class="nc">&nbsp;    private Component statusMessage = Component.empty();</b>
+&nbsp;    private int statusColor;
+&nbsp;
+&nbsp;    public UltimateMultiGrantScreen(
+&nbsp;            OpenUltimateMultiGrantScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        super(</b>
+<b class="nc">&nbsp;                payload == null</b>
+<b class="nc">&nbsp;                        ? SkillUiText.component(&quot;common.authority_action&quot;)</b>
+<b class="nc">&nbsp;                        : payload.actionMode().titleComponent()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        this.payload = payload == null</b>
+<b class="nc">&nbsp;                ? new OpenUltimateMultiGrantScreenPayload(</b>
+<b class="nc">&nbsp;                AuthorityActionMode.BENEVOLENT_BESTOW.id(),</b>
+&nbsp;                &quot;&quot;,
+<b class="nc">&nbsp;                SkillUiText.string(&quot;common.unknown_subordinate&quot;),</b>
+&nbsp;                0.0D,
+&nbsp;                0,
+&nbsp;                false,
+&nbsp;                false,
+<b class="nc">&nbsp;                List.of()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                : payload;</b>
+<b class="nc">&nbsp;        this.mode = this.payload.actionMode();</b>
+<b class="nc">&nbsp;        this.theme = resolveTheme(mode);</b>
+<b class="nc">&nbsp;        this.selectionModel = new SkillUiSelectionModel(</b>
+<b class="nc">&nbsp;                mode.selectionLimit() == 1</b>
+<b class="nc">&nbsp;                        ? SkillUiSelectionMode.SINGLE</b>
+<b class="nc">&nbsp;                        : SkillUiSelectionMode.MULTI,</b>
+<b class="nc">&nbsp;                mode.selectionLimit()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        this.allEligible = this.payload.allEligibleByDefault();</b>
+<b class="nc">&nbsp;        this.statusColor = this.theme.mutedTextColor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void init() {
+<b class="nc">&nbsp;        List&lt;String&gt; previousSelection = new ArrayList&lt;&gt;(</b>
+<b class="nc">&nbsp;                selectionModel.selectedSkillIds()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        UltimateMultiGrantUiEntryFactory.BuildResult result =</b>
+<b class="nc">&nbsp;                UltimateMultiGrantUiEntryFactory.build(payload);</b>
+&nbsp;
+<b class="nc">&nbsp;        entries = result.entries();</b>
+<b class="nc">&nbsp;        costs = result.costs();</b>
+<b class="nc">&nbsp;        selectionModel.replaceSelection(previousSelection, entries);</b>
+<b class="nc">&nbsp;        filterState.setQuery(retainedQuery);</b>
+<b class="nc">&nbsp;        layout = SkillUiLayout.calculate(width, height, true);</b>
+<b class="nc">&nbsp;        listModel = new SkillUiListModel(filterState);</b>
+<b class="nc">&nbsp;        listWidget = new SkillListWidget(</b>
+<b class="nc">&nbsp;                layout.list().left(),</b>
+<b class="nc">&nbsp;                layout.list().top(),</b>
+<b class="nc">&nbsp;                layout.list().width(),</b>
+<b class="nc">&nbsp;                layout.list().height(),</b>
+&nbsp;                font,
+&nbsp;                theme,
+&nbsp;                listModel,
+&nbsp;                selectionModel
+&nbsp;        );
+<b class="nc">&nbsp;        listWidget.setEntries(entries);</b>
+<b class="nc">&nbsp;        listWidget.setFocusListener(entry -&gt; {</b>
+<b class="nc">&nbsp;            focusedEntry = entry;</b>
+<b class="nc">&nbsp;            clearStatus();</b>
+&nbsp;        });
+<b class="nc">&nbsp;        listWidget.setSelectionListener(this::onSelectionChanged);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (focusedEntry != null</b>
+<b class="nc">&nbsp;                &amp;&amp; listModel.focusEntry(focusedEntry.skillId())) {</b>
+<b class="nc">&nbsp;            focusedEntry = findEntry(</b>
+<b class="nc">&nbsp;                    focusedEntry.skillId()</b>
+<b class="nc">&nbsp;            ).orElse(null);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (focusedEntry == null) {</b>
+<b class="nc">&nbsp;            listModel.focusFirst().ifPresent(entry -&gt;</b>
+<b class="nc">&nbsp;                    focusedEntry = entry</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        addRenderableWidget(listWidget);</b>
+<b class="nc">&nbsp;        createFilterControls();</b>
+<b class="nc">&nbsp;        createFooterControls();</b>
+<b class="nc">&nbsp;        updateControls();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createFilterControls() {
+<b class="nc">&nbsp;        categoryButtons.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiLayout.Rect filters = layout.filters();</b>
+<b class="nc">&nbsp;        int buttonHeight = Math.min(</b>
+&nbsp;                20,
+<b class="nc">&nbsp;                Math.max(16, filters.height())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int controlY = filters.top()</b>
+<b class="nc">&nbsp;                + Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                (filters.height() - buttonHeight) / 2</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int categoryCount = SkillUiCategory.values().length;</b>
+<b class="nc">&nbsp;        int desiredSearchWidth = Math.max(</b>
+&nbsp;                60,
+<b class="nc">&nbsp;                Math.min(210, filters.width() * 31 / 100)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int minimumCategoryWidth = filters.width() &lt; 390</b>
+<b class="nc">&nbsp;                ? 18</b>
+<b class="nc">&nbsp;                : 42;</b>
+<b class="nc">&nbsp;        int maximumSearchWidth = filters.width()</b>
+&nbsp;                - FILTER_GAP
+&nbsp;                - categoryCount * minimumCategoryWidth
+&nbsp;                - (categoryCount - 1) * FILTER_GAP;
+<b class="nc">&nbsp;        int searchWidth = Math.max(</b>
+&nbsp;                50,
+<b class="nc">&nbsp;                Math.min(desiredSearchWidth, maximumSearchWidth)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        searchBox = new EditBox(</b>
+&nbsp;                font,
+<b class="nc">&nbsp;                filters.left(),</b>
+&nbsp;                controlY,
+&nbsp;                searchWidth,
+&nbsp;                buttonHeight,
+<b class="nc">&nbsp;                SkillUiText.component(&quot;common.search_skills&quot;)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        searchBox.setMaxLength(80);</b>
+<b class="nc">&nbsp;        searchBox.setHint(SkillUiText.component(&quot;common.search_skills_hint&quot;));</b>
+<b class="nc">&nbsp;        searchBox.setValue(retainedQuery);</b>
+<b class="nc">&nbsp;        searchBox.setResponder(this::onSearchChanged);</b>
+<b class="nc">&nbsp;        addRenderableWidget(searchBox);</b>
+&nbsp;
+<b class="nc">&nbsp;        int categoriesLeft = filters.left()</b>
+&nbsp;                + searchWidth
+&nbsp;                + FILTER_GAP;
+<b class="nc">&nbsp;        int categoriesWidth = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                filters.right() - categoriesLeft</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int totalGaps = FILTER_GAP * (categoryCount - 1);</b>
+<b class="nc">&nbsp;        int categoryButtonWidth = Math.max(</b>
+&nbsp;                1,
+&nbsp;                (categoriesWidth - totalGaps) / categoryCount
+&nbsp;        );
+<b class="nc">&nbsp;        int buttonX = categoriesLeft;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (SkillUiCategory category : SkillUiCategory.values()) {</b>
+<b class="nc">&nbsp;            int availableRight = filters.right() - buttonX;</b>
+<b class="nc">&nbsp;            int widthForButton = category == SkillUiCategory.OTHER</b>
+<b class="nc">&nbsp;                    ? Math.max(1, availableRight)</b>
+<b class="nc">&nbsp;                    : categoryButtonWidth;</b>
+<b class="nc">&nbsp;            SkillUiButton button = new SkillUiButton(</b>
+&nbsp;                    buttonX,
+&nbsp;                    controlY,
+&nbsp;                    widthForButton,
+&nbsp;                    buttonHeight,
+<b class="nc">&nbsp;                    categoryButtonLabel(category, widthForButton),</b>
+&nbsp;                    theme,
+&nbsp;                    SkillUiButton.Tone.NORMAL,
+<b class="nc">&nbsp;                    () -&gt; toggleCategory(category)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            button.setHighlighted(</b>
+<b class="nc">&nbsp;                    filterState.isCategoryVisible(category)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            button.setTooltip(</b>
+<b class="nc">&nbsp;                    Tooltip.create(category.displayName())</b>
+&nbsp;            );
+<b class="nc">&nbsp;            categoryButtons.put(category, button);</b>
+<b class="nc">&nbsp;            addRenderableWidget(button);</b>
+<b class="nc">&nbsp;            buttonX += widthForButton + FILTER_GAP;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createFooterControls() {
+<b class="nc">&nbsp;        footerButtons.clear();</b>
+<b class="nc">&nbsp;        SkillUiLayout.Rect footer = layout.footer();</b>
+<b class="nc">&nbsp;        int buttonHeight = Math.min(</b>
+&nbsp;                20,
+<b class="nc">&nbsp;                Math.max(16, footer.height() - 4)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int buttonY = footer.top()</b>
+<b class="nc">&nbsp;                + Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                (footer.height() - buttonHeight) / 2</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int buttonCount = 3;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (mode.selectionLimit() &gt; 1) {</b>
+<b class="nc">&nbsp;            buttonCount++;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (payload.allowAllEligible()) {</b>
+<b class="nc">&nbsp;            buttonCount++;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int buttonWidth = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                (footer.width() - FOOTER_GAP * (buttonCount - 1))</b>
+&nbsp;                        / buttonCount
+&nbsp;        );
+<b class="nc">&nbsp;        boolean compact = buttonWidth &lt; 75;</b>
+<b class="nc">&nbsp;        int buttonX = footer.left();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (mode.selectionLimit() &gt; 1) {</b>
+<b class="nc">&nbsp;            selectShownButton = addFooterButton(</b>
+&nbsp;                    buttonX,
+&nbsp;                    buttonY,
+&nbsp;                    buttonWidth,
+&nbsp;                    buttonHeight,
+<b class="nc">&nbsp;                    compact</b>
+<b class="nc">&nbsp;                            ? SkillUiText.component(&quot;common.all&quot;)</b>
+<b class="nc">&nbsp;                            : SkillUiText.component(&quot;common.select_shown&quot;),</b>
+&nbsp;                    SkillUiButton.Tone.NORMAL,
+&nbsp;                    this::selectShown
+&nbsp;            );
+<b class="nc">&nbsp;            selectShownButton.setTooltip(</b>
+<b class="nc">&nbsp;                    Tooltip.create(</b>
+<b class="nc">&nbsp;                            SkillUiText.component(</b>
+&nbsp;                                    &quot;tooltip.select_visible_limit&quot;
+&nbsp;                            )
+&nbsp;                    )
+&nbsp;            );
+<b class="nc">&nbsp;            buttonX += buttonWidth + FOOTER_GAP;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        clearButton = addFooterButton(</b>
+&nbsp;                buttonX,
+&nbsp;                buttonY,
+&nbsp;                buttonWidth,
+&nbsp;                buttonHeight,
+<b class="nc">&nbsp;                SkillUiText.component(&quot;common.clear&quot;),</b>
+&nbsp;                SkillUiButton.Tone.NORMAL,
+&nbsp;                this::clearSelection
+&nbsp;        );
+<b class="nc">&nbsp;        buttonX += buttonWidth + FOOTER_GAP;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (payload.allowAllEligible()) {</b>
+<b class="nc">&nbsp;            allEligibleButton = addFooterButton(</b>
+&nbsp;                    buttonX,
+&nbsp;                    buttonY,
+&nbsp;                    buttonWidth,
+&nbsp;                    buttonHeight,
+<b class="nc">&nbsp;                    compact</b>
+<b class="nc">&nbsp;                            ? SkillUiText.component(&quot;common.all_targets&quot;)</b>
+<b class="nc">&nbsp;                            : SkillUiText.component(&quot;common.all_eligible&quot;),</b>
+&nbsp;                    SkillUiButton.Tone.NORMAL,
+&nbsp;                    this::toggleAllEligible
+&nbsp;            );
+<b class="nc">&nbsp;            allEligibleButton.setHighlighted(allEligible);</b>
+<b class="nc">&nbsp;            allEligibleButton.setTooltip(</b>
+<b class="nc">&nbsp;                    Tooltip.create(</b>
+<b class="nc">&nbsp;                            SkillUiText.component(</b>
+&nbsp;                                    &quot;tooltip.all_eligible_take_back&quot;
+&nbsp;                            )
+&nbsp;                    )
+&nbsp;            );
+<b class="nc">&nbsp;            buttonX += buttonWidth + FOOTER_GAP;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        addFooterButton(</b>
+&nbsp;                buttonX,
+&nbsp;                buttonY,
+&nbsp;                buttonWidth,
+&nbsp;                buttonHeight,
+<b class="nc">&nbsp;                SkillUiText.component(&quot;common.cancel&quot;),</b>
+&nbsp;                SkillUiButton.Tone.NORMAL,
+&nbsp;                this::onClose
+&nbsp;        );
+<b class="nc">&nbsp;        buttonX += buttonWidth + FOOTER_GAP;</b>
+&nbsp;
+<b class="nc">&nbsp;        actionButton = addFooterButton(</b>
+&nbsp;                buttonX,
+&nbsp;                buttonY,
+<b class="nc">&nbsp;                Math.max(1, footer.right() - buttonX),</b>
+&nbsp;                buttonHeight,
+<b class="nc">&nbsp;                mode.actionButtonComponent(0),</b>
+<b class="nc">&nbsp;                mode == AuthorityActionMode.GOVERNANCE_INVEST</b>
+<b class="nc">&nbsp;                        ? SkillUiButton.Tone.DANGER</b>
+<b class="nc">&nbsp;                        : SkillUiButton.Tone.PRIMARY,</b>
+&nbsp;                this::performAction
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private SkillUiButton addFooterButton(
+&nbsp;            int x,
+&nbsp;            int y,
+&nbsp;            int width,
+&nbsp;            int height,
+&nbsp;            Component label,
+&nbsp;            SkillUiButton.Tone tone,
+&nbsp;            Runnable action
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiButton button = new SkillUiButton(</b>
+&nbsp;                x,
+&nbsp;                y,
+&nbsp;                width,
+&nbsp;                height,
+&nbsp;                label,
+&nbsp;                theme,
+&nbsp;                tone,
+&nbsp;                action
+&nbsp;        );
+<b class="nc">&nbsp;        footerButtons.add(button);</b>
+<b class="nc">&nbsp;        addRenderableWidget(button);</b>
+<b class="nc">&nbsp;        return button;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onSearchChanged(String query) {
+<b class="nc">&nbsp;        retainedQuery = query == null ? &quot;&quot; : query;</b>
+<b class="nc">&nbsp;        filterState.setQuery(retainedQuery);</b>
+<b class="nc">&nbsp;        rebuildVisibleEntries();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void toggleCategory(SkillUiCategory category) {
+<b class="nc">&nbsp;        filterState.toggleCategory(category);</b>
+<b class="nc">&nbsp;        SkillUiButton button = categoryButtons.get(category);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (button != null) {</b>
+<b class="nc">&nbsp;            button.setHighlighted(</b>
+<b class="nc">&nbsp;                    filterState.isCategoryVisible(category)</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        rebuildVisibleEntries();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void rebuildVisibleEntries() {
+<b class="nc">&nbsp;        if (listWidget == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String previousFocus = focusedEntry == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : focusedEntry.skillId();</b>
+<b class="nc">&nbsp;        listWidget.rebuildFilter();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!previousFocus.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; listModel.focusEntry(previousFocus)) {</b>
+<b class="nc">&nbsp;            focusedEntry = findEntry(previousFocus).orElse(null);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            focusedEntry = listModel.focusedEntry().orElse(null);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        clearStatus();</b>
+<b class="nc">&nbsp;        updateControls();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onSelectionChanged(
+&nbsp;            SkillUiEntry entry,
+&nbsp;            SkillUiSelectionModel.ToggleResult result
+&nbsp;    ) {
+<b class="nc">&nbsp;        focusedEntry = entry;</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (result) {</b>
+<b class="nc">&nbsp;            case SELECTED -&gt; setStatus(</b>
+<b class="nc">&nbsp;                    entry.mastered()</b>
+<b class="nc">&nbsp;                            ? SkillUiText.component(&quot;status.skill_selected&quot;)</b>
+<b class="nc">&nbsp;                            : SkillUiText.component(</b>
+&nbsp;                            &quot;warning.unmastered_selected&quot;
+&nbsp;                    ),
+<b class="nc">&nbsp;                    entry.mastered()</b>
+<b class="nc">&nbsp;                            ? theme.successColor()</b>
+<b class="nc">&nbsp;                            : theme.warningColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            case DESELECTED -&gt; setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(&quot;status.selection_removed&quot;),</b>
+<b class="nc">&nbsp;                    theme.mutedTextColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            case NOT_SELECTABLE -&gt; setStatus(</b>
+<b class="nc">&nbsp;                    entry.hasDisabledReason()</b>
+<b class="nc">&nbsp;                            ? entry.disabledReason()</b>
+<b class="nc">&nbsp;                            : SkillUiText.component(</b>
+&nbsp;                            &quot;error.skill_invalid_for_action&quot;
+&nbsp;                    ),
+<b class="nc">&nbsp;                    theme.warningColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            case LIMIT_REACHED -&gt; setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(</b>
+&nbsp;                            &quot;error.selection_limit_reached&quot;,
+<b class="nc">&nbsp;                            mode.selectionLimit()</b>
+&nbsp;                    ),
+<b class="nc">&nbsp;                    theme.warningColor()</b>
+&nbsp;            );
+&nbsp;            case READ_ONLY,
+<b class="nc">&nbsp;                 NO_ENTRY -&gt; clearStatus();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        updateControls();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void selectShown() {
+<b class="nc">&nbsp;        if (listModel == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int added = selectionModel.selectAllVisible(</b>
+<b class="nc">&nbsp;                listModel.filteredEntries()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        boolean limitReached = selectionModel.selectedCount()</b>
+<b class="nc">&nbsp;                &gt;= selectionModel.maximumSelection()</b>
+<b class="nc">&nbsp;                &amp;&amp; listModel.filteredEntries()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .anyMatch(entry -&gt; entry.selectable()</b>
+<b class="nc">&nbsp;                        &amp;&amp; !selectionModel.isSelected(</b>
+<b class="nc">&nbsp;                        entry.skillId()</b>
+&nbsp;                ));
+&nbsp;
+<b class="nc">&nbsp;        if (limitReached) {</b>
+<b class="nc">&nbsp;            setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(</b>
+&nbsp;                            &quot;status.selected_limit&quot;,
+<b class="nc">&nbsp;                            selectionModel.selectedCount(),</b>
+<b class="nc">&nbsp;                            mode.selectionLimit()</b>
+&nbsp;                    ),
+<b class="nc">&nbsp;                    theme.warningColor()</b>
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            setStatus(</b>
+<b class="nc">&nbsp;                    added &gt; 0</b>
+<b class="nc">&nbsp;                            ? SkillUiText.component(</b>
+&nbsp;                            &quot;status.added_visible_skills&quot;,
+<b class="nc">&nbsp;                            added</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                            : SkillUiText.component(</b>
+&nbsp;                            &quot;status.all_visible_selected&quot;
+&nbsp;                    ),
+<b class="nc">&nbsp;                    added &gt; 0</b>
+<b class="nc">&nbsp;                            ? theme.successColor()</b>
+<b class="nc">&nbsp;                            : theme.mutedTextColor()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        updateControls();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearSelection() {
+<b class="nc">&nbsp;        selectionModel.clear();</b>
+<b class="nc">&nbsp;        setStatus(</b>
+<b class="nc">&nbsp;                SkillUiText.component(&quot;status.selection_cleared&quot;),</b>
+<b class="nc">&nbsp;                theme.mutedTextColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        updateControls();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void toggleAllEligible() {
+<b class="nc">&nbsp;        allEligible = !allEligible;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (allEligibleButton != null) {</b>
+<b class="nc">&nbsp;            allEligibleButton.setHighlighted(allEligible);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        setStatus(</b>
+<b class="nc">&nbsp;                allEligible</b>
+<b class="nc">&nbsp;                        ? SkillUiText.component(</b>
+&nbsp;                        &quot;status.all_eligible_affected&quot;
+&nbsp;                )
+<b class="nc">&nbsp;                        : SkillUiText.component(</b>
+&nbsp;                        &quot;status.single_target_affected&quot;
+&nbsp;                ),
+<b class="nc">&nbsp;                allEligible</b>
+<b class="nc">&nbsp;                        ? theme.accentColor()</b>
+<b class="nc">&nbsp;                        : theme.mutedTextColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        updateControls();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void performAction() {
+<b class="nc">&nbsp;        List&lt;String&gt; selected = new ArrayList&lt;&gt;(</b>
+<b class="nc">&nbsp;                selectionModel.selectedSkillIds()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (selected.isEmpty()) {</b>
+<b class="nc">&nbsp;            setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(&quot;error.select_skill_first&quot;),</b>
+<b class="nc">&nbsp;                    theme.warningColor()</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (payload.cooldownTicks() &gt; 0) {</b>
+<b class="nc">&nbsp;            setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(</b>
+&nbsp;                            &quot;error.action_cooling_down&quot;
+&nbsp;                    ),
+<b class="nc">&nbsp;                    theme.warningColor()</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double required = selectedCost();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (required &gt; payload.availableMagicules()) {</b>
+<b class="nc">&nbsp;            setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(</b>
+&nbsp;                            &quot;error.insufficient_magicules_required&quot;,
+&nbsp;                            UltimateMultiGrantUiEntryFactory
+<b class="nc">&nbsp;                                    .formatNumber(required)</b>
+&nbsp;                    ),
+<b class="nc">&nbsp;                    theme.warningColor()</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (payload.allowAllEligible()</b>
+&nbsp;                &amp;&amp; !allEligible
+<b class="nc">&nbsp;                &amp;&amp; payload.targetUuid().isBlank()) {</b>
+<b class="nc">&nbsp;            setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(</b>
+&nbsp;                            &quot;error.enable_all_eligible&quot;
+&nbsp;                    ),
+<b class="nc">&nbsp;                    theme.warningColor()</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (mode.granter()) {</b>
+<b class="nc">&nbsp;            PacketDistributor.sendToServer(</b>
+&nbsp;                    new ExecuteUltimateMultiGrantPayload(
+<b class="nc">&nbsp;                            mode.id(),</b>
+<b class="nc">&nbsp;                            payload.targetUuid(),</b>
+&nbsp;                            allEligible,
+&nbsp;                            selected
+&nbsp;                    )
+&nbsp;            );
+<b class="nc">&nbsp;            onClose();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;SkillUiEntry&gt; selectedEntries = selected.stream()</b>
+<b class="nc">&nbsp;                .map(this::findEntry)</b>
+<b class="nc">&nbsp;                .flatMap(Optional::stream)</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        minecraft.setScreen(</b>
+<b class="nc">&nbsp;                UltimateConfirmationScreen.forAuthorityAction(</b>
+&nbsp;                        this,
+&nbsp;                        payload,
+&nbsp;                        mode,
+&nbsp;                        selectedEntries,
+&nbsp;                        costs,
+&nbsp;                        allEligible
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateControls() {
+<b class="nc">&nbsp;        int selectedCount = selectionModel.selectedCount();</b>
+<b class="nc">&nbsp;        double required = selectedCost();</b>
+<b class="nc">&nbsp;        boolean hasTarget = !payload.allowAllEligible()</b>
+&nbsp;                || allEligible
+<b class="nc">&nbsp;                || !payload.targetUuid().isBlank();</b>
+<b class="nc">&nbsp;        boolean affordable = required &lt;= payload.availableMagicules();</b>
+<b class="nc">&nbsp;        boolean ready = selectedCount &gt; 0</b>
+<b class="nc">&nbsp;                &amp;&amp; payload.cooldownTicks() &lt;= 0</b>
+&nbsp;                &amp;&amp; affordable
+&nbsp;                &amp;&amp; hasTarget;
+&nbsp;
+<b class="nc">&nbsp;        if (selectShownButton != null) {</b>
+<b class="nc">&nbsp;            selectShownButton.active = listModel != null</b>
+<b class="nc">&nbsp;                    &amp;&amp; listModel.filteredEntries()</b>
+<b class="nc">&nbsp;                    .stream()</b>
+<b class="nc">&nbsp;                    .anyMatch(entry -&gt; entry.selectable()</b>
+<b class="nc">&nbsp;                            &amp;&amp; !selectionModel.isSelected(</b>
+<b class="nc">&nbsp;                            entry.skillId()</b>
+&nbsp;                    ));
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (clearButton != null) {</b>
+<b class="nc">&nbsp;            clearButton.active = selectedCount &gt; 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (actionButton != null) {</b>
+<b class="nc">&nbsp;            actionButton.active = ready;</b>
+<b class="nc">&nbsp;            actionButton.setMessage(</b>
+<b class="nc">&nbsp;                    mode.actionButtonComponent(</b>
+&nbsp;                            selectedCount
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private double selectedCost() {
+<b class="nc">&nbsp;        return UltimateMultiGrantUiEntryFactory.calculateTotalCost(</b>
+<b class="nc">&nbsp;                new ArrayList&lt;&gt;(selectionModel.selectedSkillIds()),</b>
+&nbsp;                costs
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;SkillUiEntry&gt; findEntry(String skillId) {
+<b class="nc">&nbsp;        if (skillId == null || skillId.isBlank()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return entries.stream()</b>
+<b class="nc">&nbsp;                .filter(entry -&gt; skillId.equals(entry.skillId()))</b>
+<b class="nc">&nbsp;                .findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Component categoryButtonLabel(
+&nbsp;            SkillUiCategory category,
+&nbsp;            int buttonWidth
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (buttonWidth &gt;= 58) {</b>
+<b class="nc">&nbsp;            return switch (category) {</b>
+<b class="nc">&nbsp;                case UNIQUE -&gt; SkillUiText.component(&quot;category.unique_short&quot;);</b>
+<b class="nc">&nbsp;                case EXTRA -&gt; SkillUiText.component(&quot;category.extra_short&quot;);</b>
+<b class="nc">&nbsp;                case BASIC -&gt; SkillUiText.component(&quot;category.basic_short&quot;);</b>
+<b class="nc">&nbsp;                case RESISTANCE -&gt; SkillUiText.component(&quot;category.resistance_short&quot;);</b>
+<b class="nc">&nbsp;                case OTHER -&gt; SkillUiText.component(&quot;category.other_short&quot;);</b>
+&nbsp;            };
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (category) {</b>
+<b class="nc">&nbsp;            case UNIQUE -&gt; SkillUiText.component(&quot;category.unique_compact&quot;);</b>
+<b class="nc">&nbsp;            case EXTRA -&gt; SkillUiText.component(&quot;category.extra_compact&quot;);</b>
+<b class="nc">&nbsp;            case BASIC -&gt; SkillUiText.component(&quot;category.basic_compact&quot;);</b>
+<b class="nc">&nbsp;            case RESISTANCE -&gt; SkillUiText.component(&quot;category.resistance_compact&quot;);</b>
+<b class="nc">&nbsp;            case OTHER -&gt; SkillUiText.component(&quot;category.other_compact&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setStatus(Component message, int color) {
+<b class="nc">&nbsp;        statusMessage = message == null</b>
+<b class="nc">&nbsp;                ? Component.empty()</b>
+<b class="nc">&nbsp;                : message;</b>
+<b class="nc">&nbsp;        statusColor = color;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearStatus() {
+<b class="nc">&nbsp;        statusMessage = Component.empty();</b>
+<b class="nc">&nbsp;        statusColor = theme.mutedTextColor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void render(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiRenderHelper.fillBackground(</b>
+&nbsp;                guiGraphics,
+&nbsp;                width,
+&nbsp;                height,
+&nbsp;                theme
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                layout.panel(),</b>
+<b class="nc">&nbsp;                theme.accentColor(),</b>
+<b class="nc">&nbsp;                theme.panelFillColor(),</b>
+&nbsp;                2
+&nbsp;        );
+<b class="nc">&nbsp;        renderHeader(guiGraphics);</b>
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawDivider(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                layout.footer().left(),</b>
+<b class="nc">&nbsp;                layout.footer().right(),</b>
+<b class="nc">&nbsp;                layout.footer().top(),</b>
+<b class="nc">&nbsp;                theme.panelBorderColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        renderWidgetsWithoutParentBlur(</b>
+&nbsp;                guiGraphics,
+&nbsp;                mouseX,
+&nbsp;                mouseY,
+&nbsp;                partialTick
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiEntry detailsEntry = listWidget == null</b>
+<b class="nc">&nbsp;                ? focusedEntry</b>
+<b class="nc">&nbsp;                : listWidget.hoveredEntry().orElse(focusedEntry);</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillDetailsPanel.render(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                layout.details(),</b>
+&nbsp;                theme,
+&nbsp;                detailsEntry,
+&nbsp;                selectionModel
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderWidgetsWithoutParentBlur(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (searchBox != null) {</b>
+<b class="nc">&nbsp;            searchBox.render(guiGraphics, mouseX, mouseY, partialTick);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (SkillUiButton button : categoryButtons.values()) {</b>
+<b class="nc">&nbsp;            if (button != null) {</b>
+<b class="nc">&nbsp;                button.render(guiGraphics, mouseX, mouseY, partialTick);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (listWidget != null) {</b>
+<b class="nc">&nbsp;            listWidget.render(guiGraphics, mouseX, mouseY, partialTick);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (SkillUiButton button : footerButtons) {</b>
+<b class="nc">&nbsp;            if (button != null) {</b>
+<b class="nc">&nbsp;                button.render(guiGraphics, mouseX, mouseY, partialTick);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderHeader(GuiGraphics guiGraphics) {
+<b class="nc">&nbsp;        SkillUiLayout.Rect header = layout.header();</b>
+<b class="nc">&nbsp;        int textLeft = header.left() + 2;</b>
+<b class="nc">&nbsp;        int badgeLeft = SkillUiRenderHelper.drawModeBadge(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                mode.badgeComponent(),</b>
+<b class="nc">&nbsp;                header.right() - 2,</b>
+<b class="nc">&nbsp;                header.top() + 1,</b>
+&nbsp;                theme
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                mode.titleComponent(),</b>
+&nbsp;                textLeft,
+<b class="nc">&nbsp;                header.top() + 2,</b>
+<b class="nc">&nbsp;                Math.max(1, badgeLeft - textLeft - 6),</b>
+<b class="nc">&nbsp;                theme.primaryTextColor()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiLayout.Rect targetStrip = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                header.left() + 1,</b>
+<b class="nc">&nbsp;                header.top() + 14,</b>
+<b class="nc">&nbsp;                Math.max(1, header.width() - 2),</b>
+&nbsp;                13
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+&nbsp;                targetStrip,
+<b class="nc">&nbsp;                theme.secondaryAccentColor(),</b>
+<b class="nc">&nbsp;                theme.categoryFillColor(),</b>
+&nbsp;                1
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                SkillUiText.component(</b>
+<b class="nc">&nbsp;                        mode.massGrant() || allEligible</b>
+<b class="nc">&nbsp;                                ? &quot;header.scope_value&quot;</b>
+<b class="nc">&nbsp;                                : &quot;header.target_value&quot;,</b>
+<b class="nc">&nbsp;                        displayedTargetOrScope()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                targetStrip.left() + 5,</b>
+<b class="nc">&nbsp;                targetStrip.top() + 3,</b>
+<b class="nc">&nbsp;                Math.max(1, targetStrip.width() - 10),</b>
+<b class="nc">&nbsp;                theme.secondaryAccentColor()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Component summary = statusMessage;</b>
+<b class="nc">&nbsp;        int summaryColor = statusColor;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (summary.getString().isBlank()) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; selected = new ArrayList&lt;&gt;(</b>
+<b class="nc">&nbsp;                    selectionModel.selectedSkillIds()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            UltimateMultiGrantUiEntryFactory.SelectionSummary selection =</b>
+<b class="nc">&nbsp;                    UltimateMultiGrantUiEntryFactory.summarizeSelection(</b>
+&nbsp;                            selected,
+&nbsp;                            costs
+&nbsp;                    );
+<b class="nc">&nbsp;            String text = SkillUiText.string(</b>
+&nbsp;                    &quot;summary.selected_limit&quot;,
+<b class="nc">&nbsp;                    selectionModel.selectedCount(),</b>
+<b class="nc">&nbsp;                    mode.selectionLimit()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            if (selection.unmastered() &gt; 0) {</b>
+<b class="nc">&nbsp;                text = SkillUiText.string(</b>
+&nbsp;                        &quot;summary.with_unmastered_warning&quot;,
+&nbsp;                        text,
+<b class="nc">&nbsp;                        selection.unmastered()</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!mode.takeBack()) {</b>
+<b class="nc">&nbsp;                text = SkillUiText.string(</b>
+&nbsp;                        &quot;summary.with_magicules&quot;,
+&nbsp;                        text,
+<b class="nc">&nbsp;                        UltimateMultiGrantUiEntryFactory.formatNumber(</b>
+<b class="nc">&nbsp;                                selection.totalCost()</b>
+&nbsp;                        ),
+<b class="nc">&nbsp;                        UltimateMultiGrantUiEntryFactory.formatNumber(</b>
+<b class="nc">&nbsp;                                payload.availableMagicules()</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (payload.cooldownTicks() &gt; 0) {</b>
+<b class="nc">&nbsp;                text = SkillUiText.string(</b>
+&nbsp;                        &quot;summary.with_cooldown&quot;,
+&nbsp;                        text,
+<b class="nc">&nbsp;                        SkillUiText.formatDecimal(</b>
+<b class="nc">&nbsp;                                payload.cooldownTicks() / 20.0D,</b>
+&nbsp;                                1
+&nbsp;                        )
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            summary = Component.literal(text);</b>
+<b class="nc">&nbsp;            summaryColor = selection.unmastered() &gt; 0</b>
+<b class="nc">&nbsp;                    ? theme.warningColor()</b>
+<b class="nc">&nbsp;                    : selection.totalCost()</b>
+<b class="nc">&nbsp;                    &gt; payload.availableMagicules()</b>
+<b class="nc">&nbsp;                      ? theme.warningColor()</b>
+<b class="nc">&nbsp;                      : theme.mutedTextColor();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+&nbsp;                summary,
+&nbsp;                textLeft,
+<b class="nc">&nbsp;                header.top() + 29,</b>
+<b class="nc">&nbsp;                Math.max(1, header.width() - 4),</b>
+&nbsp;                summaryColor
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawDivider(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                header.left(),</b>
+<b class="nc">&nbsp;                header.right(),</b>
+<b class="nc">&nbsp;                header.bottom() - 1,</b>
+<b class="nc">&nbsp;                theme.panelBorderColor()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    private Component displayedTargetOrScope() {
+<b class="nc">&nbsp;        if (!allEligible) {</b>
+<b class="nc">&nbsp;            return UiTranslationToken.toComponent(</b>
+<b class="nc">&nbsp;                    payload.targetName()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return SkillUiText.component(</b>
+<b class="nc">&nbsp;                mode.governance()</b>
+<b class="nc">&nbsp;                        ? &quot;scope.governance_128&quot;</b>
+<b class="nc">&nbsp;                        : &quot;scope.benevolent_32&quot;</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static SkillUiTheme resolveTheme(
+&nbsp;            AuthorityActionMode mode
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (mode == null || mode.granter()) {</b>
+<b class="nc">&nbsp;            return SkillUiTheme.GRANTER;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return mode.benevolent()</b>
+<b class="nc">&nbsp;                ? SkillUiTheme.BENEVOLENT</b>
+<b class="nc">&nbsp;                : SkillUiTheme.GOVERNANCE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean keyPressed(
+&nbsp;            int keyCode,
+&nbsp;            int scanCode,
+&nbsp;            int modifiers
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (super.keyPressed(keyCode, scanCode, modifiers)) {</b>
+<b class="nc">&nbsp;            updateControls();</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if ((keyCode == GLFW.GLFW_KEY_ENTER</b>
+&nbsp;                || keyCode == GLFW.GLFW_KEY_KP_ENTER)
+&nbsp;                &amp;&amp; actionButton != null
+&nbsp;                &amp;&amp; actionButton.active) {
+<b class="nc">&nbsp;            performAction();</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isPauseScreen() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

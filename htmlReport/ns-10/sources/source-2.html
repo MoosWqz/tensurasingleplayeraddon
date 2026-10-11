@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BenevolentEmpowermentSkill</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.skill</a>
+</div>
+
+<h1>Coverage Summary for Class: BenevolentEmpowermentSkill (com.mooswqz.moostensuraaddon.skill)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BenevolentEmpowermentSkill</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (2/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.6%
+  </span>
+  <span class="absValue">
+    (3/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.skill;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.util.AuthorityActionService;
+&nbsp;import com.mooswqz.moostensuraaddon.util.UltimateSkillActions;
+&nbsp;import io.github.manasmods.manascore.skill.api.ManasSkillInstance;
+&nbsp;import io.github.manasmods.tensura.ability.skill.Skill;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;
+&nbsp;public class BenevolentEmpowermentSkill extends Skill {
+&nbsp;
+<b class="fc">&nbsp;    private static final ResourceLocation ICON =</b>
+<b class="fc">&nbsp;            ResourceLocation.fromNamespaceAndPath(</b>
+&nbsp;                    &quot;minecraft&quot;,
+&nbsp;                    &quot;textures/mob_effect/absorption.png&quot;
+&nbsp;            );
+&nbsp;
+&nbsp;    public static final int MODE_COUNT = 5;
+&nbsp;    public static final int MODE_BESTOW = 0;
+&nbsp;    public static final int MODE_MASS_GRANT = 1;
+&nbsp;    public static final int MODE_RANGED_TAKE_BACK = 2;
+&nbsp;    public static final int MODE_BORROW_SKILL = 3;
+&nbsp;    public static final int MODE_RANGED_SKILL_VIEW = 4;
+&nbsp;
+&nbsp;    public BenevolentEmpowermentSkill() {
+<b class="fc">&nbsp;        super(SkillType.ULTIMATE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResourceLocation getSkillIcon() {
+<b class="nc">&nbsp;        return ICON;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getModes(ManasSkillInstance instance) {
+<b class="nc">&nbsp;        return MODE_COUNT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int nextMode(
+&nbsp;            LivingEntity entity,
+&nbsp;            ManasSkillInstance instance,
+&nbsp;            int mode,
+&nbsp;            boolean reverse
+&nbsp;    ) {
+<b class="nc">&nbsp;        int current = normalizeMode(mode);</b>
+<b class="nc">&nbsp;        int next = reverse ? current - 1 : current + 1;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (next &lt; 0) {</b>
+<b class="nc">&nbsp;            return MODE_COUNT - 1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return next &gt;= MODE_COUNT ? 0 : next;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getModeId(
+&nbsp;            ManasSkillInstance instance,
+&nbsp;            int mode
+&nbsp;    ) {
+<b class="nc">&nbsp;        return switch (normalizeMode(mode)) {</b>
+<b class="nc">&nbsp;            case MODE_BESTOW -&gt; &quot;bestow&quot;;</b>
+<b class="nc">&nbsp;            case MODE_MASS_GRANT -&gt; &quot;mass_grant&quot;;</b>
+<b class="nc">&nbsp;            case MODE_RANGED_TAKE_BACK -&gt; &quot;ranged_take_back&quot;;</b>
+<b class="nc">&nbsp;            case MODE_BORROW_SKILL -&gt; &quot;borrow_skill&quot;;</b>
+<b class="nc">&nbsp;            case MODE_RANGED_SKILL_VIEW -&gt; &quot;ranged_skill_view&quot;;</b>
+<b class="nc">&nbsp;            default -&gt; &quot;bestow&quot;;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Component getModeName(
+&nbsp;            ManasSkillInstance instance,
+&nbsp;            int mode
+&nbsp;    ) {
+<b class="nc">&nbsp;        return switch (normalizeMode(mode)) {</b>
+<b class="nc">&nbsp;            case MODE_BESTOW -&gt; Component.translatable(&quot;skill.moostensuraaddon.mode.benevolent.bestow&quot;);</b>
+<b class="nc">&nbsp;            case MODE_MASS_GRANT -&gt; Component.translatable(&quot;skill.moostensuraaddon.mode.benevolent.mass_grant&quot;);</b>
+<b class="nc">&nbsp;            case MODE_RANGED_TAKE_BACK -&gt; Component.translatable(&quot;skill.moostensuraaddon.mode.benevolent.ranged_take_back&quot;);</b>
+<b class="nc">&nbsp;            case MODE_BORROW_SKILL -&gt; Component.translatable(&quot;skill.moostensuraaddon.mode.benevolent.borrow&quot;);</b>
+<b class="nc">&nbsp;            case MODE_RANGED_SKILL_VIEW -&gt; Component.translatable(&quot;skill.moostensuraaddon.mode.benevolent.list_skills&quot;);</b>
+<b class="nc">&nbsp;            default -&gt; Component.translatable(&quot;skill.moostensuraaddon.mode.benevolent.bestow&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onPressed(
+&nbsp;            ManasSkillInstance instance,
+&nbsp;            LivingEntity entity,
+&nbsp;            int slot,
+&nbsp;            int mode
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!(entity instanceof ServerPlayer player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        switch (normalizeMode(mode)) {</b>
+&nbsp;            case MODE_BESTOW -&gt;
+<b class="nc">&nbsp;                    AuthorityActionService.openUltimateBestow(player, true);</b>
+&nbsp;            case MODE_MASS_GRANT -&gt;
+<b class="nc">&nbsp;                    AuthorityActionService.openUltimateMassGrant(player, true);</b>
+&nbsp;            case MODE_RANGED_TAKE_BACK -&gt;
+<b class="nc">&nbsp;                    AuthorityActionService.openUltimateTakeBack(player, true);</b>
+&nbsp;            case MODE_BORROW_SKILL -&gt;
+<b class="nc">&nbsp;                    UltimateSkillActions.openBorrowSkillSelection(player);</b>
+&nbsp;            case MODE_RANGED_SKILL_VIEW -&gt;
+<b class="nc">&nbsp;                    UltimateSkillActions.rangedSkillView(player, true);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    AuthorityActionService.openUltimateBestow(player, true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int normalizeMode(int mode) {
+<b class="nc">&nbsp;        return mode &gt;= 0 &amp;&amp; mode &lt; MODE_COUNT</b>
+<b class="nc">&nbsp;                ? mode</b>
+<b class="nc">&nbsp;                : MODE_BESTOW;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

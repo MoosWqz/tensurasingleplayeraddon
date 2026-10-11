@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionBenefitsService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionBenefitsService (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionBenefitsService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
+&nbsp;import com.mooswqz.moostensuraaddon.network.SyncRecognitionBenefitsPayload;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.neoforged.neoforge.network.PacketDistributor;
+&nbsp;
+&nbsp;/**
+&nbsp; * Synchronizes the existing frozen reward without recalculating or changing it.
+&nbsp; */
+&nbsp;public final class RecognitionBenefitsService {
+&nbsp;
+&nbsp;    private RecognitionBenefitsService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void send(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null || player.level().isClientSide()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData recognition = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+<b class="nc">&nbsp;        AddonIncarnationState.Snapshot lifecycle =</b>
+<b class="nc">&nbsp;                AddonIncarnationState.inspect(player);</b>
+<b class="nc">&nbsp;        RecognitionStrengthRewardSnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionStrengthRewardService.inspect(player);</b>
+<b class="nc">&nbsp;        RecognitionStrengthRewardFormula.Reward reward =</b>
+<b class="nc">&nbsp;                snapshot.expectedReward();</b>
+&nbsp;
+<b class="nc">&nbsp;        String stateId = resolveStateId(snapshot);</b>
+<b class="nc">&nbsp;        String recognitionIncarnation = recognition.getIncarnationId()</b>
+<b class="nc">&nbsp;                .isBlank()</b>
+<b class="nc">&nbsp;                ? lifecycle.lifeToken()</b>
+<b class="nc">&nbsp;                : recognition.getIncarnationId();</b>
+<b class="nc">&nbsp;        boolean nativeAnchored = !recognitionIncarnation.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; recognitionIncarnation.equals(</b>
+<b class="nc">&nbsp;                lifecycle.nativeEndowmentIncarnation()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        PacketDistributor.sendToPlayer(</b>
+&nbsp;                player,
+&nbsp;                new SyncRecognitionBenefitsPayload(
+&nbsp;                        stateId,
+&nbsp;                        nativeAnchored,
+<b class="nc">&nbsp;                        snapshot.attributeStateMatches(),</b>
+<b class="nc">&nbsp;                        snapshot.storedRewardProfileVersion(),</b>
+<b class="nc">&nbsp;                        snapshot.frozenIdentityStrength(),</b>
+<b class="nc">&nbsp;                        snapshot.identityStrengthMaximum(),</b>
+<b class="nc">&nbsp;                        snapshot.totalStrength(),</b>
+<b class="nc">&nbsp;                        reward == null</b>
+<b class="nc">&nbsp;                                ? 0.0D</b>
+<b class="nc">&nbsp;                                : reward.maxHealthMultiplier(),</b>
+<b class="nc">&nbsp;                        reward == null</b>
+<b class="nc">&nbsp;                                ? 0.0D</b>
+<b class="nc">&nbsp;                                : reward.attackDamageMultiplier(),</b>
+<b class="nc">&nbsp;                        reward == null</b>
+<b class="nc">&nbsp;                                ? 0.0D</b>
+<b class="nc">&nbsp;                                : reward.movementSpeedMultiplier(),</b>
+<b class="nc">&nbsp;                        reward == null</b>
+<b class="nc">&nbsp;                                ? 0.0D</b>
+<b class="nc">&nbsp;                                : reward.attackSpeedMultiplier(),</b>
+<b class="nc">&nbsp;                        reward == null</b>
+<b class="nc">&nbsp;                                ? 0.0D</b>
+<b class="nc">&nbsp;                                : reward.knockbackResistanceAddition()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String resolveStateId(
+&nbsp;            RecognitionStrengthRewardSnapshot snapshot
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (snapshot == null</b>
+<b class="nc">&nbsp;                || !snapshot.recognitionCommitted()) {</b>
+<b class="nc">&nbsp;            return &quot;not_recognized&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!snapshot.committedResultValid()) {</b>
+<b class="nc">&nbsp;            return &quot;invalid&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (snapshot.futureProfilePreserved()) {</b>
+<b class="nc">&nbsp;            return &quot;future_profile&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!snapshot.rewardMetadataInitialized()) {</b>
+<b class="nc">&nbsp;            return &quot;synchronizing&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;active&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

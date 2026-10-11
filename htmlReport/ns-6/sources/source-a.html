@@ -1,0 +1,420 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SkillUiLayout</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen.skillui</a>
+</div>
+
+<h1>Coverage Summary for Class: SkillUiLayout (com.mooswqz.moostensuraaddon.client.screen.skillui)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SkillUiLayout</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SkillUiLayout$Rect</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen.skillui;
+&nbsp;
+&nbsp;/**
+&nbsp; * Responsive screen geometry shared by skill-facing menus.
+&nbsp; */
+<b class="nc">&nbsp;public record SkillUiLayout(</b>
+&nbsp;        Rect panel,
+&nbsp;        Rect header,
+&nbsp;        Rect filters,
+&nbsp;        Rect list,
+&nbsp;        Rect details,
+&nbsp;        Rect footer,
+&nbsp;        boolean compact,
+&nbsp;        boolean detailsVisible
+&nbsp;) {
+&nbsp;
+&nbsp;    public static SkillUiLayout calculate(
+&nbsp;            int screenWidth,
+&nbsp;            int screenHeight,
+&nbsp;            boolean requestDetailsPanel
+&nbsp;    ) {
+<b class="nc">&nbsp;        int safeWidth = Math.max(1, screenWidth);</b>
+<b class="nc">&nbsp;        int safeHeight = Math.max(1, screenHeight);</b>
+&nbsp;
+<b class="nc">&nbsp;        int horizontalMargin = safeWidth &lt; 360</b>
+<b class="nc">&nbsp;                ? 6</b>
+<b class="nc">&nbsp;                : 12;</b>
+<b class="nc">&nbsp;        int verticalMargin = safeHeight &lt; 260</b>
+<b class="nc">&nbsp;                ? 6</b>
+<b class="nc">&nbsp;                : 12;</b>
+&nbsp;
+<b class="nc">&nbsp;        int panelWidth = Math.min(</b>
+&nbsp;                760,
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        1,
+&nbsp;                        safeWidth - horizontalMargin * 2
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        int panelHeight = Math.max(</b>
+&nbsp;                1,
+&nbsp;                safeHeight - verticalMargin * 2
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int panelLeft = safeWidth / 2</b>
+&nbsp;                - panelWidth / 2;
+<b class="nc">&nbsp;        Rect panel = new Rect(</b>
+&nbsp;                panelLeft,
+&nbsp;                verticalMargin,
+&nbsp;                panelWidth,
+&nbsp;                panelHeight
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int innerLeft = panel.left() + 8;</b>
+<b class="nc">&nbsp;        int innerWidth = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                panel.width() - 16</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int headerHeight = panelHeight &lt; 220</b>
+<b class="nc">&nbsp;                ? 34</b>
+<b class="nc">&nbsp;                : 44;</b>
+<b class="nc">&nbsp;        int filterHeight = panelHeight &lt; 220</b>
+<b class="nc">&nbsp;                ? 20</b>
+<b class="nc">&nbsp;                : 24;</b>
+<b class="nc">&nbsp;        int footerHeight = 28;</b>
+<b class="nc">&nbsp;        int gap = 5;</b>
+&nbsp;
+<b class="nc">&nbsp;        Rect header = new Rect(</b>
+&nbsp;                innerLeft,
+<b class="nc">&nbsp;                panel.top() + 7,</b>
+&nbsp;                innerWidth,
+&nbsp;                headerHeight
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Rect filters = new Rect(</b>
+&nbsp;                innerLeft,
+<b class="nc">&nbsp;                header.bottom() + gap,</b>
+&nbsp;                innerWidth,
+&nbsp;                filterHeight
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int bodyTop = filters.bottom() + gap;</b>
+<b class="nc">&nbsp;        int bodyBottom = Math.max(</b>
+&nbsp;                bodyTop,
+<b class="nc">&nbsp;                panel.bottom()</b>
+&nbsp;                        - footerHeight
+&nbsp;                        - 7
+&nbsp;                        - gap
+&nbsp;        );
+<b class="nc">&nbsp;        int bodyHeight = Math.max(</b>
+&nbsp;                1,
+&nbsp;                bodyBottom - bodyTop
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Rect footer = new Rect(</b>
+&nbsp;                innerLeft,
+&nbsp;                bodyBottom + gap,
+&nbsp;                innerWidth,
+&nbsp;                footerHeight
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean compact = innerWidth &lt; 560;</b>
+<b class="nc">&nbsp;        boolean detailsVisible = requestDetailsPanel</b>
+&nbsp;                &amp;&amp; bodyHeight &gt;= 130
+&nbsp;                &amp;&amp; innerWidth &gt;= 300;
+&nbsp;
+&nbsp;        Rect list;
+&nbsp;        Rect details;
+&nbsp;
+<b class="nc">&nbsp;        if (!detailsVisible) {</b>
+<b class="nc">&nbsp;            list = new Rect(</b>
+&nbsp;                    innerLeft,
+&nbsp;                    bodyTop,
+&nbsp;                    innerWidth,
+&nbsp;                    bodyHeight
+&nbsp;            );
+<b class="nc">&nbsp;            details = Rect.empty();</b>
+<b class="nc">&nbsp;        } else if (!compact) {</b>
+<b class="nc">&nbsp;            int bodyGap = 6;</b>
+<b class="nc">&nbsp;            int detailsWidth = Math.max(</b>
+&nbsp;                    190,
+<b class="nc">&nbsp;                    Math.min(</b>
+&nbsp;                            260,
+&nbsp;                            innerWidth * 38 / 100
+&nbsp;                    )
+&nbsp;            );
+<b class="nc">&nbsp;            int listWidth = Math.max(</b>
+&nbsp;                    1,
+&nbsp;                    innerWidth
+&nbsp;                            - detailsWidth
+&nbsp;                            - bodyGap
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            list = new Rect(</b>
+&nbsp;                    innerLeft,
+&nbsp;                    bodyTop,
+&nbsp;                    listWidth,
+&nbsp;                    bodyHeight
+&nbsp;            );
+<b class="nc">&nbsp;            details = new Rect(</b>
+<b class="nc">&nbsp;                    list.right() + bodyGap,</b>
+&nbsp;                    bodyTop,
+&nbsp;                    detailsWidth,
+&nbsp;                    bodyHeight
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            int bodyGap = 5;</b>
+<b class="nc">&nbsp;            int detailsHeight = Math.max(</b>
+&nbsp;                    74,
+<b class="nc">&nbsp;                    Math.min(</b>
+&nbsp;                            112,
+&nbsp;                            bodyHeight * 36 / 100
+&nbsp;                    )
+&nbsp;            );
+<b class="nc">&nbsp;            int listHeight = Math.max(</b>
+&nbsp;                    1,
+&nbsp;                    bodyHeight
+&nbsp;                            - detailsHeight
+&nbsp;                            - bodyGap
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            list = new Rect(</b>
+&nbsp;                    innerLeft,
+&nbsp;                    bodyTop,
+&nbsp;                    innerWidth,
+&nbsp;                    listHeight
+&nbsp;            );
+<b class="nc">&nbsp;            details = new Rect(</b>
+&nbsp;                    innerLeft,
+<b class="nc">&nbsp;                    list.bottom() + bodyGap,</b>
+&nbsp;                    innerWidth,
+&nbsp;                    detailsHeight
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new SkillUiLayout(</b>
+&nbsp;                panel,
+&nbsp;                header,
+&nbsp;                filters,
+&nbsp;                list,
+&nbsp;                details,
+&nbsp;                footer,
+&nbsp;                compact,
+&nbsp;                detailsVisible
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Rect(</b>
+&nbsp;            int left,
+&nbsp;            int top,
+&nbsp;            int width,
+&nbsp;            int height
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public Rect {</b>
+<b class="nc">&nbsp;            width = Math.max(0, width);</b>
+<b class="nc">&nbsp;            height = Math.max(0, height);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static Rect empty() {
+<b class="nc">&nbsp;            return new Rect(</b>
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    0
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        public int right() {
+<b class="nc">&nbsp;            return left + width;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public int bottom() {
+<b class="nc">&nbsp;            return top + height;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public int centerX() {
+<b class="nc">&nbsp;            return left + width / 2;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public int centerY() {
+<b class="nc">&nbsp;            return top + height / 2;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean emptyArea() {
+<b class="nc">&nbsp;            return width &lt;= 0</b>
+&nbsp;                    || height &lt;= 0;
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean contains(
+&nbsp;                double x,
+&nbsp;                double y
+&nbsp;        ) {
+<b class="nc">&nbsp;            return x &gt;= left</b>
+<b class="nc">&nbsp;                    &amp;&amp; x &lt; right()</b>
+&nbsp;                    &amp;&amp; y &gt;= top
+<b class="nc">&nbsp;                    &amp;&amp; y &lt; bottom();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Rect inset(
+&nbsp;                int amount
+&nbsp;        ) {
+<b class="nc">&nbsp;            int safeAmount = Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    amount
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return new Rect(</b>
+&nbsp;                    left + safeAmount,
+&nbsp;                    top + safeAmount,
+<b class="nc">&nbsp;                    Math.max(</b>
+&nbsp;                            0,
+&nbsp;                            width - safeAmount * 2
+&nbsp;                    ),
+<b class="nc">&nbsp;                    Math.max(</b>
+&nbsp;                            0,
+&nbsp;                            height - safeAmount * 2
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,347 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionNativeEndowmentService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.lifecycle</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionNativeEndowmentService (com.mooswqz.moostensuraaddon.lifecycle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionNativeEndowmentService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36%
+  </span>
+  <span class="absValue">
+    (18/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56%
+  </span>
+  <span class="absValue">
+    (42/75)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.lifecycle;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionDisplayNameService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionDisplayNameSyncService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionEndowmentEffortRewardService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionNativeNameStorageService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionProgressScreenService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionStatKeys;
+&nbsp;import com.mooswqz.moostensuraaddon.util.AddonAdvancementHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.util.TensuraPlayerStateHelper;
+&nbsp;import io.github.manasmods.tensura.network.c2s.RequestNamingMenuPacket;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Bridges a committed recognition result into Tensura&#39;s native high-grade
+&nbsp; * naming/endowment route exactly once per recognition incarnation.
+&nbsp; */
+&nbsp;public final class RecognitionNativeEndowmentService {
+&nbsp;
+&nbsp;    private RecognitionNativeEndowmentService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void synchronize(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null</b>
+<b class="pc">&nbsp;                || player.level().isClientSide()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        long now = System.currentTimeMillis();</b>
+<b class="fc">&nbsp;        RecognitionData recognition = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (recognition.isWriteBlockedByFutureVersion()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        AddonIncarnationState state =</b>
+<b class="fc">&nbsp;                AddonIncarnationState.load(player);</b>
+<b class="fc">&nbsp;        boolean committed = recognition.isNamingCommitted();</b>
+<b class="pc">&nbsp;        boolean revealPending = committed</b>
+<b class="fc">&nbsp;                &amp;&amp; recognition.getFlag(</b>
+&nbsp;                RecognitionStatKeys.REVEAL_PENDING
+&nbsp;        );
+<b class="fc">&nbsp;        String recognitionIncarnation = recognition.getString(</b>
+&nbsp;                RecognitionStatKeys.INCARNATION_ID
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (recognitionIncarnation.isBlank()) {</b>
+<b class="nc">&nbsp;            recognitionIncarnation = state.getLifeToken();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        boolean nativeNamed =</b>
+<b class="fc">&nbsp;                TensuraPlayerStateHelper.isNamedOrEndowed(player);</b>
+<b class="pc">&nbsp;        boolean markerMatches = !recognitionIncarnation.isBlank()</b>
+<b class="fc">&nbsp;                &amp;&amp; recognitionIncarnation.equals(</b>
+<b class="fc">&nbsp;                state.getNativeEndowmentIncarnation()</b>
+&nbsp;        );
+<b class="fc">&nbsp;        boolean guardActive = state.isResetGuardActive(now);</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Reconcile on every lifecycle synchronization. This repairs a missing
+&nbsp;         * capacity modifier without rewriting current energy when the stable
+&nbsp;         * modifiers already match.
+&nbsp;         */
+<b class="fc">&nbsp;        RecognitionEndowmentEffortRewardService.reconcile(</b>
+&nbsp;                player
+&nbsp;        );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Commitment is intentionally earlier than presentation so an
+&nbsp;         * interrupted ritual cannot reroll. Native naming must observe the
+&nbsp;         * opposite boundary: neither Tensura&#39;s stored name nor Minecraft&#39;s
+&nbsp;         * custom-name field may reveal the frozen title until presentation
+&nbsp;         * actually finishes.
+&nbsp;         */
+<b class="pc">&nbsp;        if (revealPending) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String nativeRecognitionName =</b>
+&nbsp;                RecognitionDisplayNameService
+<b class="fc">&nbsp;                        .buildNativeTensuraName(</b>
+<b class="fc">&nbsp;                                player.getGameProfile()</b>
+<b class="fc">&nbsp;                                        .getName(),</b>
+<b class="fc">&nbsp;                                recognition.getString(</b>
+&nbsp;                                        RecognitionStatKeys.BESTOWED_TITLE
+&nbsp;                                )
+&nbsp;                        );
+&nbsp;
+<b class="pc">&nbsp;        if (committed &amp;&amp; nativeNamed) {</b>
+<b class="fc">&nbsp;            IExistence existence =</b>
+<b class="fc">&nbsp;                    TensuraStorages.getExistenceFrom(</b>
+&nbsp;                            player
+&nbsp;                    );
+&nbsp;
+&nbsp;            String storedNativeName =
+&nbsp;                    existence == null
+<b class="pc">&nbsp;                            || existence.getName() == null</b>
+<b class="nc">&nbsp;                            ? &quot;&quot;</b>
+<b class="fc">&nbsp;                            : existence.getName().trim();</b>
+&nbsp;
+<b class="fc">&nbsp;            Component customName =</b>
+<b class="fc">&nbsp;                    player.getCustomName();</b>
+&nbsp;
+&nbsp;            String storedCustomName =
+<b class="pc">&nbsp;                    customName == null</b>
+<b class="nc">&nbsp;                            ? &quot;&quot;</b>
+<b class="fc">&nbsp;                            : customName.getString().trim();</b>
+&nbsp;
+<b class="fc">&nbsp;            boolean nativeNameMatches =</b>
+<b class="fc">&nbsp;                    storedNativeName.equals(</b>
+&nbsp;                            nativeRecognitionName
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            boolean customNameMatches =</b>
+<b class="fc">&nbsp;                    storedCustomName.equals(</b>
+&nbsp;                            nativeRecognitionName
+&nbsp;                    );
+&nbsp;
+<b class="pc">&nbsp;            if (!nativeNameMatches</b>
+&nbsp;                    || !customNameMatches) {
+<b class="nc">&nbsp;                boolean retryBlocked =</b>
+&nbsp;                        guardActive
+&nbsp;                                || now &lt; state
+<b class="nc">&nbsp;                                .getNativeEndowmentNextAttemptEpochMillis();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (retryBlocked) {</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+&nbsp;                RecognitionNativeNameStorageService.Result
+<b class="nc">&nbsp;                        nameSync =</b>
+<b class="nc">&nbsp;                        RecognitionNativeNameStorageService.write(</b>
+&nbsp;                                player,
+&nbsp;                                existence,
+&nbsp;                                nativeRecognitionName
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;                if (!nameSync.success()) {</b>
+<b class="nc">&nbsp;                    state.recordNativeEndowmentFailure(now);</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            boolean stateChanged =</b>
+&nbsp;                    !markerMatches
+&nbsp;                            || !nativeNameMatches
+&nbsp;                            || !customNameMatches;
+&nbsp;
+<b class="pc">&nbsp;            if (!markerMatches) {</b>
+<b class="nc">&nbsp;                state.markNativeEndowmentApplied(</b>
+&nbsp;                        recognitionIncarnation
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (stateChanged) {</b>
+<b class="nc">&nbsp;                RecognitionDisplayNameSyncService</b>
+<b class="nc">&nbsp;                        .refreshAndBroadcast(player);</b>
+<b class="nc">&nbsp;                RecognitionProgressScreenService.invalidate(player);</b>
+<b class="nc">&nbsp;                AddonAdvancementHelper.awardNameAnchor(player);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!AddonLifecyclePolicy.shouldAttemptNativeEndowment(</b>
+&nbsp;                committed,
+&nbsp;                nativeNamed,
+&nbsp;                markerMatches,
+&nbsp;                guardActive,
+<b class="nc">&nbsp;                state.getNativeEndowmentNextAttemptEpochMillis(),</b>
+&nbsp;                now
+&nbsp;        )) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            RequestNamingMenuPacket.name(</b>
+&nbsp;                    player,
+&nbsp;                    null,
+&nbsp;                    RequestNamingMenuPacket.NamingType.HIGH,
+&nbsp;                    nativeRecognitionName
+&nbsp;            );
+&nbsp;        } catch (RuntimeException exception) {
+<b class="nc">&nbsp;            state.recordNativeEndowmentFailure(now);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!TensuraPlayerStateHelper.isNamedOrEndowed(player)) {</b>
+<b class="nc">&nbsp;            state.recordNativeEndowmentFailure(now);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        IExistence refreshedExistence =</b>
+<b class="nc">&nbsp;                TensuraStorages.getExistenceFrom(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+&nbsp;        RecognitionNativeNameStorageService.Result
+<b class="nc">&nbsp;                nameSync =</b>
+<b class="nc">&nbsp;                RecognitionNativeNameStorageService.write(</b>
+&nbsp;                        player,
+&nbsp;                        refreshedExistence,
+&nbsp;                        nativeRecognitionName
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!nameSync.success()) {</b>
+<b class="nc">&nbsp;            state.recordNativeEndowmentFailure(now);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        state.markNativeEndowmentApplied(</b>
+&nbsp;                recognitionIncarnation
+&nbsp;        );
+<b class="nc">&nbsp;        RecognitionEndowmentEffortRewardService.reconcile(</b>
+&nbsp;                player
+&nbsp;        );
+<b class="nc">&nbsp;        RecognitionDisplayNameSyncService</b>
+<b class="nc">&nbsp;                .refreshAndBroadcast(player);</b>
+<b class="nc">&nbsp;        RecognitionProgressScreenService.invalidate(player);</b>
+<b class="nc">&nbsp;        AddonAdvancementHelper.awardNameAnchor(player);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

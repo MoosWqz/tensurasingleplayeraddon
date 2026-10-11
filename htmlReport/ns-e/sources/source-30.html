@@ -1,0 +1,652 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionPathSelector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionPathSelector (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionPathSelector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/90)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/143)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;public final class RecognitionPathSelector {
+&nbsp;
+&nbsp;    private RecognitionPathSelector() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Original final-score-only selector.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Retained for compatibility and isolated tests. Production recognition
+&nbsp;     * uses {@link #selectWithComponentPureGate(Map, Map,
+&nbsp;     * RecognitionPathComponents, RecognitionBalanceSnapshot.Selection)}.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static Optional&lt;RecognitionPathSelection&gt; select(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; scores,
+&nbsp;            double establishedThreshold,
+&nbsp;            double pureThreshold,
+&nbsp;            double dominanceRatio
+&nbsp;    ) {
+<b class="nc">&nbsp;        validateSettings(</b>
+&nbsp;                establishedThreshold,
+&nbsp;                pureThreshold,
+&nbsp;                dominanceRatio
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RecognitionPath&gt; rankedPaths =</b>
+<b class="nc">&nbsp;                rankPaths(</b>
+&nbsp;                        scores,
+<b class="nc">&nbsp;                        path -&gt; true</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="nc">&nbsp;                rankedPaths.get(0);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath secondaryPath =</b>
+<b class="nc">&nbsp;                rankedPaths.get(1);</b>
+&nbsp;
+<b class="nc">&nbsp;        double primaryScore =</b>
+<b class="nc">&nbsp;                getScore(</b>
+&nbsp;                        scores,
+&nbsp;                        primaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double secondaryScore =</b>
+<b class="nc">&nbsp;                getScore(</b>
+&nbsp;                        scores,
+&nbsp;                        secondaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (isPureResult(</b>
+&nbsp;                primaryScore,
+&nbsp;                secondaryScore,
+&nbsp;                pureThreshold,
+&nbsp;                dominanceRatio
+&nbsp;        )) {
+<b class="nc">&nbsp;            return Optional.of(</b>
+&nbsp;                    new RecognitionPathSelection(
+&nbsp;                            primaryPath,
+&nbsp;                            null,
+&nbsp;                            true,
+&nbsp;                            primaryScore,
+&nbsp;                            secondaryScore
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return createEstablishedSelection(</b>
+&nbsp;                primaryPath,
+&nbsp;                secondaryPath,
+&nbsp;                primaryScore,
+&nbsp;                secondaryScore,
+&nbsp;                establishedThreshold
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Former production selector.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Retained unchanged as a compatibility surface for integrations and
+&nbsp;     * regression tests that still need the complete-path dominance model.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static Optional&lt;RecognitionPathSelection&gt;
+&nbsp;    selectWithRawPureGate(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; finalScores,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; rawScores,
+&nbsp;            double establishedThreshold,
+&nbsp;            double pureThreshold,
+&nbsp;            double finalDominanceRatio,
+&nbsp;            double rawPureThreshold,
+&nbsp;            double rawDominanceRatio
+&nbsp;    ) {
+<b class="nc">&nbsp;        validateSettings(</b>
+&nbsp;                establishedThreshold,
+&nbsp;                pureThreshold,
+&nbsp;                finalDominanceRatio
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        validateRawSettings(</b>
+&nbsp;                rawPureThreshold,
+&nbsp;                rawDominanceRatio
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RecognitionPath&gt; rankedFinalPaths =</b>
+<b class="nc">&nbsp;                rankPaths(</b>
+&nbsp;                        finalScores,
+<b class="nc">&nbsp;                        path -&gt; true</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="nc">&nbsp;                rankedFinalPaths.get(0);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath secondaryPath =</b>
+<b class="nc">&nbsp;                rankedFinalPaths.get(1);</b>
+&nbsp;
+<b class="nc">&nbsp;        double primaryFinalScore =</b>
+<b class="nc">&nbsp;                getScore(</b>
+&nbsp;                        finalScores,
+&nbsp;                        primaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double secondaryFinalScore =</b>
+<b class="nc">&nbsp;                getScore(</b>
+&nbsp;                        finalScores,
+&nbsp;                        secondaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double primaryRawScore =</b>
+<b class="nc">&nbsp;                getScore(</b>
+&nbsp;                        rawScores,
+&nbsp;                        primaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double strongestCompetingRawScore =</b>
+<b class="nc">&nbsp;                getStrongestCompetingScore(</b>
+&nbsp;                        rawScores,
+&nbsp;                        primaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        boolean finalPure =</b>
+<b class="nc">&nbsp;                isPureResult(</b>
+&nbsp;                        primaryFinalScore,
+&nbsp;                        secondaryFinalScore,
+&nbsp;                        pureThreshold,
+&nbsp;                        finalDominanceRatio
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        boolean rawPure =</b>
+<b class="nc">&nbsp;                isRawPureResult(</b>
+&nbsp;                        primaryRawScore,
+&nbsp;                        strongestCompetingRawScore,
+&nbsp;                        rawPureThreshold,
+&nbsp;                        rawDominanceRatio
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (finalPure &amp;&amp; rawPure) {</b>
+<b class="nc">&nbsp;            return Optional.of(</b>
+&nbsp;                    new RecognitionPathSelection(
+&nbsp;                            primaryPath,
+&nbsp;                            null,
+&nbsp;                            true,
+&nbsp;                            primaryFinalScore,
+&nbsp;                            secondaryFinalScore
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return createEstablishedSelection(</b>
+&nbsp;                primaryPath,
+&nbsp;                secondaryPath,
+&nbsp;                primaryFinalScore,
+&nbsp;                secondaryFinalScore,
+&nbsp;                establishedThreshold
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Production selector for recognition rules version 2.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;The highest component-established path remains the primary candidate.
+&nbsp;     * Pure recognition then requires:&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * &lt;ol&gt;
+&nbsp;     *     &lt;li&gt;The normal final path threshold.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;The normal raw path threshold.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Meaningful evidence on both of the path&#39;s defining axes.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Morality dominance against the other morality components.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Temperament dominance against the other temperament
+&nbsp;     *     components.&lt;/li&gt;
+&nbsp;     * &lt;/ol&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Complete-path dominance is deliberately not required here. Adjacent
+&nbsp;     * paths share one axis by design, so comparing complete path totals made
+&nbsp;     * Neutral Good and Neutral Evil disproportionately difficult.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static Optional&lt;RecognitionPathSelection&gt;
+&nbsp;    selectWithComponentPureGate(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; finalScores,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; rawScores,
+&nbsp;            RecognitionPathComponents components,
+&nbsp;            RecognitionBalanceSnapshot.Selection selection
+&nbsp;    ) {
+&nbsp;        RecognitionBalanceSnapshot.Selection safeSelection =
+<b class="nc">&nbsp;                selection == null</b>
+&nbsp;                        ? RecognitionBalanceSnapshot
+<b class="nc">&nbsp;                        .createDefaults()</b>
+<b class="nc">&nbsp;                        .selection()</b>
+<b class="nc">&nbsp;                        : selection;</b>
+&nbsp;
+<b class="nc">&nbsp;        validateSettings(</b>
+<b class="nc">&nbsp;                safeSelection.establishedThreshold(),</b>
+<b class="nc">&nbsp;                safeSelection.pureThreshold(),</b>
+<b class="nc">&nbsp;                safeSelection.dominanceRatio()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        validateRawSettings(</b>
+<b class="nc">&nbsp;                safeSelection.rawPureThreshold(),</b>
+<b class="nc">&nbsp;                safeSelection.rawDominanceRatio()</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        RecognitionPathComponents safeComponents =
+<b class="nc">&nbsp;                components == null</b>
+<b class="nc">&nbsp;                        ? RecognitionPathComponents.empty()</b>
+<b class="nc">&nbsp;                        : components;</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionComponentQualificationRules componentRules =</b>
+&nbsp;                RecognitionComponentQualificationRules
+<b class="nc">&nbsp;                        .from(</b>
+&nbsp;                                safeSelection
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        Predicate&lt;RecognitionPath&gt; establishedEvidence =</b>
+<b class="nc">&nbsp;                path -&gt; safeComponents</b>
+<b class="nc">&nbsp;                        .hasEstablishedEvidence(</b>
+&nbsp;                                path,
+&nbsp;                                componentRules
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RecognitionPath&gt; rankedEligiblePaths =</b>
+<b class="nc">&nbsp;                rankPaths(</b>
+&nbsp;                        finalScores,
+&nbsp;                        establishedEvidence
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (rankedEligiblePaths.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="nc">&nbsp;                rankedEligiblePaths.get(0);</b>
+&nbsp;
+<b class="nc">&nbsp;        double primaryFinalScore =</b>
+<b class="nc">&nbsp;                getScore(</b>
+&nbsp;                        finalScores,
+&nbsp;                        primaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double primaryRawScore =</b>
+<b class="nc">&nbsp;                getScore(</b>
+&nbsp;                        rawScores,
+&nbsp;                        primaryPath
+&nbsp;                );
+&nbsp;
+&nbsp;        RecognitionPath secondaryPath =
+<b class="nc">&nbsp;                rankedEligiblePaths.size() &gt; 1</b>
+<b class="nc">&nbsp;                        ? rankedEligiblePaths.get(1)</b>
+<b class="nc">&nbsp;                        : null;</b>
+&nbsp;
+<b class="nc">&nbsp;        double secondaryFinalScore =</b>
+<b class="nc">&nbsp;                getScore(</b>
+&nbsp;                        finalScores,
+&nbsp;                        secondaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        boolean pathThresholdsMet =</b>
+&nbsp;                primaryFinalScore
+<b class="nc">&nbsp;                        &gt;= safeSelection.pureThreshold()</b>
+&nbsp;                        &amp;&amp; primaryRawScore
+<b class="nc">&nbsp;                        &gt;= safeSelection.rawPureThreshold();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean componentPurityMet =</b>
+<b class="nc">&nbsp;                safeComponents.hasPureEvidence(</b>
+&nbsp;                        primaryPath,
+&nbsp;                        componentRules
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (pathThresholdsMet</b>
+&nbsp;                &amp;&amp; componentPurityMet) {
+&nbsp;
+<b class="nc">&nbsp;            return Optional.of(</b>
+&nbsp;                    new RecognitionPathSelection(
+&nbsp;                            primaryPath,
+&nbsp;                            null,
+&nbsp;                            true,
+&nbsp;                            primaryFinalScore,
+&nbsp;                            secondaryFinalScore
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (secondaryPath == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return createEstablishedSelection(</b>
+&nbsp;                primaryPath,
+&nbsp;                secondaryPath,
+&nbsp;                primaryFinalScore,
+&nbsp;                secondaryFinalScore,
+<b class="nc">&nbsp;                safeSelection.establishedThreshold()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;RecognitionPathSelection&gt;
+&nbsp;    createEstablishedSelection(
+&nbsp;            RecognitionPath primaryPath,
+&nbsp;            RecognitionPath secondaryPath,
+&nbsp;            double primaryScore,
+&nbsp;            double secondaryScore,
+&nbsp;            double establishedThreshold
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (primaryPath == null</b>
+&nbsp;                || secondaryPath == null
+&nbsp;                || primaryScore &lt; establishedThreshold
+&nbsp;                || secondaryScore &lt; establishedThreshold) {
+&nbsp;
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.of(</b>
+&nbsp;                new RecognitionPathSelection(
+&nbsp;                        primaryPath,
+&nbsp;                        secondaryPath,
+&nbsp;                        false,
+&nbsp;                        primaryScore,
+&nbsp;                        secondaryScore
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isPureResult(
+&nbsp;            double primaryScore,
+&nbsp;            double secondaryScore,
+&nbsp;            double pureThreshold,
+&nbsp;            double dominanceRatio
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (primaryScore &lt; pureThreshold) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (secondaryScore &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return primaryScore &gt; 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return primaryScore</b>
+&nbsp;                &gt;= secondaryScore
+&nbsp;                * dominanceRatio;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isRawPureResult(
+&nbsp;            double primaryRawScore,
+&nbsp;            double competingRawScore,
+&nbsp;            double rawPureThreshold,
+&nbsp;            double rawDominanceRatio
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (primaryRawScore &lt; rawPureThreshold) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (competingRawScore &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return primaryRawScore &gt; 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return primaryRawScore</b>
+&nbsp;                &gt;= competingRawScore
+&nbsp;                * rawDominanceRatio;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double getStrongestCompetingScore(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; scores,
+&nbsp;            RecognitionPath primaryPath
+&nbsp;    ) {
+<b class="nc">&nbsp;        double strongestScore = 0.0D;</b>
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            if (path == primaryPath) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            strongestScore =</b>
+<b class="nc">&nbsp;                    Math.max(</b>
+&nbsp;                            strongestScore,
+<b class="nc">&nbsp;                            getScore(</b>
+&nbsp;                                    scores,
+&nbsp;                                    path
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return strongestScore;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;RecognitionPath&gt; rankPaths(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; scores,
+&nbsp;            Predicate&lt;RecognitionPath&gt; eligibility
+&nbsp;    ) {
+&nbsp;        Predicate&lt;RecognitionPath&gt; safeEligibility =
+<b class="nc">&nbsp;                eligibility == null</b>
+<b class="nc">&nbsp;                        ? path -&gt; true</b>
+<b class="nc">&nbsp;                        : eligibility;</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RecognitionPath&gt; rankedPaths =</b>
+&nbsp;                new ArrayList&lt;&gt;();
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            if (safeEligibility.test(path)) {</b>
+<b class="nc">&nbsp;                rankedPaths.add(path);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        rankedPaths.sort((first, second) -&gt; {</b>
+<b class="nc">&nbsp;            double firstScore =</b>
+<b class="nc">&nbsp;                    getScore(</b>
+&nbsp;                            scores,
+&nbsp;                            first
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            double secondScore =</b>
+<b class="nc">&nbsp;                    getScore(</b>
+&nbsp;                            scores,
+&nbsp;                            second
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            int scoreComparison =</b>
+<b class="nc">&nbsp;                    Double.compare(</b>
+&nbsp;                            secondScore,
+&nbsp;                            firstScore
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (scoreComparison != 0) {</b>
+<b class="nc">&nbsp;                return scoreComparison;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return Integer.compare(</b>
+<b class="nc">&nbsp;                    first.ordinal(),</b>
+<b class="nc">&nbsp;                    second.ordinal()</b>
+&nbsp;            );
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        return rankedPaths;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double getScore(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; scores,
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (scores == null</b>
+&nbsp;                || path == null) {
+&nbsp;
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Double score =</b>
+<b class="nc">&nbsp;                scores.get(path);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (score == null</b>
+<b class="nc">&nbsp;                || !Double.isFinite(score)</b>
+<b class="nc">&nbsp;                || score &lt; 0.0D) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return score;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateRawSettings(
+&nbsp;            double rawPureThreshold,
+&nbsp;            double rawDominanceRatio
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(rawPureThreshold)</b>
+&nbsp;                || rawPureThreshold &lt; 0.0D) {
+&nbsp;
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;rawPureThreshold must be finite and non-negative.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!Double.isFinite(rawDominanceRatio)</b>
+&nbsp;                || rawDominanceRatio &lt; 1.0D) {
+&nbsp;
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;rawDominanceRatio must be finite and at least 1.0.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateSettings(
+&nbsp;            double establishedThreshold,
+&nbsp;            double pureThreshold,
+&nbsp;            double dominanceRatio
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(establishedThreshold)</b>
+&nbsp;                || establishedThreshold &lt; 0.0D) {
+&nbsp;
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;establishedThreshold must be finite and non-negative.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!Double.isFinite(pureThreshold)</b>
+&nbsp;                || pureThreshold &lt; establishedThreshold) {
+&nbsp;
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;pureThreshold must be finite and at least the established threshold.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!Double.isFinite(dominanceRatio)</b>
+&nbsp;                || dominanceRatio &lt; 1.0D) {
+&nbsp;
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;dominanceRatio must be finite and at least 1.0.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

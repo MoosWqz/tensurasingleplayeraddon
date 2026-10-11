@@ -1,0 +1,358 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GreatSageEvolutionService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: GreatSageEvolutionService (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GreatSageEvolutionService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/95)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GreatSageEvolutionService$EvolutionResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/98)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+&nbsp;import io.github.manasmods.manascore.skill.api.ManasSkillInstance;
+&nbsp;import io.github.manasmods.manascore.skill.api.SkillAPI;
+&nbsp;import io.github.manasmods.tensura.ability.SkillHelper;
+&nbsp;import io.github.manasmods.tensura.ability.TensuraSkillInstance;
+&nbsp;import io.github.manasmods.tensura.registry.skill.UniqueSkills;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;public final class GreatSageEvolutionService {
+&nbsp;    private GreatSageEvolutionService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static EvolutionResult attemptNormalUpgrade(ServerPlayer player) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.literal(&quot;Player could not be found.&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!MoosTensuraConfig.SAGE_UPGRADE_ENABLED.get()) {</b>
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.translatable(&quot;moostensuraaddon.command.upgradesage.disabled&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (hasGreatSage(player)) {</b>
+<b class="nc">&nbsp;            AddonAdvancementHelper.awardGreatSageAwakens(player);</b>
+&nbsp;
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.translatable(&quot;moostensuraaddon.command.upgradesage.already_has_great_sage&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;ManasSkillInstance&gt; sageOptional = findSage(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (MoosTensuraConfig.SAGE_UPGRADE_REQUIRE_SAGE.get() &amp;&amp; sageOptional.isEmpty()) {</b>
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.translatable(&quot;moostensuraaddon.command.upgradesage.no_sage&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int requiredXpLevel = MoosTensuraConfig.SAGE_UPGRADE_REQUIRED_XP_LEVEL.get();</b>
+<b class="nc">&nbsp;        int relativeLevelDeduction = MoosTensuraConfig.SAGE_UPGRADE_RELATIVE_LEVEL_DEDUCTION.get();</b>
+<b class="nc">&nbsp;        double magiculeCost = MoosTensuraConfig.SAGE_UPGRADE_MAGICULE_COST.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (player.experienceLevel &lt; requiredXpLevel) {</b>
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.translatable(</b>
+&nbsp;                    &quot;moostensuraaddon.command.upgradesage.not_enough_xp_level&quot;,
+<b class="nc">&nbsp;                    requiredXpLevel,</b>
+<b class="nc">&nbsp;                    player.experienceLevel</b>
+<b class="nc">&nbsp;            ).withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        IExistence existence = TensuraStorages.getExistenceFrom(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (existence == null) {</b>
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.translatable(&quot;moostensuraaddon.command.upgradesage.failed&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (existence.getMagicule() &lt; magiculeCost) {</b>
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.translatable(</b>
+&nbsp;                    &quot;moostensuraaddon.command.upgradesage.not_enough_magicules&quot;,
+<b class="nc">&nbsp;                    formatNumber(magiculeCost),</b>
+<b class="nc">&nbsp;                    formatNumber(existence.getMagicule())</b>
+<b class="nc">&nbsp;            ).withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean upgraded = grantGreatSage(player, sageOptional);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!upgraded) {</b>
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.translatable(&quot;moostensuraaddon.command.upgradesage.failed&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        XpUtils.deductRelativeLevels(player, relativeLevelDeduction);</b>
+&nbsp;
+<b class="nc">&nbsp;        existence.setMagicule(Math.max(0.0D, existence.getMagicule() - magiculeCost));</b>
+<b class="nc">&nbsp;        existence.markDirty();</b>
+&nbsp;
+<b class="nc">&nbsp;        AddonAdvancementHelper.awardGreatSageAwakens(player);</b>
+<b class="nc">&nbsp;        AddonAdvancementHelper.awardStateBasedAdvancements(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        return EvolutionResult.success(Component.translatable(</b>
+&nbsp;                &quot;moostensuraaddon.command.upgradesage.success&quot;,
+<b class="nc">&nbsp;                relativeLevelDeduction,</b>
+<b class="nc">&nbsp;                formatNumber(magiculeCost)</b>
+<b class="nc">&nbsp;        ).withStyle(ChatFormatting.GOLD));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static EvolutionResult forceUpgrade(ServerPlayer player) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.literal(&quot;Player could not be found.&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (hasGreatSage(player)) {</b>
+<b class="nc">&nbsp;            AddonAdvancementHelper.awardGreatSageAwakens(player);</b>
+&nbsp;
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.translatable(&quot;moostensuraaddon.command.upgradesage.already_has_great_sage&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;ManasSkillInstance&gt; sageOptional = findSage(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean upgraded = grantGreatSage(player, sageOptional);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!upgraded) {</b>
+<b class="nc">&nbsp;            return EvolutionResult.failure(Component.translatable(&quot;moostensuraaddon.command.upgradesage.failed&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AddonAdvancementHelper.awardGreatSageAwakens(player);</b>
+<b class="nc">&nbsp;        AddonAdvancementHelper.awardStateBasedAdvancements(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        return EvolutionResult.success(Component.translatable(&quot;moostensuraaddon.command.upgradesage.force_success&quot;)</b>
+<b class="nc">&nbsp;                .withStyle(ChatFormatting.LIGHT_PURPLE));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean hasGreatSage(ServerPlayer player) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ResourceLocation greatSageId = UniqueSkills.GREAT_SAGE.get().getRegistryName();</b>
+&nbsp;
+<b class="nc">&nbsp;        return SkillAPI.getSkillsFrom(player)</b>
+<b class="nc">&nbsp;                .getSkill(greatSageId)</b>
+<b class="nc">&nbsp;                .isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;ManasSkillInstance&gt; findSage(ServerPlayer player) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return SkillAPI.getSkillsFrom(player)</b>
+<b class="nc">&nbsp;                .getLearnedSkills()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .filter(GreatSageEvolutionService::isSage)</b>
+<b class="nc">&nbsp;                .findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean grantGreatSage(ServerPlayer player, Optional&lt;ManasSkillInstance&gt; sageOptional) {
+<b class="nc">&nbsp;        TensuraSkillInstance greatSageInstance = new TensuraSkillInstance(UniqueSkills.GREAT_SAGE.get());</b>
+<b class="nc">&nbsp;        greatSageInstance.getOrCreateTag().putBoolean(&quot;NoMagiculeCost&quot;, true);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean learnedGreatSage = SkillHelper.learnSkill(</b>
+&nbsp;                player,
+&nbsp;                greatSageInstance,
+&nbsp;                -1,
+<b class="nc">&nbsp;                Component.translatable(&quot;moostensuraaddon.command.upgradesage.great_sage_acquired&quot;)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!learnedGreatSage) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (sageOptional.isPresent()) {</b>
+<b class="nc">&nbsp;            ManasSkillInstance sageInstance = sageOptional.get();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (sageInstance.getSkillId() != null) {</b>
+<b class="nc">&nbsp;                SkillAPI.getSkillsFrom(player).forgetSkill(</b>
+<b class="nc">&nbsp;                        sageInstance.getSkillId(),</b>
+<b class="nc">&nbsp;                        Component.translatable(&quot;moostensuraaddon.command.upgradesage.sage_evolved&quot;)</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isSage(ManasSkillInstance instance) {
+<b class="nc">&nbsp;        if (instance == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ResourceLocation skillId = instance.getSkillId();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (skillId != null &amp;&amp; skillId.toString().equals(&quot;tensura:sage&quot;)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return instance.getDisplayName()</b>
+<b class="nc">&nbsp;                .getString()</b>
+<b class="nc">&nbsp;                .equalsIgnoreCase(&quot;Sage&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatNumber(double value) {
+<b class="nc">&nbsp;        return String.format(Locale.US, &quot;%,.0f&quot;, value);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record EvolutionResult(boolean successful, Component message) {</b>
+&nbsp;        public static EvolutionResult success(Component message) {
+<b class="nc">&nbsp;            return new EvolutionResult(true, message);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static EvolutionResult failure(Component message) {
+<b class="nc">&nbsp;            return new EvolutionResult(false, message);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

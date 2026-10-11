@@ -1,0 +1,189 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UiFinalPolicy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: UiFinalPolicy (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UiFinalPolicy</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.2%
+  </span>
+  <span class="absValue">
+    (1/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.4%
+  </span>
+  <span class="absValue">
+    (2/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;/**
+&nbsp; * Pure, side-neutral rules used by the final Skill UI polish pass.
+&nbsp; */
+&nbsp;public final class UiFinalPolicy {
+&nbsp;
+&nbsp;    public static final String CATEGORY_UNIQUE = &quot;unique&quot;;
+&nbsp;    public static final String CATEGORY_EXTRA = &quot;extra&quot;;
+&nbsp;    public static final String CATEGORY_BASIC = &quot;basic&quot;;
+&nbsp;    public static final String CATEGORY_RESISTANCE = &quot;resistance&quot;;
+&nbsp;    public static final String CATEGORY_OTHER = &quot;other&quot;;
+&nbsp;
+&nbsp;    private UiFinalPolicy() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String canonicalCategoryId(
+&nbsp;            String rawCategory
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (rawCategory == null || rawCategory.isBlank()) {</b>
+<b class="nc">&nbsp;            return CATEGORY_OTHER;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String normalized = rawCategory</b>
+<b class="nc">&nbsp;                .trim()</b>
+<b class="nc">&nbsp;                .toLowerCase(Locale.ROOT)</b>
+<b class="nc">&nbsp;                .replace(&#39;-&#39;, &#39;_&#39;)</b>
+<b class="nc">&nbsp;                .replace(&#39; &#39;, &#39;_&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (normalized.contains(&quot;unique&quot;)</b>
+<b class="nc">&nbsp;                || normalized.contains(&quot;ultimate&quot;)) {</b>
+<b class="nc">&nbsp;            return CATEGORY_UNIQUE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (normalized.contains(&quot;extra&quot;)) {</b>
+<b class="nc">&nbsp;            return CATEGORY_EXTRA;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (normalized.contains(&quot;basic&quot;)</b>
+<b class="nc">&nbsp;                || normalized.contains(&quot;common&quot;)) {</b>
+<b class="nc">&nbsp;            return CATEGORY_BASIC;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (normalized.contains(&quot;resistance&quot;)</b>
+<b class="nc">&nbsp;                || normalized.contains(&quot;resist&quot;)) {</b>
+<b class="nc">&nbsp;            return CATEGORY_RESISTANCE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return CATEGORY_OTHER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int categoryOrder(
+&nbsp;            String categoryId
+&nbsp;    ) {
+<b class="nc">&nbsp;        return switch (canonicalCategoryId(categoryId)) {</b>
+<b class="nc">&nbsp;            case CATEGORY_UNIQUE -&gt; 0;</b>
+<b class="nc">&nbsp;            case CATEGORY_EXTRA -&gt; 1;</b>
+<b class="nc">&nbsp;            case CATEGORY_BASIC -&gt; 2;</b>
+<b class="nc">&nbsp;            case CATEGORY_RESISTANCE -&gt; 3;</b>
+<b class="nc">&nbsp;            default -&gt; 4;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean shouldShowOnboarding(
+&nbsp;            int seenRevision,
+&nbsp;            int currentRevision
+&nbsp;    ) {
+<b class="fc">&nbsp;        return Math.max(0, seenRevision)</b>
+<b class="pc">&nbsp;                &lt; Math.max(1, currentRevision);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

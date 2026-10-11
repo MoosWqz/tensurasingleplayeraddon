@@ -1,0 +1,208 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionIdentityHistoryModifier</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionIdentityHistoryModifier (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionIdentityHistoryModifier</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (7/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (30/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * Stable semantic identifiers reserved for contradiction-history outcomes.
+&nbsp; *
+&nbsp; * &lt;p&gt;The identifiers are serialized as strings. Enum ordinals are never
+&nbsp; * persisted, so future reordering cannot reinterpret an existing save.&lt;/p&gt;
+&nbsp; */
+<b class="fc">&nbsp;public enum RecognitionIdentityHistoryModifier {</b>
+&nbsp;
+<b class="fc">&nbsp;    NONE(&quot;none&quot;, &quot;None&quot;),</b>
+<b class="fc">&nbsp;    FALLEN(&quot;fallen&quot;, &quot;Fallen&quot;),</b>
+<b class="fc">&nbsp;    REDEEMED(&quot;redeemed&quot;, &quot;Redeemed&quot;),</b>
+<b class="fc">&nbsp;    OATHBREAKER(&quot;oathbreaker&quot;, &quot;Oathbreaker&quot;),</b>
+<b class="fc">&nbsp;    CROWNED_OR_BOUND(&quot;crowned_or_bound&quot;, &quot;Crowned or Bound&quot;),</b>
+<b class="fc">&nbsp;    DEFIANT(&quot;defiant&quot;, &quot;Defiant&quot;),</b>
+<b class="fc">&nbsp;    FRACTURED(&quot;fractured&quot;, &quot;Fractured&quot;),</b>
+<b class="fc">&nbsp;    RECONCILED(&quot;reconciled&quot;, &quot;Reconciled&quot;);</b>
+&nbsp;
+&nbsp;    private final String id;
+&nbsp;    private final String displayName;
+&nbsp;
+&nbsp;    RecognitionIdentityHistoryModifier(
+&nbsp;            String id,
+&nbsp;            String displayName
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        this.id = id;</b>
+<b class="fc">&nbsp;        this.displayName = displayName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String id() {
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String displayName() {
+<b class="nc">&nbsp;        return displayName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;RecognitionIdentityHistoryModifier&gt; byId(
+&nbsp;            String rawId
+&nbsp;    ) {
+<b class="fc">&nbsp;        String normalized = normalize(rawId);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (normalized.isBlank()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        for (RecognitionIdentityHistoryModifier modifier : values()) {</b>
+<b class="pc">&nbsp;            if (modifier.id.equals(normalized)) {</b>
+<b class="fc">&nbsp;                return Optional.of(modifier);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String canonicalOrPreserved(
+&nbsp;            String rawId
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (rawId == null || rawId.isBlank()) {</b>
+<b class="nc">&nbsp;            return NONE.id;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String preserved = rawId.trim();</b>
+&nbsp;
+<b class="fc">&nbsp;        return byId(preserved)</b>
+<b class="fc">&nbsp;                .map(RecognitionIdentityHistoryModifier::id)</b>
+<b class="fc">&nbsp;                .orElse(preserved);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String normalize(
+&nbsp;            String rawId
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (rawId == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String normalized = rawId.trim()</b>
+<b class="fc">&nbsp;                .toLowerCase(Locale.ROOT)</b>
+<b class="fc">&nbsp;                .replace(&#39;-&#39;, &#39;_&#39;)</b>
+<b class="fc">&nbsp;                .replace(&#39; &#39;, &#39;_&#39;);</b>
+&nbsp;
+<b class="pc">&nbsp;        while (normalized.contains(&quot;__&quot;)) {</b>
+<b class="nc">&nbsp;            normalized = normalized.replace(&quot;__&quot;, &quot;_&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return normalized;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

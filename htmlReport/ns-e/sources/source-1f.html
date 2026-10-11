@@ -1,0 +1,1178 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionIdentityHistoryResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionIdentityHistoryResolver (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionIdentityHistoryResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/237)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/304)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryResolver$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryResolver$StoreResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/245)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/322)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * Resolves the evolving identity-history modifier without changing the frozen
+&nbsp; * recognition result.
+&nbsp; *
+&nbsp; * &lt;p&gt;The resolver is intentionally read-only. The only write entry point is
+&nbsp; * {@link #resolveAndStoreAfterDeed(RecognitionData)}, which is called by the
+&nbsp; * event integration after a qualifying deed has already been applied. Passive
+&nbsp; * inspection, login, GUI opening and lazy time passage therefore cannot create
+&nbsp; * or change a modifier.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionIdentityHistoryResolver {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A prior opposite commitment must have been more than a brief spike before
+&nbsp;     * it can support a lasting modifier.
+&nbsp;     */
+&nbsp;    public static final double OPPOSING_HISTORY_MINIMUM = 28.0D;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Both live sides must remain clearly established before an axis is treated
+&nbsp;     * as unresolved rather than merely close.
+&nbsp;     */
+&nbsp;    public static final double CONTESTED_SIDE_MINIMUM =
+&nbsp;            RecognitionIdentityHistoryService.ESTABLISHED_DIRECTION_MINIMUM;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returning to the original direction is only &quot;Reconciled&quot; after at least
+&nbsp;     * two genuine direction changes on that axis.
+&nbsp;     */
+&nbsp;    public static final int RECONCILED_REVERSAL_MINIMUM = 2;
+&nbsp;
+&nbsp;    private RecognitionIdentityHistoryResolver() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the currently implied modifier without mutating any data.
+&nbsp;     */
+&nbsp;    public static RecognitionIdentityHistoryResolution resolve(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null) {</b>
+<b class="nc">&nbsp;            return resolution(</b>
+&nbsp;                    RecognitionIdentityHistoryModifier.NONE,
+&nbsp;                    false,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    &quot;Recognition data is unavailable.&quot;,
+&nbsp;                    &quot;No history resolution can be performed.&quot;,
+<b class="nc">&nbsp;                    List.of(&quot;RecognitionData was null.&quot;)</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;RecognitionPath&gt; primaryOptional =</b>
+<b class="nc">&nbsp;                data.getCommittedPrimaryPath();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="nc">&nbsp;                primaryOptional.orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath secondaryPath =</b>
+<b class="nc">&nbsp;                data.getCommittedSecondaryPath()</b>
+<b class="nc">&nbsp;                        .orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        String originalMoral = originalMoralDirection(</b>
+&nbsp;                primaryPath,
+&nbsp;                secondaryPath
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String originalTemperament = originalTemperamentDirection(</b>
+&nbsp;                primaryPath,
+&nbsp;                secondaryPath
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String currentMoral =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.establishedDirection(</b>
+&nbsp;                        snapshot,
+&nbsp;                        RecognitionIdentityHistoryIntegration.Axis.MORAL
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        String currentTemperament =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.establishedDirection(</b>
+&nbsp;                        snapshot,
+&nbsp;                        RecognitionIdentityHistoryIntegration.Axis.TEMPERAMENT
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        String storedMoral = normalizeMoralDirection(</b>
+<b class="nc">&nbsp;                data.getString(</b>
+&nbsp;                        RecognitionStatKeys.MORAL_ESTABLISHED_DIRECTION
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String storedTemperament = normalizeTemperamentDirection(</b>
+<b class="nc">&nbsp;                data.getString(</b>
+&nbsp;                        RecognitionStatKeys.TEMPERAMENT_ESTABLISHED_DIRECTION
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean moralContested = isContested(</b>
+<b class="nc">&nbsp;                snapshot.goodMomentum(),</b>
+<b class="nc">&nbsp;                snapshot.evilMomentum()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                &amp;&amp; snapshot.moralReversalCount() &gt; 0</b>
+<b class="nc">&nbsp;                &amp;&amp; snapshot.highestGoodCommitment()</b>
+&nbsp;                &gt;= OPPOSING_HISTORY_MINIMUM
+<b class="nc">&nbsp;                &amp;&amp; snapshot.highestEvilCommitment()</b>
+&nbsp;                &gt;= OPPOSING_HISTORY_MINIMUM;
+&nbsp;
+<b class="nc">&nbsp;        boolean temperamentContested = isContested(</b>
+<b class="nc">&nbsp;                snapshot.orderMomentum(),</b>
+<b class="nc">&nbsp;                snapshot.freedomMomentum()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                &amp;&amp; snapshot.temperamentReversalCount() &gt; 0</b>
+<b class="nc">&nbsp;                &amp;&amp; snapshot.highestOrderCommitment()</b>
+&nbsp;                &gt;= OPPOSING_HISTORY_MINIMUM
+<b class="nc">&nbsp;                &amp;&amp; snapshot.highestFreedomCommitment()</b>
+&nbsp;                &gt;= OPPOSING_HISTORY_MINIMUM;
+&nbsp;
+<b class="nc">&nbsp;        boolean committedIdentityAvailable =</b>
+<b class="nc">&nbsp;                data.isNamingCommitted()</b>
+&nbsp;                        &amp;&amp; primaryPath != null;
+&nbsp;
+<b class="nc">&nbsp;        if (!committedIdentityAvailable) {</b>
+<b class="nc">&nbsp;            return resolution(</b>
+&nbsp;                    RecognitionIdentityHistoryModifier.NONE,
+&nbsp;                    false,
+&nbsp;                    originalMoral,
+&nbsp;                    originalTemperament,
+&nbsp;                    currentMoral,
+&nbsp;                    currentTemperament,
+&nbsp;                    storedMoral,
+&nbsp;                    storedTemperament,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    moralContested,
+&nbsp;                    temperamentContested,
+&nbsp;                    &quot;Commit recognition before later deeds can become a legacy modifier.&quot;,
+&nbsp;                    &quot;A frozen recognition identity is required as the historical reference point.&quot;,
+<b class="nc">&nbsp;                    baseEvidence(</b>
+&nbsp;                            snapshot,
+&nbsp;                            originalMoral,
+&nbsp;                            originalTemperament,
+&nbsp;                            currentMoral,
+&nbsp;                            currentTemperament
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (snapshot.futureVersion()) {</b>
+<b class="nc">&nbsp;            RecognitionIdentityHistoryModifier preserved =</b>
+<b class="nc">&nbsp;                    snapshot.knownModifier()</b>
+<b class="nc">&nbsp;                            .orElse(</b>
+&nbsp;                                    RecognitionIdentityHistoryModifier.NONE
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;            return resolution(</b>
+&nbsp;                    preserved,
+&nbsp;                    true,
+&nbsp;                    originalMoral,
+&nbsp;                    originalTemperament,
+&nbsp;                    currentMoral,
+&nbsp;                    currentTemperament,
+&nbsp;                    storedMoral,
+&nbsp;                    storedTemperament,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    moralContested,
+&nbsp;                    temperamentContested,
+<b class="nc">&nbsp;                    playerFacingSummary(</b>
+&nbsp;                            preserved,
+&nbsp;                            true
+&nbsp;                    ),
+&nbsp;                    &quot;A future identity-history version is preserved without reinterpretation.&quot;,
+<b class="nc">&nbsp;                    baseEvidence(</b>
+&nbsp;                            snapshot,
+&nbsp;                            originalMoral,
+&nbsp;                            originalTemperament,
+&nbsp;                            currentMoral,
+&nbsp;                            currentTemperament
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean moralContradiction = isOppositeEstablishedDirection(</b>
+&nbsp;                originalMoral,
+&nbsp;                currentMoral
+&nbsp;        )
+<b class="nc">&nbsp;                &amp;&amp; snapshot.moralReversalCount() &gt; 0</b>
+<b class="nc">&nbsp;                &amp;&amp; historicalPeakForMoral(</b>
+&nbsp;                snapshot,
+&nbsp;                originalMoral
+&nbsp;        ) &gt;= OPPOSING_HISTORY_MINIMUM
+<b class="nc">&nbsp;                &amp;&amp; currentMomentumForMoral(</b>
+&nbsp;                snapshot,
+&nbsp;                currentMoral
+&nbsp;        ) &gt;= RecognitionIdentityHistoryService
+&nbsp;                .ESTABLISHED_DIRECTION_MINIMUM;
+&nbsp;
+<b class="nc">&nbsp;        boolean originalTemperamentContradiction =</b>
+<b class="nc">&nbsp;                isOppositeEstablishedDirection(</b>
+&nbsp;                        originalTemperament,
+&nbsp;                        currentTemperament
+&nbsp;                )
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.temperamentReversalCount() &gt; 0</b>
+<b class="nc">&nbsp;                        &amp;&amp; historicalPeakForTemperament(</b>
+&nbsp;                        snapshot,
+&nbsp;                        originalTemperament
+&nbsp;                ) &gt;= OPPOSING_HISTORY_MINIMUM
+<b class="nc">&nbsp;                        &amp;&amp; currentMomentumForTemperament(</b>
+&nbsp;                        snapshot,
+&nbsp;                        currentTemperament
+&nbsp;                ) &gt;= RecognitionIdentityHistoryService
+&nbsp;                        .ESTABLISHED_DIRECTION_MINIMUM;
+&nbsp;
+<b class="nc">&nbsp;        boolean neutralTemperamentContradiction =</b>
+<b class="nc">&nbsp;                originalTemperament.isBlank()</b>
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.temperamentReversalCount() &gt; 0</b>
+<b class="nc">&nbsp;                        &amp;&amp; !currentTemperament.isBlank()</b>
+<b class="nc">&nbsp;                        &amp;&amp; oppositeHistoricalPeakForTemperament(</b>
+&nbsp;                        snapshot,
+&nbsp;                        currentTemperament
+&nbsp;                ) &gt;= OPPOSING_HISTORY_MINIMUM
+<b class="nc">&nbsp;                        &amp;&amp; currentMomentumForTemperament(</b>
+&nbsp;                        snapshot,
+&nbsp;                        currentTemperament
+&nbsp;                ) &gt;= RecognitionIdentityHistoryService
+&nbsp;                        .ESTABLISHED_DIRECTION_MINIMUM;
+&nbsp;
+<b class="nc">&nbsp;        boolean temperamentContradiction =</b>
+&nbsp;                originalTemperamentContradiction
+&nbsp;                        || neutralTemperamentContradiction;
+&nbsp;
+<b class="nc">&nbsp;        boolean moralReturned =</b>
+<b class="nc">&nbsp;                !originalMoral.isBlank()</b>
+<b class="nc">&nbsp;                        &amp;&amp; originalMoral.equals(currentMoral)</b>
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.moralReversalCount()</b>
+&nbsp;                        &gt;= RECONCILED_REVERSAL_MINIMUM
+<b class="nc">&nbsp;                        &amp;&amp; oppositeHistoricalPeakForMoral(</b>
+&nbsp;                        snapshot,
+&nbsp;                        originalMoral
+&nbsp;                ) &gt;= OPPOSING_HISTORY_MINIMUM;
+&nbsp;
+<b class="nc">&nbsp;        boolean temperamentReturned =</b>
+<b class="nc">&nbsp;                !originalTemperament.isBlank()</b>
+<b class="nc">&nbsp;                        &amp;&amp; originalTemperament.equals(</b>
+&nbsp;                        currentTemperament
+&nbsp;                )
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.temperamentReversalCount()</b>
+&nbsp;                        &gt;= RECONCILED_REVERSAL_MINIMUM
+<b class="nc">&nbsp;                        &amp;&amp; oppositeHistoricalPeakForTemperament(</b>
+&nbsp;                        snapshot,
+&nbsp;                        originalTemperament
+&nbsp;                ) &gt;= OPPOSING_HISTORY_MINIMUM;
+&nbsp;
+<b class="nc">&nbsp;        boolean fractured =</b>
+&nbsp;                moralContradiction
+&nbsp;                        &amp;&amp; temperamentContradiction
+&nbsp;                        || moralContradiction
+&nbsp;                        &amp;&amp; temperamentContested
+&nbsp;                        || temperamentContradiction
+&nbsp;                        &amp;&amp; moralContested
+&nbsp;                        || moralContested
+&nbsp;                        &amp;&amp; temperamentContested;
+&nbsp;
+&nbsp;        RecognitionIdentityHistoryModifier modifier;
+&nbsp;        String reason;
+&nbsp;
+<b class="nc">&nbsp;        if (fractured) {</b>
+<b class="nc">&nbsp;            modifier = RecognitionIdentityHistoryModifier.FRACTURED;</b>
+<b class="nc">&nbsp;            reason = &quot;More than one part of the frozen identity is actively contradicted or unresolved.&quot;;</b>
+<b class="nc">&nbsp;        } else if (!moralContradiction</b>
+&nbsp;                &amp;&amp; !temperamentContradiction
+&nbsp;                &amp;&amp; !moralContested
+&nbsp;                &amp;&amp; !temperamentContested
+&nbsp;                &amp;&amp; (moralReturned || temperamentReturned)) {
+<b class="nc">&nbsp;            modifier = RecognitionIdentityHistoryModifier.RECONCILED;</b>
+<b class="nc">&nbsp;            reason = &quot;After genuine reversals, the currently established direction again matches the frozen identity.&quot;;</b>
+<b class="nc">&nbsp;        } else if (moralContradiction) {</b>
+<b class="nc">&nbsp;            modifier = originalMoral.equals(</b>
+&nbsp;                    RecognitionIdentityHistoryService
+&nbsp;                            .MoralDirection
+&nbsp;                            .GOOD
+<b class="nc">&nbsp;                            .id()</b>
+&nbsp;            )
+<b class="nc">&nbsp;                    ? RecognitionIdentityHistoryModifier.FALLEN</b>
+<b class="nc">&nbsp;                    : RecognitionIdentityHistoryModifier.REDEEMED;</b>
+&nbsp;
+<b class="nc">&nbsp;            reason = modifier == RecognitionIdentityHistoryModifier.FALLEN</b>
+<b class="nc">&nbsp;                    ? &quot;A Good frozen identity is now opposed by clearly established Evil history.&quot;</b>
+<b class="nc">&nbsp;                    : &quot;An Evil frozen identity is now opposed by clearly established Good history.&quot;;</b>
+<b class="nc">&nbsp;        } else if (temperamentContradiction) {</b>
+<b class="nc">&nbsp;            if (currentTemperament.equals(</b>
+&nbsp;                    RecognitionIdentityHistoryService
+&nbsp;                            .TemperamentDirection
+&nbsp;                            .FREEDOM
+<b class="nc">&nbsp;                            .id()</b>
+&nbsp;            )) {
+<b class="nc">&nbsp;                modifier = originalTemperament.equals(</b>
+&nbsp;                        RecognitionIdentityHistoryService
+&nbsp;                                .TemperamentDirection
+&nbsp;                                .ORDER
+<b class="nc">&nbsp;                                .id()</b>
+&nbsp;                )
+<b class="nc">&nbsp;                        ? RecognitionIdentityHistoryModifier.OATHBREAKER</b>
+<b class="nc">&nbsp;                        : RecognitionIdentityHistoryModifier.DEFIANT;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                modifier = RecognitionIdentityHistoryModifier</b>
+&nbsp;                        .CROWNED_OR_BOUND;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            reason = switch (modifier) {</b>
+&nbsp;                case OATHBREAKER -&gt;
+<b class="nc">&nbsp;                        &quot;A Lawful frozen identity is now opposed by clearly established Freedom history.&quot;;</b>
+&nbsp;                case DEFIANT -&gt;
+<b class="nc">&nbsp;                        &quot;A previously experienced Order commitment has been replaced by established Freedom without a Lawful identity to betray.&quot;;</b>
+&nbsp;                case CROWNED_OR_BOUND -&gt;
+<b class="nc">&nbsp;                        &quot;A Freedom-oriented or neutral frozen identity has been replaced by established Order after meaningful Freedom history.&quot;;</b>
+<b class="nc">&nbsp;                default -&gt; &quot;A temperament contradiction was established.&quot;;</b>
+&nbsp;            };
+&nbsp;        } else {
+<b class="nc">&nbsp;            modifier = RecognitionIdentityHistoryModifier.NONE;</b>
+<b class="nc">&nbsp;            reason = unresolvedReason(</b>
+&nbsp;                    originalMoral,
+&nbsp;                    originalTemperament,
+&nbsp;                    currentMoral,
+&nbsp;                    currentTemperament,
+&nbsp;                    moralContested,
+&nbsp;                    temperamentContested,
+&nbsp;                    snapshot
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; evidence = baseEvidence(</b>
+&nbsp;                snapshot,
+&nbsp;                originalMoral,
+&nbsp;                originalTemperament,
+&nbsp;                currentMoral,
+&nbsp;                currentTemperament
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        evidence.add(</b>
+&nbsp;                &quot;Moral contradiction=&quot; + moralContradiction
+&nbsp;                        + &quot;, returned=&quot; + moralReturned
+&nbsp;                        + &quot;, contested=&quot; + moralContested
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        evidence.add(</b>
+&nbsp;                &quot;Temperament contradiction=&quot; + temperamentContradiction
+&nbsp;                        + &quot;, returned=&quot; + temperamentReturned
+&nbsp;                        + &quot;, contested=&quot; + temperamentContested
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return resolution(</b>
+&nbsp;                modifier,
+&nbsp;                true,
+&nbsp;                originalMoral,
+&nbsp;                originalTemperament,
+&nbsp;                currentMoral,
+&nbsp;                currentTemperament,
+&nbsp;                storedMoral,
+&nbsp;                storedTemperament,
+&nbsp;                moralContradiction,
+&nbsp;                temperamentContradiction,
+&nbsp;                moralReturned,
+&nbsp;                temperamentReturned,
+&nbsp;                moralContested,
+&nbsp;                temperamentContested,
+<b class="nc">&nbsp;                playerFacingSummary(</b>
+&nbsp;                        modifier,
+&nbsp;                        true
+&nbsp;                ),
+&nbsp;                reason,
+&nbsp;                evidence
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Persists a known resolved modifier after a qualifying deed.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Unknown modifier IDs and future history versions are deliberately
+&nbsp;     * preserved. Repeated calls with the same result are idempotent.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static StoreResult resolveAndStoreAfterDeed(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null) {</b>
+<b class="nc">&nbsp;            return StoreResult.rejected(</b>
+&nbsp;                    &quot;Recognition data is unavailable.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.MigrationResult migration =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!migration.writable()) {</b>
+<b class="nc">&nbsp;            return StoreResult.rejected(</b>
+&nbsp;                    migration
+<b class="nc">&nbsp;                            == RecognitionIdentityHistoryService</b>
+&nbsp;                            .MigrationResult
+&nbsp;                            .FUTURE_VERSION_PRESERVED
+<b class="nc">&nbsp;                            ? &quot;Future history version preserved.&quot;</b>
+<b class="nc">&nbsp;                            : &quot;Identity history is not writable.&quot;</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String rawStoredId = data.getString(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;RecognitionIdentityHistoryModifier&gt; knownStored =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryModifier.byId(</b>
+&nbsp;                        rawStoredId
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!rawStoredId.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; knownStored.isEmpty()) {</b>
+<b class="nc">&nbsp;            return new StoreResult(</b>
+&nbsp;                    false,
+&nbsp;                    true,
+&nbsp;                    rawStoredId,
+&nbsp;                    rawStoredId,
+&nbsp;                    RecognitionIdentityHistoryModifier.NONE,
+&nbsp;                    &quot;Unknown future modifier ID preserved.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolution resolution = resolve(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryModifier previous =</b>
+<b class="nc">&nbsp;                knownStored.orElse(</b>
+&nbsp;                        RecognitionIdentityHistoryModifier.NONE
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryModifier resolved =</b>
+<b class="nc">&nbsp;                resolution.modifier();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (previous == resolved) {</b>
+<b class="nc">&nbsp;            return new StoreResult(</b>
+&nbsp;                    false,
+&nbsp;                    false,
+<b class="nc">&nbsp;                    previous.id(),</b>
+<b class="nc">&nbsp;                    resolved.id(),</b>
+&nbsp;                    resolved,
+&nbsp;                    &quot;Resolved modifier is already current.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean stored = RecognitionIdentityHistoryService</b>
+<b class="nc">&nbsp;                .setResolvedModifier(</b>
+&nbsp;                        data,
+&nbsp;                        resolved
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return new StoreResult(</b>
+&nbsp;                stored,
+&nbsp;                false,
+<b class="nc">&nbsp;                previous.id(),</b>
+<b class="nc">&nbsp;                stored ? resolved.id() : previous.id(),</b>
+&nbsp;                resolved,
+<b class="nc">&nbsp;                stored</b>
+<b class="nc">&nbsp;                        ? &quot;Resolved modifier updated after a qualifying deed.&quot;</b>
+<b class="nc">&nbsp;                        : &quot;Resolved modifier could not be stored.&quot;</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String playerFacingSummary(
+&nbsp;            RecognitionIdentityHistoryModifier modifier,
+&nbsp;            boolean committedIdentityAvailable
+&nbsp;    ) {
+&nbsp;        RecognitionIdentityHistoryModifier safeModifier =
+<b class="nc">&nbsp;                modifier == null</b>
+<b class="nc">&nbsp;                        ? RecognitionIdentityHistoryModifier.NONE</b>
+<b class="nc">&nbsp;                        : modifier;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!committedIdentityAvailable) {</b>
+<b class="nc">&nbsp;            return &quot;Your later deeds can form a legacy only after recognition is committed.&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (safeModifier) {</b>
+&nbsp;            case NONE -&gt;
+<b class="nc">&nbsp;                    &quot;Your later deeds have not formed a lasting contradiction with your recognized identity.&quot;;</b>
+&nbsp;            case FALLEN -&gt;
+<b class="nc">&nbsp;                    &quot;Your history records a sustained turn from a Good recognition toward Evil deeds.&quot;;</b>
+&nbsp;            case REDEEMED -&gt;
+<b class="nc">&nbsp;                    &quot;Your history records a sustained turn from an Evil recognition toward Good deeds.&quot;;</b>
+&nbsp;            case OATHBREAKER -&gt;
+<b class="nc">&nbsp;                    &quot;Your history records a sustained break from Lawful recognition toward personal freedom.&quot;;</b>
+&nbsp;            case CROWNED_OR_BOUND -&gt;
+<b class="nc">&nbsp;                    &quot;Your history records a sustained turn from freedom toward hierarchy and command.&quot;;</b>
+&nbsp;            case DEFIANT -&gt;
+<b class="nc">&nbsp;                    &quot;After experiencing authority, you established independence without a Lawful recognition to betray.&quot;;</b>
+&nbsp;            case FRACTURED -&gt;
+<b class="nc">&nbsp;                    &quot;Strong contradictions now pull across more than one part of your recognized identity.&quot;;</b>
+&nbsp;            case RECONCILED -&gt;
+<b class="nc">&nbsp;                    &quot;After genuine reversals, your deeds have re-established the direction of your recognized identity.&quot;;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int colorFor(
+&nbsp;            RecognitionIdentityHistoryModifier modifier
+&nbsp;    ) {
+&nbsp;        RecognitionIdentityHistoryModifier safeModifier =
+<b class="nc">&nbsp;                modifier == null</b>
+<b class="nc">&nbsp;                        ? RecognitionIdentityHistoryModifier.NONE</b>
+<b class="nc">&nbsp;                        : modifier;</b>
+&nbsp;
+<b class="nc">&nbsp;        return switch (safeModifier) {</b>
+<b class="nc">&nbsp;            case NONE -&gt; 0x8B98A5;</b>
+<b class="nc">&nbsp;            case FALLEN -&gt; 0xD9644F;</b>
+<b class="nc">&nbsp;            case REDEEMED -&gt; 0x71E0B8;</b>
+<b class="nc">&nbsp;            case OATHBREAKER -&gt; 0x7F86FF;</b>
+<b class="nc">&nbsp;            case CROWNED_OR_BOUND -&gt; 0x73D66E;</b>
+<b class="nc">&nbsp;            case DEFIANT -&gt; 0xA98CFF;</b>
+<b class="nc">&nbsp;            case FRACTURED -&gt; 0xC03E86;</b>
+<b class="nc">&nbsp;            case RECONCILED -&gt; 0x5DD9E8;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int guidanceProgressFor(
+&nbsp;            RecognitionIdentityHistoryModifier modifier
+&nbsp;    ) {
+&nbsp;        return modifier == null
+<b class="nc">&nbsp;                || modifier == RecognitionIdentityHistoryModifier.NONE</b>
+<b class="nc">&nbsp;                ? 0</b>
+<b class="nc">&nbsp;                : 100;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionIdentityHistoryResolution resolution(
+&nbsp;            RecognitionIdentityHistoryModifier modifier,
+&nbsp;            boolean committedIdentityAvailable,
+&nbsp;            String originalMoral,
+&nbsp;            String originalTemperament,
+&nbsp;            String currentMoral,
+&nbsp;            String currentTemperament,
+&nbsp;            String storedMoral,
+&nbsp;            String storedTemperament,
+&nbsp;            boolean moralContradiction,
+&nbsp;            boolean temperamentContradiction,
+&nbsp;            boolean moralReturned,
+&nbsp;            boolean temperamentReturned,
+&nbsp;            boolean moralContested,
+&nbsp;            boolean temperamentContested,
+&nbsp;            String summary,
+&nbsp;            String reason,
+&nbsp;            List&lt;String&gt; evidence
+&nbsp;    ) {
+&nbsp;        RecognitionIdentityHistoryModifier safeModifier =
+<b class="nc">&nbsp;                modifier == null</b>
+<b class="nc">&nbsp;                        ? RecognitionIdentityHistoryModifier.NONE</b>
+<b class="nc">&nbsp;                        : modifier;</b>
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionIdentityHistoryResolution(</b>
+&nbsp;                safeModifier,
+&nbsp;                committedIdentityAvailable,
+&nbsp;                originalMoral,
+&nbsp;                originalTemperament,
+&nbsp;                currentMoral,
+&nbsp;                currentTemperament,
+&nbsp;                storedMoral,
+&nbsp;                storedTemperament,
+&nbsp;                moralContradiction,
+&nbsp;                temperamentContradiction,
+&nbsp;                moralReturned,
+&nbsp;                temperamentReturned,
+&nbsp;                moralContested,
+&nbsp;                temperamentContested,
+<b class="nc">&nbsp;                guidanceProgressFor(safeModifier),</b>
+<b class="nc">&nbsp;                colorFor(safeModifier),</b>
+&nbsp;                summary,
+&nbsp;                reason,
+&nbsp;                evidence
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; baseEvidence(
+&nbsp;            RecognitionIdentityHistorySnapshot snapshot,
+&nbsp;            String originalMoral,
+&nbsp;            String originalTemperament,
+&nbsp;            String currentMoral,
+&nbsp;            String currentTemperament
+&nbsp;    ) {
+<b class="nc">&nbsp;        List&lt;String&gt; evidence = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        evidence.add(</b>
+&nbsp;                &quot;Original axes: moral=&quot;
+<b class="nc">&nbsp;                        + displayDirection(originalMoral)</b>
+&nbsp;                        + &quot;, temperament=&quot;
+<b class="nc">&nbsp;                        + displayDirection(originalTemperament)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        evidence.add(</b>
+&nbsp;                &quot;Current clear axes: moral=&quot;
+<b class="nc">&nbsp;                        + displayDirection(currentMoral)</b>
+&nbsp;                        + &quot;, temperament=&quot;
+<b class="nc">&nbsp;                        + displayDirection(currentTemperament)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        evidence.add(</b>
+<b class="nc">&nbsp;                &quot;Momentum: good=&quot; + format(snapshot.goodMomentum())</b>
+<b class="nc">&nbsp;                        + &quot;, evil=&quot; + format(snapshot.evilMomentum())</b>
+<b class="nc">&nbsp;                        + &quot;, order=&quot; + format(snapshot.orderMomentum())</b>
+<b class="nc">&nbsp;                        + &quot;, freedom=&quot; + format(snapshot.freedomMomentum())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        evidence.add(</b>
+&nbsp;                &quot;Historical peaks: good=&quot;
+<b class="nc">&nbsp;                        + format(snapshot.highestGoodCommitment())</b>
+&nbsp;                        + &quot;, evil=&quot;
+<b class="nc">&nbsp;                        + format(snapshot.highestEvilCommitment())</b>
+&nbsp;                        + &quot;, order=&quot;
+<b class="nc">&nbsp;                        + format(snapshot.highestOrderCommitment())</b>
+&nbsp;                        + &quot;, freedom=&quot;
+<b class="nc">&nbsp;                        + format(snapshot.highestFreedomCommitment())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        evidence.add(</b>
+&nbsp;                &quot;Reversals: moral=&quot;
+<b class="nc">&nbsp;                        + snapshot.moralReversalCount()</b>
+&nbsp;                        + &quot;, temperament=&quot;
+<b class="nc">&nbsp;                        + snapshot.temperamentReversalCount()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return evidence;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String unresolvedReason(
+&nbsp;            String originalMoral,
+&nbsp;            String originalTemperament,
+&nbsp;            String currentMoral,
+&nbsp;            String currentTemperament,
+&nbsp;            boolean moralContested,
+&nbsp;            boolean temperamentContested,
+&nbsp;            RecognitionIdentityHistorySnapshot snapshot
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (moralContested || temperamentContested) {</b>
+<b class="nc">&nbsp;            return &quot;Opposing commitments are visible, but they do not currently satisfy the combined Fractured rule.&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (snapshot.moralReversalCount() &lt;= 0</b>
+<b class="nc">&nbsp;                &amp;&amp; snapshot.temperamentReversalCount() &lt;= 0) {</b>
+<b class="nc">&nbsp;            return &quot;No genuine established-direction reversal has been recorded.&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (currentMoral.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; currentTemperament.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;Neither history axis currently has a clearly established direction.&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (originalMoral.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; originalTemperament.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;The frozen recognition is neutral on both axes, so no opposing identity direction exists.&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;The current history does not meet a modifier&#39;s evidence, reversal or dominance requirements.&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String originalMoralDirection(
+&nbsp;            RecognitionPath primary,
+&nbsp;            RecognitionPath secondary
+&nbsp;    ) {
+<b class="nc">&nbsp;        String primaryDirection = moralDirection(primary);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!primaryDirection.isBlank()) {</b>
+<b class="nc">&nbsp;            return primaryDirection;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return moralDirection(secondary);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String originalTemperamentDirection(
+&nbsp;            RecognitionPath primary,
+&nbsp;            RecognitionPath secondary
+&nbsp;    ) {
+<b class="nc">&nbsp;        String primaryDirection = temperamentDirection(primary);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!primaryDirection.isBlank()) {</b>
+<b class="nc">&nbsp;            return primaryDirection;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return temperamentDirection(secondary);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String moralDirection(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (path.getMorality()) {</b>
+<b class="nc">&nbsp;            case GOOD -&gt; RecognitionIdentityHistoryService</b>
+&nbsp;                    .MoralDirection
+&nbsp;                    .GOOD
+<b class="nc">&nbsp;                    .id();</b>
+<b class="nc">&nbsp;            case EVIL -&gt; RecognitionIdentityHistoryService</b>
+&nbsp;                    .MoralDirection
+&nbsp;                    .EVIL
+<b class="nc">&nbsp;                    .id();</b>
+<b class="nc">&nbsp;            case NEUTRAL -&gt; &quot;&quot;;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String temperamentDirection(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (path.getTemperament()) {</b>
+<b class="nc">&nbsp;            case LAWFUL -&gt; RecognitionIdentityHistoryService</b>
+&nbsp;                    .TemperamentDirection
+&nbsp;                    .ORDER
+<b class="nc">&nbsp;                    .id();</b>
+<b class="nc">&nbsp;            case CHAOTIC -&gt; RecognitionIdentityHistoryService</b>
+&nbsp;                    .TemperamentDirection
+&nbsp;                    .FREEDOM
+<b class="nc">&nbsp;                    .id();</b>
+<b class="nc">&nbsp;            case NEUTRAL -&gt; &quot;&quot;;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isOppositeEstablishedDirection(
+&nbsp;            String original,
+&nbsp;            String current
+&nbsp;    ) {
+<b class="nc">&nbsp;        return !original.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; !current.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; !original.equals(current);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isContested(
+&nbsp;            double first,
+&nbsp;            double second
+&nbsp;    ) {
+<b class="nc">&nbsp;        double safeFirst = sanitize(first);</b>
+<b class="nc">&nbsp;        double safeSecond = sanitize(second);</b>
+&nbsp;
+<b class="nc">&nbsp;        return safeFirst &gt;= CONTESTED_SIDE_MINIMUM</b>
+&nbsp;                &amp;&amp; safeSecond &gt;= CONTESTED_SIDE_MINIMUM
+<b class="nc">&nbsp;                &amp;&amp; Math.abs(safeFirst - safeSecond)</b>
+&nbsp;                &lt; RecognitionIdentityHistoryService
+&nbsp;                .ESTABLISHED_DIRECTION_MARGIN;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double historicalPeakForMoral(
+&nbsp;            RecognitionIdentityHistorySnapshot snapshot,
+&nbsp;            String direction
+&nbsp;    ) {
+&nbsp;        return RecognitionIdentityHistoryService
+&nbsp;                .MoralDirection
+&nbsp;                .GOOD
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                ? snapshot.highestGoodCommitment()</b>
+&nbsp;                : RecognitionIdentityHistoryService
+&nbsp;                .MoralDirection
+&nbsp;                .EVIL
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                  ? snapshot.highestEvilCommitment()</b>
+<b class="nc">&nbsp;                  : 0.0D;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double oppositeHistoricalPeakForMoral(
+&nbsp;            RecognitionIdentityHistorySnapshot snapshot,
+&nbsp;            String direction
+&nbsp;    ) {
+&nbsp;        return RecognitionIdentityHistoryService
+&nbsp;                .MoralDirection
+&nbsp;                .GOOD
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                ? snapshot.highestEvilCommitment()</b>
+&nbsp;                : RecognitionIdentityHistoryService
+&nbsp;                .MoralDirection
+&nbsp;                .EVIL
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                  ? snapshot.highestGoodCommitment()</b>
+<b class="nc">&nbsp;                  : 0.0D;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double currentMomentumForMoral(
+&nbsp;            RecognitionIdentityHistorySnapshot snapshot,
+&nbsp;            String direction
+&nbsp;    ) {
+&nbsp;        return RecognitionIdentityHistoryService
+&nbsp;                .MoralDirection
+&nbsp;                .GOOD
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                ? snapshot.goodMomentum()</b>
+&nbsp;                : RecognitionIdentityHistoryService
+&nbsp;                .MoralDirection
+&nbsp;                .EVIL
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                  ? snapshot.evilMomentum()</b>
+<b class="nc">&nbsp;                  : 0.0D;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double historicalPeakForTemperament(
+&nbsp;            RecognitionIdentityHistorySnapshot snapshot,
+&nbsp;            String direction
+&nbsp;    ) {
+&nbsp;        return RecognitionIdentityHistoryService
+&nbsp;                .TemperamentDirection
+&nbsp;                .ORDER
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                ? snapshot.highestOrderCommitment()</b>
+&nbsp;                : RecognitionIdentityHistoryService
+&nbsp;                .TemperamentDirection
+&nbsp;                .FREEDOM
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                  ? snapshot.highestFreedomCommitment()</b>
+<b class="nc">&nbsp;                  : 0.0D;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double oppositeHistoricalPeakForTemperament(
+&nbsp;            RecognitionIdentityHistorySnapshot snapshot,
+&nbsp;            String direction
+&nbsp;    ) {
+&nbsp;        return RecognitionIdentityHistoryService
+&nbsp;                .TemperamentDirection
+&nbsp;                .ORDER
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                ? snapshot.highestFreedomCommitment()</b>
+&nbsp;                : RecognitionIdentityHistoryService
+&nbsp;                .TemperamentDirection
+&nbsp;                .FREEDOM
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                  ? snapshot.highestOrderCommitment()</b>
+<b class="nc">&nbsp;                  : 0.0D;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double currentMomentumForTemperament(
+&nbsp;            RecognitionIdentityHistorySnapshot snapshot,
+&nbsp;            String direction
+&nbsp;    ) {
+&nbsp;        return RecognitionIdentityHistoryService
+&nbsp;                .TemperamentDirection
+&nbsp;                .ORDER
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                ? snapshot.orderMomentum()</b>
+&nbsp;                : RecognitionIdentityHistoryService
+&nbsp;                .TemperamentDirection
+&nbsp;                .FREEDOM
+<b class="nc">&nbsp;                .id()</b>
+<b class="nc">&nbsp;                .equals(direction)</b>
+<b class="nc">&nbsp;                  ? snapshot.freedomMomentum()</b>
+<b class="nc">&nbsp;                  : 0.0D;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String normalizeMoralDirection(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        String clean = clean(value);</b>
+&nbsp;
+<b class="nc">&nbsp;        return clean.equals(</b>
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="nc">&nbsp;                        .id()</b>
+<b class="nc">&nbsp;        ) || clean.equals(</b>
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                ? clean</b>
+<b class="nc">&nbsp;                : &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String normalizeTemperamentDirection(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        String clean = clean(value);</b>
+&nbsp;
+<b class="nc">&nbsp;        return clean.equals(</b>
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .ORDER
+<b class="nc">&nbsp;                        .id()</b>
+<b class="nc">&nbsp;        ) || clean.equals(</b>
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                ? clean</b>
+<b class="nc">&nbsp;                : &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String displayDirection(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        String clean = clean(value);</b>
+<b class="nc">&nbsp;        return clean.isBlank() ? &quot;neutral/none&quot; : clean;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String clean(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : value.trim().toLowerCase(java.util.Locale.ROOT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitize(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(value) || value &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(</b>
+&nbsp;                RecognitionIdentityHistoryService.MAXIMUM_MOMENTUM,
+&nbsp;                value
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String format(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                java.util.Locale.US,
+&nbsp;                &quot;%.1f&quot;,
+<b class="nc">&nbsp;                sanitize(value)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record StoreResult(</b>
+&nbsp;            boolean changed,
+&nbsp;            boolean unknownModifierPreserved,
+&nbsp;            String previousModifierId,
+&nbsp;            String storedModifierId,
+&nbsp;            RecognitionIdentityHistoryModifier resolvedModifier,
+&nbsp;            String detail
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public StoreResult {</b>
+<b class="nc">&nbsp;            previousModifierId = previousModifierId == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : previousModifierId.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            storedModifierId = storedModifierId == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : storedModifierId.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            resolvedModifier = resolvedModifier == null</b>
+<b class="nc">&nbsp;                    ? RecognitionIdentityHistoryModifier.NONE</b>
+<b class="nc">&nbsp;                    : resolvedModifier;</b>
+&nbsp;
+<b class="nc">&nbsp;            detail = detail == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : detail.trim();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static StoreResult rejected(
+&nbsp;                String detail
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new StoreResult(</b>
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    RecognitionIdentityHistoryModifier.NONE,
+&nbsp;                    detail
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

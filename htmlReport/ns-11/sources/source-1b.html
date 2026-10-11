@@ -1,0 +1,260 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UltimateMultiGrantPolicy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: UltimateMultiGrantPolicy (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UltimateMultiGrantPolicy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UltimateMultiGrantPolicy$RequestAnalysis</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public final class UltimateMultiGrantPolicy {
+&nbsp;
+&nbsp;    public static final int MAX_SELECTED_SKILLS = 32;
+&nbsp;
+&nbsp;    private UltimateMultiGrantPolicy() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RequestAnalysis analyseRequest(
+&nbsp;            List&lt;String&gt; requestedSkillIds
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (requestedSkillIds == null</b>
+<b class="nc">&nbsp;                || requestedSkillIds.isEmpty()) {</b>
+<b class="nc">&nbsp;            return RequestAnalysis.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean overLimit = requestedSkillIds.size()</b>
+&nbsp;                &gt; MAX_SELECTED_SKILLS;
+<b class="nc">&nbsp;        LinkedHashSet&lt;String&gt; unique =</b>
+&nbsp;                new LinkedHashSet&lt;&gt;();
+<b class="nc">&nbsp;        int rejected = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String rawSkillId : requestedSkillIds) {</b>
+<b class="nc">&nbsp;            String skillId = rawSkillId == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : rawSkillId.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (skillId.isBlank()) {</b>
+<b class="nc">&nbsp;                rejected++;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!unique.add(skillId)) {</b>
+<b class="nc">&nbsp;                rejected++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new RequestAnalysis(</b>
+<b class="nc">&nbsp;                List.copyOf(</b>
+&nbsp;                        new ArrayList&lt;&gt;(unique)
+&nbsp;                ),
+<b class="nc">&nbsp;                requestedSkillIds.size(),</b>
+&nbsp;                rejected,
+&nbsp;                overLimit
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static double calculateCharge(
+&nbsp;            List&lt;Double&gt; successfulCosts
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (successfulCosts == null</b>
+<b class="nc">&nbsp;                || successfulCosts.isEmpty()) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double total = 0.0D;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Double value : successfulCosts) {</b>
+<b class="nc">&nbsp;            if (value == null</b>
+<b class="nc">&nbsp;                    || !Double.isFinite(value)</b>
+<b class="nc">&nbsp;                    || value &lt;= 0.0D) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            total += value;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Double.isFinite(total)</b>
+<b class="nc">&nbsp;                ? Math.max(0.0D, total)</b>
+<b class="nc">&nbsp;                : 0.0D;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record RequestAnalysis(</b>
+&nbsp;            List&lt;String&gt; uniqueSkillIds,
+&nbsp;            int submittedCount,
+&nbsp;            int rejectedCount,
+&nbsp;            boolean overLimit
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public RequestAnalysis {</b>
+<b class="nc">&nbsp;            uniqueSkillIds = uniqueSkillIds == null</b>
+<b class="nc">&nbsp;                    ? List.of()</b>
+<b class="nc">&nbsp;                    : List.copyOf(uniqueSkillIds);</b>
+<b class="nc">&nbsp;            submittedCount = Math.max(0, submittedCount);</b>
+<b class="nc">&nbsp;            rejectedCount = Math.max(0, rejectedCount);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static RequestAnalysis empty() {
+<b class="nc">&nbsp;            return new RequestAnalysis(</b>
+<b class="nc">&nbsp;                    List.of(),</b>
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

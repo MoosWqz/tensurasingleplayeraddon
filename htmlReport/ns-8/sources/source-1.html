@@ -1,0 +1,780 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MoosTensuraConfig</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.config</a>
+</div>
+
+<h1>Coverage Summary for Class: MoosTensuraConfig (com.mooswqz.moostensuraaddon.config)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MoosTensuraConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (6/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.4%
+  </span>
+  <span class="absValue">
+    (1/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.6%
+  </span>
+  <span class="absValue">
+    (204/311)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MoosTensuraConfig$SkillAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (6/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.4%
+  </span>
+  <span class="absValue">
+    (1/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.6%
+  </span>
+  <span class="absValue">
+    (204/316)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.config;
+&nbsp;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.neoforged.fml.ModContainer;
+&nbsp;import net.neoforged.fml.config.ModConfig;
+&nbsp;import net.neoforged.neoforge.common.ModConfigSpec;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public final class MoosTensuraConfig {
+&nbsp;    public static final int CURRENT_CONFIG_VERSION = 5;
+&nbsp;
+&nbsp;    public static final ModConfigSpec SPEC;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.IntValue CONFIG_VERSION;
+&nbsp;    public static final ModConfigSpec.BooleanValue DEBUG_MODE;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.BooleanValue SELF_ENDOWMENT_ENABLED;
+&nbsp;    public static final ModConfigSpec.IntValue SELF_ENDOWMENT_REQUIRED_LEVEL;
+&nbsp;    public static final ModConfigSpec.DoubleValue SELF_ENDOWMENT_REQUIRED_EP;
+&nbsp;    public static final ModConfigSpec.DoubleValue SELF_ENDOWMENT_REQUIRED_MAGICULES;
+&nbsp;    public static final ModConfigSpec.IntValue SELF_ENDOWMENT_XP_LEVEL_COST;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.BooleanValue SAGE_UPGRADE_ENABLED;
+&nbsp;    public static final ModConfigSpec.BooleanValue SAGE_UPGRADE_REQUIRE_SAGE;
+&nbsp;    public static final ModConfigSpec.IntValue SAGE_UPGRADE_REQUIRED_XP_LEVEL;
+&nbsp;    public static final ModConfigSpec.IntValue SAGE_UPGRADE_RELATIVE_LEVEL_DEDUCTION;
+&nbsp;    public static final ModConfigSpec.DoubleValue SAGE_UPGRADE_MAGICULE_COST;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.BooleanValue GREAT_SAGE_RITUAL_ENABLED;
+&nbsp;    public static final ModConfigSpec.IntValue GREAT_SAGE_RITUAL_DURATION_TICKS;
+&nbsp;    public static final ModConfigSpec.DoubleValue GREAT_SAGE_RITUAL_REQUIRED_EP;
+&nbsp;    public static final ModConfigSpec.IntValue GREAT_SAGE_RITUAL_REQUIRED_MASTERED_SKILLS;
+&nbsp;    public static final ModConfigSpec.BooleanValue GREAT_SAGE_RITUAL_REQUIRE_NAMED;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.BooleanValue GREAT_CRYSTAL_READY_PARTICLES_ENABLED;
+&nbsp;    public static final ModConfigSpec.IntValue GREAT_CRYSTAL_READY_PARTICLE_INTERVAL_TICKS;
+&nbsp;    public static final ModConfigSpec.IntValue GREAT_CRYSTAL_READY_PARTICLE_RANGE;
+&nbsp;    public static final ModConfigSpec.IntValue GREAT_CRYSTAL_READY_PARTICLE_VERTICAL_RANGE;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.BooleanValue SAGE_WHISPERS_ENABLED;
+&nbsp;    public static final ModConfigSpec.IntValue SAGE_WHISPER_INITIAL_DELAY_TICKS;
+&nbsp;    public static final ModConfigSpec.IntValue SAGE_WHISPER_MIN_INTERVAL_TICKS;
+&nbsp;    public static final ModConfigSpec.IntValue SAGE_WHISPER_RANDOM_INTERVAL_TICKS;
+&nbsp;    public static final ModConfigSpec.DoubleValue SAGE_WHISPER_CHANCE;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.DoubleValue RECOGNITION_MAXIMUM_EXTRA_EP;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.BooleanValue GRANTER_AWAKENING_ENABLED;
+&nbsp;    public static final ModConfigSpec.DoubleValue GRANTER_AWAKENING_REQUIRED_EP;
+&nbsp;    public static final ModConfigSpec.IntValue GRANTER_AWAKENING_REQUIRED_MASTERED_SKILLS;
+&nbsp;    public static final ModConfigSpec.IntValue GRANTER_AWAKENING_REQUIRED_SUBORDINATES;
+&nbsp;    public static final ModConfigSpec.DoubleValue GRANTER_AWAKENING_SCAN_RADIUS;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.DoubleValue GRANTER_GRANT_MAGICULE_COST;
+&nbsp;    public static final ModConfigSpec.IntValue GRANTER_GRANT_COOLDOWN_TICKS;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.DoubleValue ULTIMATE_EVOLUTION_REQUIRED_EP;
+&nbsp;    public static final ModConfigSpec.DoubleValue ULTIMATE_EVOLUTION_REQUIRED_MAGICULES;
+&nbsp;    public static final ModConfigSpec.IntValue ULTIMATE_EVOLUTION_REQUIRED_MASTERED_SKILLS;
+&nbsp;    public static final ModConfigSpec.IntValue ULTIMATE_EVOLUTION_REQUIRED_SUCCESSFUL_GRANTS;
+&nbsp;    public static final ModConfigSpec.IntValue ULTIMATE_EVOLUTION_REQUIRED_SUBORDINATES;
+&nbsp;    public static final ModConfigSpec.DoubleValue ULTIMATE_EVOLUTION_SCAN_RADIUS;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.DoubleValue BENEVOLENT_MASS_GRANT_COST_PER_TARGET;
+&nbsp;    public static final ModConfigSpec.DoubleValue ABSOLUTE_MASS_GRANT_COST_PER_TARGET;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.DoubleValue BENEVOLENT_GRANT_WITHOUT_MASTERY_BASE_COST;
+&nbsp;    public static final ModConfigSpec.DoubleValue ABSOLUTE_GRANT_WITHOUT_MASTERY_BASE_COST;
+&nbsp;    public static final ModConfigSpec.DoubleValue BENEVOLENT_GRANT_WITHOUT_MASTERY_EXTRA_COST;
+&nbsp;    public static final ModConfigSpec.DoubleValue ABSOLUTE_GRANT_WITHOUT_MASTERY_EXTRA_COST;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.DoubleValue BORROW_COST_PER_SKILL;
+&nbsp;    public static final ModConfigSpec.IntValue BORROW_DURATION_TICKS;
+&nbsp;    public static final ModConfigSpec.DoubleValue BORROW_PERMANENT_BASE_CHANCE;
+&nbsp;    public static final ModConfigSpec.DoubleValue BORROW_PERMANENT_BONUS_PER_PREVIOUS_BORROW;
+&nbsp;    public static final ModConfigSpec.DoubleValue BORROW_PERMANENT_MAX_CHANCE;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.DoubleValue SEIZE_COST_PER_SKILL;
+&nbsp;    public static final ModConfigSpec.DoubleValue SEIZE_DEATH_CHANCE_PER_SKILL;
+&nbsp;    public static final ModConfigSpec.DoubleValue SEIZE_DEATH_CHANCE_MAX;
+&nbsp;
+&nbsp;    public static final ModConfigSpec.ConfigValue&lt;List&lt;? extends String&gt;&gt; GLOBAL_SKILL_BLACKLIST;
+&nbsp;    public static final ModConfigSpec.ConfigValue&lt;List&lt;? extends String&gt;&gt; GRANT_SKILL_BLACKLIST;
+&nbsp;    public static final ModConfigSpec.ConfigValue&lt;List&lt;? extends String&gt;&gt; BORROW_SKILL_BLACKLIST;
+&nbsp;    public static final ModConfigSpec.ConfigValue&lt;List&lt;? extends String&gt;&gt; SEIZE_SKILL_BLACKLIST;
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();</b>
+&nbsp;
+<b class="fc">&nbsp;        CONFIG_VERSION = builder</b>
+<b class="fc">&nbsp;                .comment(</b>
+&nbsp;                        &quot;Internal config schema version for Moos Tensura Addon.&quot;,
+&nbsp;                        &quot;Do not edit unless you intentionally want the addon to re-apply migration defaults.&quot;
+&nbsp;                )
+<b class="fc">&nbsp;                .defineInRange(&quot;configVersion&quot;, 0, 0, Integer.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;debug&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        DEBUG_MODE = builder</b>
+<b class="fc">&nbsp;                .comment(</b>
+&nbsp;                        &quot;Enables developer commands and diagnostic tools.&quot;,
+&nbsp;                        &quot;This setting is controlled by the server.&quot;,
+&nbsp;                        &quot;Keep this disabled during normal gameplay and in release server configurations.&quot;,
+&nbsp;                        &quot;Normal players cannot use debug tools even when this is enabled; command permission checks still apply.&quot;
+&nbsp;                )
+<b class="fc">&nbsp;                .define(</b>
+&nbsp;                        &quot;enabled&quot;,
+&nbsp;                        false
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;self_endowment&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        SELF_ENDOWMENT_ENABLED = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Allows players to use the self-endowment system.&quot;)</b>
+<b class="fc">&nbsp;                .define(&quot;enabled&quot;, true);</b>
+&nbsp;
+<b class="fc">&nbsp;        SELF_ENDOWMENT_REQUIRED_LEVEL = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Minimum vanilla XP level required before self-endowment is allowed.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredLevel&quot;, 75, 0, 100000);</b>
+&nbsp;
+<b class="fc">&nbsp;        SELF_ENDOWMENT_REQUIRED_EP = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Minimum current EP required before self-endowment is allowed.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredEp&quot;, 200_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        SELF_ENDOWMENT_REQUIRED_MAGICULES = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current magicules consumed by self-endowment.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredMagicules&quot;, 100_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        SELF_ENDOWMENT_XP_LEVEL_COST = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Raw XP equivalent of this level is consumed by self-endowment.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;xpLevelEquivalentCost&quot;, 50, 0, 100000);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;sage_upgrade&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        SAGE_UPGRADE_ENABLED = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Allows Sage to evolve into Great Sage through this addon.&quot;)</b>
+<b class="fc">&nbsp;                .define(&quot;enabled&quot;, true);</b>
+&nbsp;
+<b class="fc">&nbsp;        SAGE_UPGRADE_REQUIRE_SAGE = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;If true, the player must already have Sage before evolving it into Great Sage.&quot;)</b>
+<b class="fc">&nbsp;                .define(&quot;requireSage&quot;, true);</b>
+&nbsp;
+<b class="fc">&nbsp;        SAGE_UPGRADE_REQUIRED_XP_LEVEL = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Minimum vanilla XP level equivalent required before Sage can evolve into Great Sage.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredXpLevel&quot;, 45, 0, 100000);</b>
+&nbsp;
+<b class="fc">&nbsp;        SAGE_UPGRADE_RELATIVE_LEVEL_DEDUCTION = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Amount of relative vanilla XP levels removed when Sage evolves into Great Sage. Example: 45 -&gt; 20 when set to 25.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;relativeLevelDeduction&quot;, 25, 0, 100000);</b>
+&nbsp;
+<b class="fc">&nbsp;        SAGE_UPGRADE_MAGICULE_COST = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current magicules consumed by Sage -&gt; Great Sage.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;magiculeCost&quot;, 0.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;great_sage_ritual&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        GREAT_SAGE_RITUAL_ENABLED = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Allows the Great Crystal Altar ritual path for Sage -&gt; Great Sage.&quot;)</b>
+<b class="fc">&nbsp;                .define(&quot;enabled&quot;, true);</b>
+&nbsp;
+<b class="fc">&nbsp;        GREAT_SAGE_RITUAL_DURATION_TICKS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Duration of the Great Crystal Altar ritual in ticks. 20 ticks = 1 second. Costs and skill changes happen only when this finishes.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;durationTicks&quot;, 300, 40, 20 * 60);</b>
+&nbsp;
+<b class="fc">&nbsp;        GREAT_SAGE_RITUAL_REQUIRED_EP = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current EP required to start the Great Crystal Altar ritual.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredEp&quot;, 60_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        GREAT_SAGE_RITUAL_REQUIRED_MASTERED_SKILLS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Amount of mastered skills required to start the Great Crystal Altar ritual.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredMasteredSkills&quot;, 1, 0, 100000);</b>
+&nbsp;
+<b class="fc">&nbsp;        GREAT_SAGE_RITUAL_REQUIRE_NAMED = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;If true, the player must be named/endowed before using the Great Crystal Altar ritual.&quot;)</b>
+<b class="fc">&nbsp;                .define(&quot;requireNamed&quot;, false);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;great_crystal_altar&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLES_ENABLED = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;If true, Great Crystal Altars emit subtle particles when a nearby player is ready to evolve Sage into Great Sage.&quot;)</b>
+<b class="fc">&nbsp;                .define(&quot;readyParticlesEnabled&quot;, true);</b>
+&nbsp;
+<b class="fc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLE_INTERVAL_TICKS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;How often ready-particle checks happen. 20 ticks = 1 second.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;readyParticleIntervalTicks&quot;, 10, 5, 20 * 60);</b>
+&nbsp;
+<b class="fc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLE_RANGE = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Horizontal block range for altar ready particles around a ritual-ready player.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;readyParticleRange&quot;, 8, 1, 64);</b>
+&nbsp;
+<b class="fc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLE_VERTICAL_RANGE = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Vertical block range for altar ready particles around a ritual-ready player.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;readyParticleVerticalRange&quot;, 4, 1, 32);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;sage_whispers&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        SAGE_WHISPERS_ENABLED = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Allows Sage to occasionally give subtle actionbar hints before evolving into Great Sage.&quot;)</b>
+<b class="fc">&nbsp;                .define(&quot;enabled&quot;, true);</b>
+&nbsp;
+<b class="fc">&nbsp;        SAGE_WHISPER_INITIAL_DELAY_TICKS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Initial delay before Sage can whisper after the player has Sage. 20 ticks = 1 second.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;initialDelayTicks&quot;, 600, 20, Integer.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        SAGE_WHISPER_MIN_INTERVAL_TICKS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Minimum time between Sage whispers. 20 ticks = 1 second.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;minIntervalTicks&quot;, 2400, 20, Integer.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        SAGE_WHISPER_RANDOM_INTERVAL_TICKS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Random extra time added to the minimum whisper interval. 20 ticks = 1 second.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;randomIntervalTicks&quot;, 2400, 0, Integer.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        SAGE_WHISPER_CHANCE = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Chance for a whisper to actually appear when the cooldown finishes. 1.0 = always, 0.5 = 50%.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;chance&quot;, 0.75D, 0.0D, 1.0D);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;recognition_rewards&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        RECOGNITION_MAXIMUM_EXTRA_EP = builder</b>
+<b class="fc">&nbsp;                .comment(</b>
+&nbsp;                        &quot;Maximum additional EP-equivalent capacity Soul Recognition can grant from Identity Strength.&quot;,
+&nbsp;                        &quot;The actual reward scales from 0 up to this value and is split evenly between maximum magicules and maximum aura.&quot;,
+&nbsp;                        &quot;This value is frozen when a recognition ritual commits; changing it affects only future recognitions and new incarnations.&quot;,
+&nbsp;                        &quot;Set this to 0 to disable the addon&#39;s additional capacity reward without changing Tensura&#39;s native HIGH endowment.&quot;
+&nbsp;                )
+<b class="fc">&nbsp;                .defineInRange(</b>
+&nbsp;                        &quot;maximumExtraEp&quot;,
+&nbsp;                        1_000_000.0D,
+&nbsp;                        0.0D,
+&nbsp;                        Double.MAX_VALUE
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;granter_awakening&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        GRANTER_AWAKENING_ENABLED = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Allows natural awakening of the Unique Skill Granter.&quot;)</b>
+<b class="fc">&nbsp;                .define(&quot;enabled&quot;, true);</b>
+&nbsp;
+<b class="fc">&nbsp;        GRANTER_AWAKENING_REQUIRED_EP = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current EP required for natural Granter awakening.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredEp&quot;, 200_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        GRANTER_AWAKENING_REQUIRED_MASTERED_SKILLS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Amount of mastered skills required for natural Granter awakening.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredMasteredSkills&quot;, 5, 0, 100000);</b>
+&nbsp;
+<b class="fc">&nbsp;        GRANTER_AWAKENING_REQUIRED_SUBORDINATES = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Amount of nearby or recognized subordinates required for natural Granter awakening.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredSubordinates&quot;, 5, 0, 100000);</b>
+&nbsp;
+<b class="fc">&nbsp;        GRANTER_AWAKENING_SCAN_RADIUS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Radius used to scan for nearby subordinates for Granter awakening.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;scanRadius&quot;, 32.0D, 1.0D, 512.0D);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;granter&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        GRANTER_GRANT_MAGICULE_COST = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current magicule cost for normal Granter skill granting.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;grantMagiculeCost&quot;, 200_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        GRANTER_GRANT_COOLDOWN_TICKS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Cooldown in ticks for normal Granter skill granting. 20 ticks = 1 second.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;grantCooldownTicks&quot;, 6000, 0, Integer.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;ultimate_evolution&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        ULTIMATE_EVOLUTION_REQUIRED_EP = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current EP required for Granter to evolve into an Ultimate Skill.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredEp&quot;, 1_000_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        ULTIMATE_EVOLUTION_REQUIRED_MAGICULES = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current magicules consumed by Granter Ultimate evolution.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredMagicules&quot;, 500_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        ULTIMATE_EVOLUTION_REQUIRED_MASTERED_SKILLS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Amount of mastered skills required for Granter Ultimate evolution.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredMasteredSkills&quot;, 10, 0, 100000);</b>
+&nbsp;
+<b class="fc">&nbsp;        ULTIMATE_EVOLUTION_REQUIRED_SUCCESSFUL_GRANTS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Amount of successful Granter grants required for Granter Ultimate evolution.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredSuccessfulGrants&quot;, 10, 0, 100000);</b>
+&nbsp;
+<b class="fc">&nbsp;        ULTIMATE_EVOLUTION_REQUIRED_SUBORDINATES = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Amount of nearby or recognized subordinates required for Granter Ultimate evolution.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;requiredSubordinates&quot;, 10, 0, 100000);</b>
+&nbsp;
+<b class="fc">&nbsp;        ULTIMATE_EVOLUTION_SCAN_RADIUS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Radius used to scan for nearby subordinates for Granter Ultimate evolution.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;scanRadius&quot;, 32.0D, 1.0D, 512.0D);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;ultimate_actions&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        BENEVOLENT_MASS_GRANT_COST_PER_TARGET = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current magicule cost per target for Benevolent Empowerment Mass Grant.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;benevolentMassGrantCostPerTarget&quot;, 75_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        ABSOLUTE_MASS_GRANT_COST_PER_TARGET = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current magicule cost per target for Absolute Governance Mass Grant.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;absoluteMassGrantCostPerTarget&quot;, 100_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        BENEVOLENT_GRANT_WITHOUT_MASTERY_BASE_COST = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Base magicule cost for Benevolent Empowerment Grant Without Mastery.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;benevolentGrantWithoutMasteryBaseCost&quot;, 100_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        ABSOLUTE_GRANT_WITHOUT_MASTERY_BASE_COST = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Base magicule cost for Absolute Governance Grant Without Mastery.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;absoluteGrantWithoutMasteryBaseCost&quot;, 150_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        BENEVOLENT_GRANT_WITHOUT_MASTERY_EXTRA_COST = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Maximum extra cost added when a Benevolent Grant Without Mastery skill has 0 mastery.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;benevolentGrantWithoutMasteryExtraCost&quot;, 650_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        ABSOLUTE_GRANT_WITHOUT_MASTERY_EXTRA_COST = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Maximum extra cost added when an Absolute Grant Without Mastery skill has 0 mastery.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;absoluteGrantWithoutMasteryExtraCost&quot;, 350_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        BORROW_COST_PER_SKILL = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current magicule cost per borrowed skill.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;borrowCostPerSkill&quot;, 150_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        BORROW_DURATION_TICKS = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Duration of temporary borrowed skills in ticks. 6000 ticks = 5 minutes.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;borrowDurationTicks&quot;, 6000, 1, Integer.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        BORROW_PERMANENT_BASE_CHANCE = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Base chance for a borrowed skill to become permanent. 0.02 = 2%.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;borrowPermanentBaseChance&quot;, 0.02D, 0.0D, 1.0D);</b>
+&nbsp;
+<b class="fc">&nbsp;        BORROW_PERMANENT_BONUS_PER_PREVIOUS_BORROW = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Extra permanence chance added for each previous time the same skill was borrowed. 0.01 = +1%.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;borrowPermanentBonusPerPreviousBorrow&quot;, 0.01D, 0.0D, 1.0D);</b>
+&nbsp;
+<b class="fc">&nbsp;        BORROW_PERMANENT_MAX_CHANCE = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Maximum permanence chance for repeatedly borrowed skills. 0.20 = 20%.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;borrowPermanentMaxChance&quot;, 0.20D, 0.0D, 1.0D);</b>
+&nbsp;
+<b class="fc">&nbsp;        SEIZE_COST_PER_SKILL = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Current magicule cost per seized skill.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;seizeCostPerSkill&quot;, 250_000.0D, 0.0D, Double.MAX_VALUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        SEIZE_DEATH_CHANCE_PER_SKILL = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Chance added per seized skill that the subordinate dies from forced extraction. 0.01 = 1% per skill.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;seizeDeathChancePerSkill&quot;, 0.01D, 0.0D, 1.0D);</b>
+&nbsp;
+<b class="fc">&nbsp;        SEIZE_DEATH_CHANCE_MAX = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Maximum death chance from a single multi-skill Seize action. 0.25 = 25%.&quot;)</b>
+<b class="fc">&nbsp;                .defineInRange(&quot;seizeDeathChanceMax&quot;, 0.25D, 0.0D, 1.0D);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.push(&quot;compatibility&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        GLOBAL_SKILL_BLACKLIST = builder</b>
+<b class="fc">&nbsp;                .comment(</b>
+&nbsp;                        &quot;Skills listed here cannot be granted, borrowed, or seized by this addon.&quot;,
+&nbsp;                        &quot;Use full skill IDs, for example: \&quot;tensura:creator\&quot;.&quot;,
+&nbsp;                        &quot;Example inactive entry you may add manually: \&quot;tensura:example_skill\&quot;.&quot;
+&nbsp;                )
+<b class="fc">&nbsp;                .defineList(&quot;globalSkillBlacklist&quot;, List.of(</b>
+&nbsp;                        &quot;moostensuraaddon:granter&quot;,
+&nbsp;                        &quot;moostensuraaddon:benevolent_empowerment&quot;,
+&nbsp;                        &quot;moostensuraaddon:absolute_governance&quot;,
+&nbsp;                        &quot;tensura:creator&quot;
+<b class="fc">&nbsp;                ), value -&gt; value instanceof String);</b>
+&nbsp;
+<b class="fc">&nbsp;        GRANT_SKILL_BLACKLIST = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Skills listed here cannot be granted.&quot;)</b>
+<b class="fc">&nbsp;                .defineList(&quot;grantSkillBlacklist&quot;, List.of(), value -&gt; value instanceof String);</b>
+&nbsp;
+<b class="fc">&nbsp;        BORROW_SKILL_BLACKLIST = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Skills listed here cannot be borrowed.&quot;)</b>
+<b class="fc">&nbsp;                .defineList(&quot;borrowSkillBlacklist&quot;, List.of(), value -&gt; value instanceof String);</b>
+&nbsp;
+<b class="fc">&nbsp;        SEIZE_SKILL_BLACKLIST = builder</b>
+<b class="fc">&nbsp;                .comment(&quot;Skills listed here cannot be seized.&quot;)</b>
+<b class="fc">&nbsp;                .defineList(&quot;seizeSkillBlacklist&quot;, List.of(), value -&gt; value instanceof String);</b>
+&nbsp;
+<b class="fc">&nbsp;        builder.pop();</b>
+&nbsp;
+<b class="fc">&nbsp;        SPEC = builder.build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private MoosTensuraConfig() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void register(ModContainer modContainer) {
+<b class="nc">&nbsp;        modContainer.registerConfig(ModConfig.Type.SERVER, SPEC);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void migrateIfNeeded() {
+<b class="fc">&nbsp;        int version =</b>
+<b class="fc">&nbsp;                CONFIG_VERSION.get();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (version &gt;= CURRENT_CONFIG_VERSION) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (version &lt; 2) {</b>
+<b class="nc">&nbsp;            migrateToVersion2();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (version &lt; 3) {</b>
+<b class="nc">&nbsp;            migrateToVersion3();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (version &lt; 4) {</b>
+<b class="nc">&nbsp;            migrateToVersion4();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (version &lt; 5) {</b>
+<b class="nc">&nbsp;            migrateToVersion5();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CONFIG_VERSION.set(</b>
+<b class="nc">&nbsp;                CURRENT_CONFIG_VERSION</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SPEC.save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void migrateToVersion2() {
+<b class="nc">&nbsp;        if (SAGE_UPGRADE_REQUIRED_XP_LEVEL.get() &gt; 50) {</b>
+<b class="nc">&nbsp;            SAGE_UPGRADE_REQUIRED_XP_LEVEL.set(45);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (SAGE_UPGRADE_RELATIVE_LEVEL_DEDUCTION.get() &gt; 25) {</b>
+<b class="nc">&nbsp;            SAGE_UPGRADE_RELATIVE_LEVEL_DEDUCTION.set(25);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLES_ENABLED.set(true);</b>
+<b class="nc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLE_INTERVAL_TICKS.set(10);</b>
+<b class="nc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLE_RANGE.set(8);</b>
+<b class="nc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLE_VERTICAL_RANGE.set(4);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void migrateToVersion3() {
+&nbsp;        /*
+&nbsp;         * Existing worlds must enter the new debug system safely.
+&nbsp;         *
+&nbsp;         * Debug mode always begins disabled during the migration. An operator
+&nbsp;         * must deliberately enable it through the permission-protected,
+&nbsp;         * confirmation-protected command.
+&nbsp;         */
+<b class="nc">&nbsp;        DEBUG_MODE.set(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void migrateToVersion4() {
+&nbsp;        /*
+&nbsp;         * Lower only the former built-in ritual requirement. Server owners
+&nbsp;         * who deliberately configured a different value keep their choice.
+&nbsp;         */
+<b class="nc">&nbsp;        if (Double.compare(</b>
+<b class="nc">&nbsp;                GREAT_SAGE_RITUAL_REQUIRED_EP.get(),</b>
+&nbsp;                100_000.0D
+&nbsp;        ) == 0) {
+<b class="nc">&nbsp;            GREAT_SAGE_RITUAL_REQUIRED_EP.set(60_000.0D);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void migrateToVersion5() {
+&nbsp;        /*
+&nbsp;         * NeoForge&#39;s config spec supplies the default when the new key is
+&nbsp;         * absent. Preserve every valid value a server owner may already have
+&nbsp;         * added manually and repair only an invalid value defensively.
+&nbsp;         */
+<b class="nc">&nbsp;        double configuredMaximum =</b>
+<b class="nc">&nbsp;                RECOGNITION_MAXIMUM_EXTRA_EP.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!Double.isFinite(configuredMaximum)</b>
+&nbsp;                || configuredMaximum &lt; 0.0D) {
+<b class="nc">&nbsp;            RECOGNITION_MAXIMUM_EXTRA_EP.set(1_000_000.0D);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void resetToAddonDefaults() {
+<b class="nc">&nbsp;        CONFIG_VERSION.set(</b>
+<b class="nc">&nbsp;                CURRENT_CONFIG_VERSION</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        DEBUG_MODE.set(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        SELF_ENDOWMENT_ENABLED.set(true);</b>
+<b class="nc">&nbsp;        SELF_ENDOWMENT_REQUIRED_LEVEL.set(75);</b>
+<b class="nc">&nbsp;        SELF_ENDOWMENT_REQUIRED_EP.set(200_000.0D);</b>
+<b class="nc">&nbsp;        SELF_ENDOWMENT_REQUIRED_MAGICULES.set(100_000.0D);</b>
+<b class="nc">&nbsp;        SELF_ENDOWMENT_XP_LEVEL_COST.set(50);</b>
+&nbsp;
+<b class="nc">&nbsp;        SAGE_UPGRADE_ENABLED.set(true);</b>
+<b class="nc">&nbsp;        SAGE_UPGRADE_REQUIRE_SAGE.set(true);</b>
+<b class="nc">&nbsp;        SAGE_UPGRADE_REQUIRED_XP_LEVEL.set(45);</b>
+<b class="nc">&nbsp;        SAGE_UPGRADE_RELATIVE_LEVEL_DEDUCTION.set(25);</b>
+<b class="nc">&nbsp;        SAGE_UPGRADE_MAGICULE_COST.set(0.0D);</b>
+&nbsp;
+<b class="nc">&nbsp;        GREAT_SAGE_RITUAL_ENABLED.set(true);</b>
+<b class="nc">&nbsp;        GREAT_SAGE_RITUAL_DURATION_TICKS.set(300);</b>
+<b class="nc">&nbsp;        GREAT_SAGE_RITUAL_REQUIRED_EP.set(60_000.0D);</b>
+<b class="nc">&nbsp;        GREAT_SAGE_RITUAL_REQUIRED_MASTERED_SKILLS.set(1);</b>
+<b class="nc">&nbsp;        GREAT_SAGE_RITUAL_REQUIRE_NAMED.set(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLES_ENABLED.set(true);</b>
+<b class="nc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLE_INTERVAL_TICKS.set(10);</b>
+<b class="nc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLE_RANGE.set(8);</b>
+<b class="nc">&nbsp;        GREAT_CRYSTAL_READY_PARTICLE_VERTICAL_RANGE.set(4);</b>
+&nbsp;
+<b class="nc">&nbsp;        SAGE_WHISPERS_ENABLED.set(true);</b>
+<b class="nc">&nbsp;        SAGE_WHISPER_INITIAL_DELAY_TICKS.set(600);</b>
+<b class="nc">&nbsp;        SAGE_WHISPER_MIN_INTERVAL_TICKS.set(2400);</b>
+<b class="nc">&nbsp;        SAGE_WHISPER_RANDOM_INTERVAL_TICKS.set(2400);</b>
+<b class="nc">&nbsp;        SAGE_WHISPER_CHANCE.set(0.75D);</b>
+&nbsp;
+<b class="nc">&nbsp;        RECOGNITION_MAXIMUM_EXTRA_EP.set(1_000_000.0D);</b>
+&nbsp;
+<b class="nc">&nbsp;        GRANTER_AWAKENING_ENABLED.set(true);</b>
+<b class="nc">&nbsp;        GRANTER_AWAKENING_REQUIRED_EP.set(200_000.0D);</b>
+<b class="nc">&nbsp;        GRANTER_AWAKENING_REQUIRED_MASTERED_SKILLS.set(5);</b>
+<b class="nc">&nbsp;        GRANTER_AWAKENING_REQUIRED_SUBORDINATES.set(5);</b>
+<b class="nc">&nbsp;        GRANTER_AWAKENING_SCAN_RADIUS.set(32.0D);</b>
+&nbsp;
+<b class="nc">&nbsp;        GRANTER_GRANT_MAGICULE_COST.set(200_000.0D);</b>
+<b class="nc">&nbsp;        GRANTER_GRANT_COOLDOWN_TICKS.set(6000);</b>
+&nbsp;
+<b class="nc">&nbsp;        ULTIMATE_EVOLUTION_REQUIRED_EP.set(1_000_000.0D);</b>
+<b class="nc">&nbsp;        ULTIMATE_EVOLUTION_REQUIRED_MAGICULES.set(500_000.0D);</b>
+<b class="nc">&nbsp;        ULTIMATE_EVOLUTION_REQUIRED_MASTERED_SKILLS.set(10);</b>
+<b class="nc">&nbsp;        ULTIMATE_EVOLUTION_REQUIRED_SUCCESSFUL_GRANTS.set(10);</b>
+<b class="nc">&nbsp;        ULTIMATE_EVOLUTION_REQUIRED_SUBORDINATES.set(10);</b>
+<b class="nc">&nbsp;        ULTIMATE_EVOLUTION_SCAN_RADIUS.set(32.0D);</b>
+&nbsp;
+<b class="nc">&nbsp;        BENEVOLENT_MASS_GRANT_COST_PER_TARGET.set(75_000.0D);</b>
+<b class="nc">&nbsp;        ABSOLUTE_MASS_GRANT_COST_PER_TARGET.set(100_000.0D);</b>
+&nbsp;
+<b class="nc">&nbsp;        BENEVOLENT_GRANT_WITHOUT_MASTERY_BASE_COST.set(100_000.0D);</b>
+<b class="nc">&nbsp;        ABSOLUTE_GRANT_WITHOUT_MASTERY_BASE_COST.set(150_000.0D);</b>
+<b class="nc">&nbsp;        BENEVOLENT_GRANT_WITHOUT_MASTERY_EXTRA_COST.set(650_000.0D);</b>
+<b class="nc">&nbsp;        ABSOLUTE_GRANT_WITHOUT_MASTERY_EXTRA_COST.set(350_000.0D);</b>
+&nbsp;
+<b class="nc">&nbsp;        BORROW_COST_PER_SKILL.set(150_000.0D);</b>
+<b class="nc">&nbsp;        BORROW_DURATION_TICKS.set(6000);</b>
+<b class="nc">&nbsp;        BORROW_PERMANENT_BASE_CHANCE.set(0.02D);</b>
+<b class="nc">&nbsp;        BORROW_PERMANENT_BONUS_PER_PREVIOUS_BORROW.set(0.01D);</b>
+<b class="nc">&nbsp;        BORROW_PERMANENT_MAX_CHANCE.set(0.20D);</b>
+&nbsp;
+<b class="nc">&nbsp;        SEIZE_COST_PER_SKILL.set(250_000.0D);</b>
+<b class="nc">&nbsp;        SEIZE_DEATH_CHANCE_PER_SKILL.set(0.01D);</b>
+<b class="nc">&nbsp;        SEIZE_DEATH_CHANCE_MAX.set(0.25D);</b>
+&nbsp;
+<b class="nc">&nbsp;        GLOBAL_SKILL_BLACKLIST.set(List.of(</b>
+&nbsp;                &quot;moostensuraaddon:granter&quot;,
+&nbsp;                &quot;moostensuraaddon:benevolent_empowerment&quot;,
+&nbsp;                &quot;moostensuraaddon:absolute_governance&quot;,
+&nbsp;                &quot;tensura:creator&quot;
+&nbsp;        ));
+<b class="nc">&nbsp;        GRANT_SKILL_BLACKLIST.set(List.of());</b>
+<b class="nc">&nbsp;        BORROW_SKILL_BLACKLIST.set(List.of());</b>
+<b class="nc">&nbsp;        SEIZE_SKILL_BLACKLIST.set(List.of());</b>
+&nbsp;
+<b class="nc">&nbsp;        SPEC.save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isSkillBlacklisted(ResourceLocation skillId, SkillAction action) {
+<b class="nc">&nbsp;        if (skillId == null) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String id = skillId.toString();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (containsSkill(GLOBAL_SKILL_BLACKLIST.get(), id)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (action) {</b>
+<b class="nc">&nbsp;            case GRANT -&gt; containsSkill(GRANT_SKILL_BLACKLIST.get(), id);</b>
+<b class="nc">&nbsp;            case BORROW -&gt; containsSkill(BORROW_SKILL_BLACKLIST.get(), id);</b>
+<b class="nc">&nbsp;            case SEIZE -&gt; containsSkill(SEIZE_SKILL_BLACKLIST.get(), id);</b>
+<b class="nc">&nbsp;            case ANY -&gt; false;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean containsSkill(List&lt;? extends String&gt; entries, String skillId) {
+<b class="nc">&nbsp;        if (entries == null || skillId == null || skillId.isBlank()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (String entry : entries) {</b>
+<b class="nc">&nbsp;            if (entry == null) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String cleaned = entry.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (cleaned.isBlank()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (cleaned.equals(skillId)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum SkillAction {</b>
+<b class="nc">&nbsp;        ANY,</b>
+<b class="nc">&nbsp;        GRANT,</b>
+<b class="nc">&nbsp;        BORROW,</b>
+<b class="nc">&nbsp;        SEIZE</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

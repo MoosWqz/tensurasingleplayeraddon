@@ -1,0 +1,628 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionIndependenceMilestoneManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionIndependenceMilestoneManager (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionIndependenceMilestoneManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (6/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.8%
+  </span>
+  <span class="absValue">
+    (14/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.6%
+  </span>
+  <span class="absValue">
+    (59/90)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionIndependenceMilestoneManager$Milestone</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (5/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIndependenceMilestoneManager$State</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (8/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.1%
+  </span>
+  <span class="absValue">
+    (31/36)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (12/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.5%
+  </span>
+  <span class="absValue">
+    (27/62)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70.9%
+  </span>
+  <span class="absValue">
+    (95/134)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * Immutable, reloadable registry of meaningful self-reliance milestones.
+&nbsp; *
+&nbsp; * &lt;p&gt;The manager does no ticking, world scanning or advancement enumeration.
+&nbsp; * Runtime scoring only checks the semantic milestone IDs already stored in
+&nbsp; * {@link RecognitionData}. Definitions are installed atomically after a
+&nbsp; * datapack reload.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionIndependenceMilestoneManager {
+&nbsp;
+&nbsp;    public static final int MAX_MILESTONES =
+&nbsp;            256;
+&nbsp;
+&nbsp;    public static final double MAX_POINTS_PER_MILESTONE =
+&nbsp;            100.0D;
+&nbsp;
+&nbsp;    public static final double MAXIMUM_TOTAL_SCORE =
+&nbsp;            100.0D;
+&nbsp;
+<b class="fc">&nbsp;    private static final Object INSTALL_LOCK =</b>
+&nbsp;            new Object();
+&nbsp;
+&nbsp;    private static volatile State state =
+<b class="fc">&nbsp;            State.empty();</b>
+&nbsp;
+&nbsp;    private RecognitionIndependenceMilestoneManager() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static State getState() {
+<b class="fc">&nbsp;        return state;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static long getRevision() {
+<b class="nc">&nbsp;        return state.revision();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getFingerprint() {
+<b class="nc">&nbsp;        return state.fingerprint();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculates the active Freedom contribution from persisted semantic IDs.
+&nbsp;     */
+&nbsp;    public static double calculateScore(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double score =</b>
+&nbsp;                0.0D;
+&nbsp;
+&nbsp;        for (Milestone milestone :
+<b class="nc">&nbsp;                state.milestones()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            if (data.containsUniqueValue(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .INDEPENDENCE_MILESTONES,
+<b class="nc">&nbsp;                    milestone.id().toString()</b>
+&nbsp;            )) {
+<b class="nc">&nbsp;                score += milestone.points();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!Double.isFinite(score)</b>
+&nbsp;                || score &lt;= 0.0D) {
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(</b>
+&nbsp;                MAXIMUM_TOTAL_SCORE,
+&nbsp;                score
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Records a configured advancement as one permanent semantic milestone.
+&nbsp;     */
+&nbsp;    public static boolean recordEarned(
+&nbsp;            RecognitionData data,
+&nbsp;            ResourceLocation advancementId
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null</b>
+&nbsp;                || advancementId == null) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Milestone milestone =</b>
+<b class="nc">&nbsp;                state.byAdvancement()</b>
+<b class="nc">&nbsp;                        .get(advancementId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (milestone == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .INDEPENDENCE_MILESTONES,
+<b class="nc">&nbsp;                milestone.id().toString()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    static State install(
+&nbsp;            List&lt;Milestone&gt; rawMilestones,
+&nbsp;            int sourceFileCount
+&nbsp;    ) {
+<b class="fc">&nbsp;        List&lt;Milestone&gt; milestones =</b>
+<b class="fc">&nbsp;                sanitizeMilestones(</b>
+&nbsp;                        rawMilestones
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        String fingerprint =</b>
+<b class="fc">&nbsp;                createFingerprint(</b>
+&nbsp;                        milestones
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        synchronized (INSTALL_LOCK) {</b>
+<b class="fc">&nbsp;            long nextRevision =</b>
+<b class="fc">&nbsp;                    state.revision()</b>
+&nbsp;                            + 1L;
+&nbsp;
+<b class="fc">&nbsp;            State next =</b>
+<b class="fc">&nbsp;                    State.create(</b>
+&nbsp;                            nextRevision,
+&nbsp;                            fingerprint,
+&nbsp;                            milestones,
+&nbsp;                            sourceFileCount
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            state = next;</b>
+&nbsp;
+&nbsp;            RecognitionProgressScreenService
+<b class="fc">&nbsp;                    .clearAll();</b>
+&nbsp;
+<b class="fc">&nbsp;            return next;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;Milestone&gt; sanitizeMilestones(
+&nbsp;            List&lt;Milestone&gt; rawMilestones
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (rawMilestones == null</b>
+<b class="pc">&nbsp;                || rawMilestones.isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (rawMilestones.size()</b>
+&nbsp;                &gt; MAX_MILESTONES) {
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;At most &quot;
+&nbsp;                            + MAX_MILESTONES
+&nbsp;                            + &quot; independence milestones may be installed.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        List&lt;Milestone&gt; sorted =</b>
+&nbsp;                new ArrayList&lt;&gt;(
+&nbsp;                        rawMilestones
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        sorted.sort(</b>
+<b class="fc">&nbsp;                Comparator.comparing(</b>
+&nbsp;                        milestone -&gt;
+<b class="fc">&nbsp;                                milestone.id()</b>
+<b class="fc">&nbsp;                                        .toString()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;ResourceLocation, Milestone&gt; byId =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;ResourceLocation, Milestone&gt; byAdvancement =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="fc">&nbsp;        double total =</b>
+&nbsp;                0.0D;
+&nbsp;
+<b class="fc">&nbsp;        for (Milestone milestone : sorted) {</b>
+<b class="pc">&nbsp;            if (milestone == null) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(</b>
+&nbsp;                        &quot;Independence milestone definitions cannot contain null entries.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (byId.putIfAbsent(</b>
+<b class="fc">&nbsp;                    milestone.id(),</b>
+&nbsp;                    milestone
+&nbsp;            ) != null) {
+<b class="nc">&nbsp;                throw new IllegalArgumentException(</b>
+&nbsp;                        &quot;Duplicate independence milestone ID: &quot;
+<b class="nc">&nbsp;                                + milestone.id()</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (byAdvancement.putIfAbsent(</b>
+<b class="fc">&nbsp;                    milestone.advancementId(),</b>
+&nbsp;                    milestone
+&nbsp;            ) != null) {
+<b class="nc">&nbsp;                throw new IllegalArgumentException(</b>
+&nbsp;                        &quot;Duplicate independence advancement ID: &quot;
+<b class="nc">&nbsp;                                + milestone.advancementId()</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            total += milestone.points();</b>
+&nbsp;
+<b class="pc">&nbsp;            if (!Double.isFinite(total)</b>
+&nbsp;                    || total
+&nbsp;                    &gt; MAXIMUM_TOTAL_SCORE) {
+<b class="nc">&nbsp;                throw new IllegalArgumentException(</b>
+&nbsp;                        &quot;The configured independence score exceeds the &quot;
+&nbsp;                                + MAXIMUM_TOTAL_SCORE
+&nbsp;                                + &quot; point safety maximum.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return List.copyOf(</b>
+&nbsp;                sorted
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String createFingerprint(
+&nbsp;            List&lt;Milestone&gt; milestones
+&nbsp;    ) {
+<b class="fc">&nbsp;        StringBuilder canonical =</b>
+&nbsp;                new StringBuilder();
+&nbsp;
+<b class="fc">&nbsp;        for (Milestone milestone : milestones) {</b>
+<b class="fc">&nbsp;            canonical.append(</b>
+<b class="fc">&nbsp;                            milestone.id()</b>
+&nbsp;                    )
+<b class="fc">&nbsp;                    .append(&#39;|&#39;)</b>
+<b class="fc">&nbsp;                    .append(</b>
+<b class="fc">&nbsp;                            milestone.advancementId()</b>
+&nbsp;                    )
+<b class="fc">&nbsp;                    .append(&#39;|&#39;)</b>
+<b class="fc">&nbsp;                    .append(</b>
+<b class="fc">&nbsp;                            Double.toHexString(</b>
+<b class="fc">&nbsp;                                    milestone.points()</b>
+&nbsp;                            )
+&nbsp;                    )
+<b class="fc">&nbsp;                    .append(&#39;\n&#39;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            MessageDigest digest =</b>
+<b class="fc">&nbsp;                    MessageDigest.getInstance(</b>
+&nbsp;                            &quot;SHA-256&quot;
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            byte[] hash =</b>
+<b class="fc">&nbsp;                    digest.digest(</b>
+<b class="fc">&nbsp;                            canonical.toString()</b>
+<b class="fc">&nbsp;                                    .getBytes(</b>
+&nbsp;                                            StandardCharsets.UTF_8
+&nbsp;                                    )
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            StringBuilder result =</b>
+&nbsp;                    new StringBuilder(
+&nbsp;                            hash.length * 2
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            for (byte value : hash) {</b>
+<b class="fc">&nbsp;                result.append(</b>
+<b class="fc">&nbsp;                        String.format(</b>
+&nbsp;                                java.util.Locale.ROOT,
+&nbsp;                                &quot;%02x&quot;,
+<b class="fc">&nbsp;                                value &amp; 0xFF</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return result.toString();</b>
+&nbsp;        } catch (NoSuchAlgorithmException exception) {
+<b class="nc">&nbsp;            throw new IllegalStateException(</b>
+&nbsp;                    &quot;SHA-256 is unavailable for independence definition fingerprints.&quot;,
+&nbsp;                    exception
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public record Milestone(</b>
+&nbsp;            ResourceLocation id,
+&nbsp;            ResourceLocation advancementId,
+&nbsp;            double points
+&nbsp;    ) {
+&nbsp;
+<b class="fc">&nbsp;        public Milestone {</b>
+<b class="pc">&nbsp;            if (id == null) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(</b>
+&nbsp;                        &quot;An independence milestone requires a semantic ID.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (advancementId == null) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(</b>
+&nbsp;                        &quot;An independence milestone requires an advancement ID.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (!Double.isFinite(points)</b>
+&nbsp;                    || points &lt;= 0.0D
+&nbsp;                    || points
+&nbsp;                    &gt; MAX_POINTS_PER_MILESTONE) {
+<b class="nc">&nbsp;                throw new IllegalArgumentException(</b>
+&nbsp;                        &quot;Independence milestone points must be finite, positive and at most &quot;
+&nbsp;                                + MAX_POINTS_PER_MILESTONE
+&nbsp;                                + &quot;.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public record State(</b>
+&nbsp;            long revision,
+&nbsp;            String fingerprint,
+&nbsp;            List&lt;Milestone&gt; milestones,
+&nbsp;            Map&lt;ResourceLocation, Milestone&gt; byId,
+&nbsp;            Map&lt;ResourceLocation, Milestone&gt; byAdvancement,
+&nbsp;            int sourceFileCount,
+&nbsp;            double maximumScore
+&nbsp;    ) {
+&nbsp;
+<b class="fc">&nbsp;        public State {</b>
+<b class="fc">&nbsp;            revision =</b>
+<b class="fc">&nbsp;                    Math.max(</b>
+&nbsp;                            0L,
+&nbsp;                            revision
+&nbsp;                    );
+&nbsp;
+&nbsp;            fingerprint =
+<b class="pc">&nbsp;                    fingerprint == null</b>
+<b class="nc">&nbsp;                            ? &quot;&quot;</b>
+<b class="fc">&nbsp;                            : fingerprint;</b>
+&nbsp;
+&nbsp;            milestones =
+<b class="pc">&nbsp;                    milestones == null</b>
+<b class="nc">&nbsp;                            ? List.of()</b>
+<b class="fc">&nbsp;                            : List.copyOf(</b>
+&nbsp;                            milestones
+&nbsp;                    );
+&nbsp;
+&nbsp;            byId =
+<b class="pc">&nbsp;                    byId == null</b>
+<b class="nc">&nbsp;                            ? Map.of()</b>
+<b class="fc">&nbsp;                            : Map.copyOf(</b>
+&nbsp;                            byId
+&nbsp;                    );
+&nbsp;
+&nbsp;            byAdvancement =
+<b class="pc">&nbsp;                    byAdvancement == null</b>
+<b class="nc">&nbsp;                            ? Map.of()</b>
+<b class="fc">&nbsp;                            : Map.copyOf(</b>
+&nbsp;                            byAdvancement
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            sourceFileCount =</b>
+<b class="fc">&nbsp;                    Math.max(</b>
+&nbsp;                            0,
+&nbsp;                            sourceFileCount
+&nbsp;                    );
+&nbsp;
+&nbsp;            maximumScore =
+<b class="pc">&nbsp;                    !Double.isFinite(</b>
+&nbsp;                            maximumScore
+<b class="fc">&nbsp;                    ) || maximumScore &lt; 0.0D</b>
+<b class="nc">&nbsp;                            ? 0.0D</b>
+<b class="fc">&nbsp;                            : maximumScore;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static State create(
+&nbsp;                long revision,
+&nbsp;                String fingerprint,
+&nbsp;                List&lt;Milestone&gt; milestones,
+&nbsp;                int sourceFileCount
+&nbsp;        ) {
+<b class="fc">&nbsp;            Map&lt;ResourceLocation, Milestone&gt; byId =</b>
+&nbsp;                    new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="fc">&nbsp;            Map&lt;ResourceLocation, Milestone&gt; byAdvancement =</b>
+&nbsp;                    new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="fc">&nbsp;            double maximumScore =</b>
+&nbsp;                    0.0D;
+&nbsp;
+<b class="fc">&nbsp;            for (Milestone milestone : milestones) {</b>
+<b class="fc">&nbsp;                byId.put(</b>
+<b class="fc">&nbsp;                        milestone.id(),</b>
+&nbsp;                        milestone
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;                byAdvancement.put(</b>
+<b class="fc">&nbsp;                        milestone.advancementId(),</b>
+&nbsp;                        milestone
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;                maximumScore +=</b>
+<b class="fc">&nbsp;                        milestone.points();</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return new State(</b>
+&nbsp;                    revision,
+&nbsp;                    fingerprint,
+&nbsp;                    milestones,
+&nbsp;                    byId,
+&nbsp;                    byAdvancement,
+&nbsp;                    sourceFileCount,
+&nbsp;                    maximumScore
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private static State empty() {
+&nbsp;            List&lt;Milestone&gt; milestones =
+<b class="fc">&nbsp;                    List.of();</b>
+&nbsp;
+<b class="fc">&nbsp;            return create(</b>
+&nbsp;                    0L,
+<b class="fc">&nbsp;                    createFingerprint(</b>
+&nbsp;                            milestones
+&nbsp;                    ),
+&nbsp;                    milestones,
+&nbsp;                    0
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

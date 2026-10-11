@@ -1,0 +1,1414 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionIdentityHistoryService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionIdentityHistoryService (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionIdentityHistoryService</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.6%
+  </span>
+  <span class="absValue">
+    (9/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.6%
+  </span>
+  <span class="absValue">
+    (26/178)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.8%
+  </span>
+  <span class="absValue">
+    (69/302)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryService$AxisDecay</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryService$MigrationResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryService$MigrationState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryService$MoralDirection</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryService$MutationResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryService$TemperamentDirection</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    44.7%
+  </span>
+  <span class="absValue">
+    (21/47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.1%
+  </span>
+  <span class="absValue">
+    (26/184)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    26.1%
+  </span>
+  <span class="absValue">
+    (92/353)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Versioned persistence and mutation rules for contradiction history.
+&nbsp; *
+&nbsp; * &lt;p&gt;This service deliberately does not influence recognition scoring or
+&nbsp; * committed results. Event integration feeds qualifying deeds into these
+&nbsp; * APIs, while {@link RecognitionIdentityHistoryResolver} interprets the
+&nbsp; * resulting history only after a qualifying deed.&lt;/p&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;Decay is lazy: no tick handler exists. A moral deed decays the stored Good
+&nbsp; * and Evil momenta before applying the new deed. A temperament deed does the
+&nbsp; * same for Order and Freedom.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionIdentityHistoryService {
+&nbsp;
+&nbsp;    public static final int CURRENT_HISTORY_VERSION = 2;
+&nbsp;
+&nbsp;    public static final double MAXIMUM_MOMENTUM = 100.0D;
+&nbsp;    public static final double MAXIMUM_DEED_WEIGHT = 25.0D;
+&nbsp;
+&nbsp;    public static final double ESTABLISHED_DIRECTION_MINIMUM = 20.0D;
+&nbsp;    public static final double ESTABLISHED_DIRECTION_MARGIN = 8.0D;
+&nbsp;
+&nbsp;    public static final long DECAY_GRACE_TICKS = 24_000L;
+&nbsp;    public static final long DECAY_INTERVAL_TICKS = 24_000L;
+&nbsp;    public static final double DECAY_PER_INTERVAL = 4.0D;
+&nbsp;
+&nbsp;    public static final String MIGRATION_SOURCE_NATIVE =
+&nbsp;            &quot;identity_history_native_v2&quot;;
+&nbsp;
+&nbsp;    public static final String MIGRATION_SOURCE_UNVERSIONED =
+&nbsp;            &quot;identity_history_v0_to_v2&quot;;
+&nbsp;
+&nbsp;    public static final String MIGRATION_SOURCE_V1 =
+&nbsp;            &quot;identity_history_v1_to_v2&quot;;
+&nbsp;
+&nbsp;    private RecognitionIdentityHistoryService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RecognitionIdentityHistorySnapshot inspect(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null) {</b>
+<b class="nc">&nbsp;            return invalidSnapshot();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int version = data.getCounter(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_VERSION
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        MigrationState migrationState = determineMigrationState(</b>
+&nbsp;                data,
+&nbsp;                version
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double goodMomentum = getMomentum(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.GOOD_MOMENTUM
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double evilMomentum = getMomentum(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.EVIL_MOMENTUM
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double orderMomentum = getMomentum(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.ORDER_MOMENTUM
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double freedomMomentum = getMomentum(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.FREEDOM_MOMENTUM
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double highestGood = getMomentum(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.HIGHEST_GOOD_COMMITMENT
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double highestEvil = getMomentum(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.HIGHEST_EVIL_COMMITMENT
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double highestOrder = getMomentum(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.HIGHEST_ORDER_COMMITMENT
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double highestFreedom = getMomentum(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.HIGHEST_FREEDOM_COMMITMENT
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; issues = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (highestGood + 1.0E-9D &lt; goodMomentum) {</b>
+<b class="nc">&nbsp;            issues.add(&quot;Highest Good commitment is below current Good momentum.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (highestEvil + 1.0E-9D &lt; evilMomentum) {</b>
+<b class="nc">&nbsp;            issues.add(&quot;Highest Evil commitment is below current Evil momentum.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (highestOrder + 1.0E-9D &lt; orderMomentum) {</b>
+<b class="nc">&nbsp;            issues.add(&quot;Highest Order commitment is below current Order momentum.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (highestFreedom + 1.0E-9D &lt; freedomMomentum) {</b>
+<b class="nc">&nbsp;            issues.add(&quot;Highest Freedom commitment is below current Freedom momentum.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String modifierId = RecognitionIdentityHistoryModifier</b>
+<b class="nc">&nbsp;                .canonicalOrPreserved(</b>
+<b class="nc">&nbsp;                        data.getString(</b>
+&nbsp;                                RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionIdentityHistorySnapshot(</b>
+&nbsp;                version,
+&nbsp;                CURRENT_HISTORY_VERSION,
+&nbsp;                migrationState,
+&nbsp;                goodMomentum,
+&nbsp;                evilMomentum,
+&nbsp;                orderMomentum,
+&nbsp;                freedomMomentum,
+&nbsp;                highestGood,
+&nbsp;                highestEvil,
+&nbsp;                highestOrder,
+&nbsp;                highestFreedom,
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.MORAL_REVERSAL_COUNT
+&nbsp;                ),
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.TEMPERAMENT_REVERSAL_COUNT
+&nbsp;                ),
+<b class="nc">&nbsp;                getStoredGameTime(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionStatKeys.LAST_GOOD_DEED_GAME_TIME
+&nbsp;                ),
+<b class="nc">&nbsp;                getStoredGameTime(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionStatKeys.LAST_EVIL_DEED_GAME_TIME
+&nbsp;                ),
+<b class="nc">&nbsp;                getStoredGameTime(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionStatKeys.LAST_ORDER_DEED_GAME_TIME
+&nbsp;                ),
+<b class="nc">&nbsp;                getStoredGameTime(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionStatKeys.LAST_FREEDOM_DEED_GAME_TIME
+&nbsp;                ),
+&nbsp;                modifierId,
+<b class="nc">&nbsp;                data.getString(</b>
+&nbsp;                        RecognitionStatKeys.IDENTITY_HISTORY_MIGRATION_SOURCE
+&nbsp;                ),
+&nbsp;                issues
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initializes or repairs only the independent history namespace.
+&nbsp;     * Unknown future versions and unknown modifier IDs are preserved.
+&nbsp;     */
+&nbsp;    public static MigrationResult ensureCurrent(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (data == null) {</b>
+<b class="nc">&nbsp;            return MigrationResult.INVALID_DATA;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        int storedVersion = data.getCounter(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_VERSION
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (storedVersion &gt; CURRENT_HISTORY_VERSION) {</b>
+<b class="nc">&nbsp;            return MigrationResult.FUTURE_VERSION_PRESERVED;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        boolean changed = false;</b>
+<b class="pc">&nbsp;        boolean hadUnversionedPayload = storedVersion == 0</b>
+<b class="nc">&nbsp;                &amp;&amp; hasAnyHistoryPayload(data);</b>
+&nbsp;
+&nbsp;        MigrationResult versionResult;
+&nbsp;
+<b class="pc">&nbsp;        if (storedVersion == 0) {</b>
+<b class="nc">&nbsp;            data.setCounter(</b>
+&nbsp;                    RecognitionStatKeys.IDENTITY_HISTORY_VERSION,
+&nbsp;                    CURRENT_HISTORY_VERSION
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            data.setString(</b>
+&nbsp;                    RecognitionStatKeys.IDENTITY_HISTORY_MIGRATION_SOURCE,
+<b class="nc">&nbsp;                    hadUnversionedPayload</b>
+<b class="nc">&nbsp;                            ? MIGRATION_SOURCE_UNVERSIONED</b>
+<b class="nc">&nbsp;                            : MIGRATION_SOURCE_NATIVE</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            versionResult = hadUnversionedPayload</b>
+<b class="nc">&nbsp;                    ? MigrationResult.MIGRATED_FROM_UNVERSIONED</b>
+<b class="nc">&nbsp;                    : MigrationResult.INITIALIZED_NATIVE;</b>
+&nbsp;
+<b class="nc">&nbsp;            changed = true;</b>
+<b class="pc">&nbsp;        } else if (storedVersion == 1) {</b>
+<b class="nc">&nbsp;            migrateDecayAnchorsFromV1(data);</b>
+<b class="nc">&nbsp;            repairEstablishedDirections(data);</b>
+&nbsp;
+<b class="nc">&nbsp;            data.setCounter(</b>
+&nbsp;                    RecognitionStatKeys.IDENTITY_HISTORY_VERSION,
+&nbsp;                    CURRENT_HISTORY_VERSION
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            data.setString(</b>
+&nbsp;                    RecognitionStatKeys.IDENTITY_HISTORY_MIGRATION_SOURCE,
+&nbsp;                    MIGRATION_SOURCE_V1
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            versionResult = MigrationResult.MIGRATED_FROM_V1;</b>
+<b class="nc">&nbsp;            changed = true;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            versionResult = MigrationResult.ALREADY_CURRENT;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String rawModifier = data.getString(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (rawModifier.isBlank()) {</b>
+<b class="nc">&nbsp;            data.setString(</b>
+&nbsp;                    RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER,
+<b class="nc">&nbsp;                    RecognitionIdentityHistoryModifier.NONE.id()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            changed = true;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            String canonical = RecognitionIdentityHistoryModifier</b>
+<b class="fc">&nbsp;                    .canonicalOrPreserved(rawModifier);</b>
+&nbsp;
+<b class="pc">&nbsp;            if (!canonical.equals(rawModifier)) {</b>
+<b class="nc">&nbsp;                data.setString(</b>
+&nbsp;                        RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER,
+&nbsp;                        canonical
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        changed |= repairPeak(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.GOOD_MOMENTUM,
+&nbsp;                RecognitionStatKeys.HIGHEST_GOOD_COMMITMENT
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        changed |= repairPeak(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.EVIL_MOMENTUM,
+&nbsp;                RecognitionStatKeys.HIGHEST_EVIL_COMMITMENT
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        changed |= repairPeak(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.ORDER_MOMENTUM,
+&nbsp;                RecognitionStatKeys.HIGHEST_ORDER_COMMITMENT
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        changed |= repairPeak(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.FREEDOM_MOMENTUM,
+&nbsp;                RecognitionStatKeys.HIGHEST_FREEDOM_COMMITMENT
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        changed |= repairDecayAnchor(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.LAST_GOOD_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.GOOD_DECAY_ANCHOR_GAME_TIME
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        changed |= repairDecayAnchor(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.LAST_EVIL_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.EVIL_DECAY_ANCHOR_GAME_TIME
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        changed |= repairDecayAnchor(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.LAST_ORDER_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.ORDER_DECAY_ANCHOR_GAME_TIME
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        changed |= repairDecayAnchor(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.LAST_FREEDOM_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.FREEDOM_DECAY_ANCHOR_GAME_TIME
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        changed |= repairEstablishedDirections(data);</b>
+<b class="fc">&nbsp;        changed |= repairAuthorityBaselines(data);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (versionResult != MigrationResult.ALREADY_CURRENT) {</b>
+<b class="nc">&nbsp;            return versionResult;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        return changed</b>
+<b class="nc">&nbsp;                ? MigrationResult.REPAIRED_CURRENT</b>
+<b class="fc">&nbsp;                : MigrationResult.ALREADY_CURRENT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static MutationResult recordMoralDeed(
+&nbsp;            RecognitionData data,
+&nbsp;            MoralDirection direction,
+&nbsp;            double weight,
+&nbsp;            long overworldGameTime
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (direction == null) {</b>
+<b class="nc">&nbsp;            return MutationResult.rejected(&quot;A moral direction is required.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return recordDeed(</b>
+&nbsp;                data,
+<b class="nc">&nbsp;                direction == MoralDirection.GOOD</b>
+<b class="nc">&nbsp;                        ? RecognitionStatKeys.GOOD_MOMENTUM</b>
+<b class="nc">&nbsp;                        : RecognitionStatKeys.EVIL_MOMENTUM,</b>
+<b class="nc">&nbsp;                direction == MoralDirection.GOOD</b>
+<b class="nc">&nbsp;                        ? RecognitionStatKeys.HIGHEST_GOOD_COMMITMENT</b>
+<b class="nc">&nbsp;                        : RecognitionStatKeys.HIGHEST_EVIL_COMMITMENT,</b>
+<b class="nc">&nbsp;                direction == MoralDirection.GOOD</b>
+<b class="nc">&nbsp;                        ? RecognitionStatKeys.LAST_GOOD_DEED_GAME_TIME</b>
+<b class="nc">&nbsp;                        : RecognitionStatKeys.LAST_EVIL_DEED_GAME_TIME,</b>
+<b class="nc">&nbsp;                direction == MoralDirection.GOOD</b>
+<b class="nc">&nbsp;                        ? RecognitionStatKeys.GOOD_DECAY_ANCHOR_GAME_TIME</b>
+<b class="nc">&nbsp;                        : RecognitionStatKeys.EVIL_DECAY_ANCHOR_GAME_TIME,</b>
+&nbsp;                RecognitionStatKeys.GOOD_MOMENTUM,
+&nbsp;                RecognitionStatKeys.LAST_GOOD_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.GOOD_DECAY_ANCHOR_GAME_TIME,
+&nbsp;                RecognitionStatKeys.EVIL_MOMENTUM,
+&nbsp;                RecognitionStatKeys.LAST_EVIL_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.EVIL_DECAY_ANCHOR_GAME_TIME,
+&nbsp;                weight,
+&nbsp;                overworldGameTime,
+<b class="nc">&nbsp;                direction.id()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static MutationResult recordTemperamentDeed(
+&nbsp;            RecognitionData data,
+&nbsp;            TemperamentDirection direction,
+&nbsp;            double weight,
+&nbsp;            long overworldGameTime
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (direction == null) {</b>
+<b class="nc">&nbsp;            return MutationResult.rejected(&quot;A temperament direction is required.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return recordDeed(</b>
+&nbsp;                data,
+<b class="nc">&nbsp;                direction == TemperamentDirection.ORDER</b>
+<b class="nc">&nbsp;                        ? RecognitionStatKeys.ORDER_MOMENTUM</b>
+<b class="nc">&nbsp;                        : RecognitionStatKeys.FREEDOM_MOMENTUM,</b>
+<b class="nc">&nbsp;                direction == TemperamentDirection.ORDER</b>
+<b class="nc">&nbsp;                        ? RecognitionStatKeys.HIGHEST_ORDER_COMMITMENT</b>
+<b class="nc">&nbsp;                        : RecognitionStatKeys.HIGHEST_FREEDOM_COMMITMENT,</b>
+<b class="nc">&nbsp;                direction == TemperamentDirection.ORDER</b>
+<b class="nc">&nbsp;                        ? RecognitionStatKeys.LAST_ORDER_DEED_GAME_TIME</b>
+<b class="nc">&nbsp;                        : RecognitionStatKeys.LAST_FREEDOM_DEED_GAME_TIME,</b>
+<b class="nc">&nbsp;                direction == TemperamentDirection.ORDER</b>
+<b class="nc">&nbsp;                        ? RecognitionStatKeys.ORDER_DECAY_ANCHOR_GAME_TIME</b>
+<b class="nc">&nbsp;                        : RecognitionStatKeys.FREEDOM_DECAY_ANCHOR_GAME_TIME,</b>
+&nbsp;                RecognitionStatKeys.ORDER_MOMENTUM,
+&nbsp;                RecognitionStatKeys.LAST_ORDER_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.ORDER_DECAY_ANCHOR_GAME_TIME,
+&nbsp;                RecognitionStatKeys.FREEDOM_MOMENTUM,
+&nbsp;                RecognitionStatKeys.LAST_FREEDOM_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.FREEDOM_DECAY_ANCHOR_GAME_TIME,
+&nbsp;                weight,
+&nbsp;                overworldGameTime,
+<b class="nc">&nbsp;                direction.id()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int registerMoralReversal(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        return incrementVersionedCounter(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.MORAL_REVERSAL_COUNT
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int registerTemperamentReversal(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        return incrementVersionedCounter(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.TEMPERAMENT_REVERSAL_COUNT
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean setResolvedModifier(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionIdentityHistoryModifier modifier
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null || modifier == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MigrationResult migration = ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!migration.writable()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER,
+<b class="nc">&nbsp;                modifier.id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static double calculateDecayedMomentum(
+&nbsp;            double storedMomentum,
+&nbsp;            long lastEventGameTime,
+&nbsp;            long currentGameTime
+&nbsp;    ) {
+<b class="nc">&nbsp;        double safeMomentum = sanitizeMomentum(storedMomentum);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (safeMomentum &lt;= 0.0D</b>
+&nbsp;                || lastEventGameTime &lt;= 0L
+&nbsp;                || currentGameTime &lt;= lastEventGameTime) {
+<b class="nc">&nbsp;            return safeMomentum;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long elapsed = currentGameTime - lastEventGameTime;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (elapsed &lt;= DECAY_GRACE_TICKS) {</b>
+<b class="nc">&nbsp;            return safeMomentum;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long decayingTicks = elapsed - DECAY_GRACE_TICKS;</b>
+<b class="nc">&nbsp;        double intervals = (double) decayingTicks</b>
+&nbsp;                / (double) DECAY_INTERVAL_TICKS;
+&nbsp;
+<b class="nc">&nbsp;        double decayed = safeMomentum</b>
+&nbsp;                - intervals * DECAY_PER_INTERVAL;
+&nbsp;
+<b class="nc">&nbsp;        return sanitizeMomentum(decayed);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static MutationResult recordDeed(
+&nbsp;            RecognitionData data,
+&nbsp;            String targetMomentumKey,
+&nbsp;            String targetPeakKey,
+&nbsp;            String targetTimestampKey,
+&nbsp;            String targetDecayAnchorKey,
+&nbsp;            String firstMomentumKey,
+&nbsp;            String firstTimestampKey,
+&nbsp;            String firstDecayAnchorKey,
+&nbsp;            String secondMomentumKey,
+&nbsp;            String secondTimestampKey,
+&nbsp;            String secondDecayAnchorKey,
+&nbsp;            double weight,
+&nbsp;            long gameTime,
+&nbsp;            String semanticDirection
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null) {</b>
+<b class="nc">&nbsp;            return MutationResult.rejected(&quot;Recognition data is required.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MigrationResult migration = ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!migration.writable()) {</b>
+<b class="nc">&nbsp;            return MutationResult.rejected(</b>
+<b class="nc">&nbsp;                    migration == MigrationResult.FUTURE_VERSION_PRESERVED</b>
+<b class="nc">&nbsp;                            ? &quot;Future history version preserved without mutation.&quot;</b>
+<b class="nc">&nbsp;                            : &quot;History data could not be initialized.&quot;</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double safeWeight = sanitizeDeedWeight(weight);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (safeWeight &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return MutationResult.rejected(&quot;Deed weight must be positive.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long safeGameTime = Math.max(0L, gameTime);</b>
+&nbsp;
+<b class="nc">&nbsp;        AxisDecay firstDecay = decayStoredSide(</b>
+&nbsp;                data,
+&nbsp;                firstMomentumKey,
+&nbsp;                firstTimestampKey,
+&nbsp;                firstDecayAnchorKey,
+&nbsp;                safeGameTime
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        AxisDecay secondDecay = decayStoredSide(</b>
+&nbsp;                data,
+&nbsp;                secondMomentumKey,
+&nbsp;                secondTimestampKey,
+&nbsp;                secondDecayAnchorKey,
+&nbsp;                safeGameTime
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double before = getMomentum(data, targetMomentumKey);</b>
+<b class="nc">&nbsp;        double after = sanitizeMomentum(before + safeWeight);</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                targetMomentumKey,
+&nbsp;                after
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurementMaximum(</b>
+&nbsp;                targetPeakKey,
+&nbsp;                after
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setStoredGameTime(</b>
+&nbsp;                data,
+&nbsp;                targetTimestampKey,
+&nbsp;                safeGameTime
+&nbsp;        );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * A deed resets that direction&#39;s decay grace and incremental anchor.
+&nbsp;         * The last-deed timestamp remains semantically accurate, while the
+&nbsp;         * separate anchor prevents repeated lazy evaluations from subtracting
+&nbsp;         * the same elapsed period twice.
+&nbsp;         */
+<b class="nc">&nbsp;        setStoredGameTime(</b>
+&nbsp;                data,
+&nbsp;                targetDecayAnchorKey,
+&nbsp;                safeGameTime
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return new MutationResult(</b>
+&nbsp;                true,
+&nbsp;                semanticDirection,
+&nbsp;                safeWeight,
+&nbsp;                before,
+&nbsp;                after,
+<b class="nc">&nbsp;                firstDecay.decayedAmount()</b>
+<b class="nc">&nbsp;                        + secondDecay.decayedAmount(),</b>
+&nbsp;                safeGameTime,
+&nbsp;                &quot;&quot;
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static AxisDecay decayStoredSide(
+&nbsp;            RecognitionData data,
+&nbsp;            String momentumKey,
+&nbsp;            String lastDeedTimestampKey,
+&nbsp;            String decayAnchorKey,
+&nbsp;            long currentGameTime
+&nbsp;    ) {
+<b class="nc">&nbsp;        double before = getMomentum(data, momentumKey);</b>
+<b class="nc">&nbsp;        long lastDeedTime = getStoredGameTime(</b>
+&nbsp;                data,
+&nbsp;                lastDeedTimestampKey
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        long decayAnchor = getStoredGameTime(</b>
+&nbsp;                data,
+&nbsp;                decayAnchorKey
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (currentGameTime &lt;= 0L) {</b>
+<b class="nc">&nbsp;            return new AxisDecay(before, before);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (lastDeedTime &gt; currentGameTime) {</b>
+<b class="nc">&nbsp;            setStoredGameTime(</b>
+&nbsp;                    data,
+&nbsp;                    lastDeedTimestampKey,
+&nbsp;                    currentGameTime
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            setStoredGameTime(</b>
+&nbsp;                    data,
+&nbsp;                    decayAnchorKey,
+&nbsp;                    currentGameTime
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return new AxisDecay(before, before);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (decayAnchor &gt; currentGameTime) {</b>
+<b class="nc">&nbsp;            setStoredGameTime(</b>
+&nbsp;                    data,
+&nbsp;                    decayAnchorKey,
+&nbsp;                    currentGameTime
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return new AxisDecay(before, before);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (before &lt;= 0.0D || lastDeedTime &lt;= 0L) {</b>
+<b class="nc">&nbsp;            setStoredGameTime(</b>
+&nbsp;                    data,
+&nbsp;                    decayAnchorKey,
+&nbsp;                    currentGameTime
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return new AxisDecay(before, before);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long graceEnd = safeAdd(</b>
+&nbsp;                lastDeedTime,
+&nbsp;                DECAY_GRACE_TICKS
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        long decayStart = Math.max(</b>
+&nbsp;                decayAnchor,
+&nbsp;                graceEnd
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double after = before;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (currentGameTime &gt; decayStart) {</b>
+<b class="nc">&nbsp;            long elapsedDecayTicks =</b>
+&nbsp;                    currentGameTime - decayStart;
+&nbsp;
+<b class="nc">&nbsp;            double intervals =</b>
+&nbsp;                    (double) elapsedDecayTicks
+&nbsp;                            / (double) DECAY_INTERVAL_TICKS;
+&nbsp;
+<b class="nc">&nbsp;            after = sanitizeMomentum(</b>
+&nbsp;                    before
+&nbsp;                            - intervals
+&nbsp;                            * DECAY_PER_INTERVAL
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            if (Math.abs(after - before) &gt; 1.0E-9D) {</b>
+<b class="nc">&nbsp;                data.setMeasurement(</b>
+&nbsp;                        momentumKey,
+&nbsp;                        after
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        setStoredGameTime(</b>
+&nbsp;                data,
+&nbsp;                decayAnchorKey,
+&nbsp;                currentGameTime
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return new AxisDecay(before, after);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void migrateDecayAnchorsFromV1(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        repairDecayAnchor(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.LAST_GOOD_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.GOOD_DECAY_ANCHOR_GAME_TIME
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        repairDecayAnchor(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.LAST_EVIL_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.EVIL_DECAY_ANCHOR_GAME_TIME
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        repairDecayAnchor(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.LAST_ORDER_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.ORDER_DECAY_ANCHOR_GAME_TIME
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        repairDecayAnchor(</b>
+&nbsp;                data,
+&nbsp;                RecognitionStatKeys.LAST_FREEDOM_DEED_GAME_TIME,
+&nbsp;                RecognitionStatKeys.FREEDOM_DECAY_ANCHOR_GAME_TIME
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean repairDecayAnchor(
+&nbsp;            RecognitionData data,
+&nbsp;            String lastDeedKey,
+&nbsp;            String decayAnchorKey
+&nbsp;    ) {
+<b class="fc">&nbsp;        long lastDeedTime = getStoredGameTime(</b>
+&nbsp;                data,
+&nbsp;                lastDeedKey
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        long decayAnchor = getStoredGameTime(</b>
+&nbsp;                data,
+&nbsp;                decayAnchorKey
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (decayAnchor &gt; 0L || lastDeedTime &lt;= 0L) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        setStoredGameTime(</b>
+&nbsp;                data,
+&nbsp;                decayAnchorKey,
+&nbsp;                lastDeedTime
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean repairEstablishedDirections(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="fc">&nbsp;        boolean changed = false;</b>
+&nbsp;
+<b class="fc">&nbsp;        String moralDirection = data.getString(</b>
+&nbsp;                RecognitionStatKeys.MORAL_ESTABLISHED_DIRECTION
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (moralDirection.isBlank()) {</b>
+<b class="fc">&nbsp;            String inferred = inferEstablishedDirection(</b>
+<b class="fc">&nbsp;                    getMomentum(</b>
+&nbsp;                            data,
+&nbsp;                            RecognitionStatKeys.GOOD_MOMENTUM
+&nbsp;                    ),
+<b class="fc">&nbsp;                    getMomentum(</b>
+&nbsp;                            data,
+&nbsp;                            RecognitionStatKeys.EVIL_MOMENTUM
+&nbsp;                    ),
+<b class="fc">&nbsp;                    MoralDirection.GOOD.id(),</b>
+<b class="fc">&nbsp;                    MoralDirection.EVIL.id()</b>
+&nbsp;            );
+&nbsp;
+<b class="pc">&nbsp;            if (!inferred.isBlank()) {</b>
+<b class="nc">&nbsp;                data.setString(</b>
+&nbsp;                        RecognitionStatKeys.MORAL_ESTABLISHED_DIRECTION,
+&nbsp;                        inferred
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String temperamentDirection = data.getString(</b>
+&nbsp;                RecognitionStatKeys.TEMPERAMENT_ESTABLISHED_DIRECTION
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (temperamentDirection.isBlank()) {</b>
+<b class="fc">&nbsp;            String inferred = inferEstablishedDirection(</b>
+<b class="fc">&nbsp;                    getMomentum(</b>
+&nbsp;                            data,
+&nbsp;                            RecognitionStatKeys.ORDER_MOMENTUM
+&nbsp;                    ),
+<b class="fc">&nbsp;                    getMomentum(</b>
+&nbsp;                            data,
+&nbsp;                            RecognitionStatKeys.FREEDOM_MOMENTUM
+&nbsp;                    ),
+<b class="fc">&nbsp;                    TemperamentDirection.ORDER.id(),</b>
+<b class="fc">&nbsp;                    TemperamentDirection.FREEDOM.id()</b>
+&nbsp;            );
+&nbsp;
+<b class="pc">&nbsp;            if (!inferred.isBlank()) {</b>
+<b class="nc">&nbsp;                data.setString(</b>
+&nbsp;                        RecognitionStatKeys.TEMPERAMENT_ESTABLISHED_DIRECTION,
+&nbsp;                        inferred
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String inferEstablishedDirection(
+&nbsp;            double firstMomentum,
+&nbsp;            double secondMomentum,
+&nbsp;            String firstDirectionId,
+&nbsp;            String secondDirectionId
+&nbsp;    ) {
+<b class="fc">&nbsp;        double first = sanitizeMomentum(firstMomentum);</b>
+<b class="fc">&nbsp;        double second = sanitizeMomentum(secondMomentum);</b>
+&nbsp;
+&nbsp;        String safeFirstId =
+<b class="pc">&nbsp;                firstDirectionId == null</b>
+<b class="nc">&nbsp;                        ? &quot;&quot;</b>
+<b class="fc">&nbsp;                        : firstDirectionId.trim();</b>
+&nbsp;
+&nbsp;        String safeSecondId =
+<b class="pc">&nbsp;                secondDirectionId == null</b>
+<b class="nc">&nbsp;                        ? &quot;&quot;</b>
+<b class="fc">&nbsp;                        : secondDirectionId.trim();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!safeFirstId.isBlank()</b>
+&nbsp;                &amp;&amp; first &gt;= ESTABLISHED_DIRECTION_MINIMUM
+&nbsp;                &amp;&amp; first &gt;= second + ESTABLISHED_DIRECTION_MARGIN) {
+<b class="nc">&nbsp;            return safeFirstId;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!safeSecondId.isBlank()</b>
+&nbsp;                &amp;&amp; second &gt;= ESTABLISHED_DIRECTION_MINIMUM
+&nbsp;                &amp;&amp; second &gt;= first + ESTABLISHED_DIRECTION_MARGIN) {
+<b class="nc">&nbsp;            return safeSecondId;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean repairAuthorityBaselines(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (data.getFlag(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .IDENTITY_HISTORY_AUTHORITY_BASELINE_INITIALIZED
+&nbsp;        )) {
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .HISTORY_OBSERVED_UNIQUE_SUBORDINATES_EMPOWERED,
+<b class="nc">&nbsp;                data.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .UNIQUE_SUBORDINATES_EMPOWERED
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .HISTORY_OBSERVED_MASS_GRANTS_PERFORMED,
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .MASS_GRANTS_PERFORMED
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .HISTORY_OBSERVED_GLOBAL_TAKE_BACKS_PERFORMED,
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .GLOBAL_TAKE_BACKS_PERFORMED
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .HISTORY_OBSERVED_SKILLS_SEIZED,
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .SKILLS_SEIZED
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setFlag(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .IDENTITY_HISTORY_AUTHORITY_BASELINE_INITIALIZED,
+&nbsp;                true
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static long safeAdd(
+&nbsp;            long first,
+&nbsp;            long second
+&nbsp;    ) {
+<b class="nc">&nbsp;        long safeFirst = Math.max(0L, first);</b>
+<b class="nc">&nbsp;        long safeSecond = Math.max(0L, second);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (safeFirst &gt; Long.MAX_VALUE - safeSecond) {</b>
+<b class="nc">&nbsp;            return Long.MAX_VALUE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return safeFirst + safeSecond;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int incrementVersionedCounter(
+&nbsp;            RecognitionData data,
+&nbsp;            String key
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MigrationResult migration = ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!migration.writable()) {</b>
+<b class="nc">&nbsp;            return data.getCounter(key);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return data.incrementCounter(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean repairPeak(
+&nbsp;            RecognitionData data,
+&nbsp;            String momentumKey,
+&nbsp;            String peakKey
+&nbsp;    ) {
+<b class="fc">&nbsp;        double momentum = getMomentum(data, momentumKey);</b>
+<b class="fc">&nbsp;        double peak = getMomentum(data, peakKey);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (peak + 1.0E-9D &gt;= momentum) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(peakKey, momentum);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static MigrationState determineMigrationState(
+&nbsp;            RecognitionData data,
+&nbsp;            int storedVersion
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (storedVersion &gt; CURRENT_HISTORY_VERSION) {</b>
+<b class="nc">&nbsp;            return MigrationState.FUTURE_VERSION;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (storedVersion == CURRENT_HISTORY_VERSION) {</b>
+<b class="nc">&nbsp;            return MigrationState.CURRENT;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (storedVersion &gt; 0) {</b>
+<b class="nc">&nbsp;            return MigrationState.LEGACY_VERSION;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (hasAnyHistoryPayload(data)) {</b>
+<b class="nc">&nbsp;            return MigrationState.UNVERSIONED_PAYLOAD;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return MigrationState.UNINITIALIZED;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasAnyHistoryPayload(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        return getMomentum(data, RecognitionStatKeys.GOOD_MOMENTUM) &gt; 0.0D</b>
+<b class="nc">&nbsp;                || getMomentum(data, RecognitionStatKeys.EVIL_MOMENTUM) &gt; 0.0D</b>
+<b class="nc">&nbsp;                || getMomentum(data, RecognitionStatKeys.ORDER_MOMENTUM) &gt; 0.0D</b>
+<b class="nc">&nbsp;                || getMomentum(data, RecognitionStatKeys.FREEDOM_MOMENTUM) &gt; 0.0D</b>
+<b class="nc">&nbsp;                || getMomentum(data, RecognitionStatKeys.HIGHEST_GOOD_COMMITMENT) &gt; 0.0D</b>
+<b class="nc">&nbsp;                || getMomentum(data, RecognitionStatKeys.HIGHEST_EVIL_COMMITMENT) &gt; 0.0D</b>
+<b class="nc">&nbsp;                || getMomentum(data, RecognitionStatKeys.HIGHEST_ORDER_COMMITMENT) &gt; 0.0D</b>
+<b class="nc">&nbsp;                || getMomentum(data, RecognitionStatKeys.HIGHEST_FREEDOM_COMMITMENT) &gt; 0.0D</b>
+<b class="nc">&nbsp;                || data.getCounter(RecognitionStatKeys.MORAL_REVERSAL_COUNT) &gt; 0</b>
+<b class="nc">&nbsp;                || data.getCounter(RecognitionStatKeys.TEMPERAMENT_REVERSAL_COUNT) &gt; 0</b>
+<b class="nc">&nbsp;                || getStoredGameTime(data, RecognitionStatKeys.LAST_GOOD_DEED_GAME_TIME) &gt; 0L</b>
+<b class="nc">&nbsp;                || getStoredGameTime(data, RecognitionStatKeys.LAST_EVIL_DEED_GAME_TIME) &gt; 0L</b>
+<b class="nc">&nbsp;                || getStoredGameTime(data, RecognitionStatKeys.LAST_ORDER_DEED_GAME_TIME) &gt; 0L</b>
+<b class="nc">&nbsp;                || getStoredGameTime(data, RecognitionStatKeys.LAST_FREEDOM_DEED_GAME_TIME) &gt; 0L</b>
+<b class="nc">&nbsp;                || !data.getString(RecognitionStatKeys.MORAL_ESTABLISHED_DIRECTION).isBlank()</b>
+<b class="nc">&nbsp;                || !data.getString(RecognitionStatKeys.TEMPERAMENT_ESTABLISHED_DIRECTION).isBlank()</b>
+<b class="nc">&nbsp;                || !data.getString(RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER).isBlank()</b>
+<b class="nc">&nbsp;                || !data.getString(RecognitionStatKeys.IDENTITY_HISTORY_MIGRATION_SOURCE).isBlank();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionIdentityHistorySnapshot invalidSnapshot() {
+<b class="nc">&nbsp;        return new RecognitionIdentityHistorySnapshot(</b>
+&nbsp;                0,
+&nbsp;                CURRENT_HISTORY_VERSION,
+&nbsp;                MigrationState.INVALID_DATA,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0,
+&nbsp;                0,
+&nbsp;                0L,
+&nbsp;                0L,
+&nbsp;                0L,
+&nbsp;                0L,
+<b class="nc">&nbsp;                RecognitionIdentityHistoryModifier.NONE.id(),</b>
+&nbsp;                &quot;&quot;,
+<b class="nc">&nbsp;                List.of(&quot;Recognition data is unavailable.&quot;)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double getMomentum(
+&nbsp;            RecognitionData data,
+&nbsp;            String key
+&nbsp;    ) {
+<b class="fc">&nbsp;        return sanitizeMomentum(data.getMeasurement(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeMomentum(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!Double.isFinite(value) || value &lt;= 0.0D) {</b>
+<b class="fc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(MAXIMUM_MOMENTUM, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeDeedWeight(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(value) || value &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(MAXIMUM_DEED_WEIGHT, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static long getStoredGameTime(
+&nbsp;            RecognitionData data,
+&nbsp;            String key
+&nbsp;    ) {
+<b class="fc">&nbsp;        String raw = data.getString(key);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (raw.isBlank()) {</b>
+<b class="fc">&nbsp;            return 0L;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return Math.max(0L, Long.parseLong(raw));</b>
+&nbsp;        } catch (NumberFormatException ignored) {
+<b class="nc">&nbsp;            return 0L;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void setStoredGameTime(
+&nbsp;            RecognitionData data,
+&nbsp;            String key,
+&nbsp;            long value
+&nbsp;    ) {
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                key,
+<b class="nc">&nbsp;                Long.toString(Math.max(0L, value))</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum MoralDirection {</b>
+<b class="fc">&nbsp;        GOOD(&quot;good&quot;),</b>
+<b class="fc">&nbsp;        EVIL(&quot;evil&quot;);</b>
+&nbsp;
+&nbsp;        private final String id;
+&nbsp;
+<b class="fc">&nbsp;        MoralDirection(String id) {</b>
+<b class="fc">&nbsp;            this.id = id;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String id() {
+<b class="fc">&nbsp;            return id;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum TemperamentDirection {</b>
+<b class="fc">&nbsp;        ORDER(&quot;order&quot;),</b>
+<b class="fc">&nbsp;        FREEDOM(&quot;freedom&quot;);</b>
+&nbsp;
+&nbsp;        private final String id;
+&nbsp;
+<b class="fc">&nbsp;        TemperamentDirection(String id) {</b>
+<b class="fc">&nbsp;            this.id = id;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String id() {
+<b class="fc">&nbsp;            return id;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum MigrationState {</b>
+<b class="nc">&nbsp;        UNINITIALIZED(&quot;uninitialized&quot;),</b>
+<b class="nc">&nbsp;        UNVERSIONED_PAYLOAD(&quot;unversioned payload&quot;),</b>
+<b class="nc">&nbsp;        LEGACY_VERSION(&quot;legacy history version&quot;),</b>
+<b class="nc">&nbsp;        CURRENT(&quot;current&quot;),</b>
+<b class="nc">&nbsp;        FUTURE_VERSION(&quot;future version preserved&quot;),</b>
+<b class="nc">&nbsp;        INVALID_DATA(&quot;invalid data&quot;);</b>
+&nbsp;
+&nbsp;        private final String displayName;
+&nbsp;
+<b class="nc">&nbsp;        MigrationState(String displayName) {</b>
+<b class="nc">&nbsp;            this.displayName = displayName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String displayName() {
+<b class="nc">&nbsp;            return displayName;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum MigrationResult {</b>
+<b class="fc">&nbsp;        INVALID_DATA(false),</b>
+<b class="fc">&nbsp;        FUTURE_VERSION_PRESERVED(false),</b>
+<b class="fc">&nbsp;        ALREADY_CURRENT(true),</b>
+<b class="fc">&nbsp;        REPAIRED_CURRENT(true),</b>
+<b class="fc">&nbsp;        INITIALIZED_NATIVE(true),</b>
+<b class="fc">&nbsp;        MIGRATED_FROM_UNVERSIONED(true),</b>
+<b class="fc">&nbsp;        MIGRATED_FROM_V1(true);</b>
+&nbsp;
+&nbsp;        private final boolean writable;
+&nbsp;
+<b class="fc">&nbsp;        MigrationResult(boolean writable) {</b>
+<b class="fc">&nbsp;            this.writable = writable;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean writable() {
+<b class="fc">&nbsp;            return writable;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record MutationResult(</b>
+&nbsp;            boolean applied,
+&nbsp;            String semanticDirection,
+&nbsp;            double appliedWeight,
+&nbsp;            double momentumBefore,
+&nbsp;            double momentumAfter,
+&nbsp;            double totalDecayApplied,
+&nbsp;            long gameTime,
+&nbsp;            String rejectionReason
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public MutationResult {</b>
+<b class="nc">&nbsp;            semanticDirection = semanticDirection == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : semanticDirection;</b>
+&nbsp;
+<b class="nc">&nbsp;            appliedWeight = applied</b>
+<b class="nc">&nbsp;                    ? sanitizeDeedWeight(appliedWeight)</b>
+<b class="nc">&nbsp;                    : 0.0D;</b>
+&nbsp;
+<b class="nc">&nbsp;            momentumBefore = sanitizeMomentum(momentumBefore);</b>
+<b class="nc">&nbsp;            momentumAfter = sanitizeMomentum(momentumAfter);</b>
+<b class="nc">&nbsp;            totalDecayApplied = Math.max(0.0D, totalDecayApplied);</b>
+<b class="nc">&nbsp;            gameTime = Math.max(0L, gameTime);</b>
+<b class="nc">&nbsp;            rejectionReason = rejectionReason == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : rejectionReason;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static MutationResult rejected(
+&nbsp;                String reason
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new MutationResult(</b>
+&nbsp;                    false,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    0.0D,
+&nbsp;                    0.0D,
+&nbsp;                    0.0D,
+&nbsp;                    0.0D,
+&nbsp;                    0L,
+&nbsp;                    reason
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record AxisDecay(</b>
+&nbsp;            double before,
+&nbsp;            double after
+&nbsp;    ) {
+&nbsp;        private double decayedAmount() {
+<b class="nc">&nbsp;            return Math.max(0.0D, before - after);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

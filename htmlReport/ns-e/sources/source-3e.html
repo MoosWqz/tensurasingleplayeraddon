@@ -1,0 +1,488 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionTitlePoolManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionTitlePoolManager (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionTitlePoolManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.1%
+  </span>
+  <span class="absValue">
+    (49/59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.1%
+  </span>
+  <span class="absValue">
+    (73/81)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionTitlePoolManager$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionTitlePoolManager$Snapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.1%
+  </span>
+  <span class="absValue">
+    (49/59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (88/96)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.EnumMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * Holds the immutable recognition-title snapshot produced by the most recent
+&nbsp; * server datapack reload.
+&nbsp; *
+&nbsp; * Reads are lock-free. The reload listener creates a completely new snapshot
+&nbsp; * and atomically publishes it through the volatile field.
+&nbsp; */
+&nbsp;public final class RecognitionTitlePoolManager {
+&nbsp;
+&nbsp;    public static final int MAX_TITLES_PER_POOL =
+&nbsp;            128;
+&nbsp;
+&nbsp;    private static volatile Snapshot currentSnapshot =
+<b class="fc">&nbsp;            Snapshot.fallbackOnly();</b>
+&nbsp;
+&nbsp;    private RecognitionTitlePoolManager() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;String&gt; getTitles(
+&nbsp;            RecognitionPath path,
+&nbsp;            boolean pure
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Snapshot snapshot =</b>
+&nbsp;                currentSnapshot;
+&nbsp;
+&nbsp;        List&lt;String&gt; titles =
+<b class="fc">&nbsp;                pure</b>
+<b class="fc">&nbsp;                        ? snapshot.pureTitles()</b>
+<b class="fc">&nbsp;                        .get(path)</b>
+<b class="fc">&nbsp;                        : snapshot.standardTitles()</b>
+<b class="fc">&nbsp;                        .get(path);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (titles == null || titles.isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of(</b>
+<b class="nc">&nbsp;                    getFallbackTitle(</b>
+&nbsp;                            path,
+&nbsp;                            pure
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return titles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int getLoadedSourceFileCount() {
+<b class="nc">&nbsp;        return currentSnapshot.sourceFileCount();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int getTitleCount(
+&nbsp;            RecognitionPath path,
+&nbsp;            boolean pure
+&nbsp;    ) {
+<b class="fc">&nbsp;        return getTitles(</b>
+&nbsp;                path,
+&nbsp;                pure
+<b class="fc">&nbsp;        ).size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int getTotalStandardTitleCount() {
+<b class="fc">&nbsp;        int total =</b>
+&nbsp;                0;
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="fc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="fc">&nbsp;            total += getTitleCount(</b>
+&nbsp;                    path,
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return total;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int getTotalPureTitleCount() {
+<b class="fc">&nbsp;        int total =</b>
+&nbsp;                0;
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="fc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="fc">&nbsp;            total += getTitleCount(</b>
+&nbsp;                    path,
+&nbsp;                    true
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return total;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Installs an entirely new immutable title snapshot.
+&nbsp;     *
+&nbsp;     * Package-private because only the server reload listener should replace
+&nbsp;     * the active datapack state.
+&nbsp;     */
+&nbsp;    static void install(
+&nbsp;            Map&lt;RecognitionPath, List&lt;String&gt;&gt; standardTitles,
+&nbsp;            Map&lt;RecognitionPath, List&lt;String&gt;&gt; pureTitles,
+&nbsp;            int sourceFileCount
+&nbsp;    ) {
+<b class="fc">&nbsp;        currentSnapshot =</b>
+<b class="fc">&nbsp;                Snapshot.create(</b>
+&nbsp;                        standardTitles,
+&nbsp;                        pureTitles,
+&nbsp;                        sourceFileCount
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Every recognition path retains a single failsafe title.
+&nbsp;     *
+&nbsp;     * These are not the normal title pools. They are only used when a path has
+&nbsp;     * no valid datapack title after a reload, such as when a pack contains a
+&nbsp;     * malformed or intentionally empty definition.
+&nbsp;     */
+&nbsp;    public static String getFallbackTitle(
+&nbsp;            RecognitionPath path,
+&nbsp;            boolean pure
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return pure</b>
+<b class="nc">&nbsp;                    ? &quot;the Ascendant&quot;</b>
+<b class="nc">&nbsp;                    : &quot;the Recognized&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        return switch (path) {</b>
+&nbsp;            case LAWFUL_GOOD -&gt;
+<b class="fc">&nbsp;                    pure</b>
+<b class="fc">&nbsp;                            ? &quot;the Radiant Sovereign&quot;</b>
+<b class="fc">&nbsp;                            : &quot;the Steadfast Guardian&quot;;</b>
+&nbsp;
+&nbsp;            case NEUTRAL_GOOD -&gt;
+<b class="fc">&nbsp;                    pure</b>
+<b class="fc">&nbsp;                            ? &quot;the Benevolent Saint&quot;</b>
+<b class="fc">&nbsp;                            : &quot;the Gentle Hand&quot;;</b>
+&nbsp;
+&nbsp;            case CHAOTIC_GOOD -&gt;
+<b class="fc">&nbsp;                    pure</b>
+<b class="fc">&nbsp;                            ? &quot;the Liberating Dawn&quot;</b>
+<b class="fc">&nbsp;                            : &quot;the Unbound Savior&quot;;</b>
+&nbsp;
+&nbsp;            case LAWFUL_NEUTRAL -&gt;
+<b class="fc">&nbsp;                    pure</b>
+<b class="fc">&nbsp;                            ? &quot;the Absolute Crown&quot;</b>
+<b class="fc">&nbsp;                            : &quot;the Crowned Will&quot;;</b>
+&nbsp;
+&nbsp;            case TRUE_NEUTRAL -&gt;
+<b class="fc">&nbsp;                    pure</b>
+<b class="fc">&nbsp;                            ? &quot;the Perfect Equilibrium&quot;</b>
+<b class="fc">&nbsp;                            : &quot;the Soul Ascendant&quot;;</b>
+&nbsp;
+&nbsp;            case CHAOTIC_NEUTRAL -&gt;
+<b class="fc">&nbsp;                    pure</b>
+<b class="fc">&nbsp;                            ? &quot;the Infinite Wanderer&quot;</b>
+<b class="fc">&nbsp;                            : &quot;the Unbound Seeker&quot;;</b>
+&nbsp;
+&nbsp;            case LAWFUL_EVIL -&gt;
+<b class="fc">&nbsp;                    pure</b>
+<b class="fc">&nbsp;                            ? &quot;the Eternal Tyrant&quot;</b>
+<b class="fc">&nbsp;                            : &quot;the Dread Sovereign&quot;;</b>
+&nbsp;
+&nbsp;            case NEUTRAL_EVIL -&gt;
+<b class="fc">&nbsp;                    pure</b>
+<b class="fc">&nbsp;                            ? &quot;the Supreme Usurper&quot;</b>
+<b class="fc">&nbsp;                            : &quot;the Ambitious One&quot;;</b>
+&nbsp;
+&nbsp;            case CHAOTIC_EVIL -&gt;
+<b class="fc">&nbsp;                    pure</b>
+<b class="fc">&nbsp;                            ? &quot;the End of Order&quot;</b>
+<b class="fc">&nbsp;                            : &quot;the Unchained Calamity&quot;;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;RecognitionPath, List&lt;String&gt;&gt;
+&nbsp;    sanitizePools(
+&nbsp;            Map&lt;RecognitionPath, List&lt;String&gt;&gt; source,
+&nbsp;            boolean pure
+&nbsp;    ) {
+<b class="fc">&nbsp;        EnumMap&lt;RecognitionPath, List&lt;String&gt;&gt; result =</b>
+&nbsp;                new EnumMap&lt;&gt;(
+&nbsp;                        RecognitionPath.class
+&nbsp;                );
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="fc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+&nbsp;            List&lt;String&gt; rawTitles =
+<b class="pc">&nbsp;                    source == null</b>
+<b class="nc">&nbsp;                            ? null</b>
+<b class="fc">&nbsp;                            : source.get(path);</b>
+&nbsp;
+<b class="fc">&nbsp;            List&lt;String&gt; safeTitles =</b>
+<b class="fc">&nbsp;                    sanitizeTitleList(</b>
+&nbsp;                            rawTitles
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            if (safeTitles.isEmpty()) {</b>
+<b class="fc">&nbsp;                safeTitles =</b>
+<b class="fc">&nbsp;                        List.of(</b>
+<b class="fc">&nbsp;                                getFallbackTitle(</b>
+&nbsp;                                        path,
+&nbsp;                                        pure
+&nbsp;                                )
+&nbsp;                        );
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            result.put(</b>
+&nbsp;                    path,
+&nbsp;                    safeTitles
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return Map.copyOf(</b>
+&nbsp;                result
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; sanitizeTitleList(
+&nbsp;            List&lt;String&gt; source
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (source == null || source.isEmpty()) {</b>
+<b class="fc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        LinkedHashSet&lt;String&gt; uniqueTitles =</b>
+&nbsp;                new LinkedHashSet&lt;&gt;();
+&nbsp;
+<b class="fc">&nbsp;        for (String rawTitle : source) {</b>
+<b class="fc">&nbsp;            String safeTitle =</b>
+&nbsp;                    RecognitionDisplayNameService
+<b class="fc">&nbsp;                            .sanitizeTitle(</b>
+&nbsp;                                    rawTitle
+&nbsp;                            );
+&nbsp;
+<b class="pc">&nbsp;            if (safeTitle.isBlank()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            uniqueTitles.add(</b>
+&nbsp;                    safeTitle
+&nbsp;            );
+&nbsp;
+<b class="pc">&nbsp;            if (uniqueTitles.size()</b>
+&nbsp;                    &gt;= MAX_TITLES_PER_POOL) {
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return List.copyOf(</b>
+&nbsp;                new ArrayList&lt;&gt;(
+&nbsp;                        uniqueTitles
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private record Snapshot(</b>
+&nbsp;            Map&lt;RecognitionPath, List&lt;String&gt;&gt; standardTitles,
+&nbsp;            Map&lt;RecognitionPath, List&lt;String&gt;&gt; pureTitles,
+&nbsp;            int sourceFileCount
+&nbsp;    ) {
+&nbsp;
+<b class="fc">&nbsp;        private Snapshot {</b>
+<b class="fc">&nbsp;            standardTitles =</b>
+<b class="fc">&nbsp;                    Map.copyOf(</b>
+&nbsp;                            standardTitles
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            pureTitles =</b>
+<b class="fc">&nbsp;                    Map.copyOf(</b>
+&nbsp;                            pureTitles
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            sourceFileCount =</b>
+<b class="fc">&nbsp;                    Math.max(</b>
+&nbsp;                            0,
+&nbsp;                            sourceFileCount
+&nbsp;                    );
+&nbsp;        }
+&nbsp;
+&nbsp;        private static Snapshot create(
+&nbsp;                Map&lt;RecognitionPath, List&lt;String&gt;&gt; standardTitles,
+&nbsp;                Map&lt;RecognitionPath, List&lt;String&gt;&gt; pureTitles,
+&nbsp;                int sourceFileCount
+&nbsp;        ) {
+<b class="fc">&nbsp;            return new Snapshot(</b>
+<b class="fc">&nbsp;                    sanitizePools(</b>
+&nbsp;                            standardTitles,
+&nbsp;                            false
+&nbsp;                    ),
+<b class="fc">&nbsp;                    sanitizePools(</b>
+&nbsp;                            pureTitles,
+&nbsp;                            true
+&nbsp;                    ),
+&nbsp;                    sourceFileCount
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private static Snapshot fallbackOnly() {
+<b class="fc">&nbsp;            return create(</b>
+<b class="fc">&nbsp;                    Map.of(),</b>
+<b class="fc">&nbsp;                    Map.of(),</b>
+&nbsp;                    0
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

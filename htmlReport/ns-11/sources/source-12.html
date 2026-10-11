@@ -1,0 +1,251 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SubordinateOverviewPolicy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: SubordinateOverviewPolicy (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SubordinateOverviewPolicy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SubordinateOverviewPolicy$Candidate</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;public final class SubordinateOverviewPolicy {
+&nbsp;
+&nbsp;    public static final double NEARBY_RADIUS = 64.0D;
+&nbsp;    public static final int MAX_TARGETS_PER_PAYLOAD = 512;
+&nbsp;    public static final int MAX_SKILLS_PER_TARGET = 512;
+&nbsp;    public static final int AUTO_REFRESH_TICKS = 100;
+&nbsp;    public static final long MINIMUM_REFRESH_INTERVAL_NANOS =
+&nbsp;            500_000_000L;
+&nbsp;
+&nbsp;    private SubordinateOverviewPolicy() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String normalizeQuery(
+&nbsp;            String query
+&nbsp;    ) {
+<b class="nc">&nbsp;        return query == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : query.trim().toLowerCase(Locale.ROOT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean matchesTarget(
+&nbsp;            String query,
+&nbsp;            String targetName,
+&nbsp;            String typeName,
+&nbsp;            List&lt;String&gt; skillSearchTexts
+&nbsp;    ) {
+<b class="nc">&nbsp;        String normalized = normalizeQuery(query);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (normalized.isBlank()) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (contains(targetName, normalized)</b>
+<b class="nc">&nbsp;                || contains(typeName, normalized)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (skillSearchTexts == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (String searchText : skillSearchTexts) {</b>
+<b class="nc">&nbsp;            if (contains(searchText, normalized)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Comparator&lt;Candidate&gt; candidateOrder() {
+<b class="nc">&nbsp;        return Comparator</b>
+<b class="nc">&nbsp;                .comparingDouble(Candidate::distanceSquared)</b>
+<b class="nc">&nbsp;                .thenComparing(</b>
+&nbsp;                        Candidate::displayName,
+&nbsp;                        String.CASE_INSENSITIVE_ORDER
+&nbsp;                )
+<b class="nc">&nbsp;                .thenComparing(Candidate::uuid);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean contains(
+&nbsp;            String value,
+&nbsp;            String normalizedQuery
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value != null</b>
+<b class="nc">&nbsp;                &amp;&amp; value.toLowerCase(Locale.ROOT)</b>
+<b class="nc">&nbsp;                .contains(normalizedQuery);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Candidate(</b>
+&nbsp;            String uuid,
+&nbsp;            String displayName,
+&nbsp;            double distanceSquared
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public Candidate {</b>
+<b class="nc">&nbsp;            uuid = uuid == null ? &quot;&quot; : uuid;</b>
+<b class="nc">&nbsp;            displayName = displayName == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : displayName;</b>
+<b class="nc">&nbsp;            distanceSquared = Double.isFinite(distanceSquared)</b>
+<b class="nc">&nbsp;                    &amp;&amp; distanceSquared &gt;= 0.0D</b>
+<b class="nc">&nbsp;                    ? distanceSquared</b>
+<b class="nc">&nbsp;                    : Double.MAX_VALUE;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

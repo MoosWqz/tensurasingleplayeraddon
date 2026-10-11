@@ -1,0 +1,987 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionProgressionEvents</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.event</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionProgressionEvents (com.mooswqz.moostensuraaddon.event)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionProgressionEvents</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (8/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20.3%
+  </span>
+  <span class="absValue">
+    (26/128)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.1%
+  </span>
+  <span class="absValue">
+    (79/232)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.event;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.CureAttributionData;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.CivilianDefenseTracker;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionAuthorityProgress;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionAttributionPolicy;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatAttribution.CombatCredit;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatCreditTracker;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionEntityTags;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionIdentityHistoryIntegration;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionIndependenceProgress;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionStatKeys;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionStrengthRewardService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionSubordinateCombatTracker;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionSubordinateSupport;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.TensuraRecognitionStateHelper;
+&nbsp;import net.minecraft.core.registries.BuiltInRegistries;
+&nbsp;import net.minecraft.resources.ResourceKey;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.level.ServerLevel;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.stats.Stats;
+&nbsp;import net.minecraft.world.effect.MobEffects;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;import net.minecraft.world.entity.TamableAnimal;
+&nbsp;import net.minecraft.world.entity.monster.ZombieVillager;
+&nbsp;import net.minecraft.world.entity.npc.Villager;
+&nbsp;import net.minecraft.world.item.Items;
+&nbsp;import net.minecraft.world.level.Level;
+&nbsp;import net.neoforged.bus.api.EventPriority;
+&nbsp;import net.neoforged.bus.api.SubscribeEvent;
+&nbsp;import net.neoforged.fml.common.EventBusSubscriber;
+&nbsp;import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
+&nbsp;import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
+&nbsp;import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+&nbsp;import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+&nbsp;import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
+&nbsp;import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+&nbsp;import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+&nbsp;import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;@EventBusSubscriber(modid = MoosTensuraAddon.MODID)
+&nbsp;public final class RecognitionProgressionEvents {
+&nbsp;
+&nbsp;    private static final int STATE_SYNC_INTERVAL_TICKS = 40;
+&nbsp;
+&nbsp;    private RecognitionProgressionEvents() {
+&nbsp;    }
+&nbsp;
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onPlayerLoggedIn(
+&nbsp;            PlayerEvent.PlayerLoggedInEvent event
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!(event.getEntity()</b>
+<b class="fc">&nbsp;                instanceof ServerPlayer player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionIndependenceProgress.synchronize(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionIdentityHistoryIntegration</b>
+<b class="fc">&nbsp;                .synchronizeAuthorityCounters(</b>
+&nbsp;                        data,
+<b class="fc">&nbsp;                        getOverworldGameTime(</b>
+&nbsp;                                player
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionStrengthRewardService.reconcile(</b>
+&nbsp;                player
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onPlayerRespawned(
+&nbsp;            PlayerEvent.PlayerRespawnEvent event
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!(event.getEntity()</b>
+<b class="nc">&nbsp;                instanceof ServerPlayer player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionStrengthRewardService.reconcile(</b>
+&nbsp;                player
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onAdvancementEarned(
+&nbsp;            AdvancementEvent.AdvancementEarnEvent event
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!(event.getEntity()</b>
+<b class="nc">&nbsp;                instanceof ServerPlayer player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIndependenceProgress.recordEarned(</b>
+&nbsp;                player,
+<b class="nc">&nbsp;                event.getAdvancement()</b>
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onPlayerTick(
+&nbsp;            PlayerTickEvent.Post event
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (!(event.getEntity()</b>
+<b class="fc">&nbsp;                instanceof ServerPlayer player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (player.level().isClientSide()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (player.tickCount</b>
+&nbsp;                % STATE_SYNC_INTERVAL_TICKS != 0) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        data.setCounterMaximum(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_EXPERIENCE_LEVEL,
+&nbsp;                player.experienceLevel
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        recordDimensionMilestone(</b>
+&nbsp;                player,
+&nbsp;                data,
+<b class="fc">&nbsp;                player.level().dimension()</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        synchronizeRaidVictories(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionIndependenceProgress.synchronize(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        TensuraRecognitionStateHelper.synchronize(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionAuthorityProgress.synchronize(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionIdentityHistoryIntegration</b>
+<b class="fc">&nbsp;                .synchronizeAuthorityCounters(</b>
+&nbsp;                        data,
+<b class="fc">&nbsp;                        getOverworldGameTime(</b>
+&nbsp;                                player
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionStrengthRewardService.reconcile(</b>
+&nbsp;                player
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionSubordinateCombatTracker.cleanup(</b>
+<b class="fc">&nbsp;                getOverworldGameTime(player)</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionCombatCreditTracker.cleanup(</b>
+<b class="fc">&nbsp;                player.getServer()</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        CivilianDefenseTracker.cleanup(</b>
+<b class="fc">&nbsp;                player.getServer()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onPlayerChangedDimension(
+&nbsp;            PlayerEvent.PlayerChangedDimensionEvent event
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!(event.getEntity()</b>
+<b class="nc">&nbsp;                instanceof ServerPlayer player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        recordDimensionMilestone(</b>
+&nbsp;                player,
+&nbsp;                data,
+<b class="nc">&nbsp;                event.getTo()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        synchronizeRaidVictories(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIndependenceProgress.synchronize(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        TensuraRecognitionStateHelper.synchronize(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionAuthorityProgress.synchronize(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration</b>
+<b class="nc">&nbsp;                .synchronizeAuthorityCounters(</b>
+&nbsp;                        data,
+<b class="nc">&nbsp;                        getOverworldGameTime(</b>
+&nbsp;                                player
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionStrengthRewardService.reconcile(</b>
+&nbsp;                player
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Records who began a valid zombie-villager cure.
+&nbsp;     *
+&nbsp;     * The interaction event runs before vanilla performs the interaction.
+&nbsp;     * We therefore only arm attribution when the vanilla cure prerequisites
+&nbsp;     * are already present.
+&nbsp;     */
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onEntityInteract(
+&nbsp;            PlayerInteractEvent.EntityInteract event
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (!(event.getEntity()</b>
+<b class="fc">&nbsp;                instanceof ServerPlayer player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (event.getLevel().isClientSide()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!(event.getTarget()</b>
+<b class="fc">&nbsp;                instanceof ZombieVillager zombieVillager)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!event.getItemStack().is(</b>
+&nbsp;                Items.GOLDEN_APPLE
+&nbsp;        )) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!zombieVillager.hasEffect(</b>
+&nbsp;                MobEffects.WEAKNESS
+&nbsp;        )) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (zombieVillager.isConverting()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CureAttributionData attribution =</b>
+<b class="nc">&nbsp;                zombieVillager.getData(</b>
+&nbsp;                        AttachmentRegistry
+&nbsp;                                .CURE_ATTRIBUTION_DATA
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        attribution.arm(</b>
+<b class="nc">&nbsp;                player.getUUID(),</b>
+<b class="nc">&nbsp;                player.level().getGameTime()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Awards the cure only when a zombie villager genuinely becomes a
+&nbsp;     * villager.
+&nbsp;     */
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onLivingConverted(
+&nbsp;            LivingConversionEvent.Post event
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!(event.getEntity()</b>
+<b class="nc">&nbsp;                instanceof ZombieVillager zombieVillager)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!(event.getOutcome()</b>
+&nbsp;                instanceof Villager)) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!(zombieVillager.level()</b>
+<b class="nc">&nbsp;                instanceof ServerLevel serverLevel)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CureAttributionData attribution =</b>
+<b class="nc">&nbsp;                zombieVillager.getData(</b>
+&nbsp;                        AttachmentRegistry
+&nbsp;                                .CURE_ATTRIBUTION_DATA
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;UUID&gt; starterUuid =</b>
+<b class="nc">&nbsp;                attribution.getStarterUuid();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (starterUuid.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ServerPlayer player = serverLevel</b>
+<b class="nc">&nbsp;                .getServer()</b>
+<b class="nc">&nbsp;                .getPlayerList()</b>
+<b class="nc">&nbsp;                .getPlayer(starterUuid.orElseThrow());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (player == null) {</b>
+&nbsp;            /*
+&nbsp;             * In the addon&#39;s primary singleplayer use case, the integrated
+&nbsp;             * server pauses/stops with the player, so the starter is normally
+&nbsp;             * online when conversion completes.
+&nbsp;             */
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.incrementCounter(</b>
+&nbsp;                RecognitionStatKeys.VILLAGERS_CURED
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryIntegration
+&nbsp;                        .TrackedDeed
+&nbsp;                        .VILLAGER_CURED,
+<b class="nc">&nbsp;                getOverworldGameTime(player)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        attribution.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onLivingChangedTarget(
+&nbsp;            LivingChangeTargetEvent event
+&nbsp;    ) {
+<b class="nc">&nbsp;        LivingEntity aggressor = event.getEntity();</b>
+&nbsp;
+<b class="nc">&nbsp;        LivingEntity newTarget =</b>
+<b class="nc">&nbsp;                event.getNewAboutToBeSetTarget();</b>
+&nbsp;
+<b class="nc">&nbsp;        CivilianDefenseTracker.recordTargetChange(</b>
+&nbsp;                aggressor,
+&nbsp;                newTarget
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Records only damage that actually reduced health. */
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onLivingDamageApplied(
+&nbsp;            LivingDamageEvent.Post event
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (event.getNewDamage() &lt;= 0.0F) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        LivingEntity victim = event.getEntity();</b>
+&nbsp;
+<b class="fc">&nbsp;        RecognitionCombatCreditTracker.recordIncomingDamage(</b>
+&nbsp;                victim,
+<b class="fc">&nbsp;                event.getSource()</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionSubordinateCombatTracker.recordIncomingDamage(</b>
+&nbsp;                victim,
+<b class="fc">&nbsp;                event.getSource()</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        if (CivilianDefenseTracker.isCivilian(victim)) {</b>
+<b class="fc">&nbsp;            CivilianDefenseTracker.recordCivilianDamage(</b>
+&nbsp;                    victim,
+<b class="fc">&nbsp;                    event.getSource()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @SubscribeEvent(priority = EventPriority.LOWEST)
+&nbsp;    public static void onLivingDeath(
+&nbsp;            LivingDeathEvent event
+&nbsp;    ) {
+<b class="fc">&nbsp;        LivingEntity victim = event.getEntity();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (victim.level().isClientSide()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        ServerPlayer victimSubordinateOwner =</b>
+<b class="fc">&nbsp;                RecognitionSubordinateSupport.findOnlineOwner(</b>
+&nbsp;                        victim
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        Set&lt;UUID&gt; subordinateParticipants =</b>
+&nbsp;                RecognitionSubordinateCombatTracker
+<b class="fc">&nbsp;                        .consumeParticipants(victim);</b>
+&nbsp;
+&nbsp;        RecognitionCombatCreditTracker.DeathResolution
+<b class="fc">&nbsp;                deathResolution =</b>
+<b class="fc">&nbsp;                RecognitionCombatCreditTracker.consumeDeath(</b>
+&nbsp;                        victim,
+<b class="fc">&nbsp;                        event.getSource()</b>
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (deathResolution.duplicateSuppressed()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Optional&lt;CombatCredit&gt; optionalCredit =</b>
+<b class="fc">&nbsp;                deathResolution.credit();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (optionalCredit.isEmpty()) {</b>
+<b class="fc">&nbsp;            RecognitionSubordinateCombatTracker.forget(</b>
+&nbsp;                    victim
+&nbsp;            );
+&nbsp;
+<b class="pc">&nbsp;            if (victimSubordinateOwner != null) {</b>
+<b class="nc">&nbsp;                RecognitionAuthorityProgress.removeDeadSubordinate(</b>
+&nbsp;                        victimSubordinateOwner,
+<b class="nc">&nbsp;                        victim.getUUID()</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            CivilianDefenseTracker.forget(victim);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CombatCredit credit =</b>
+<b class="nc">&nbsp;                optionalCredit.orElseThrow();</b>
+&nbsp;
+<b class="nc">&nbsp;        ServerPlayer responsiblePlayer =</b>
+<b class="nc">&nbsp;                credit.player();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (responsiblePlayer == victim) {</b>
+<b class="nc">&nbsp;            RecognitionSubordinateCombatTracker.forget(</b>
+&nbsp;                    victim
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            if (victimSubordinateOwner != null) {</b>
+<b class="nc">&nbsp;                RecognitionAuthorityProgress.removeDeadSubordinate(</b>
+&nbsp;                        victimSubordinateOwner,
+<b class="nc">&nbsp;                        victim.getUUID()</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            CivilianDefenseTracker.forget(victim);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            if (victim.getType().is(</b>
+&nbsp;                    RecognitionEntityTags.IGNORED
+&nbsp;            )) {
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            RecognitionData data =</b>
+<b class="nc">&nbsp;                    responsiblePlayer.getData(</b>
+&nbsp;                            AttachmentRegistry
+&nbsp;                                    .RECOGNITION_DATA
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            ResourceLocation entityTypeId =</b>
+&nbsp;                    BuiltInRegistries.ENTITY_TYPE
+<b class="nc">&nbsp;                            .getKey(victim.getType());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (entityTypeId == null) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String entityTypeString =</b>
+<b class="nc">&nbsp;                    entityTypeId.toString();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (CivilianDefenseTracker.consumeDefense(</b>
+&nbsp;                    victim,
+&nbsp;                    responsiblePlayer
+&nbsp;            )) {
+<b class="nc">&nbsp;                data.incrementCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .CIVILIANS_DEFENDED
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionIdentityHistoryIntegration
+&nbsp;                                .TrackedDeed
+&nbsp;                                .CIVILIAN_DEFENDED,
+<b class="nc">&nbsp;                        getOverworldGameTime(</b>
+&nbsp;                                responsiblePlayer
+&nbsp;                        )
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (victim.getType().is(</b>
+&nbsp;                    RecognitionEntityTags.MAJOR_ENEMIES
+&nbsp;            )) {
+<b class="nc">&nbsp;                data.addUniqueValue(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .MAJOR_ENEMY_TYPES_DEFEATED,
+&nbsp;                        entityTypeString
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                if (credit.isSoloPlayerAction()) {</b>
+<b class="nc">&nbsp;                    boolean newSoloType =</b>
+<b class="nc">&nbsp;                            data.addUniqueValue(</b>
+&nbsp;                                    RecognitionStatKeys
+&nbsp;                                            .SOLO_MAJOR_ENEMY_TYPES_DEFEATED,
+&nbsp;                                    entityTypeString
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;                    if (newSoloType) {</b>
+<b class="nc">&nbsp;                        RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                                data,
+&nbsp;                                RecognitionIdentityHistoryIntegration
+&nbsp;                                        .TrackedDeed
+&nbsp;                                        .SOLO_MAJOR_VICTORY,
+<b class="nc">&nbsp;                                getOverworldGameTime(</b>
+&nbsp;                                        responsiblePlayer
+&nbsp;                                )
+&nbsp;                        );
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (subordinateParticipants.contains(</b>
+<b class="nc">&nbsp;                        responsiblePlayer.getUUID()</b>
+&nbsp;                )) {
+<b class="nc">&nbsp;                    data.incrementCounter(</b>
+&nbsp;                            RecognitionStatKeys
+&nbsp;                                    .SUBORDINATE_ASSISTED_MAJOR_VICTORIES
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                            data,
+&nbsp;                            RecognitionIdentityHistoryIntegration
+&nbsp;                                    .TrackedDeed
+&nbsp;                                    .SUBORDINATE_ASSISTED_MAJOR_VICTORY,
+<b class="nc">&nbsp;                            getOverworldGameTime(</b>
+&nbsp;                                    responsiblePlayer
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            RecognitionAttributionPolicy.NegativeDeed negativeDeed =</b>
+<b class="nc">&nbsp;                    RecognitionAttributionPolicy.classifyNegativeDeed(</b>
+&nbsp;                            victimSubordinateOwner != null
+<b class="nc">&nbsp;                                    &amp;&amp; victimSubordinateOwner.getUUID().equals(</b>
+<b class="nc">&nbsp;                                    responsiblePlayer.getUUID()</b>
+&nbsp;                            ),
+<b class="nc">&nbsp;                            isOwnedCompanion(</b>
+&nbsp;                                    victim,
+&nbsp;                                    responsiblePlayer
+&nbsp;                            ),
+<b class="nc">&nbsp;                            CivilianDefenseTracker.isCivilian(victim),</b>
+<b class="nc">&nbsp;                            victim.getType().is(</b>
+&nbsp;                                    RecognitionEntityTags.BENEVOLENT_BOSSES
+&nbsp;                            ),
+<b class="nc">&nbsp;                            victim.isBaby()</b>
+<b class="nc">&nbsp;                                    &amp;&amp; victim.getType().is(</b>
+&nbsp;                                    RecognitionEntityTags.BABY_KILL_MORALITY
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;
+&nbsp;            /* Exactly one highest-priority negative deed is applied. */
+<b class="nc">&nbsp;            if (negativeDeed</b>
+&nbsp;                    == RecognitionAttributionPolicy.NegativeDeed
+&nbsp;                    .OWNED_SUBORDINATE_KILLED) {
+<b class="nc">&nbsp;                data.incrementCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .OWNED_SUBORDINATE_KILLS
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionIdentityHistoryIntegration
+&nbsp;                                .TrackedDeed
+&nbsp;                                .OWNED_SUBORDINATE_KILLED,
+<b class="nc">&nbsp;                        getOverworldGameTime(</b>
+&nbsp;                                responsiblePlayer
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (negativeDeed</b>
+&nbsp;                    == RecognitionAttributionPolicy.NegativeDeed
+&nbsp;                    .OWNED_COMPANION_KILLED) {
+<b class="nc">&nbsp;                data.incrementCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .OWNED_COMPANION_KILLS
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionIdentityHistoryIntegration
+&nbsp;                                .TrackedDeed
+&nbsp;                                .OWNED_COMPANION_KILLED,
+<b class="nc">&nbsp;                        getOverworldGameTime(</b>
+&nbsp;                                responsiblePlayer
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (negativeDeed</b>
+&nbsp;                    == RecognitionAttributionPolicy.NegativeDeed
+&nbsp;                    .CIVILIAN_KILLED) {
+<b class="nc">&nbsp;                data.incrementCounter(</b>
+&nbsp;                        RecognitionStatKeys.CIVILIAN_KILLS
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionIdentityHistoryIntegration
+&nbsp;                                .TrackedDeed
+&nbsp;                                .CIVILIAN_KILLED,
+<b class="nc">&nbsp;                        getOverworldGameTime(</b>
+&nbsp;                                responsiblePlayer
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (negativeDeed</b>
+&nbsp;                    == RecognitionAttributionPolicy.NegativeDeed
+&nbsp;                    .BENEVOLENT_BOSS_KILLED) {
+<b class="nc">&nbsp;                boolean newBenevolentBossType =</b>
+<b class="nc">&nbsp;                        data.addUniqueValue(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .BENEVOLENT_BOSS_TYPES_KILLED,
+&nbsp;                                entityTypeString
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;                if (newBenevolentBossType) {</b>
+<b class="nc">&nbsp;                    RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                            data,
+&nbsp;                            RecognitionIdentityHistoryIntegration
+&nbsp;                                    .TrackedDeed
+&nbsp;                                    .BENEVOLENT_BOSS_KILLED,
+<b class="nc">&nbsp;                            getOverworldGameTime(</b>
+&nbsp;                                    responsiblePlayer
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;                }
+&nbsp;
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (negativeDeed</b>
+&nbsp;                    == RecognitionAttributionPolicy.NegativeDeed
+&nbsp;                    .PASSIVE_BABY_KILLED) {
+<b class="nc">&nbsp;                data.incrementCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .PASSIVE_BABY_KILLS
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionIdentityHistoryIntegration
+&nbsp;                                .TrackedDeed
+&nbsp;                                .PASSIVE_BABY_KILLED,
+<b class="nc">&nbsp;                        getOverworldGameTime(</b>
+&nbsp;                                responsiblePlayer
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (victim.getType().is(</b>
+&nbsp;                    RecognitionEntityTags
+&nbsp;                            .MALEVOLENT_BOSSES
+&nbsp;            )) {
+<b class="nc">&nbsp;                boolean newMalevolentBossType =</b>
+<b class="nc">&nbsp;                        data.addUniqueValue(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .MALEVOLENT_BOSS_TYPES_DEFEATED,
+&nbsp;                                entityTypeString
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;                if (newMalevolentBossType) {</b>
+<b class="nc">&nbsp;                    RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                            data,
+&nbsp;                            RecognitionIdentityHistoryIntegration
+&nbsp;                                    .TrackedDeed
+&nbsp;                                    .MALEVOLENT_BOSS_DEFEATED,
+<b class="nc">&nbsp;                            getOverworldGameTime(</b>
+&nbsp;                                    responsiblePlayer
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } finally {
+<b class="nc">&nbsp;            RecognitionSubordinateCombatTracker.forget(</b>
+&nbsp;                    victim
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            if (victimSubordinateOwner != null) {</b>
+<b class="nc">&nbsp;                RecognitionAuthorityProgress.removeDeadSubordinate(</b>
+&nbsp;                        victimSubordinateOwner,
+<b class="nc">&nbsp;                        victim.getUUID()</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            CivilianDefenseTracker.forget(victim);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void synchronizeRaidVictories(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="fc">&nbsp;        int vanillaRaidWins = player</b>
+<b class="fc">&nbsp;                .getStats()</b>
+<b class="fc">&nbsp;                .getValue(</b>
+<b class="fc">&nbsp;                        Stats.CUSTOM.get(</b>
+&nbsp;                                Stats.RAID_WIN
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        int storedRaidWins = data.getCounter(</b>
+&nbsp;                RecognitionStatKeys.RAID_VICTORIES
+&nbsp;        );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Maximum preserves recognition history even if a command or external
+&nbsp;         * tool later resets the player&#39;s vanilla statistics.
+&nbsp;         */
+<b class="fc">&nbsp;        data.setCounterMaximum(</b>
+&nbsp;                RecognitionStatKeys.RAID_VICTORIES,
+&nbsp;                vanillaRaidWins
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        int newRaidVictories = Math.max(</b>
+&nbsp;                0,
+&nbsp;                vanillaRaidWins - storedRaidWins
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (newRaidVictories &gt; 0) {</b>
+<b class="nc">&nbsp;            RecognitionIdentityHistoryIntegration.recordOccurrences(</b>
+&nbsp;                    data,
+&nbsp;                    RecognitionIdentityHistoryIntegration
+&nbsp;                            .TrackedDeed
+&nbsp;                            .RAID_VICTORY,
+&nbsp;                    newRaidVictories,
+<b class="nc">&nbsp;                    getOverworldGameTime(player)</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isOwnedCompanion(
+&nbsp;            LivingEntity victim,
+&nbsp;            ServerPlayer responsiblePlayer
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!(victim</b>
+<b class="nc">&nbsp;                instanceof TamableAnimal tamableAnimal)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        UUID ownerUuid =</b>
+<b class="nc">&nbsp;                tamableAnimal.getOwnerUUID();</b>
+&nbsp;
+<b class="nc">&nbsp;        return ownerUuid != null</b>
+<b class="nc">&nbsp;                &amp;&amp; ownerUuid.equals(</b>
+<b class="nc">&nbsp;                responsiblePlayer.getUUID()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void recordDimensionMilestone(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData data,
+&nbsp;            ResourceKey&lt;Level&gt; dimension
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null</b>
+&nbsp;                || data == null
+&nbsp;                || dimension == null) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String milestoneId = &quot;&quot;;</b>
+&nbsp;
+<b class="pc">&nbsp;        if (Level.NETHER.equals(dimension)) {</b>
+<b class="nc">&nbsp;            milestoneId = &quot;minecraft:entered_nether&quot;;</b>
+<b class="pc">&nbsp;        } else if (Level.END.equals(dimension)) {</b>
+<b class="nc">&nbsp;            milestoneId = &quot;minecraft:entered_end&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (milestoneId.isBlank()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean newlyRecorded =</b>
+<b class="nc">&nbsp;                data.addUniqueValue(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .DISCOVERY_MILESTONES,
+&nbsp;                        milestoneId
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (newlyRecorded) {</b>
+<b class="nc">&nbsp;            RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                    data,
+&nbsp;                    RecognitionIdentityHistoryIntegration
+&nbsp;                            .TrackedDeed
+&nbsp;                            .DISCOVERY_MILESTONE,
+<b class="nc">&nbsp;                    getOverworldGameTime(player)</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static long getOverworldGameTime(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return 0L;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (player.getServer() != null) {</b>
+<b class="fc">&nbsp;            return Math.max(</b>
+&nbsp;                    0L,
+<b class="fc">&nbsp;                    player.getServer()</b>
+<b class="fc">&nbsp;                            .overworld()</b>
+<b class="fc">&nbsp;                            .getGameTime()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.max(</b>
+&nbsp;                0L,
+<b class="nc">&nbsp;                player.level()</b>
+<b class="nc">&nbsp;                        .getGameTime()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

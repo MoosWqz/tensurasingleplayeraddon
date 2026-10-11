@@ -1,0 +1,1545 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionNamingRitualManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.ritual</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionNamingRitualManager (com.mooswqz.moostensuraaddon.ritual)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionNamingRitualManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    29.2%
+  </span>
+  <span class="absValue">
+    (7/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.9%
+  </span>
+  <span class="absValue">
+    (9/131)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.7%
+  </span>
+  <span class="absValue">
+    (31/356)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionNamingRitualManager$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionNamingRitualManager$CommitmentResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionNamingRitualManager$RitualState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    23.3%
+  </span>
+  <span class="absValue">
+    (7/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.9%
+  </span>
+  <span class="absValue">
+    (9/131)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.1%
+  </span>
+  <span class="absValue">
+    (31/383)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.ritual;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.block.BlockRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.block.GreatCrystalAltarBlock;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.RecognitionNativeEndowmentService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.*;
+&nbsp;import com.mooswqz.moostensuraaddon.util.AddonAdvancementHelper;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.core.BlockPos;
+&nbsp;import net.minecraft.core.particles.ParticleTypes;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.resources.ResourceKey;
+&nbsp;import net.minecraft.server.level.ServerLevel;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.sounds.SoundEvents;
+&nbsp;import net.minecraft.sounds.SoundSource;
+&nbsp;import net.minecraft.world.effect.MobEffectInstance;
+&nbsp;import net.minecraft.world.effect.MobEffects;
+&nbsp;import net.minecraft.world.entity.Pose;
+&nbsp;import net.minecraft.world.level.Level;
+&nbsp;import net.minecraft.world.level.block.state.BlockState;
+&nbsp;import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+&nbsp;import net.minecraft.world.phys.Vec3;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;public final class RecognitionNamingRitualManager {
+&nbsp;
+&nbsp;    private static final Map&lt;UUID, RitualState&gt;
+<b class="fc">&nbsp;            ACTIVE_RITUALS =</b>
+&nbsp;            new HashMap&lt;&gt;();
+&nbsp;
+&nbsp;    private static final int RITUAL_DURATION_TICKS =
+&nbsp;            20 * 15;
+&nbsp;
+&nbsp;    private static final int DARKNESS_REFRESH_INTERVAL_TICKS =
+&nbsp;            20;
+&nbsp;
+<b class="fc">&nbsp;    private static final Component[] PHASE_MESSAGES =</b>
+&nbsp;            new Component[]{
+<b class="fc">&nbsp;                    Component.literal(</b>
+&nbsp;                            &quot;The crystal reaches toward the shape of your soul...&quot;
+&nbsp;                    ),
+<b class="fc">&nbsp;                    Component.literal(</b>
+&nbsp;                            &quot;Your deeds gather into a single answer...&quot;
+&nbsp;                    ),
+<b class="fc">&nbsp;                    Component.literal(</b>
+&nbsp;                            &quot;The answer settles beyond the reach of change...&quot;
+&nbsp;                    ),
+<b class="fc">&nbsp;                    Component.literal(</b>
+&nbsp;                            &quot;A name begins to anchor itself to your existence...&quot;
+&nbsp;                    ),
+<b class="fc">&nbsp;                    Component.literal(</b>
+&nbsp;                            &quot;The world prepares to bear witness...&quot;
+&nbsp;                    )
+&nbsp;            };
+&nbsp;
+&nbsp;    private RecognitionNamingRitualManager() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true while the altar should treat the player as a naming
+&nbsp;     * candidate rather than forwarding them to the Great Sage ritual.
+&nbsp;     */
+&nbsp;    public static boolean shouldHandleNaming(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionData data =</b>
+<b class="fc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (hasPendingReveal(player)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return !data.isNamingCommitted();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A committed reveal is resumed before either normal altar flow. This
+&nbsp;     * preserves the already-fixed result across updates and interruptions.
+&nbsp;     */
+&nbsp;    public static boolean hasPendingReveal(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionData data =</b>
+<b class="fc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        return data.isNamingCommitted()</b>
+<b class="fc">&nbsp;                &amp;&amp; data.getFlag(</b>
+&nbsp;                RecognitionStatKeys.REVEAL_PENDING
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void tryStartRitual(
+&nbsp;            ServerPlayer player,
+&nbsp;            BlockPos altarPos
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null || altarPos == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!(player.level()</b>
+<b class="nc">&nbsp;                instanceof ServerLevel serverLevel)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isRitualActive(player)) {</b>
+<b class="nc">&nbsp;            player.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;The crystal is already reading your soul.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (GreatSageRitualManager.isRitualActive(</b>
+&nbsp;                player
+&nbsp;        )) {
+<b class="nc">&nbsp;            player.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;Another altar ritual is already in progress.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED),</b>
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BlockPos lowerAltarPos =</b>
+<b class="nc">&nbsp;                getLowerAltarPos(</b>
+&nbsp;                        serverLevel,
+&nbsp;                        altarPos
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (lowerAltarPos == null</b>
+<b class="nc">&nbsp;                || !isValidAltar(</b>
+&nbsp;                serverLevel,
+&nbsp;                lowerAltarPos
+&nbsp;        )) {
+<b class="nc">&nbsp;            player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;The altar structure is incomplete.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data =</b>
+<b class="nc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        CommitmentResult commitment =</b>
+<b class="nc">&nbsp;                resolveOrCommitResult(</b>
+&nbsp;                        player,
+&nbsp;                        data
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!commitment.successful()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * The path and title were committed before the runtime ritual state
+&nbsp;         * is created.
+&nbsp;         *
+&nbsp;         * An interruption can therefore stop the presentation, but it cannot
+&nbsp;         * cause another recognition result to be generated.
+&nbsp;         */
+<b class="nc">&nbsp;        RitualState state =</b>
+&nbsp;                new RitualState(
+<b class="nc">&nbsp;                        serverLevel.dimension(),</b>
+&nbsp;                        lowerAltarPos,
+<b class="nc">&nbsp;                        player.position(),</b>
+&nbsp;                        RITUAL_DURATION_TICKS,
+<b class="nc">&nbsp;                        player.getYRot(),</b>
+<b class="nc">&nbsp;                        commitment.primaryPathId(),</b>
+<b class="nc">&nbsp;                        commitment.secondaryPathId(),</b>
+<b class="nc">&nbsp;                        commitment.pure(),</b>
+<b class="nc">&nbsp;                        commitment.bestowedTitle()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        ACTIVE_RITUALS.put(</b>
+<b class="nc">&nbsp;                player.getUUID(),</b>
+&nbsp;                state
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.displayClientMessage(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                                commitment.resumed()</b>
+<b class="nc">&nbsp;                                        ? &quot;The crystal resumes its unfinished recognition.&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;The Great Crystal Altar begins to judge your existence.&quot;</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendPhaseMessage(</b>
+&nbsp;                player,
+&nbsp;                state,
+&nbsp;                0
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        playPhaseSound(</b>
+&nbsp;                serverLevel,
+&nbsp;                lowerAltarPos,
+&nbsp;                0
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void tick(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RitualState state =</b>
+<b class="fc">&nbsp;                ACTIVE_RITUALS.get(</b>
+<b class="fc">&nbsp;                        player.getUUID()</b>
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (state == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!(player.level()</b>
+<b class="nc">&nbsp;                instanceof ServerLevel serverLevel)) {</b>
+<b class="nc">&nbsp;            cancelRitual(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!player.level()</b>
+<b class="nc">&nbsp;                .dimension()</b>
+<b class="nc">&nbsp;                .equals(state.dimension)) {</b>
+&nbsp;
+<b class="nc">&nbsp;            cancelRitual(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!player.isAlive()) {</b>
+<b class="nc">&nbsp;            cancelRitual(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!isValidAltar(</b>
+&nbsp;                serverLevel,
+&nbsp;                state.altarPos
+&nbsp;        )) {
+<b class="nc">&nbsp;            cancelRitual(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        applyRitualStasis(</b>
+&nbsp;                player,
+&nbsp;                state
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        spawnRitualParticles(</b>
+&nbsp;                serverLevel,
+&nbsp;                player,
+&nbsp;                state
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int phase =</b>
+<b class="nc">&nbsp;                getPhase(state);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (phase != state.lastPhase) {</b>
+<b class="nc">&nbsp;            sendPhaseMessage(</b>
+&nbsp;                    player,
+&nbsp;                    state,
+&nbsp;                    phase
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            playPhaseSound(</b>
+&nbsp;                    serverLevel,
+&nbsp;                    state.altarPos,
+&nbsp;                    phase
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            state.lastPhase = phase;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        state.elapsedTicks++;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (state.elapsedTicks</b>
+&nbsp;                &gt;= state.durationTicks) {
+&nbsp;
+<b class="nc">&nbsp;            completeRitual(</b>
+&nbsp;                    player,
+&nbsp;                    serverLevel,
+&nbsp;                    state
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isRitualActive(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        return player != null</b>
+<b class="fc">&nbsp;                &amp;&amp; ACTIVE_RITUALS.containsKey(</b>
+<b class="fc">&nbsp;                player.getUUID()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void cancelForLogout(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="fc">&nbsp;        cancelRitual(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void cancelForDeath(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        cancelRitual(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void cancelRitual(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RitualState removed =</b>
+<b class="fc">&nbsp;                ACTIVE_RITUALS.remove(</b>
+<b class="fc">&nbsp;                        player.getUUID()</b>
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (removed == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        clearRitualPose(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        player.displayClientMessage(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                &quot;The ritual was interrupted, but its answer remains fixed.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                true
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static CommitmentResult resolveOrCommitResult(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        boolean alreadyCommitted =</b>
+<b class="nc">&nbsp;                data.getFlag(</b>
+&nbsp;                        RecognitionStatKeys.NAMING_COMMITTED
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (alreadyCommitted) {</b>
+<b class="nc">&nbsp;            boolean revealPending =</b>
+<b class="nc">&nbsp;                    data.getFlag(</b>
+&nbsp;                            RecognitionStatKeys.REVEAL_PENDING
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            String primaryPathId =</b>
+<b class="nc">&nbsp;                    safeString(</b>
+<b class="nc">&nbsp;                            data.getString(</b>
+&nbsp;                                    RecognitionStatKeys.PRIMARY_PATH
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            String secondaryPathId =</b>
+<b class="nc">&nbsp;                    safeString(</b>
+<b class="nc">&nbsp;                            data.getString(</b>
+&nbsp;                                    RecognitionStatKeys.SECONDARY_PATH
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            String bestowedTitle =</b>
+<b class="nc">&nbsp;                    safeString(</b>
+<b class="nc">&nbsp;                            data.getString(</b>
+&nbsp;                                    RecognitionStatKeys.BESTOWED_TITLE
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            boolean pure =</b>
+<b class="nc">&nbsp;                    data.getFlag(</b>
+&nbsp;                            RecognitionStatKeys.PURE_RECOGNITION
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (!revealPending) {</b>
+<b class="nc">&nbsp;                player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                        Component.literal(</b>
+&nbsp;                                        &quot;Your recognition has already been presented.&quot;
+&nbsp;                                )
+<b class="nc">&nbsp;                                .withStyle(ChatFormatting.GRAY)</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                return CommitmentResult.failed();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (primaryPathId.isBlank()</b>
+<b class="nc">&nbsp;                    || bestowedTitle.isBlank()) {</b>
+&nbsp;
+<b class="nc">&nbsp;                player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                        Component.literal(</b>
+&nbsp;                                        &quot;The committed recognition record is incomplete. Use the admin unname command before testing again.&quot;
+&nbsp;                                )
+<b class="nc">&nbsp;                                .withStyle(ChatFormatting.RED)</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                return CommitmentResult.failed();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return CommitmentResult.success(</b>
+&nbsp;                    true,
+&nbsp;                    primaryPathId,
+&nbsp;                    secondaryPathId,
+&nbsp;                    pure,
+&nbsp;                    bestowedTitle
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionNamingEligibility eligibility =</b>
+<b class="nc">&nbsp;                RecognitionNamingService.evaluate(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!eligibility.eligible()) {</b>
+<b class="nc">&nbsp;            sendEligibilityFailure(</b>
+&nbsp;                    player,
+&nbsp;                    eligibility
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return CommitmentResult.failed();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionNamingCandidate candidate =</b>
+<b class="nc">&nbsp;                eligibility.candidate();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (candidate == null) {</b>
+<b class="nc">&nbsp;            player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;The crystal cannot form a stable answer from your deeds.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return CommitmentResult.failed();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Atomic commitment point.
+&nbsp;         *
+&nbsp;         * Use the authoritative service so the full frozen result, reward
+&nbsp;         * profile, identity-strength snapshot and incarnation metadata are
+&nbsp;         * written before the visual ritual begins.
+&nbsp;         */
+<b class="nc">&nbsp;        if (!RecognitionNamingService.commitRecognition(</b>
+&nbsp;                player,
+&nbsp;                eligibility
+&nbsp;        )) {
+<b class="nc">&nbsp;            player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;The crystal could not preserve its answer. Try the altar again.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return CommitmentResult.failed();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String primaryPathId =</b>
+<b class="nc">&nbsp;                candidate.primaryPath()</b>
+<b class="nc">&nbsp;                        .getId();</b>
+&nbsp;
+&nbsp;        String secondaryPathId =
+<b class="nc">&nbsp;                candidate.hasSecondaryPath()</b>
+<b class="nc">&nbsp;                        ? candidate.secondaryPath()</b>
+<b class="nc">&nbsp;                        .getId()</b>
+<b class="nc">&nbsp;                        : &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        String bestowedTitle =</b>
+<b class="nc">&nbsp;                candidate.bestowedTitle();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionDisplayNameSyncService.refreshAndBroadcast(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        return CommitmentResult.success(</b>
+&nbsp;                false,
+&nbsp;                primaryPathId,
+&nbsp;                secondaryPathId,
+<b class="nc">&nbsp;                candidate.pure(),</b>
+&nbsp;                bestowedTitle
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendEligibilityFailure(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionNamingEligibility eligibility
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent message =</b>
+<b class="nc">&nbsp;                switch (eligibility.status()) {</b>
+&nbsp;                    case NOT_ENOUGH_LEVEL -&gt;
+<b class="nc">&nbsp;                            Component.translatable(</b>
+&nbsp;                                    &quot;message.moostensuraaddon.recognition.eligibility.not_enough_level&quot;,
+<b class="nc">&nbsp;                                    eligibility.requiredLevel()</b>
+&nbsp;                            );
+&nbsp;
+&nbsp;                    case NO_RECOGNITION_SELECTION -&gt;
+<b class="nc">&nbsp;                            Component.literal(</b>
+&nbsp;                                    &quot;Your deeds have not yet formed a stable recognition.&quot;
+&nbsp;                            );
+&nbsp;
+&nbsp;                    case ALREADY_NAMED -&gt;
+<b class="nc">&nbsp;                            Component.literal(</b>
+&nbsp;                                    &quot;Your existence is already anchored by a name.&quot;
+&nbsp;                            );
+&nbsp;
+&nbsp;                    case ALREADY_COMMITTED -&gt;
+<b class="nc">&nbsp;                            Component.literal(</b>
+&nbsp;                                    &quot;The altar remembers an answer that has already been fixed.&quot;
+&nbsp;                            );
+&nbsp;
+&nbsp;                    case READY -&gt;
+<b class="nc">&nbsp;                            Component.literal(</b>
+&nbsp;                                    &quot;The crystal hesitates despite recognizing your readiness.&quot;
+&nbsp;                            );
+&nbsp;                };
+&nbsp;
+&nbsp;        ChatFormatting messageColor =
+<b class="nc">&nbsp;                eligibility.status()</b>
+<b class="nc">&nbsp;                        == RecognitionNamingEligibility.Status</b>
+&nbsp;                        .NO_RECOGNITION_SELECTION
+<b class="nc">&nbsp;                        ? ChatFormatting.YELLOW</b>
+<b class="nc">&nbsp;                        : ChatFormatting.RED;</b>
+&nbsp;
+<b class="nc">&nbsp;        player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                message.withStyle(messageColor)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void completeRitual(
+&nbsp;            ServerPlayer player,
+&nbsp;            ServerLevel level,
+&nbsp;            RitualState state
+&nbsp;    ) {
+<b class="nc">&nbsp;        ACTIVE_RITUALS.remove(</b>
+<b class="nc">&nbsp;                player.getUUID()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        clearRitualPose(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data =</b>
+<b class="nc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        data.setFlag(</b>
+&nbsp;                RecognitionStatKeys.REVEAL_PENDING,
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.setData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * The reveal guard is cleared only at the presentation boundary.
+&nbsp;         * Periodic lifecycle reconciliation therefore cannot publish the
+&nbsp;         * frozen title during the 15-second ritual or after an interruption.
+&nbsp;         *
+&nbsp;         * The lifecycle service owns the exactly-once native HIGH endowment.
+&nbsp;         * If a compatible native name already exists, it updates the stored
+&nbsp;         * and custom names without sending another HIGH request.
+&nbsp;         */
+<b class="nc">&nbsp;        RecognitionNativeEndowmentService.synchronize(</b>
+&nbsp;                player
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!isNativeIdentityPublished(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        )) {
+&nbsp;            /*
+&nbsp;             * Restore the pending guard if Tensura rejected the native naming
+&nbsp;             * operation. The same committed result can then be presented
+&nbsp;             * again without a reroll.
+&nbsp;             */
+<b class="nc">&nbsp;            data.setFlag(</b>
+&nbsp;                    RecognitionStatKeys.REVEAL_PENDING,
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            player.setData(</b>
+&nbsp;                    AttachmentRegistry.RECOGNITION_DATA,
+&nbsp;                    data
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;The recognition was fixed, but Tensura did not accept the complete native name. Interact with the altar to try presenting the same result again.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Refresh after the native identity is coherent so chat, tab-list,
+&nbsp;         * client nametag and Tensura menu consumers publish the same frozen
+&nbsp;         * name at the completed reveal boundary.
+&nbsp;         */
+<b class="nc">&nbsp;        RecognitionDisplayNameSyncService</b>
+<b class="nc">&nbsp;                .refreshAndBroadcast(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        spawnCompletionParticles(</b>
+&nbsp;                level,
+&nbsp;                player,
+&nbsp;                state
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        playCompletionSounds(</b>
+&nbsp;                level,
+&nbsp;                state.altarPos
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        AddonAdvancementHelper.awardNameAnchor(</b>
+&nbsp;                player
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        AddonAdvancementHelper</b>
+<b class="nc">&nbsp;                .awardStateBasedAdvancements(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        String username =</b>
+<b class="nc">&nbsp;                player.getGameProfile()</b>
+<b class="nc">&nbsp;                        .getName();</b>
+&nbsp;
+&nbsp;        String displayTitle =
+<b class="nc">&nbsp;                state.bestowedTitle.isBlank()</b>
+<b class="nc">&nbsp;                        ? username</b>
+&nbsp;                        : username
+&nbsp;                          + &quot; &quot;
+<b class="nc">&nbsp;                          + state.bestowedTitle;</b>
+&nbsp;
+<b class="nc">&nbsp;        player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                &quot;Your soul has been recognized.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GOLD,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                Component.literal(displayTitle)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+&nbsp;        String pathDescription =
+<b class="nc">&nbsp;                state.pure</b>
+&nbsp;                        ? &quot;Pure &quot;
+<b class="nc">&nbsp;                          + state.primaryPathId</b>
+<b class="nc">&nbsp;                        : state.secondaryPathId.isBlank()</b>
+<b class="nc">&nbsp;                          ? state.primaryPathId</b>
+&nbsp;                          : state.primaryPathId
+&nbsp;                            + &quot; + &quot;
+<b class="nc">&nbsp;                            + state.secondaryPathId;</b>
+&nbsp;
+<b class="nc">&nbsp;        player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                &quot;Recognition: &quot;
+&nbsp;                                        + pathDescription
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.AQUA)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Component globalMessage =</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                username
+&nbsp;                                        + &quot; has been recognized as &quot;
+&nbsp;                                        + displayTitle
+&nbsp;                                        + &quot;.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        level.getServer()</b>
+<b class="nc">&nbsp;                .getPlayerList()</b>
+<b class="nc">&nbsp;                .broadcastSystemMessage(</b>
+&nbsp;                        globalMessage,
+&nbsp;                        false
+&nbsp;                );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * The announcement sound is sent to every online player, regardless
+&nbsp;         * of dimension.
+&nbsp;         */
+&nbsp;        for (ServerPlayer onlinePlayer :
+<b class="nc">&nbsp;                level.getServer()</b>
+<b class="nc">&nbsp;                        .getPlayerList()</b>
+<b class="nc">&nbsp;                        .getPlayers()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            onlinePlayer.playNotifySound(</b>
+&nbsp;                    SoundEvents.BEACON_ACTIVATE,
+&nbsp;                    SoundSource.PLAYERS,
+&nbsp;                    0.85F,
+&nbsp;                    1.15F
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            onlinePlayer.playNotifySound(</b>
+&nbsp;                    SoundEvents.AMETHYST_BLOCK_CHIME,
+&nbsp;                    SoundSource.PLAYERS,
+&nbsp;                    0.65F,
+&nbsp;                    1.45F
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void applyRitualStasis(
+&nbsp;            ServerPlayer player,
+&nbsp;            RitualState state
+&nbsp;    ) {
+<b class="nc">&nbsp;        Vec3 position =</b>
+&nbsp;                state.stasisPos;
+&nbsp;
+<b class="nc">&nbsp;        player.teleportTo(</b>
+&nbsp;                position.x,
+&nbsp;                position.y,
+&nbsp;                position.z
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.setDeltaMovement(</b>
+&nbsp;                Vec3.ZERO
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.resetFallDistance();</b>
+<b class="nc">&nbsp;        player.setSprinting(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        player.setYRot(</b>
+&nbsp;                state.lockedYaw
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.setYHeadRot(</b>
+&nbsp;                state.lockedYaw
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.setYBodyRot(</b>
+&nbsp;                state.lockedYaw
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.setXRot(0.0F);</b>
+<b class="nc">&nbsp;        player.setPose(Pose.SLEEPING);</b>
+&nbsp;
+<b class="nc">&nbsp;        player.addEffect(</b>
+&nbsp;                new MobEffectInstance(
+&nbsp;                        MobEffects.MOVEMENT_SLOWDOWN,
+&nbsp;                        40,
+&nbsp;                        255,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.addEffect(</b>
+&nbsp;                new MobEffectInstance(
+&nbsp;                        MobEffects.WEAKNESS,
+&nbsp;                        40,
+&nbsp;                        255,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.addEffect(</b>
+&nbsp;                new MobEffectInstance(
+&nbsp;                        MobEffects.DAMAGE_RESISTANCE,
+&nbsp;                        40,
+&nbsp;                        255,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (state.elapsedTicks</b>
+&nbsp;                % DARKNESS_REFRESH_INTERVAL_TICKS
+&nbsp;                == 0) {
+&nbsp;
+<b class="nc">&nbsp;            player.addEffect(</b>
+&nbsp;                    new MobEffectInstance(
+&nbsp;                            MobEffects.DARKNESS,
+&nbsp;                            80,
+&nbsp;                            0,
+&nbsp;                            false,
+&nbsp;                            false,
+&nbsp;                            true
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void clearRitualPose(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        player.setPose(Pose.STANDING);</b>
+<b class="nc">&nbsp;        player.setDeltaMovement(Vec3.ZERO);</b>
+<b class="nc">&nbsp;        player.resetFallDistance();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void spawnRitualParticles(
+&nbsp;            ServerLevel level,
+&nbsp;            ServerPlayer player,
+&nbsp;            RitualState state
+&nbsp;    ) {
+<b class="nc">&nbsp;        double progress =</b>
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        1.0D,
+&nbsp;                        (double) state.elapsedTicks
+<b class="nc">&nbsp;                                / Math.max(</b>
+&nbsp;                                1,
+&nbsp;                                state.durationTicks
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double playerX =</b>
+<b class="nc">&nbsp;                player.getX();</b>
+&nbsp;
+<b class="nc">&nbsp;        double playerY =</b>
+<b class="nc">&nbsp;                player.getY() + 0.25D;</b>
+&nbsp;
+<b class="nc">&nbsp;        double playerZ =</b>
+<b class="nc">&nbsp;                player.getZ();</b>
+&nbsp;
+<b class="nc">&nbsp;        double altarX =</b>
+<b class="nc">&nbsp;                state.altarPos.getX()</b>
+&nbsp;                        + 0.5D;
+&nbsp;
+<b class="nc">&nbsp;        double altarY =</b>
+<b class="nc">&nbsp;                state.altarPos.getY()</b>
+&nbsp;                        + 1.2D;
+&nbsp;
+<b class="nc">&nbsp;        double altarZ =</b>
+<b class="nc">&nbsp;                state.altarPos.getZ()</b>
+&nbsp;                        + 0.5D;
+&nbsp;
+&nbsp;        int soulCount =
+<b class="nc">&nbsp;                progress &lt; 0.5D</b>
+<b class="nc">&nbsp;                        ? 4</b>
+<b class="nc">&nbsp;                        : 7;</b>
+&nbsp;
+&nbsp;        int flameCount =
+<b class="nc">&nbsp;                progress &lt; 0.5D</b>
+<b class="nc">&nbsp;                        ? 2</b>
+<b class="nc">&nbsp;                        : 5;</b>
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL,
+&nbsp;                playerX,
+&nbsp;                playerY,
+&nbsp;                playerZ,
+&nbsp;                soulCount,
+&nbsp;                0.75D,
+&nbsp;                0.15D,
+&nbsp;                0.75D,
+&nbsp;                0.015D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL_FIRE_FLAME,
+&nbsp;                playerX,
+&nbsp;                playerY + 0.15D,
+&nbsp;                playerZ,
+&nbsp;                flameCount,
+&nbsp;                0.45D,
+&nbsp;                0.20D,
+&nbsp;                0.45D,
+&nbsp;                0.01D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL_FIRE_FLAME,
+&nbsp;                altarX,
+&nbsp;                altarY,
+&nbsp;                altarZ,
+&nbsp;                flameCount,
+&nbsp;                0.35D,
+&nbsp;                0.45D,
+&nbsp;                0.35D,
+&nbsp;                0.015D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (state.elapsedTicks % 10 == 0) {</b>
+<b class="nc">&nbsp;            level.sendParticles(</b>
+&nbsp;                    ParticleTypes.SOUL,
+&nbsp;                    altarX,
+&nbsp;                    altarY + 0.35D,
+&nbsp;                    altarZ,
+&nbsp;                    10,
+&nbsp;                    0.65D,
+&nbsp;                    0.35D,
+&nbsp;                    0.65D,
+&nbsp;                    0.02D
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void spawnCompletionParticles(
+&nbsp;            ServerLevel level,
+&nbsp;            ServerPlayer player,
+&nbsp;            RitualState state
+&nbsp;    ) {
+<b class="nc">&nbsp;        double playerX =</b>
+<b class="nc">&nbsp;                player.getX();</b>
+&nbsp;
+<b class="nc">&nbsp;        double playerY =</b>
+<b class="nc">&nbsp;                player.getY() + 0.75D;</b>
+&nbsp;
+<b class="nc">&nbsp;        double playerZ =</b>
+<b class="nc">&nbsp;                player.getZ();</b>
+&nbsp;
+<b class="nc">&nbsp;        double altarX =</b>
+<b class="nc">&nbsp;                state.altarPos.getX()</b>
+&nbsp;                        + 0.5D;
+&nbsp;
+<b class="nc">&nbsp;        double altarY =</b>
+<b class="nc">&nbsp;                state.altarPos.getY()</b>
+&nbsp;                        + 1.4D;
+&nbsp;
+<b class="nc">&nbsp;        double altarZ =</b>
+<b class="nc">&nbsp;                state.altarPos.getZ()</b>
+&nbsp;                        + 0.5D;
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL_FIRE_FLAME,
+&nbsp;                playerX,
+&nbsp;                playerY,
+&nbsp;                playerZ,
+&nbsp;                64,
+&nbsp;                1.0D,
+&nbsp;                0.6D,
+&nbsp;                1.0D,
+&nbsp;                0.05D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL,
+&nbsp;                playerX,
+&nbsp;                playerY,
+&nbsp;                playerZ,
+&nbsp;                48,
+&nbsp;                1.1D,
+&nbsp;                0.7D,
+&nbsp;                1.1D,
+&nbsp;                0.04D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL_FIRE_FLAME,
+&nbsp;                altarX,
+&nbsp;                altarY,
+&nbsp;                altarZ,
+&nbsp;                48,
+&nbsp;                0.9D,
+&nbsp;                0.8D,
+&nbsp;                0.9D,
+&nbsp;                0.05D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.sendParticles(</b>
+&nbsp;                ParticleTypes.SOUL,
+&nbsp;                altarX,
+&nbsp;                altarY,
+&nbsp;                altarZ,
+&nbsp;                36,
+&nbsp;                0.8D,
+&nbsp;                0.7D,
+&nbsp;                0.8D,
+&nbsp;                0.04D
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int getPhase(
+&nbsp;            RitualState state
+&nbsp;    ) {
+<b class="nc">&nbsp;        int phaseCount =</b>
+&nbsp;                PHASE_MESSAGES.length;
+&nbsp;
+<b class="nc">&nbsp;        int phase =</b>
+&nbsp;                (int) (
+&nbsp;                        (long) state.elapsedTicks
+&nbsp;                                * phaseCount
+<b class="nc">&nbsp;                                / Math.max(</b>
+&nbsp;                                1,
+&nbsp;                                state.durationTicks
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (phase &lt; 0) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(</b>
+&nbsp;                phase,
+&nbsp;                phaseCount - 1
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendPhaseMessage(
+&nbsp;            ServerPlayer player,
+&nbsp;            RitualState state,
+&nbsp;            int phase
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (phase &lt; 0</b>
+&nbsp;                || phase &gt;= PHASE_MESSAGES.length) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        player.displayClientMessage(</b>
+&nbsp;                PHASE_MESSAGES[phase]
+<b class="nc">&nbsp;                        .copy()</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                true
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void playPhaseSound(
+&nbsp;            ServerLevel level,
+&nbsp;            BlockPos altarPos,
+&nbsp;            int phase
+&nbsp;    ) {
+<b class="nc">&nbsp;        float pitch =</b>
+&nbsp;                0.75F
+&nbsp;                        + phase * 0.13F;
+&nbsp;
+<b class="nc">&nbsp;        level.playSound(</b>
+&nbsp;                null,
+&nbsp;                altarPos,
+&nbsp;                SoundEvents.AMETHYST_BLOCK_CHIME,
+&nbsp;                SoundSource.BLOCKS,
+&nbsp;                0.75F,
+&nbsp;                pitch
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (phase &gt;= 2) {</b>
+<b class="nc">&nbsp;            level.playSound(</b>
+&nbsp;                    null,
+&nbsp;                    altarPos,
+&nbsp;                    SoundEvents.BEACON_AMBIENT,
+&nbsp;                    SoundSource.BLOCKS,
+&nbsp;                    0.35F,
+&nbsp;                    0.95F
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void playCompletionSounds(
+&nbsp;            ServerLevel level,
+&nbsp;            BlockPos altarPos
+&nbsp;    ) {
+<b class="nc">&nbsp;        level.playSound(</b>
+&nbsp;                null,
+&nbsp;                altarPos,
+&nbsp;                SoundEvents.BEACON_ACTIVATE,
+&nbsp;                SoundSource.BLOCKS,
+&nbsp;                0.9F,
+&nbsp;                1.25F
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.playSound(</b>
+&nbsp;                null,
+&nbsp;                altarPos,
+&nbsp;                SoundEvents.PLAYER_LEVELUP,
+&nbsp;                SoundSource.PLAYERS,
+&nbsp;                0.75F,
+&nbsp;                1.2F
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        level.playSound(</b>
+&nbsp;                null,
+&nbsp;                altarPos,
+&nbsp;                SoundEvents.AMETHYST_BLOCK_CHIME,
+&nbsp;                SoundSource.BLOCKS,
+&nbsp;                1.0F,
+&nbsp;                1.6F
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isNativeIdentityPublished(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null || data == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        IExistence existence =</b>
+<b class="nc">&nbsp;                TensuraStorages.getExistenceFrom(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (existence == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String nativeName =</b>
+<b class="nc">&nbsp;                existence.getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        String expectedName =</b>
+&nbsp;                RecognitionDisplayNameService
+<b class="nc">&nbsp;                        .buildNativeTensuraName(</b>
+<b class="nc">&nbsp;                                player.getGameProfile()</b>
+<b class="nc">&nbsp;                                        .getName(),</b>
+<b class="nc">&nbsp;                                data.getString(</b>
+&nbsp;                                        RecognitionStatKeys.BESTOWED_TITLE
+&nbsp;                                )
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        Component customName =</b>
+<b class="nc">&nbsp;                player.getCustomName();</b>
+&nbsp;
+&nbsp;        String storedNativeName =
+<b class="nc">&nbsp;                nativeName == null</b>
+<b class="nc">&nbsp;                        ? &quot;&quot;</b>
+<b class="nc">&nbsp;                        : nativeName.trim();</b>
+&nbsp;
+&nbsp;        String storedCustomName =
+<b class="nc">&nbsp;                customName == null</b>
+<b class="nc">&nbsp;                        ? &quot;&quot;</b>
+<b class="nc">&nbsp;                        : customName.getString().trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        return !expectedName.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; storedNativeName.equals(expectedName)</b>
+<b class="nc">&nbsp;                &amp;&amp; storedCustomName.equals(expectedName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static BlockPos getLowerAltarPos(
+&nbsp;            ServerLevel level,
+&nbsp;            BlockPos position
+&nbsp;    ) {
+<b class="nc">&nbsp;        BlockState state =</b>
+<b class="nc">&nbsp;                level.getBlockState(</b>
+&nbsp;                        position
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!state.is(</b>
+<b class="nc">&nbsp;                BlockRegistry.GREAT_CRYSTAL_ALTAR.get()</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!state.hasProperty(</b>
+&nbsp;                GreatCrystalAltarBlock.HALF
+&nbsp;        )) {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (state.getValue(</b>
+&nbsp;                GreatCrystalAltarBlock.HALF
+&nbsp;        ) == DoubleBlockHalf.UPPER) {
+&nbsp;
+<b class="nc">&nbsp;            return position.below();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return position;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isValidAltar(
+&nbsp;            ServerLevel level,
+&nbsp;            BlockPos lowerPosition
+&nbsp;    ) {
+<b class="nc">&nbsp;        BlockState lowerState =</b>
+<b class="nc">&nbsp;                level.getBlockState(</b>
+&nbsp;                        lowerPosition
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        BlockState upperState =</b>
+<b class="nc">&nbsp;                level.getBlockState(</b>
+<b class="nc">&nbsp;                        lowerPosition.above()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!lowerState.is(</b>
+<b class="nc">&nbsp;                BlockRegistry.GREAT_CRYSTAL_ALTAR.get()</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!upperState.is(</b>
+<b class="nc">&nbsp;                BlockRegistry.GREAT_CRYSTAL_ALTAR.get()</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!lowerState.hasProperty(</b>
+&nbsp;                GreatCrystalAltarBlock.HALF
+&nbsp;        )) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!upperState.hasProperty(</b>
+&nbsp;                GreatCrystalAltarBlock.HALF
+&nbsp;        )) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return lowerState.getValue(</b>
+&nbsp;                GreatCrystalAltarBlock.HALF
+&nbsp;        ) == DoubleBlockHalf.LOWER
+<b class="nc">&nbsp;                &amp;&amp; upperState.getValue(</b>
+&nbsp;                GreatCrystalAltarBlock.HALF
+&nbsp;        ) == DoubleBlockHalf.UPPER;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String safeString(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : value.trim();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record CommitmentResult(</b>
+&nbsp;            boolean successful,
+&nbsp;            boolean resumed,
+&nbsp;            String primaryPathId,
+&nbsp;            String secondaryPathId,
+&nbsp;            boolean pure,
+&nbsp;            String bestowedTitle
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        private CommitmentResult {</b>
+<b class="nc">&nbsp;            primaryPathId =</b>
+<b class="nc">&nbsp;                    safeString(primaryPathId);</b>
+&nbsp;
+<b class="nc">&nbsp;            secondaryPathId =</b>
+<b class="nc">&nbsp;                    safeString(secondaryPathId);</b>
+&nbsp;
+<b class="nc">&nbsp;            bestowedTitle =</b>
+<b class="nc">&nbsp;                    safeString(bestowedTitle);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static CommitmentResult success(
+&nbsp;                boolean resumed,
+&nbsp;                String primaryPathId,
+&nbsp;                String secondaryPathId,
+&nbsp;                boolean pure,
+&nbsp;                String bestowedTitle
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new CommitmentResult(</b>
+&nbsp;                    true,
+&nbsp;                    resumed,
+&nbsp;                    primaryPathId,
+&nbsp;                    secondaryPathId,
+&nbsp;                    pure,
+&nbsp;                    bestowedTitle
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private static CommitmentResult failed() {
+<b class="nc">&nbsp;            return new CommitmentResult(</b>
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    false,
+&nbsp;                    &quot;&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class RitualState {
+&nbsp;
+&nbsp;        private final ResourceKey&lt;Level&gt; dimension;
+&nbsp;        private final BlockPos altarPos;
+&nbsp;        private final Vec3 stasisPos;
+&nbsp;        private final int durationTicks;
+&nbsp;        private final float lockedYaw;
+&nbsp;
+&nbsp;        private final String primaryPathId;
+&nbsp;        private final String secondaryPathId;
+&nbsp;        private final boolean pure;
+&nbsp;        private final String bestowedTitle;
+&nbsp;
+&nbsp;        private int elapsedTicks;
+&nbsp;        private int lastPhase;
+&nbsp;
+&nbsp;        private RitualState(
+&nbsp;                ResourceKey&lt;Level&gt; dimension,
+&nbsp;                BlockPos altarPos,
+&nbsp;                Vec3 stasisPos,
+&nbsp;                int durationTicks,
+&nbsp;                float lockedYaw,
+&nbsp;                String primaryPathId,
+&nbsp;                String secondaryPathId,
+&nbsp;                boolean pure,
+&nbsp;                String bestowedTitle
+<b class="nc">&nbsp;        ) {</b>
+<b class="nc">&nbsp;            this.dimension = dimension;</b>
+<b class="nc">&nbsp;            this.altarPos =</b>
+<b class="nc">&nbsp;                    altarPos.immutable();</b>
+&nbsp;
+<b class="nc">&nbsp;            this.stasisPos = stasisPos;</b>
+<b class="nc">&nbsp;            this.durationTicks =</b>
+&nbsp;                    durationTicks;
+&nbsp;
+<b class="nc">&nbsp;            this.lockedYaw =</b>
+&nbsp;                    lockedYaw;
+&nbsp;
+<b class="nc">&nbsp;            this.primaryPathId =</b>
+<b class="nc">&nbsp;                    safeString(primaryPathId);</b>
+&nbsp;
+<b class="nc">&nbsp;            this.secondaryPathId =</b>
+<b class="nc">&nbsp;                    safeString(secondaryPathId);</b>
+&nbsp;
+<b class="nc">&nbsp;            this.pure = pure;</b>
+&nbsp;
+<b class="nc">&nbsp;            this.bestowedTitle =</b>
+<b class="nc">&nbsp;                    safeString(bestowedTitle);</b>
+&nbsp;
+<b class="nc">&nbsp;            this.elapsedTicks = 0;</b>
+<b class="nc">&nbsp;            this.lastPhase = -1;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

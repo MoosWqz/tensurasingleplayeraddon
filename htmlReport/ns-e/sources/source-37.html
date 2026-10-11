@@ -1,0 +1,290 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionStrengthRewardFormula</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionStrengthRewardFormula (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionStrengthRewardFormula</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (6/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (16/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionStrengthRewardFormula$Reward</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (10/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (30/35)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;/**
+&nbsp; * Alignment-neutral reward formula for recognition strength profile 2.
+&nbsp; *
+&nbsp; * &lt;p&gt;The reward is frozen when recognition is committed. Identity strength
+&nbsp; * controls the scalable part, while Pure recognition receives a small bonus
+&nbsp; * for meeting the stricter one-path qualification.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionStrengthRewardFormula {
+&nbsp;
+&nbsp;    public static final int PROFILE_VERSION = 2;
+&nbsp;    public static final String PROFILE_ID = &quot;recognition_strength_v2&quot;;
+&nbsp;
+&nbsp;    public static final double BASE_REWARD = 0.10D;
+&nbsp;    public static final double MAXIMUM_IDENTITY_BONUS = 0.10D;
+&nbsp;    public static final double PURE_RECOGNITION_BONUS = 0.025D;
+&nbsp;    public static final double DEFAULT_IDENTITY_STRENGTH_MAXIMUM = 40.0D;
+&nbsp;
+&nbsp;    public static final double MOVEMENT_AND_ATTACK_SPEED_SHARE = 0.50D;
+&nbsp;    public static final double KNOCKBACK_RESISTANCE_SHARE = 0.25D;
+&nbsp;
+&nbsp;    private RecognitionStrengthRewardFormula() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Reward calculate(
+&nbsp;            double identityStrength,
+&nbsp;            double identityStrengthMaximum,
+&nbsp;            boolean pure
+&nbsp;    ) {
+<b class="fc">&nbsp;        double safeMaximum = sanitizeMaximum(identityStrengthMaximum);</b>
+<b class="fc">&nbsp;        double safeIdentity = clamp(identityStrength, 0.0D, safeMaximum);</b>
+<b class="pc">&nbsp;        double identityRatio = safeMaximum &lt;= 0.0D</b>
+<b class="nc">&nbsp;                ? 0.0D</b>
+<b class="fc">&nbsp;                : safeIdentity / safeMaximum;</b>
+&nbsp;
+<b class="fc">&nbsp;        double total = BASE_REWARD</b>
+&nbsp;                + identityRatio * MAXIMUM_IDENTITY_BONUS
+<b class="pc">&nbsp;                + (pure ? PURE_RECOGNITION_BONUS : 0.0D);</b>
+&nbsp;
+<b class="fc">&nbsp;        double maximum = maximumReward(pure);</b>
+<b class="fc">&nbsp;        total = clamp(total, BASE_REWARD, maximum);</b>
+&nbsp;
+<b class="fc">&nbsp;        return new Reward(</b>
+&nbsp;                PROFILE_VERSION,
+&nbsp;                PROFILE_ID,
+&nbsp;                safeIdentity,
+&nbsp;                safeMaximum,
+&nbsp;                pure,
+&nbsp;                total,
+&nbsp;                total,
+&nbsp;                total,
+&nbsp;                total * MOVEMENT_AND_ATTACK_SPEED_SHARE,
+&nbsp;                total * MOVEMENT_AND_ATTACK_SPEED_SHARE,
+&nbsp;                total * KNOCKBACK_RESISTANCE_SHARE
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Reward calculateDefault(
+&nbsp;            double identityStrength,
+&nbsp;            boolean pure
+&nbsp;    ) {
+<b class="nc">&nbsp;        return calculate(</b>
+&nbsp;                identityStrength,
+&nbsp;                DEFAULT_IDENTITY_STRENGTH_MAXIMUM,
+&nbsp;                pure
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static double maximumReward(boolean pure) {
+<b class="fc">&nbsp;        return BASE_REWARD</b>
+&nbsp;                + MAXIMUM_IDENTITY_BONUS
+<b class="pc">&nbsp;                + (pure ? PURE_RECOGNITION_BONUS : 0.0D);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeMaximum(double value) {
+<b class="pc">&nbsp;        return Double.isFinite(value) &amp;&amp; value &gt; 0.0D</b>
+<b class="fc">&nbsp;                ? value</b>
+<b class="nc">&nbsp;                : DEFAULT_IDENTITY_STRENGTH_MAXIMUM;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double clamp(
+&nbsp;            double value,
+&nbsp;            double minimum,
+&nbsp;            double maximum
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!Double.isFinite(value)) {</b>
+<b class="nc">&nbsp;            return minimum;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return Math.max(</b>
+&nbsp;                minimum,
+<b class="fc">&nbsp;                Math.min(maximum, value)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public record Reward(</b>
+&nbsp;            int profileVersion,
+&nbsp;            String profileId,
+&nbsp;            double frozenIdentityStrength,
+&nbsp;            double identityStrengthMaximum,
+&nbsp;            boolean pure,
+&nbsp;            double totalStrength,
+&nbsp;            double maxHealthMultiplier,
+&nbsp;            double attackDamageMultiplier,
+&nbsp;            double movementSpeedMultiplier,
+&nbsp;            double attackSpeedMultiplier,
+&nbsp;            double knockbackResistanceAddition
+&nbsp;    ) {
+<b class="fc">&nbsp;        public Reward {</b>
+<b class="pc">&nbsp;            profileId = profileId == null ? &quot;&quot; : profileId.trim();</b>
+<b class="fc">&nbsp;            frozenIdentityStrength = sanitizeNonNegative(frozenIdentityStrength);</b>
+<b class="fc">&nbsp;            identityStrengthMaximum = sanitizeNonNegative(identityStrengthMaximum);</b>
+<b class="fc">&nbsp;            totalStrength = sanitizeNonNegative(totalStrength);</b>
+<b class="fc">&nbsp;            maxHealthMultiplier = sanitizeNonNegative(maxHealthMultiplier);</b>
+<b class="fc">&nbsp;            attackDamageMultiplier = sanitizeNonNegative(attackDamageMultiplier);</b>
+<b class="fc">&nbsp;            movementSpeedMultiplier = sanitizeNonNegative(movementSpeedMultiplier);</b>
+<b class="fc">&nbsp;            attackSpeedMultiplier = sanitizeNonNegative(attackSpeedMultiplier);</b>
+<b class="fc">&nbsp;            knockbackResistanceAddition = sanitizeNonNegative(knockbackResistanceAddition);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public double totalStrengthPercent() {
+<b class="nc">&nbsp;            return totalStrength * 100.0D;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static double sanitizeNonNegative(double value) {
+<b class="pc">&nbsp;            return Double.isFinite(value) &amp;&amp; value &gt; 0.0D</b>
+<b class="fc">&nbsp;                    ? value</b>
+<b class="fc">&nbsp;                    : 0.0D;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

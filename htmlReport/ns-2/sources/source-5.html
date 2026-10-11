@@ -1,0 +1,491 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GranterProgressData</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.attachment</a>
+</div>
+
+<h1>Coverage Summary for Class: GranterProgressData (com.mooswqz.moostensuraaddon.attachment)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GranterProgressData</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.7%
+  </span>
+  <span class="absValue">
+    (14/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    18.3%
+  </span>
+  <span class="absValue">
+    (15/82)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.7%
+  </span>
+  <span class="absValue">
+    (64/150)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.attachment;
+&nbsp;
+&nbsp;import com.mojang.serialization.Codec;
+&nbsp;import com.mojang.serialization.codecs.RecordCodecBuilder;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;public class GranterProgressData {
+&nbsp;    public static final int CURRENT_DATA_VERSION = 2;
+&nbsp;
+<b class="fc">&nbsp;    public static final Codec&lt;GranterProgressData&gt; CODEC = RecordCodecBuilder.create(instance -&gt; instance.group(</b>
+&nbsp;            Codec.INT
+<b class="fc">&nbsp;                    .optionalFieldOf(&quot;data_version&quot;, 1)</b>
+<b class="fc">&nbsp;                    .forGetter(GranterProgressData::getDataVersion),</b>
+&nbsp;
+&nbsp;            Codec.INT
+<b class="fc">&nbsp;                    .optionalFieldOf(&quot;successful_grants&quot;, 0)</b>
+<b class="fc">&nbsp;                    .forGetter(GranterProgressData::getSuccessfulGrants),</b>
+&nbsp;
+&nbsp;            Codec.INT
+<b class="fc">&nbsp;                    .optionalFieldOf(&quot;successful_take_backs&quot;, 0)</b>
+<b class="fc">&nbsp;                    .forGetter(GranterProgressData::getSuccessfulTakeBacks),</b>
+&nbsp;
+&nbsp;            Codec.INT
+<b class="fc">&nbsp;                    .optionalFieldOf(&quot;earned_granter_mastery&quot;, 0)</b>
+<b class="fc">&nbsp;                    .forGetter(GranterProgressData::getEarnedGranterMastery),</b>
+&nbsp;
+&nbsp;            Codec.BOOL
+<b class="fc">&nbsp;                    .optionalFieldOf(&quot;awakened_granter_naturally&quot;, false)</b>
+<b class="fc">&nbsp;                    .forGetter(GranterProgressData::hasAwakenedGranterNaturally),</b>
+&nbsp;
+&nbsp;            Codec.STRING
+<b class="fc">&nbsp;                    .optionalFieldOf(&quot;granter_ultimate_evolution&quot;, &quot;&quot;)</b>
+<b class="fc">&nbsp;                    .forGetter(GranterProgressData::getGranterUltimateEvolution),</b>
+&nbsp;
+&nbsp;            Codec.STRING
+<b class="fc">&nbsp;                    .listOf()</b>
+<b class="fc">&nbsp;                    .optionalFieldOf(&quot;recognized_subordinates&quot;, List.of())</b>
+<b class="fc">&nbsp;                    .forGetter(GranterProgressData::getRecognizedSubordinates),</b>
+&nbsp;
+&nbsp;            Codec.STRING
+<b class="fc">&nbsp;                    .listOf()</b>
+<b class="fc">&nbsp;                    .optionalFieldOf(&quot;granted_skill_types&quot;, List.of())</b>
+<b class="fc">&nbsp;                    .forGetter(GranterProgressData::getGrantedSkillTypes)</b>
+<b class="fc">&nbsp;    ).apply(instance, GranterProgressData::new));</b>
+&nbsp;
+&nbsp;    private int dataVersion;
+&nbsp;    private int successfulGrants;
+&nbsp;    private int successfulTakeBacks;
+&nbsp;    private int earnedGranterMastery;
+&nbsp;    private boolean awakenedGranterNaturally;
+&nbsp;    private String granterUltimateEvolution;
+&nbsp;    private final List&lt;String&gt; recognizedSubordinates;
+&nbsp;    private final List&lt;String&gt; grantedSkillTypes;
+&nbsp;
+&nbsp;    public GranterProgressData() {
+<b class="nc">&nbsp;        this(</b>
+&nbsp;                CURRENT_DATA_VERSION,
+&nbsp;                0,
+&nbsp;                0,
+&nbsp;                0,
+&nbsp;                false,
+&nbsp;                &quot;&quot;,
+<b class="nc">&nbsp;                List.of(),</b>
+<b class="nc">&nbsp;                List.of()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public GranterProgressData(
+&nbsp;            int dataVersion,
+&nbsp;            int successfulGrants,
+&nbsp;            int successfulTakeBacks,
+&nbsp;            int earnedGranterMastery,
+&nbsp;            boolean awakenedGranterNaturally,
+&nbsp;            String granterUltimateEvolution,
+&nbsp;            List&lt;String&gt; recognizedSubordinates,
+&nbsp;            List&lt;String&gt; grantedSkillTypes
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        this.dataVersion = Math.max(1, dataVersion);</b>
+<b class="fc">&nbsp;        this.successfulGrants = Math.max(0, successfulGrants);</b>
+<b class="fc">&nbsp;        this.successfulTakeBacks = Math.max(0, successfulTakeBacks);</b>
+<b class="fc">&nbsp;        this.earnedGranterMastery = Math.max(0, earnedGranterMastery);</b>
+<b class="fc">&nbsp;        this.awakenedGranterNaturally = awakenedGranterNaturally;</b>
+<b class="pc">&nbsp;        this.granterUltimateEvolution = granterUltimateEvolution == null ? &quot;&quot; : granterUltimateEvolution;</b>
+<b class="fc">&nbsp;        this.recognizedSubordinates = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        this.grantedSkillTypes = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (recognizedSubordinates != null) {</b>
+<b class="pc">&nbsp;            for (String subordinate : recognizedSubordinates) {</b>
+<b class="nc">&nbsp;                if (subordinate == null || subordinate.isBlank()) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                this.recognizedSubordinates.add(subordinate);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (grantedSkillTypes != null) {</b>
+<b class="pc">&nbsp;            for (String skillType : grantedSkillTypes) {</b>
+<b class="nc">&nbsp;                if (skillType == null || skillType.isBlank()) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                this.grantedSkillTypes.add(skillType);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getDataVersion() {
+<b class="fc">&nbsp;        return dataVersion;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDataVersion(int dataVersion) {
+<b class="nc">&nbsp;        this.dataVersion = Math.max(1, dataVersion);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getSuccessfulGrants() {
+<b class="fc">&nbsp;        return successfulGrants;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getSuccessfulTakeBacks() {
+<b class="fc">&nbsp;        return successfulTakeBacks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getEarnedGranterMastery() {
+<b class="fc">&nbsp;        return earnedGranterMastery;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasAwakenedGranterNaturally() {
+<b class="fc">&nbsp;        return awakenedGranterNaturally;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getGranterUltimateEvolution() {
+<b class="fc">&nbsp;        return granterUltimateEvolution;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasEvolvedGranterUltimate() {
+<b class="nc">&nbsp;        return granterUltimateEvolution != null &amp;&amp; !granterUltimateEvolution.isBlank();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getRecognizedSubordinates() {
+<b class="fc">&nbsp;        return recognizedSubordinates;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getGrantedSkillTypes() {
+<b class="fc">&nbsp;        return grantedSkillTypes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void incrementSuccessfulGrants() {
+<b class="nc">&nbsp;        successfulGrants++;</b>
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void incrementSuccessfulTakeBacks() {
+<b class="nc">&nbsp;        successfulTakeBacks++;</b>
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAwakenedGranterNaturally(boolean awakenedGranterNaturally) {
+<b class="nc">&nbsp;        this.awakenedGranterNaturally = awakenedGranterNaturally;</b>
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setGranterUltimateEvolution(String granterUltimateEvolution) {
+<b class="nc">&nbsp;        this.granterUltimateEvolution = granterUltimateEvolution == null ? &quot;&quot; : granterUltimateEvolution;</b>
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEarnedGranterMastery(int earnedGranterMastery) {
+<b class="nc">&nbsp;        this.earnedGranterMastery = Math.max(0, earnedGranterMastery);</b>
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addEarnedGranterMastery(int amount, int currentRealMastery, int maxMastery) {
+<b class="nc">&nbsp;        if (amount &lt;= 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int safeMaxMastery = Math.max(0, maxMastery);</b>
+<b class="nc">&nbsp;        int baseline = Math.max(earnedGranterMastery, Math.max(0, currentRealMastery));</b>
+<b class="nc">&nbsp;        int newValue = baseline + amount;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (safeMaxMastery &gt; 0) {</b>
+<b class="nc">&nbsp;            newValue = Math.min(newValue, safeMaxMastery);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        earnedGranterMastery = Math.max(0, newValue);</b>
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean recognizeSubordinate(UUID subordinateUuid) {
+<b class="nc">&nbsp;        if (subordinateUuid == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String uuid = subordinateUuid.toString();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (recognizedSubordinates.contains(uuid)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        recognizedSubordinates.add(uuid);</b>
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasRecognizedSubordinate(UUID subordinateUuid) {
+<b class="nc">&nbsp;        if (subordinateUuid == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return recognizedSubordinates.contains(subordinateUuid.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean forgetRecognizedSubordinate(
+&nbsp;            UUID subordinateUuid
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (subordinateUuid == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean removed = recognizedSubordinates.remove(</b>
+<b class="nc">&nbsp;                subordinateUuid.toString()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (removed) {</b>
+<b class="nc">&nbsp;            markCurrentVersion();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return removed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean recordGrantedSkillType(String skillId) {
+<b class="nc">&nbsp;        if (skillId == null || skillId.isBlank()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (grantedSkillTypes.contains(skillId)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        grantedSkillTypes.add(skillId);</b>
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasGrantedSkillType(String skillId) {
+<b class="nc">&nbsp;        if (skillId == null || skillId.isBlank()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return grantedSkillTypes.contains(skillId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getRecognizedSubordinateCount() {
+<b class="fc">&nbsp;        return recognizedSubordinates.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getGrantedSkillTypeCount() {
+<b class="nc">&nbsp;        return grantedSkillTypes.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean cleanup(Predicate&lt;String&gt; validSkillPredicate) {
+<b class="fc">&nbsp;        boolean changed = false;</b>
+&nbsp;
+<b class="pc">&nbsp;        if (successfulGrants &lt; 0) {</b>
+<b class="nc">&nbsp;            successfulGrants = 0;</b>
+<b class="nc">&nbsp;            changed = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (successfulTakeBacks &lt; 0) {</b>
+<b class="nc">&nbsp;            successfulTakeBacks = 0;</b>
+<b class="nc">&nbsp;            changed = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (earnedGranterMastery &lt; 0) {</b>
+<b class="nc">&nbsp;            earnedGranterMastery = 0;</b>
+<b class="nc">&nbsp;            changed = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (granterUltimateEvolution == null) {</b>
+<b class="nc">&nbsp;            granterUltimateEvolution = &quot;&quot;;</b>
+<b class="nc">&nbsp;            changed = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        changed |= cleanupRecognizedSubordinates();</b>
+<b class="fc">&nbsp;        changed |= cleanupGrantedSkillTypes(validSkillPredicate);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (changed) {</b>
+<b class="nc">&nbsp;            markCurrentVersion();</b>
+<b class="pc">&nbsp;        } else if (dataVersion &lt; CURRENT_DATA_VERSION) {</b>
+<b class="nc">&nbsp;            markCurrentVersion();</b>
+<b class="nc">&nbsp;            changed = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean cleanupRecognizedSubordinates() {
+<b class="fc">&nbsp;        boolean changed = false;</b>
+<b class="fc">&nbsp;        Set&lt;String&gt; seen = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        List&lt;String&gt; cleaned = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="pc">&nbsp;        for (String rawUuid : recognizedSubordinates) {</b>
+<b class="nc">&nbsp;            if (rawUuid == null || rawUuid.isBlank()) {</b>
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+&nbsp;            try {
+<b class="nc">&nbsp;                UUID.fromString(rawUuid);</b>
+&nbsp;            } catch (IllegalArgumentException exception) {
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!seen.add(rawUuid)) {</b>
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            cleaned.add(rawUuid);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (changed) {</b>
+<b class="nc">&nbsp;            recognizedSubordinates.clear();</b>
+<b class="nc">&nbsp;            recognizedSubordinates.addAll(cleaned);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean cleanupGrantedSkillTypes(Predicate&lt;String&gt; validSkillPredicate) {
+<b class="fc">&nbsp;        boolean changed = false;</b>
+<b class="fc">&nbsp;        Set&lt;String&gt; seen = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        List&lt;String&gt; cleaned = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="pc">&nbsp;        for (String skillId : grantedSkillTypes) {</b>
+<b class="nc">&nbsp;            if (skillId == null || skillId.isBlank()) {</b>
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (validSkillPredicate != null &amp;&amp; !validSkillPredicate.test(skillId)) {</b>
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!seen.add(skillId)) {</b>
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            cleaned.add(skillId);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (changed) {</b>
+<b class="nc">&nbsp;            grantedSkillTypes.clear();</b>
+<b class="nc">&nbsp;            grantedSkillTypes.addAll(cleaned);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void markCurrentVersion() {
+<b class="nc">&nbsp;        this.dataVersion = CURRENT_DATA_VERSION;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

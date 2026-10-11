@@ -1,0 +1,496 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GreatCrystalAltarBlock</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.block</a>
+</div>
+
+<h1>Coverage Summary for Class: GreatCrystalAltarBlock (com.mooswqz.moostensuraaddon.block)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GreatCrystalAltarBlock</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (8/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20.7%
+  </span>
+  <span class="absValue">
+    (12/58)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (40/100)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.block;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.ritual
+&nbsp;        .GreatCrystalAltarInteractionRouter;
+&nbsp;import net.minecraft.core.BlockPos;
+&nbsp;import net.minecraft.core.Direction;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.InteractionHand;
+&nbsp;import net.minecraft.world.InteractionResult;
+&nbsp;import net.minecraft.world.ItemInteractionResult;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;import net.minecraft.world.entity.player.Player;
+&nbsp;import net.minecraft.world.item.ItemStack;
+&nbsp;import net.minecraft.world.item.context.BlockPlaceContext;
+&nbsp;import net.minecraft.world.level.BlockGetter;
+&nbsp;import net.minecraft.world.level.Level;
+&nbsp;import net.minecraft.world.level.LevelAccessor;
+&nbsp;import net.minecraft.world.level.LevelReader;
+&nbsp;import net.minecraft.world.level.block.Block;
+&nbsp;import net.minecraft.world.level.block.Blocks;
+&nbsp;import net.minecraft.world.level.block.state.BlockState;
+&nbsp;import net.minecraft.world.level.block.state.StateDefinition;
+&nbsp;import net.minecraft.world.level.block.state.properties
+&nbsp;        .BlockStateProperties;
+&nbsp;import net.minecraft.world.level.block.state.properties
+&nbsp;        .DoubleBlockHalf;
+&nbsp;import net.minecraft.world.level.block.state.properties.EnumProperty;
+&nbsp;import net.minecraft.world.phys.BlockHitResult;
+&nbsp;import net.minecraft.world.phys.shapes.CollisionContext;
+&nbsp;import net.minecraft.world.phys.shapes.Shapes;
+&nbsp;import net.minecraft.world.phys.shapes.VoxelShape;
+&nbsp;
+&nbsp;public class GreatCrystalAltarBlock extends Block {
+&nbsp;
+<b class="fc">&nbsp;    public static final EnumProperty&lt;DoubleBlockHalf&gt; HALF =</b>
+&nbsp;            BlockStateProperties.DOUBLE_BLOCK_HALF;
+&nbsp;
+<b class="fc">&nbsp;    private static final VoxelShape LOWER_SHAPE =</b>
+<b class="fc">&nbsp;            Shapes.or(</b>
+<b class="fc">&nbsp;                    Block.box(</b>
+&nbsp;                            6.0D,
+&nbsp;                            0.0D,
+&nbsp;                            6.0D,
+&nbsp;                            10.0D,
+&nbsp;                            1.0D,
+&nbsp;                            10.0D
+&nbsp;                    ),
+<b class="fc">&nbsp;                    Block.box(</b>
+&nbsp;                            7.0D,
+&nbsp;                            1.0D,
+&nbsp;                            7.0D,
+&nbsp;                            9.0D,
+&nbsp;                            16.0D,
+&nbsp;                            9.0D
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;    private static final VoxelShape UPPER_SHAPE =</b>
+<b class="fc">&nbsp;            Block.box(</b>
+&nbsp;                    0.0D,
+&nbsp;                    0.0D,
+&nbsp;                    0.0D,
+&nbsp;                    16.0D,
+&nbsp;                    16.0D,
+&nbsp;                    16.0D
+&nbsp;            );
+&nbsp;
+&nbsp;    public GreatCrystalAltarBlock(
+&nbsp;            Properties properties
+&nbsp;    ) {
+<b class="fc">&nbsp;        super(properties);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.registerDefaultState(</b>
+&nbsp;                this.stateDefinition
+<b class="fc">&nbsp;                        .any()</b>
+<b class="fc">&nbsp;                        .setValue(</b>
+&nbsp;                                HALF,
+&nbsp;                                DoubleBlockHalf.LOWER
+&nbsp;                        )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BlockState getStateForPlacement(
+&nbsp;            BlockPlaceContext context
+&nbsp;    ) {
+<b class="nc">&nbsp;        BlockPos position =</b>
+<b class="nc">&nbsp;                context.getClickedPos();</b>
+&nbsp;
+<b class="nc">&nbsp;        Level level =</b>
+<b class="nc">&nbsp;                context.getLevel();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (position.getY()</b>
+<b class="nc">&nbsp;                &gt;= level.getMaxBuildHeight() - 1) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!level.getBlockState(</b>
+<b class="nc">&nbsp;                position.above()</b>
+<b class="nc">&nbsp;        ).canBeReplaced(context)) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return this.defaultBlockState()</b>
+<b class="nc">&nbsp;                .setValue(</b>
+&nbsp;                        HALF,
+&nbsp;                        DoubleBlockHalf.LOWER
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setPlacedBy(
+&nbsp;            Level level,
+&nbsp;            BlockPos position,
+&nbsp;            BlockState state,
+&nbsp;            LivingEntity placer,
+&nbsp;            ItemStack stack
+&nbsp;    ) {
+<b class="nc">&nbsp;        level.setBlock(</b>
+<b class="nc">&nbsp;                position.above(),</b>
+<b class="nc">&nbsp;                state.setValue(</b>
+&nbsp;                        HALF,
+&nbsp;                        DoubleBlockHalf.UPPER
+&nbsp;                ),
+&nbsp;                Block.UPDATE_ALL
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected InteractionResult useWithoutItem(
+&nbsp;            BlockState state,
+&nbsp;            Level level,
+&nbsp;            BlockPos position,
+&nbsp;            Player player,
+&nbsp;            BlockHitResult hitResult
+&nbsp;    ) {
+<b class="nc">&nbsp;        return interactWithAltar(</b>
+&nbsp;                state,
+&nbsp;                level,
+&nbsp;                position,
+&nbsp;                player
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected ItemInteractionResult useItemOn(
+&nbsp;            ItemStack stack,
+&nbsp;            BlockState state,
+&nbsp;            Level level,
+&nbsp;            BlockPos position,
+&nbsp;            Player player,
+&nbsp;            InteractionHand hand,
+&nbsp;            BlockHitResult hitResult
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player.isSecondaryUseActive()) {</b>
+<b class="nc">&nbsp;            return ItemInteractionResult</b>
+&nbsp;                    .PASS_TO_DEFAULT_BLOCK_INTERACTION;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        InteractionResult result =</b>
+<b class="fc">&nbsp;                interactWithAltar(</b>
+&nbsp;                        state,
+&nbsp;                        level,
+&nbsp;                        position,
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (result.consumesAction()) {</b>
+<b class="fc">&nbsp;            return ItemInteractionResult.sidedSuccess(</b>
+<b class="fc">&nbsp;                    level.isClientSide()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return ItemInteractionResult</b>
+&nbsp;                .PASS_TO_DEFAULT_BLOCK_INTERACTION;
+&nbsp;    }
+&nbsp;
+&nbsp;    private InteractionResult interactWithAltar(
+&nbsp;            BlockState state,
+&nbsp;            Level level,
+&nbsp;            BlockPos position,
+&nbsp;            Player player
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (level.isClientSide()) {</b>
+<b class="fc">&nbsp;            return InteractionResult.SUCCESS;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        BlockPos altarPosition =</b>
+<b class="fc">&nbsp;                getLowerHalfPosition(</b>
+&nbsp;                        state,
+&nbsp;                        position
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        BlockState lowerState =</b>
+<b class="fc">&nbsp;                level.getBlockState(</b>
+&nbsp;                        altarPosition
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (!lowerState.is(this)</b>
+<b class="pc">&nbsp;                || lowerState.getValue(HALF)</b>
+&nbsp;                != DoubleBlockHalf.LOWER) {
+&nbsp;
+<b class="nc">&nbsp;            return InteractionResult.CONSUME;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (player instanceof ServerPlayer serverPlayer) {</b>
+<b class="fc">&nbsp;            GreatCrystalAltarInteractionRouter.interact(</b>
+&nbsp;                    serverPlayer,
+&nbsp;                    altarPosition
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return InteractionResult.CONSUME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected BlockState updateShape(
+&nbsp;            BlockState state,
+&nbsp;            Direction direction,
+&nbsp;            BlockState neighborState,
+&nbsp;            LevelAccessor level,
+&nbsp;            BlockPos position,
+&nbsp;            BlockPos neighborPosition
+&nbsp;    ) {
+<b class="nc">&nbsp;        DoubleBlockHalf half =</b>
+<b class="nc">&nbsp;                state.getValue(HALF);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (half == DoubleBlockHalf.LOWER</b>
+&nbsp;                &amp;&amp; direction == Direction.UP) {
+&nbsp;
+<b class="nc">&nbsp;            if (!neighborState.is(this)</b>
+<b class="nc">&nbsp;                    || neighborState.getValue(HALF)</b>
+&nbsp;                    != DoubleBlockHalf.UPPER) {
+&nbsp;
+<b class="nc">&nbsp;                return Blocks.AIR</b>
+<b class="nc">&nbsp;                        .defaultBlockState();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (half == DoubleBlockHalf.UPPER</b>
+&nbsp;                &amp;&amp; direction == Direction.DOWN) {
+&nbsp;
+<b class="nc">&nbsp;            if (!neighborState.is(this)</b>
+<b class="nc">&nbsp;                    || neighborState.getValue(HALF)</b>
+&nbsp;                    != DoubleBlockHalf.LOWER) {
+&nbsp;
+<b class="nc">&nbsp;                return Blocks.AIR</b>
+<b class="nc">&nbsp;                        .defaultBlockState();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return super.updateShape(</b>
+&nbsp;                state,
+&nbsp;                direction,
+&nbsp;                neighborState,
+&nbsp;                level,
+&nbsp;                position,
+&nbsp;                neighborPosition
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected boolean canSurvive(
+&nbsp;            BlockState state,
+&nbsp;            LevelReader level,
+&nbsp;            BlockPos position
+&nbsp;    ) {
+<b class="nc">&nbsp;        DoubleBlockHalf half =</b>
+<b class="nc">&nbsp;                state.getValue(HALF);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (half == DoubleBlockHalf.UPPER) {</b>
+<b class="nc">&nbsp;            BlockState belowState =</b>
+<b class="nc">&nbsp;                    level.getBlockState(</b>
+<b class="nc">&nbsp;                            position.below()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            return belowState.is(this)</b>
+<b class="nc">&nbsp;                    &amp;&amp; belowState.getValue(HALF)</b>
+&nbsp;                    == DoubleBlockHalf.LOWER;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return position.getY()</b>
+<b class="nc">&nbsp;                &lt; level.getMaxBuildHeight() - 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BlockState playerWillDestroy(
+&nbsp;            Level level,
+&nbsp;            BlockPos position,
+&nbsp;            BlockState state,
+&nbsp;            Player player
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!level.isClientSide()) {</b>
+<b class="nc">&nbsp;            DoubleBlockHalf half =</b>
+<b class="nc">&nbsp;                    state.getValue(HALF);</b>
+&nbsp;
+&nbsp;            BlockPos otherPosition =
+<b class="nc">&nbsp;                    half == DoubleBlockHalf.LOWER</b>
+<b class="nc">&nbsp;                            ? position.above()</b>
+<b class="nc">&nbsp;                            : position.below();</b>
+&nbsp;
+<b class="nc">&nbsp;            BlockState otherState =</b>
+<b class="nc">&nbsp;                    level.getBlockState(</b>
+&nbsp;                            otherPosition
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (otherState.is(this)</b>
+<b class="nc">&nbsp;                    &amp;&amp; otherState.getValue(HALF)</b>
+&nbsp;                    != half) {
+&nbsp;
+<b class="nc">&nbsp;                if (half == DoubleBlockHalf.UPPER</b>
+<b class="nc">&nbsp;                        &amp;&amp; !player.isCreative()) {</b>
+&nbsp;
+<b class="nc">&nbsp;                    Block.dropResources(</b>
+&nbsp;                            otherState,
+&nbsp;                            level,
+&nbsp;                            otherPosition
+&nbsp;                    );
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                level.setBlock(</b>
+&nbsp;                        otherPosition,
+<b class="nc">&nbsp;                        Blocks.AIR.defaultBlockState(),</b>
+&nbsp;                        Block.UPDATE_ALL
+&nbsp;                                | Block.UPDATE_SUPPRESS_DROPS
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return super.playerWillDestroy(</b>
+&nbsp;                level,
+&nbsp;                position,
+&nbsp;                state,
+&nbsp;                player
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected VoxelShape getShape(
+&nbsp;            BlockState state,
+&nbsp;            BlockGetter level,
+&nbsp;            BlockPos position,
+&nbsp;            CollisionContext context
+&nbsp;    ) {
+<b class="fc">&nbsp;        return state.getValue(HALF)</b>
+<b class="fc">&nbsp;                == DoubleBlockHalf.LOWER</b>
+<b class="fc">&nbsp;                ? LOWER_SHAPE</b>
+<b class="fc">&nbsp;                : UPPER_SHAPE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected VoxelShape getCollisionShape(
+&nbsp;            BlockState state,
+&nbsp;            BlockGetter level,
+&nbsp;            BlockPos position,
+&nbsp;            CollisionContext context
+&nbsp;    ) {
+<b class="fc">&nbsp;        return state.getValue(HALF)</b>
+<b class="fc">&nbsp;                == DoubleBlockHalf.LOWER</b>
+<b class="fc">&nbsp;                ? LOWER_SHAPE</b>
+<b class="fc">&nbsp;                : UPPER_SHAPE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void createBlockStateDefinition(
+&nbsp;            StateDefinition.Builder&lt;Block, BlockState&gt; builder
+&nbsp;    ) {
+<b class="fc">&nbsp;        builder.add(HALF);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static BlockPos getLowerHalfPosition(
+&nbsp;            BlockState state,
+&nbsp;            BlockPos position
+&nbsp;    ) {
+<b class="pc">&nbsp;        return state.getValue(HALF)</b>
+<b class="fc">&nbsp;                == DoubleBlockHalf.UPPER</b>
+<b class="fc">&nbsp;                ? position.below()</b>
+<b class="nc">&nbsp;                : position;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

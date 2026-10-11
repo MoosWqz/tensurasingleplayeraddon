@@ -1,0 +1,237 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GreatCrystalAltarInteractionRouter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.ritual</a>
+</div>
+
+<h1>Coverage Summary for Class: GreatCrystalAltarInteractionRouter (com.mooswqz.moostensuraaddon.ritual)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GreatCrystalAltarInteractionRouter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (10/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    52.2%
+  </span>
+  <span class="absValue">
+    (12/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.ritual;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+&nbsp;import com.mooswqz.moostensuraaddon.util.GreatSageAwakeningHelper;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.core.BlockPos;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;public final class GreatCrystalAltarInteractionRouter {
+&nbsp;
+&nbsp;    private GreatCrystalAltarInteractionRouter() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void interact(
+&nbsp;            ServerPlayer player,
+&nbsp;            BlockPos altarPos
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null || altarPos == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * The altar supports only one active ritual per player.
+&nbsp;         */
+<b class="pc">&nbsp;        if (RecognitionNamingRitualManager.isRitualActive(</b>
+&nbsp;                player
+&nbsp;        )) {
+<b class="nc">&nbsp;            player.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;The crystal is already reading your soul.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (GreatSageRitualManager.isRitualActive(</b>
+&nbsp;                player
+&nbsp;        )) {
+<b class="nc">&nbsp;            player.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;The Great Sage ritual is already in progress.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * A committed answer must remain recoverable even when this update
+&nbsp;         * changes the normal order of the altar flows. Resuming its reveal
+&nbsp;         * cannot wait behind another ritual because the result is already
+&nbsp;         * fixed for this incarnation.
+&nbsp;         */
+<b class="fc">&nbsp;        if (RecognitionNamingRitualManager</b>
+<b class="pc">&nbsp;                .hasPendingReveal(player)) {</b>
+&nbsp;
+<b class="nc">&nbsp;            RecognitionNamingRitualManager.tryStartRitual(</b>
+&nbsp;                    player,
+&nbsp;                    altarPos
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * When Sage is still present, its Great Sage evolution is the first
+&nbsp;         * altar milestone. Soul Recognition follows on a later interaction.
+&nbsp;         * Disabling either Great Sage progression or its altar ritual leaves
+&nbsp;         * Soul Recognition available instead of deadlocking the altar.
+&nbsp;         */
+<b class="pc">&nbsp;        if (shouldPrioritizeGreatSage(player)) {</b>
+<b class="nc">&nbsp;            GreatSageRitualManager.tryStartRitual(</b>
+&nbsp;                    player,
+&nbsp;                    altarPos
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Native Tensura naming is compatible metadata, not a blocker: an
+&nbsp;         * administrator-created or legacy native name can still be followed
+&nbsp;         * by the altar recognition ritual.
+&nbsp;         */
+<b class="fc">&nbsp;        if (RecognitionNamingRitualManager</b>
+<b class="pc">&nbsp;                .shouldHandleNaming(player)) {</b>
+&nbsp;
+<b class="nc">&nbsp;            RecognitionNamingRitualManager.tryStartRitual(</b>
+&nbsp;                    player,
+&nbsp;                    altarPos
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * A player who acquired Sage only after recognition can still use the
+&nbsp;         * normal Great Sage altar flow here.
+&nbsp;         */
+<b class="fc">&nbsp;        GreatSageRitualManager.tryStartRitual(</b>
+&nbsp;                player,
+&nbsp;                altarPos
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean shouldPrioritizeGreatSage(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        return MoosTensuraConfig.SAGE_UPGRADE_ENABLED.get()</b>
+<b class="pc">&nbsp;                &amp;&amp; MoosTensuraConfig.GREAT_SAGE_RITUAL_ENABLED.get()</b>
+<b class="pc">&nbsp;                &amp;&amp; !GreatSageAwakeningHelper.hasGreatSage(player)</b>
+<b class="nc">&nbsp;                &amp;&amp; GreatSageAwakeningHelper.findSage(player)</b>
+<b class="nc">&nbsp;                .isPresent();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

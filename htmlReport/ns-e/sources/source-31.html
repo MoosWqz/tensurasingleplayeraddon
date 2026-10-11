@@ -1,0 +1,1374 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionProgressScreenService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionProgressScreenService (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionProgressScreenService</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.8%
+  </span>
+  <span class="absValue">
+    (4/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.1%
+  </span>
+  <span class="absValue">
+    (2/174)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.8%
+  </span>
+  <span class="absValue">
+    (26/383)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionProgressScreenService$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionProgressScreenService$RequestOrigin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionProgressScreenService$RequestState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionProgressScreenService$RuntimeSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    10.3%
+  </span>
+  <span class="absValue">
+    (4/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.1%
+  </span>
+  <span class="absValue">
+    (2/174)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.6%
+  </span>
+  <span class="absValue">
+    (26/391)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment
+&nbsp;        .AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment
+&nbsp;        .RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.network
+&nbsp;        .OpenRecognitionProgressScreenPayload;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.neoforged.neoforge.network.PacketDistributor;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;public final class RecognitionProgressScreenService {
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Normal UI protection:
+&nbsp;     *
+&nbsp;     * The client disables its Refresh button for two seconds, but the client
+&nbsp;     * must never be trusted as the only protection. These server-side limits
+&nbsp;     * are therefore applied to both the command and the network request.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final long MIN_RESPONSE_INTERVAL_NANOS =</b>
+<b class="fc">&nbsp;            TimeUnit.MILLISECONDS.toNanos(750L);</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * The expensive synchronization and recognition evaluation can run at
+&nbsp;     * most once per player during this interval. Repeated accepted requests
+&nbsp;     * receive the already sanitized cached payload.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final long PAYLOAD_CACHE_NANOS =</b>
+<b class="fc">&nbsp;            TimeUnit.SECONDS.toNanos(2L);</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Hard per-player burst ceiling. A modified client can bypass the local
+&nbsp;     * button cooldown, but it cannot make this service answer indefinitely.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final long REQUEST_WINDOW_NANOS =</b>
+<b class="fc">&nbsp;            TimeUnit.SECONDS.toNanos(10L);</b>
+&nbsp;
+&nbsp;    private static final int MAX_REQUESTS_PER_WINDOW =
+&nbsp;            8;
+&nbsp;
+<b class="fc">&nbsp;    private static final long FEEDBACK_INTERVAL_NANOS =</b>
+<b class="fc">&nbsp;            TimeUnit.SECONDS.toNanos(2L);</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * A second, server-wide budget protects against many different players
+&nbsp;     * requesting an uncached rebuild at the same time. Cached snapshots do
+&nbsp;     * not consume this budget.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final long GLOBAL_BUILD_WINDOW_NANOS =</b>
+<b class="fc">&nbsp;            TimeUnit.SECONDS.toNanos(1L);</b>
+&nbsp;
+&nbsp;    private static final int MAX_GLOBAL_FRESH_BUILDS_PER_WINDOW =
+&nbsp;            16;
+&nbsp;
+<b class="fc">&nbsp;    private static final long STATE_EXPIRY_NANOS =</b>
+<b class="fc">&nbsp;            TimeUnit.MINUTES.toNanos(10L);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final long CLEANUP_INTERVAL_NANOS =</b>
+<b class="fc">&nbsp;            TimeUnit.MINUTES.toNanos(1L);</b>
+&nbsp;
+&nbsp;    private static final int MAX_TRACKED_REQUEST_STATES =
+&nbsp;            1024;
+&nbsp;
+&nbsp;    private static final RecognitionRuntimeCapTable&lt;UUID, RequestState&gt;
+<b class="fc">&nbsp;            REQUEST_STATES =</b>
+&nbsp;            new RecognitionRuntimeCapTable&lt;&gt;(
+&nbsp;                    MAX_TRACKED_REQUEST_STATES,
+<b class="nc">&nbsp;                    state -&gt; state.lastActivityNanos</b>
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;    private static final Object GLOBAL_BUILD_LOCK =</b>
+&nbsp;            new Object();
+&nbsp;
+&nbsp;    private static volatile long nextCleanupNanos;
+&nbsp;
+&nbsp;    private static long globalBuildWindowStartedNanos;
+&nbsp;    private static int globalFreshBuildsInWindow;
+&nbsp;
+&nbsp;    private RecognitionProgressScreenService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Opens the screen from /moostensura paths.
+&nbsp;     *
+&nbsp;     * This route uses the same cache and server-side rate limiter as the
+&nbsp;     * Refresh button, so command spam cannot repeatedly recalculate the
+&nbsp;     * recognition graph.
+&nbsp;     */
+&nbsp;    public static void open(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        requestOpen(</b>
+&nbsp;                player,
+&nbsp;                RequestOrigin.COMMAND
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles the empty client-to-server Refresh request.
+&nbsp;     */
+&nbsp;    public static void requestRefresh(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        requestOpen(</b>
+&nbsp;                player,
+&nbsp;                RequestOrigin.CLIENT_REFRESH
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Invalidates only the cached snapshot for this player.
+&nbsp;     *
+&nbsp;     * Naming, unnaming, progression reset and similar server-authoritative
+&nbsp;     * actions can call this method when they need the very next accepted
+&nbsp;     * request to rebuild immediately.
+&nbsp;     */
+&nbsp;    public static void invalidate(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        invalidate(</b>
+<b class="nc">&nbsp;                player.getUUID()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void invalidate(
+&nbsp;            UUID playerUuid
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (playerUuid == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RequestState state =</b>
+<b class="nc">&nbsp;                REQUEST_STATES.get(playerUuid);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (state == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        synchronized (state) {</b>
+<b class="nc">&nbsp;            state.cachedPayload = null;</b>
+<b class="nc">&nbsp;            state.cacheExpiresNanos = 0L;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clear(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        clear(player.getUUID());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clear(
+&nbsp;            UUID playerUuid
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (playerUuid == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        REQUEST_STATES.remove(playerUuid);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clearAll() {
+<b class="fc">&nbsp;        REQUEST_STATES.clear();</b>
+<b class="fc">&nbsp;        nextCleanupNanos = 0L;</b>
+&nbsp;
+<b class="fc">&nbsp;        synchronized (GLOBAL_BUILD_LOCK) {</b>
+<b class="fc">&nbsp;            globalBuildWindowStartedNanos = 0L;</b>
+<b class="fc">&nbsp;            globalFreshBuildsInWindow = 0;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RuntimeSnapshot inspectRuntimeState() {
+<b class="nc">&nbsp;        synchronized (GLOBAL_BUILD_LOCK) {</b>
+<b class="nc">&nbsp;            return new RuntimeSnapshot(</b>
+<b class="nc">&nbsp;                    REQUEST_STATES.size(),</b>
+&nbsp;                    MAX_TRACKED_REQUEST_STATES,
+&nbsp;                    globalFreshBuildsInWindow,
+&nbsp;                    MAX_GLOBAL_FRESH_BUILDS_PER_WINDOW,
+&nbsp;                    globalBuildWindowStartedNanos,
+&nbsp;                    nextCleanupNanos
+&nbsp;            );
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int maximumTrackedRequestStates() {
+<b class="nc">&nbsp;        return MAX_TRACKED_REQUEST_STATES;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int maximumFreshBuildsPerWindow() {
+<b class="nc">&nbsp;        return MAX_GLOBAL_FRESH_BUILDS_PER_WINDOW;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void requestOpen(
+&nbsp;            ServerPlayer player,
+&nbsp;            RequestOrigin origin
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null</b>
+<b class="nc">&nbsp;                || player.isRemoved()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long now = System.nanoTime();</b>
+&nbsp;
+<b class="nc">&nbsp;        cleanupExpiredStates(now);</b>
+&nbsp;
+<b class="nc">&nbsp;        RequestState state =</b>
+<b class="nc">&nbsp;                REQUEST_STATES.getOrCreate(</b>
+<b class="nc">&nbsp;                        player.getUUID(),</b>
+<b class="nc">&nbsp;                        () -&gt; new RequestState(now)</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        OpenRecognitionProgressScreenPayload payload =</b>
+&nbsp;                null;
+&nbsp;
+<b class="nc">&nbsp;        boolean sendCooldownFeedback = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        synchronized (state) {</b>
+<b class="nc">&nbsp;            state.lastActivityNanos = now;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (now - state.windowStartedNanos</b>
+&nbsp;                    &gt;= REQUEST_WINDOW_NANOS) {
+<b class="nc">&nbsp;                state.windowStartedNanos = now;</b>
+<b class="nc">&nbsp;                state.requestsInWindow = 0;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (state.requestsInWindow</b>
+&nbsp;                    &lt; Integer.MAX_VALUE) {
+<b class="nc">&nbsp;                state.requestsInWindow++;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            boolean hardLimited =</b>
+&nbsp;                    state.requestsInWindow
+&nbsp;                            &gt; MAX_REQUESTS_PER_WINDOW;
+&nbsp;
+<b class="nc">&nbsp;            boolean responseTooSoon =</b>
+&nbsp;                    state.lastResponseNanos != 0L
+&nbsp;                            &amp;&amp; now - state.lastResponseNanos
+&nbsp;                            &lt; MIN_RESPONSE_INTERVAL_NANOS;
+&nbsp;
+<b class="nc">&nbsp;            if (hardLimited || responseTooSoon) {</b>
+<b class="nc">&nbsp;                if (origin == RequestOrigin.COMMAND</b>
+&nbsp;                        &amp;&amp; now - state.lastFeedbackNanos
+&nbsp;                        &gt;= FEEDBACK_INTERVAL_NANOS) {
+&nbsp;
+<b class="nc">&nbsp;                    state.lastFeedbackNanos = now;</b>
+<b class="nc">&nbsp;                    sendCooldownFeedback = true;</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                boolean debugDetailsAvailable =</b>
+<b class="nc">&nbsp;                        DebugModeService.canUseDebugTools(</b>
+<b class="nc">&nbsp;                                player.createCommandSourceStack()</b>
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;                boolean cacheValid =</b>
+&nbsp;                        state.cachedPayload != null
+&nbsp;                                &amp;&amp; now
+&nbsp;                                &lt; state.cacheExpiresNanos
+&nbsp;                                &amp;&amp; state.cachedDebugDetails
+&nbsp;                                == debugDetailsAvailable;
+&nbsp;
+<b class="nc">&nbsp;                if (cacheValid) {</b>
+<b class="nc">&nbsp;                    payload = state.cachedPayload;</b>
+<b class="nc">&nbsp;                } else if (tryReserveFreshBuild(now)) {</b>
+<b class="nc">&nbsp;                    payload = buildPayload(</b>
+&nbsp;                            player,
+&nbsp;                            debugDetailsAvailable
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    state.cachedPayload = payload;</b>
+<b class="nc">&nbsp;                    state.cachedDebugDetails =</b>
+&nbsp;                            debugDetailsAvailable;
+<b class="nc">&nbsp;                    state.cacheExpiresNanos =</b>
+&nbsp;                            now + PAYLOAD_CACHE_NANOS;
+<b class="nc">&nbsp;                } else if (state.cachedPayload != null</b>
+&nbsp;                        &amp;&amp; state.cachedDebugDetails
+&nbsp;                        == debugDetailsAvailable) {
+&nbsp;                    /*
+&nbsp;                     * Under a short global burst, an older sanitized snapshot
+&nbsp;                     * is safer than another expensive rebuild. The next
+&nbsp;                     * accepted request can refresh it when the global budget
+&nbsp;                     * is available again.
+&nbsp;                     */
+<b class="nc">&nbsp;                    payload = state.cachedPayload;</b>
+<b class="nc">&nbsp;                } else if (origin == RequestOrigin.COMMAND</b>
+&nbsp;                        &amp;&amp; now - state.lastFeedbackNanos
+&nbsp;                        &gt;= FEEDBACK_INTERVAL_NANOS) {
+&nbsp;
+<b class="nc">&nbsp;                    state.lastFeedbackNanos = now;</b>
+<b class="nc">&nbsp;                    sendCooldownFeedback = true;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (payload != null) {</b>
+<b class="nc">&nbsp;                    state.lastResponseNanos = now;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (sendCooldownFeedback) {</b>
+<b class="nc">&nbsp;            player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;Soul Recognition is cooling down. Please wait a moment.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.GRAY
+&nbsp;                            )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (payload == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        PacketDistributor.sendToPlayer(</b>
+&nbsp;                player,
+&nbsp;                payload
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static OpenRecognitionProgressScreenPayload
+&nbsp;    buildPayload(
+&nbsp;            ServerPlayer player,
+&nbsp;            boolean debugDetailsAvailable
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionNamingEligibility eligibility =</b>
+<b class="nc">&nbsp;                RecognitionNamingService.evaluate(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data =</b>
+<b class="nc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvaluation evaluation =</b>
+<b class="nc">&nbsp;                eligibility.evaluation();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPathSelection liveSelection =</b>
+<b class="nc">&nbsp;                evaluation.getSelection()</b>
+<b class="nc">&nbsp;                        .orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean recognitionCommitted =</b>
+<b class="nc">&nbsp;                data.isNamingCommitted();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="nc">&nbsp;                resolvePrimaryPath(</b>
+&nbsp;                        data,
+&nbsp;                        liveSelection,
+&nbsp;                        recognitionCommitted
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath secondaryPath =</b>
+<b class="nc">&nbsp;                resolveSecondaryPath(</b>
+&nbsp;                        data,
+&nbsp;                        liveSelection,
+&nbsp;                        recognitionCommitted
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        boolean pureRecognition =</b>
+<b class="nc">&nbsp;                resolvePureRecognition(</b>
+&nbsp;                        data,
+&nbsp;                        liveSelection,
+&nbsp;                        recognitionCommitted
+&nbsp;                );
+&nbsp;
+&nbsp;        int recognitionColor =
+<b class="nc">&nbsp;                primaryPath == null</b>
+<b class="nc">&nbsp;                        ? 0xFFFFFF</b>
+&nbsp;                        : RecognitionNameColorService
+<b class="nc">&nbsp;                        .getRecognitionColor(</b>
+&nbsp;                                primaryPath,
+&nbsp;                                secondaryPath,
+&nbsp;                                pureRecognition
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        String accountName =</b>
+<b class="nc">&nbsp;                player.getGameProfile()</b>
+<b class="nc">&nbsp;                        .getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        String identityLine =</b>
+<b class="nc">&nbsp;                buildIdentityLine(</b>
+&nbsp;                        accountName,
+<b class="nc">&nbsp;                        eligibility.nativeName()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        String pathSummary =</b>
+<b class="nc">&nbsp;                buildPathSummary(</b>
+&nbsp;                        primaryPath,
+&nbsp;                        secondaryPath,
+&nbsp;                        pureRecognition
+&nbsp;                );
+&nbsp;
+&nbsp;        List&lt;OpenRecognitionProgressScreenPayload.PathEntry&gt;
+<b class="nc">&nbsp;                pathEntries =</b>
+<b class="nc">&nbsp;                buildPathEntries(</b>
+&nbsp;                        evaluation,
+&nbsp;                        primaryPath,
+&nbsp;                        secondaryPath,
+&nbsp;                        debugDetailsAvailable
+&nbsp;                );
+&nbsp;
+&nbsp;        List&lt;OpenRecognitionProgressScreenPayload.GuidanceEntry&gt;
+<b class="nc">&nbsp;                guidanceEntries =</b>
+<b class="nc">&nbsp;                buildGuidanceEntries(</b>
+&nbsp;                        data,
+&nbsp;                        evaluation,
+&nbsp;                        debugDetailsAvailable
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        String statusHeading =</b>
+<b class="nc">&nbsp;                buildStatusHeading(</b>
+&nbsp;                        eligibility,
+&nbsp;                        data
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        String statusDetail =</b>
+<b class="nc">&nbsp;                buildStatusDetail(</b>
+&nbsp;                        eligibility,
+&nbsp;                        data,
+&nbsp;                        pathSummary
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        String levelLine =</b>
+<b class="nc">&nbsp;                buildLevelLine(eligibility);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new OpenRecognitionProgressScreenPayload(</b>
+&nbsp;                accountName,
+&nbsp;                identityLine,
+<b class="nc">&nbsp;                recognitionCommitted</b>
+<b class="nc">&nbsp;                        ? data.getBestowedTitle()</b>
+<b class="nc">&nbsp;                        : &quot;&quot;,</b>
+&nbsp;                pathSummary,
+<b class="nc">&nbsp;                eligibility.status().getId(),</b>
+&nbsp;                statusHeading,
+&nbsp;                statusDetail,
+&nbsp;                levelLine,
+<b class="nc">&nbsp;                eligibility.currentLevel(),</b>
+<b class="nc">&nbsp;                eligibility.requiredLevel(),</b>
+<b class="nc">&nbsp;                eligibility.nativeNamed(),</b>
+&nbsp;                recognitionCommitted,
+<b class="nc">&nbsp;                data.isRevealPending(),</b>
+&nbsp;                pureRecognition,
+<b class="nc">&nbsp;                pathId(primaryPath),</b>
+<b class="nc">&nbsp;                pathId(secondaryPath),</b>
+&nbsp;                recognitionColor,
+&nbsp;                primaryPath != null
+&nbsp;                        &amp;&amp; pureRecognition,
+&nbsp;                debugDetailsAvailable,
+<b class="nc">&nbsp;                debugDetailsAvailable</b>
+&nbsp;                        ? RecognitionPathEvaluator
+<b class="nc">&nbsp;                          .DEFAULT_ESTABLISHED_THRESHOLD</b>
+<b class="nc">&nbsp;                        : 0.0D,</b>
+<b class="nc">&nbsp;                debugDetailsAvailable</b>
+&nbsp;                        ? RecognitionPathEvaluator
+<b class="nc">&nbsp;                          .DEFAULT_PURE_THRESHOLD</b>
+<b class="nc">&nbsp;                        : 0.0D,</b>
+<b class="nc">&nbsp;                debugDetailsAvailable</b>
+&nbsp;                        ? RecognitionPathEvaluator
+<b class="nc">&nbsp;                          .DEFAULT_RAW_PURE_THRESHOLD</b>
+<b class="nc">&nbsp;                        : 0.0D,</b>
+&nbsp;                pathEntries,
+&nbsp;                guidanceEntries
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionPath resolvePrimaryPath(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionPathSelection liveSelection,
+&nbsp;            boolean recognitionCommitted
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (recognitionCommitted) {</b>
+<b class="nc">&nbsp;            RecognitionPath committedPrimary =</b>
+<b class="nc">&nbsp;                    data.getCommittedPrimaryPath()</b>
+<b class="nc">&nbsp;                            .orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (committedPrimary != null) {</b>
+<b class="nc">&nbsp;                return committedPrimary;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return liveSelection == null</b>
+<b class="nc">&nbsp;                ? null</b>
+<b class="nc">&nbsp;                : liveSelection.primaryPath();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionPath resolveSecondaryPath(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionPathSelection liveSelection,
+&nbsp;            boolean recognitionCommitted
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (recognitionCommitted) {</b>
+<b class="nc">&nbsp;            return data.getCommittedSecondaryPath()</b>
+<b class="nc">&nbsp;                    .orElse(null);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (liveSelection == null</b>
+<b class="nc">&nbsp;                || liveSelection.pure()) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return liveSelection.secondaryPath();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean resolvePureRecognition(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionPathSelection liveSelection,
+&nbsp;            boolean recognitionCommitted
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (recognitionCommitted) {</b>
+<b class="nc">&nbsp;            return data.isPureRecognition();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return liveSelection != null</b>
+<b class="nc">&nbsp;                &amp;&amp; liveSelection.pure();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String buildIdentityLine(
+&nbsp;            String accountName,
+&nbsp;            String nativeName
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (nativeName != null</b>
+<b class="nc">&nbsp;                &amp;&amp; !nativeName.isBlank()) {</b>
+<b class="nc">&nbsp;            return nativeName.trim();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return accountName == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : accountName.trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String buildPathSummary(
+&nbsp;            RecognitionPath primaryPath,
+&nbsp;            RecognitionPath secondaryPath,
+&nbsp;            boolean pureRecognition
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (primaryPath == null) {</b>
+<b class="nc">&nbsp;            return &quot;No dominant path yet&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String primaryName =</b>
+&nbsp;                RecognitionNameColorService
+<b class="nc">&nbsp;                        .getDisplayName(primaryPath);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (pureRecognition) {</b>
+<b class="nc">&nbsp;            return &quot;Pure &quot; + primaryName;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (secondaryPath == null) {</b>
+<b class="nc">&nbsp;            return primaryName;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return primaryName</b>
+&nbsp;                + &quot; / &quot;
+&nbsp;                + RecognitionNameColorService
+<b class="nc">&nbsp;                .getDisplayName(secondaryPath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;
+&nbsp;            OpenRecognitionProgressScreenPayload.PathEntry
+&nbsp;            &gt; buildPathEntries(
+&nbsp;            RecognitionEvaluation evaluation,
+&nbsp;            RecognitionPath primaryPath,
+&nbsp;            RecognitionPath secondaryPath,
+&nbsp;            boolean debugDetailsAvailable
+&nbsp;    ) {
+&nbsp;        List&lt;OpenRecognitionProgressScreenPayload.PathEntry&gt;
+<b class="nc">&nbsp;                entries =</b>
+&nbsp;                new ArrayList&lt;&gt;(
+<b class="nc">&nbsp;                        RecognitionPath.values().length</b>
+&nbsp;                );
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            double finalScore =</b>
+<b class="nc">&nbsp;                    evaluation.getPathScore(path);</b>
+&nbsp;
+<b class="nc">&nbsp;            double rawScore =</b>
+<b class="nc">&nbsp;                    evaluation.getRawPathScore(path);</b>
+&nbsp;
+<b class="nc">&nbsp;            double identityBoost =</b>
+<b class="nc">&nbsp;                    evaluation.getIdentityBoost(path);</b>
+&nbsp;
+<b class="nc">&nbsp;            entries.add(</b>
+&nbsp;                    new OpenRecognitionProgressScreenPayload
+&nbsp;                            .PathEntry(
+<b class="nc">&nbsp;                            path.getId(),</b>
+&nbsp;                            RecognitionNameColorService
+<b class="nc">&nbsp;                                    .getDisplayName(path),</b>
+<b class="nc">&nbsp;                            getPathStageLabel(finalScore),</b>
+<b class="nc">&nbsp;                            getPathProgress(finalScore),</b>
+&nbsp;                            RecognitionNameColorService
+<b class="nc">&nbsp;                                    .getBaseColor(path),</b>
+&nbsp;                            path == primaryPath,
+&nbsp;                            path == secondaryPath,
+<b class="nc">&nbsp;                            debugDetailsAvailable</b>
+<b class="nc">&nbsp;                                    ? finalScore</b>
+<b class="nc">&nbsp;                                    : 0.0D,</b>
+<b class="nc">&nbsp;                            debugDetailsAvailable</b>
+<b class="nc">&nbsp;                                    ? rawScore</b>
+<b class="nc">&nbsp;                                    : 0.0D,</b>
+<b class="nc">&nbsp;                            debugDetailsAvailable</b>
+<b class="nc">&nbsp;                                    ? identityBoost</b>
+<b class="nc">&nbsp;                                    : 0.0D</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return List.copyOf(entries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;
+&nbsp;            OpenRecognitionProgressScreenPayload.GuidanceEntry
+&nbsp;            &gt; buildGuidanceEntries(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionEvaluation evaluation,
+&nbsp;            boolean debugDetailsAvailable
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionDimensions dimensions =</b>
+<b class="nc">&nbsp;                evaluation.getDimensions();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPathComponents components =</b>
+<b class="nc">&nbsp;                evaluation.getComponents();</b>
+&nbsp;
+<b class="nc">&nbsp;        double masteryMaximum =</b>
+&nbsp;                RecognitionEvidenceBreakdown
+<b class="nc">&nbsp;                        .calculate(</b>
+&nbsp;                                data,
+<b class="nc">&nbsp;                                evaluation.getBalance()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .mastery()</b>
+<b class="nc">&nbsp;                        .entries()</b>
+<b class="nc">&nbsp;                        .stream()</b>
+<b class="nc">&nbsp;                        .mapToDouble(</b>
+&nbsp;                                RecognitionEvidenceBreakdown.Entry::maximum
+&nbsp;                        )
+<b class="nc">&nbsp;                        .sum();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionFreedomProgressSnapshot freedomProgress =</b>
+<b class="nc">&nbsp;                RecognitionFreedomProgressSnapshot.inspect(</b>
+&nbsp;                        data,
+&nbsp;                        evaluation
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot historySnapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryModifier storedHistoryModifier =</b>
+<b class="nc">&nbsp;                historySnapshot.knownModifier()</b>
+<b class="nc">&nbsp;                        .orElse(</b>
+&nbsp;                                RecognitionIdentityHistoryModifier.NONE
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        int recognizedSubordinates =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .CURRENT_SUBORDINATES
+&nbsp;                        ),
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .HIGHEST_SUBORDINATES
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double companionship =</b>
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        30.0D,
+&nbsp;                        recognizedSubordinates * 1.5D
+&nbsp;                )
+<b class="nc">&nbsp;                        + Math.min(</b>
+&nbsp;                        20.0D,
+<b class="nc">&nbsp;                        data.getUniqueValueCount(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .UNIQUE_SUBORDINATES_EMPOWERED
+&nbsp;                        ) * 2.0D
+&nbsp;                )
+<b class="nc">&nbsp;                        + Math.min(</b>
+&nbsp;                        20.0D,
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .SUBORDINATE_ASSISTED_MAJOR_VICTORIES
+&nbsp;                        ) * 4.0D
+&nbsp;                );
+&nbsp;
+&nbsp;        List&lt;OpenRecognitionProgressScreenPayload.GuidanceEntry&gt;
+<b class="nc">&nbsp;                entries =</b>
+&nbsp;                new ArrayList&lt;&gt;(11);
+&nbsp;
+<b class="nc">&nbsp;        boolean rewardInitialized = data.getFlag(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED
+&nbsp;        );
+&nbsp;
+&nbsp;        double recognitionStrength;
+&nbsp;
+<b class="nc">&nbsp;        if (rewardInitialized) {</b>
+<b class="nc">&nbsp;            recognitionStrength = data.getMeasurement(</b>
+&nbsp;                    RecognitionStatKeys.RECOGNITION_STRENGTH_REWARD
+&nbsp;            );
+<b class="nc">&nbsp;        } else if (data.isNamingCommitted()</b>
+<b class="nc">&nbsp;                || evaluation.getSelection().isPresent()) {</b>
+<b class="nc">&nbsp;            recognitionStrength = RecognitionStrengthRewardFormula</b>
+<b class="nc">&nbsp;                    .calculate(</b>
+<b class="nc">&nbsp;                            dimensions.identityStrength(),</b>
+<b class="nc">&nbsp;                            evaluation.getBalance()</b>
+<b class="nc">&nbsp;                                    .identityStrength()</b>
+<b class="nc">&nbsp;                                    .maximum(),</b>
+<b class="nc">&nbsp;                            data.isNamingCommitted()</b>
+<b class="nc">&nbsp;                                    ? data.isPureRecognition()</b>
+<b class="nc">&nbsp;                                    : evaluation.getSelection()</b>
+<b class="nc">&nbsp;                                    .map(RecognitionPathSelection::pure)</b>
+<b class="nc">&nbsp;                                    .orElse(false)</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                    .totalStrength();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            recognitionStrength = 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;protection&quot;,
+&nbsp;                &quot;Protection&quot;,
+&nbsp;                &quot;Defending civilians and overcoming malevolent threats shape this aspect.&quot;,
+<b class="nc">&nbsp;                dimensions.good(),</b>
+&nbsp;                70.0D,
+&nbsp;                0x71E0B8,
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;authority&quot;,
+&nbsp;                &quot;Authority&quot;,
+&nbsp;                &quot;Leadership, hierarchy and influence over subordinates strengthen this aspect.&quot;,
+<b class="nc">&nbsp;                dimensions.order(),</b>
+&nbsp;                70.0D,
+&nbsp;                0x73D66E,
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;balance&quot;,
+&nbsp;                &quot;Balance&quot;,
+&nbsp;                &quot;Active balance between authority and independence forms Neutral behaviour. Quiet posture is only an early hint and cannot establish recognition by itself.&quot;,
+<b class="nc">&nbsp;                components.displayNeutralBehaviour(),</b>
+<b class="nc">&nbsp;                evaluation.getBalance()</b>
+<b class="nc">&nbsp;                        .neutrality()</b>
+<b class="nc">&nbsp;                        .behaviour()</b>
+<b class="nc">&nbsp;                        .maximum(),</b>
+&nbsp;                0x5DD9E8,
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;mastery&quot;,
+&nbsp;                &quot;Mastery&quot;,
+&nbsp;                &quot;Skills, categories, highest EP and major enemies build Mastery. Run /moostensura guide mastery.&quot;,
+<b class="nc">&nbsp;                dimensions.mastery(),</b>
+&nbsp;                masteryMaximum,
+&nbsp;                0x5DD9E8,
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;independence&quot;,
+&nbsp;                &quot;Independence&quot;,
+&nbsp;                &quot;Major enemies overcome without subordinate assistance demonstrate personal independence.&quot;,
+<b class="nc">&nbsp;                freedomProgress.soloMajorVictoryScore(),</b>
+<b class="nc">&nbsp;                freedomProgress.soloMajorVictoryMaximum(),</b>
+&nbsp;                0x7F86FF,
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;exploration&quot;,
+&nbsp;                &quot;Exploration&quot;,
+&nbsp;                &quot;Meaningful discoveries and journeys beyond familiar boundaries develop this aspect.&quot;,
+<b class="nc">&nbsp;                freedomProgress.discoveryMilestoneScore(),</b>
+<b class="nc">&nbsp;                freedomProgress.discoveryMilestoneMaximum(),</b>
+&nbsp;                0x5DD9E8,
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;self_reliance&quot;,
+&nbsp;                &quot;Self-Reliance&quot;,
+&nbsp;                &quot;Configured autonomous accomplishments and difficult feats completed through personal initiative strengthen this aspect.&quot;,
+<b class="nc">&nbsp;                freedomProgress.activeIndependenceScore(),</b>
+<b class="nc">&nbsp;                freedomProgress.activeIndependenceMaximum(),</b>
+&nbsp;                0xA98CFF,
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;companionship&quot;,
+&nbsp;                &quot;Companionship&quot;,
+&nbsp;                &quot;Lasting bonds, empowered subordinates and shared victories shape this aspect.&quot;,
+&nbsp;                companionship,
+&nbsp;                70.0D,
+&nbsp;                0xBFF57A,
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;cruelty&quot;,
+&nbsp;                &quot;Cruelty&quot;,
+&nbsp;                &quot;Harm against innocents, companions and benevolent beings strengthens this aspect.&quot;,
+<b class="nc">&nbsp;                dimensions.evil(),</b>
+&nbsp;                70.0D,
+&nbsp;                0xE05276,
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+&nbsp;        String legacyDisplayName =
+&nbsp;                storedHistoryModifier
+<b class="nc">&nbsp;                        == RecognitionIdentityHistoryModifier.NONE</b>
+<b class="nc">&nbsp;                        ? &quot;Legacy&quot;</b>
+&nbsp;                        : &quot;Legacy — &quot;
+<b class="nc">&nbsp;                          + storedHistoryModifier.displayName();</b>
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;legacy&quot;,
+&nbsp;                legacyDisplayName,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .playerFacingSummary(</b>
+&nbsp;                                storedHistoryModifier,
+<b class="nc">&nbsp;                                data.isNamingCommitted()</b>
+&nbsp;                        ),
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .guidanceProgressFor(</b>
+&nbsp;                                storedHistoryModifier
+&nbsp;                        ),
+&nbsp;                100.0D,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .colorFor(storedHistoryModifier),</b>
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addGuidanceEntry(</b>
+&nbsp;                entries,
+&nbsp;                &quot;recognition_strength&quot;,
+&nbsp;                &quot;Recognition Strength&quot;,
+&nbsp;                RecognitionReleasePolicy
+<b class="nc">&nbsp;                        .playerFacingSummary(</b>
+<b class="nc">&nbsp;                                data.isNamingCommitted()</b>
+&nbsp;                        ),
+&nbsp;                recognitionStrength * 100.0D,
+&nbsp;                RecognitionStrengthRewardFormula
+<b class="nc">&nbsp;                        .maximumReward(true)</b>
+&nbsp;                        * 100.0D,
+&nbsp;                0xD7B5FF,
+&nbsp;                debugDetailsAvailable
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return List.copyOf(entries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addGuidanceEntry(
+&nbsp;            List&lt;OpenRecognitionProgressScreenPayload.GuidanceEntry&gt;
+&nbsp;                    entries,
+&nbsp;            String categoryId,
+&nbsp;            String displayName,
+&nbsp;            String guidanceText,
+&nbsp;            double value,
+&nbsp;            double definingValue,
+&nbsp;            int color,
+&nbsp;            boolean debugDetailsAvailable
+&nbsp;    ) {
+<b class="nc">&nbsp;        double safeValue =</b>
+<b class="nc">&nbsp;                sanitizeScore(value);</b>
+&nbsp;
+&nbsp;        double progress =
+<b class="nc">&nbsp;                definingValue &lt;= 0.0D</b>
+<b class="nc">&nbsp;                        ? 0.0D</b>
+<b class="nc">&nbsp;                        : Math.min(</b>
+&nbsp;                        1.0D,
+&nbsp;                        safeValue / definingValue
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        entries.add(</b>
+&nbsp;                new OpenRecognitionProgressScreenPayload
+&nbsp;                        .GuidanceEntry(
+&nbsp;                        categoryId,
+&nbsp;                        displayName,
+<b class="nc">&nbsp;                        getGuidanceStageLabel(progress),</b>
+&nbsp;                        guidanceText,
+&nbsp;                        progress,
+&nbsp;                        color,
+<b class="nc">&nbsp;                        debugDetailsAvailable</b>
+<b class="nc">&nbsp;                                ? safeValue</b>
+<b class="nc">&nbsp;                                : 0.0D</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double getPathProgress(
+&nbsp;            double finalScore
+&nbsp;    ) {
+<b class="nc">&nbsp;        double safeScore =</b>
+<b class="nc">&nbsp;                sanitizeScore(finalScore);</b>
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(</b>
+&nbsp;                1.0D,
+&nbsp;                safeScore
+&nbsp;                        / RecognitionPathEvaluator
+&nbsp;                        .DEFAULT_PURE_THRESHOLD
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getPathStageLabel(
+&nbsp;            double finalScore
+&nbsp;    ) {
+<b class="nc">&nbsp;        double safeScore =</b>
+<b class="nc">&nbsp;                sanitizeScore(finalScore);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (safeScore &lt; 0.5D) {</b>
+<b class="nc">&nbsp;            return &quot;Dormant&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (safeScore &lt; 12.0D) {</b>
+<b class="nc">&nbsp;            return &quot;Faint&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (safeScore</b>
+&nbsp;                &lt; RecognitionPathEvaluator
+&nbsp;                .DEFAULT_ESTABLISHED_THRESHOLD) {
+<b class="nc">&nbsp;            return &quot;Developing&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (safeScore</b>
+&nbsp;                &lt; RecognitionPathEvaluator
+&nbsp;                .DEFAULT_PURE_THRESHOLD) {
+<b class="nc">&nbsp;            return &quot;Established&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;Dominant&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getGuidanceStageLabel(
+&nbsp;            double progress
+&nbsp;    ) {
+<b class="nc">&nbsp;        double safeProgress =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        0.0D,
+<b class="nc">&nbsp;                        Math.min(</b>
+&nbsp;                                1.0D,
+&nbsp;                                progress
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (safeProgress &lt; 0.02D) {</b>
+<b class="nc">&nbsp;            return &quot;Dormant&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (safeProgress &lt; 0.20D) {</b>
+<b class="nc">&nbsp;            return &quot;Faint&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (safeProgress &lt; 0.50D) {</b>
+<b class="nc">&nbsp;            return &quot;Developing&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (safeProgress &lt; 0.80D) {</b>
+<b class="nc">&nbsp;            return &quot;Strong&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;Defining&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String buildStatusHeading(
+&nbsp;            RecognitionNamingEligibility eligibility,
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data.isRevealPending()) {</b>
+<b class="nc">&nbsp;            return &quot;Your recognition awaits revelation.&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (eligibility.status()) {</b>
+&nbsp;            case READY -&gt;
+<b class="nc">&nbsp;                    &quot;Your soul is ready to be recognized.&quot;;</b>
+&nbsp;
+&nbsp;            case ALREADY_COMMITTED -&gt;
+<b class="nc">&nbsp;                    &quot;This incarnation has been recognized.&quot;;</b>
+&nbsp;
+&nbsp;            case ALREADY_NAMED -&gt;
+<b class="nc">&nbsp;                    &quot;A native Tensura name is already present.&quot;;</b>
+&nbsp;
+&nbsp;            case NOT_ENOUGH_LEVEL -&gt;
+<b class="nc">&nbsp;                    &quot;Your identity is still maturing.&quot;;</b>
+&nbsp;
+&nbsp;            case NO_RECOGNITION_SELECTION -&gt;
+<b class="nc">&nbsp;                    &quot;No recognition path has fully formed.&quot;;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String buildStatusDetail(
+&nbsp;            RecognitionNamingEligibility eligibility,
+&nbsp;            RecognitionData data,
+&nbsp;            String pathSummary
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data.isRevealPending()) {</b>
+<b class="nc">&nbsp;            return &quot;Return to the Great Crystal Altar to complete the revelation.&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (eligibility.status()) {</b>
+&nbsp;            case READY -&gt;
+<b class="nc">&nbsp;                    &quot;Seek a Great Crystal Altar.&quot;;</b>
+&nbsp;
+&nbsp;            case ALREADY_COMMITTED -&gt;
+<b class="nc">&nbsp;                    data.getBestowedTitle().isBlank()</b>
+<b class="nc">&nbsp;                            ? pathSummary</b>
+&nbsp;                            : &quot;Recognition: &quot;
+<b class="nc">&nbsp;                              + data.getBestowedTitle();</b>
+&nbsp;
+&nbsp;            case ALREADY_NAMED -&gt;
+<b class="nc">&nbsp;                    &quot;Soul Recognition remains available independently of the native name.&quot;;</b>
+&nbsp;
+&nbsp;            case NOT_ENOUGH_LEVEL -&gt;
+<b class="nc">&nbsp;                    &quot;Continue developing this incarnation before seeking the altar.&quot;;</b>
+&nbsp;
+&nbsp;            case NO_RECOGNITION_SELECTION -&gt;
+<b class="nc">&nbsp;                    &quot;Continue acting according to your convictions.&quot;;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String buildLevelLine(
+&nbsp;            RecognitionNamingEligibility eligibility
+&nbsp;    ) {
+&nbsp;        String state =
+<b class="nc">&nbsp;                eligibility.currentLevel()</b>
+<b class="nc">&nbsp;                        &gt;= eligibility.requiredLevel()</b>
+<b class="nc">&nbsp;                        ? &quot;Ready&quot;</b>
+<b class="nc">&nbsp;                        : &quot;Developing&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        return &quot;Life experience: &quot;</b>
+<b class="nc">&nbsp;                + eligibility.currentLevel()</b>
+&nbsp;                + &quot; / &quot;
+<b class="nc">&nbsp;                + eligibility.requiredLevel()</b>
+&nbsp;                + &quot;  •  &quot;
+&nbsp;                + state;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String pathId(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        return path == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : path.getId();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeScore(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(value) || value &lt; 0.0D) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean tryReserveFreshBuild(
+&nbsp;            long now
+&nbsp;    ) {
+<b class="nc">&nbsp;        synchronized (GLOBAL_BUILD_LOCK) {</b>
+<b class="nc">&nbsp;            if (globalBuildWindowStartedNanos == 0L</b>
+&nbsp;                    || now - globalBuildWindowStartedNanos
+&nbsp;                    &gt;= GLOBAL_BUILD_WINDOW_NANOS) {
+&nbsp;
+<b class="nc">&nbsp;                globalBuildWindowStartedNanos = now;</b>
+<b class="nc">&nbsp;                globalFreshBuildsInWindow = 0;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (globalFreshBuildsInWindow</b>
+&nbsp;                    &gt;= MAX_GLOBAL_FRESH_BUILDS_PER_WINDOW) {
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            globalFreshBuildsInWindow++;</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void cleanupExpiredStates(
+&nbsp;            long now
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (now &lt; nextCleanupNanos) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        nextCleanupNanos =</b>
+&nbsp;                now + CLEANUP_INTERVAL_NANOS;
+&nbsp;
+<b class="nc">&nbsp;        REQUEST_STATES.removeIf(entry -&gt; {</b>
+<b class="nc">&nbsp;            RequestState state = entry.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (state == null) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            synchronized (state) {</b>
+<b class="nc">&nbsp;                return now - state.lastActivityNanos</b>
+&nbsp;                        &gt;= STATE_EXPIRY_NANOS;
+<b class="nc">&nbsp;            }</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record RuntimeSnapshot(</b>
+&nbsp;            int trackedPlayerStates,
+&nbsp;            int maximumTrackedPlayerStates,
+&nbsp;            int freshBuildsInCurrentWindow,
+&nbsp;            int maximumFreshBuildsPerWindow,
+&nbsp;            long buildWindowStartedNanos,
+&nbsp;            long nextCleanupNanos
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private enum RequestOrigin {</b>
+<b class="nc">&nbsp;        COMMAND,</b>
+<b class="nc">&nbsp;        CLIENT_REFRESH</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class RequestState {
+&nbsp;
+&nbsp;        private long windowStartedNanos;
+&nbsp;        private int requestsInWindow;
+&nbsp;
+&nbsp;        private long lastResponseNanos;
+&nbsp;        private long lastFeedbackNanos;
+&nbsp;        private volatile long lastActivityNanos;
+&nbsp;
+&nbsp;        private long cacheExpiresNanos;
+&nbsp;        private boolean cachedDebugDetails;
+&nbsp;
+&nbsp;        private OpenRecognitionProgressScreenPayload
+&nbsp;                cachedPayload;
+&nbsp;
+&nbsp;        private RequestState(
+&nbsp;                long now
+<b class="nc">&nbsp;        ) {</b>
+<b class="nc">&nbsp;            this.windowStartedNanos = now;</b>
+<b class="nc">&nbsp;            this.lastActivityNanos = now;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

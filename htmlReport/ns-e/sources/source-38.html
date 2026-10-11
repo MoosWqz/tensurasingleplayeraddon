@@ -1,0 +1,786 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionStrengthRewardService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionStrengthRewardService (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionStrengthRewardService</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.2%
+  </span>
+  <span class="absValue">
+    (7/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.7%
+  </span>
+  <span class="absValue">
+    (20/88)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.7%
+  </span>
+  <span class="absValue">
+    (78/207)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionStrengthRewardService$ReconcileResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (8/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    23.3%
+  </span>
+  <span class="absValue">
+    (21/90)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.9%
+  </span>
+  <span class="absValue">
+    (80/211)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+&nbsp;import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+&nbsp;import net.minecraft.world.entity.ai.attributes.Attributes;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Persists and reconciles the permanent recognition-strength reward.
+&nbsp; *
+&nbsp; * &lt;p&gt;Stable modifier IDs make reconciliation idempotent. The existing
+&nbsp; * 40-tick recognition synchronizer calls this service, so removal after
+&nbsp; * unname/reset happens promptly without adding a new tick handler.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionStrengthRewardService {
+&nbsp;
+&nbsp;    public static final String MIGRATION_SOURCE_NATIVE =
+&nbsp;            &quot;native_identity_snapshot_v2&quot;;
+&nbsp;
+&nbsp;    public static final String MIGRATION_SOURCE_LEGACY =
+&nbsp;            &quot;legacy_live_snapshot_v1_to_v2&quot;;
+&nbsp;
+&nbsp;    public static final String MIGRATION_SOURCE_INTERRUPTED =
+&nbsp;            &quot;interrupted_profile2_repair&quot;;
+&nbsp;
+<b class="fc">&nbsp;    public static final ResourceLocation MAX_HEALTH_MODIFIER_ID =</b>
+<b class="fc">&nbsp;            id(&quot;recognition_strength_max_health&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final ResourceLocation ATTACK_DAMAGE_MODIFIER_ID =</b>
+<b class="fc">&nbsp;            id(&quot;recognition_strength_attack_damage&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final ResourceLocation MOVEMENT_SPEED_MODIFIER_ID =</b>
+<b class="fc">&nbsp;            id(&quot;recognition_strength_movement_speed&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final ResourceLocation ATTACK_SPEED_MODIFIER_ID =</b>
+<b class="fc">&nbsp;            id(&quot;recognition_strength_attack_speed&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final ResourceLocation KNOCKBACK_RESISTANCE_MODIFIER_ID =</b>
+<b class="fc">&nbsp;            id(&quot;recognition_strength_knockback_resistance&quot;);</b>
+&nbsp;
+&nbsp;    private RecognitionStrengthRewardService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Stores the exact identity-strength snapshot used by a new altar
+&nbsp;     * commitment. A later reconciliation applies the matching modifiers.
+&nbsp;     */
+&nbsp;    public static boolean initializeNewCommit(
+&nbsp;            RecognitionData data,
+&nbsp;            double identityStrength,
+&nbsp;            double identityStrengthMaximum,
+&nbsp;            boolean pure
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null</b>
+<b class="nc">&nbsp;                || !data.isNamingCommitted()</b>
+<b class="nc">&nbsp;                || data.getRewardProfileVersion()</b>
+&nbsp;                &gt; RecognitionStrengthRewardFormula.PROFILE_VERSION) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionStrengthRewardFormula.Reward reward =</b>
+<b class="nc">&nbsp;                RecognitionStrengthRewardFormula.calculate(</b>
+&nbsp;                        identityStrength,
+&nbsp;                        identityStrengthMaximum,
+&nbsp;                        pure
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        storeReward(</b>
+&nbsp;                data,
+&nbsp;                reward,
+&nbsp;                MIGRATION_SOURCE_NATIVE,
+&nbsp;                MoosTensuraConfig
+&nbsp;                        .RECOGNITION_MAXIMUM_EXTRA_EP
+<b class="nc">&nbsp;                        .get()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Repairs metadata when necessary and makes actual attributes exactly
+&nbsp;     * match the frozen reward. Repeated calls do not stack.
+&nbsp;     */
+&nbsp;    public static ReconcileResult reconcile(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return ReconcileResult.rejected(</b>
+&nbsp;                    &quot;A server player is required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (data.isWriteBlockedByFutureVersion()) {</b>
+<b class="nc">&nbsp;            return new ReconcileResult(</b>
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    &quot;Future recognition version preserved without mutation.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionCommittedResult committed =</b>
+<b class="fc">&nbsp;                data.getCommittedResult();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!data.isNamingCommitted()</b>
+<b class="pc">&nbsp;                || !committed.valid()) {</b>
+<b class="nc">&nbsp;            boolean removed = removeAllModifiers(player);</b>
+<b class="nc">&nbsp;            return new ReconcileResult(</b>
+&nbsp;                    true,
+&nbsp;                    removed,
+&nbsp;                    false,
+&nbsp;                    &quot;No valid committed recognition; reward modifiers removed.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        int profileVersion = data.getRewardProfileVersion();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (profileVersion</b>
+&nbsp;                &gt; RecognitionStrengthRewardFormula.PROFILE_VERSION) {
+<b class="nc">&nbsp;            return new ReconcileResult(</b>
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    &quot;Future reward profile preserved without mutation.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        boolean initialized = data.getFlag(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        boolean metadataChanged = false;</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!initialized) {</b>
+<b class="nc">&nbsp;            RecognitionEvaluation evaluation =</b>
+<b class="nc">&nbsp;                    RecognitionPathEvaluator.evaluate(data);</b>
+&nbsp;
+<b class="nc">&nbsp;            double identityMaximum = evaluation.getBalance()</b>
+<b class="nc">&nbsp;                    .identityStrength()</b>
+<b class="nc">&nbsp;                    .maximum();</b>
+&nbsp;
+<b class="nc">&nbsp;            RecognitionStrengthRewardFormula.Reward reward =</b>
+<b class="nc">&nbsp;                    RecognitionStrengthRewardFormula.calculate(</b>
+<b class="nc">&nbsp;                            evaluation.getDimensions()</b>
+<b class="nc">&nbsp;                                    .identityStrength(),</b>
+&nbsp;                            identityMaximum,
+<b class="nc">&nbsp;                            data.isPureRecognition()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            boolean legacyCommit = profileVersion</b>
+&nbsp;                    &lt; RecognitionStrengthRewardFormula.PROFILE_VERSION
+&nbsp;                    || !RecognitionCommitRecord
+&nbsp;                    .NATIVE_MIGRATION_SOURCE
+<b class="nc">&nbsp;                    .equals(</b>
+<b class="nc">&nbsp;                            data.getRecognitionMigrationSource()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            String source = legacyCommit</b>
+<b class="nc">&nbsp;                    ? MIGRATION_SOURCE_LEGACY</b>
+<b class="nc">&nbsp;                    : MIGRATION_SOURCE_INTERRUPTED;</b>
+&nbsp;
+<b class="nc">&nbsp;            storeReward(</b>
+&nbsp;                    data,
+&nbsp;                    reward,
+&nbsp;                    source,
+&nbsp;                    RecognitionEndowmentEffortRewardFormula
+&nbsp;                            .DEFAULT_MAXIMUM_EXTRA_EP
+&nbsp;            );
+<b class="nc">&nbsp;            metadataChanged = true;</b>
+<b class="pc">&nbsp;        } else if (profileVersion</b>
+&nbsp;                &lt; RecognitionStrengthRewardFormula.PROFILE_VERSION) {
+<b class="nc">&nbsp;            data.setCounter(</b>
+&nbsp;                    RecognitionStatKeys.REWARD_PROFILE_VERSION,
+&nbsp;                    RecognitionStrengthRewardFormula.PROFILE_VERSION
+&nbsp;            );
+<b class="nc">&nbsp;            metadataChanged = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionStrengthRewardFormula.Reward reward =</b>
+<b class="fc">&nbsp;                rewardFromStoredData(data);</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean attributesChanged = applyExpectedModifiers(</b>
+&nbsp;                player,
+&nbsp;                reward
+&nbsp;        );
+&nbsp;
+&nbsp;        RecognitionEndowmentEffortRewardService.ReconcileResult
+<b class="fc">&nbsp;                endowmentResult =</b>
+<b class="fc">&nbsp;                RecognitionEndowmentEffortRewardService.reconcile(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        boolean endowmentChanged =</b>
+<b class="pc">&nbsp;                endowmentResult.supported()</b>
+<b class="fc">&nbsp;                        &amp;&amp; endowmentResult.changed();</b>
+&nbsp;
+<b class="pc">&nbsp;        return new ReconcileResult(</b>
+&nbsp;                true,
+&nbsp;                metadataChanged
+&nbsp;                        || attributesChanged
+&nbsp;                        || endowmentChanged,
+&nbsp;                true,
+<b class="pc">&nbsp;                metadataChanged</b>
+<b class="nc">&nbsp;                        ? &quot;Recognition reward metadata migrated and modifiers reconciled.&quot;</b>
+&nbsp;                        : attributesChanged
+<b class="pc">&nbsp;                                || endowmentChanged</b>
+<b class="nc">&nbsp;                          ? &quot;Recognition reward modifiers repaired.&quot;</b>
+<b class="fc">&nbsp;                          : &quot;Recognition reward already current.&quot;</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Read-only inspection. This never repairs metadata or attributes. */
+&nbsp;    public static RecognitionStrengthRewardSnapshot inspect(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return emptySnapshot();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCommittedResult committed =</b>
+<b class="nc">&nbsp;                data.getCommittedResult();</b>
+&nbsp;
+<b class="nc">&nbsp;        int version = data.getRewardProfileVersion();</b>
+<b class="nc">&nbsp;        boolean future = data.isWriteBlockedByFutureVersion();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean initialized = data.getFlag(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED
+&nbsp;        );
+&nbsp;
+&nbsp;        RecognitionStrengthRewardFormula.Reward expected;
+&nbsp;
+<b class="nc">&nbsp;        if (initialized &amp;&amp; !future) {</b>
+<b class="nc">&nbsp;            expected = rewardFromStoredData(data);</b>
+<b class="nc">&nbsp;        } else if (!future &amp;&amp; committed.valid()) {</b>
+<b class="nc">&nbsp;            RecognitionEvaluation evaluation =</b>
+<b class="nc">&nbsp;                    RecognitionPathEvaluator.evaluate(data);</b>
+&nbsp;
+<b class="nc">&nbsp;            expected = RecognitionStrengthRewardFormula.calculate(</b>
+<b class="nc">&nbsp;                    evaluation.getDimensions()</b>
+<b class="nc">&nbsp;                            .identityStrength(),</b>
+<b class="nc">&nbsp;                    evaluation.getBalance()</b>
+<b class="nc">&nbsp;                            .identityStrength()</b>
+<b class="nc">&nbsp;                            .maximum(),</b>
+<b class="nc">&nbsp;                    data.isPureRecognition()</b>
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            expected = zeroReward();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        List&lt;String&gt; mismatches =
+<b class="nc">&nbsp;                initialized &amp;&amp; !future &amp;&amp; committed.valid()</b>
+<b class="nc">&nbsp;                        ? findMismatches(player, expected)</b>
+<b class="nc">&nbsp;                        : List.of();</b>
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionStrengthRewardSnapshot(</b>
+<b class="nc">&nbsp;                data.isNamingCommitted(),</b>
+<b class="nc">&nbsp;                committed.valid(),</b>
+&nbsp;                version,
+&nbsp;                initialized,
+<b class="nc">&nbsp;                data.getString(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .RECOGNITION_REWARD_MIGRATION_SOURCE
+&nbsp;                ),
+<b class="nc">&nbsp;                data.getMeasurement(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .IDENTITY_STRENGTH_AT_COMMIT
+&nbsp;                ),
+<b class="nc">&nbsp;                data.getMeasurement(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .IDENTITY_STRENGTH_MAXIMUM_AT_COMMIT
+&nbsp;                ),
+<b class="nc">&nbsp;                data.getMeasurement(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .RECOGNITION_STRENGTH_REWARD
+&nbsp;                ),
+&nbsp;                future,
+<b class="nc">&nbsp;                mismatches.isEmpty(),</b>
+&nbsp;                mismatches,
+&nbsp;                expected
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean removeAllModifiers(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        float oldMaximum = player.getMaxHealth();</b>
+<b class="nc">&nbsp;        float oldHealth = player.getHealth();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean changed = false;</b>
+<b class="nc">&nbsp;        changed |= remove(player.getAttribute(Attributes.MAX_HEALTH), MAX_HEALTH_MODIFIER_ID);</b>
+<b class="nc">&nbsp;        changed |= remove(player.getAttribute(Attributes.ATTACK_DAMAGE), ATTACK_DAMAGE_MODIFIER_ID);</b>
+<b class="nc">&nbsp;        changed |= remove(player.getAttribute(Attributes.MOVEMENT_SPEED), MOVEMENT_SPEED_MODIFIER_ID);</b>
+<b class="nc">&nbsp;        changed |= remove(player.getAttribute(Attributes.ATTACK_SPEED), ATTACK_SPEED_MODIFIER_ID);</b>
+<b class="nc">&nbsp;        changed |= remove(player.getAttribute(Attributes.KNOCKBACK_RESISTANCE), KNOCKBACK_RESISTANCE_MODIFIER_ID);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean endowmentChanged =</b>
+&nbsp;                RecognitionEndowmentEffortRewardService
+<b class="nc">&nbsp;                        .removeAllModifiers(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (changed) {</b>
+<b class="nc">&nbsp;            preserveHealthRatio(player, oldHealth, oldMaximum);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return changed || endowmentChanged;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void storeReward(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionStrengthRewardFormula.Reward reward,
+&nbsp;            String migrationSource,
+&nbsp;            double maximumExtraEp
+&nbsp;    ) {
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_STRENGTH_AT_COMMIT,
+<b class="nc">&nbsp;                reward.frozenIdentityStrength()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_STRENGTH_MAXIMUM_AT_COMMIT,
+<b class="nc">&nbsp;                reward.identityStrengthMaximum()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_STRENGTH_REWARD,
+<b class="nc">&nbsp;                reward.totalStrength()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.ENDOWMENT_MAXIMUM_EXTRA_EP_AT_COMMIT,
+&nbsp;                RecognitionEndowmentEffortRewardFormula
+<b class="nc">&nbsp;                        .sanitizeMaximumExtraEp(</b>
+&nbsp;                                maximumExtraEp
+&nbsp;                        )
+&nbsp;        );
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_REWARD_MIGRATION_SOURCE,
+&nbsp;                migrationSource
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.REWARD_PROFILE_VERSION,
+&nbsp;                RecognitionStrengthRewardFormula.PROFILE_VERSION
+&nbsp;        );
+<b class="nc">&nbsp;        data.setFlag(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED,
+&nbsp;                true
+&nbsp;        );
+<b class="nc">&nbsp;        data.setFlag(</b>
+&nbsp;                RecognitionStatKeys.ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED,
+&nbsp;                true
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionStrengthRewardFormula.Reward rewardFromStoredData(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="fc">&nbsp;        double identity = data.getMeasurement(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_STRENGTH_AT_COMMIT
+&nbsp;        );
+<b class="fc">&nbsp;        double maximum = data.getMeasurement(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_STRENGTH_MAXIMUM_AT_COMMIT
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionStrengthRewardFormula.Reward calculated =</b>
+<b class="fc">&nbsp;                RecognitionStrengthRewardFormula.calculate(</b>
+&nbsp;                        identity,
+&nbsp;                        maximum,
+<b class="fc">&nbsp;                        data.isPureRecognition()</b>
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        double storedTotal = data.getMeasurement(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_STRENGTH_REWARD
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (storedTotal &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return calculated;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        double safeTotal = Math.max(</b>
+&nbsp;                RecognitionStrengthRewardFormula.BASE_REWARD,
+<b class="fc">&nbsp;                Math.min(</b>
+<b class="fc">&nbsp;                        RecognitionStrengthRewardFormula.maximumReward(</b>
+<b class="fc">&nbsp;                                data.isPureRecognition()</b>
+&nbsp;                        ),
+&nbsp;                        storedTotal
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return new RecognitionStrengthRewardFormula.Reward(</b>
+&nbsp;                RecognitionStrengthRewardFormula.PROFILE_VERSION,
+&nbsp;                RecognitionStrengthRewardFormula.PROFILE_ID,
+<b class="fc">&nbsp;                calculated.frozenIdentityStrength(),</b>
+<b class="fc">&nbsp;                calculated.identityStrengthMaximum(),</b>
+<b class="fc">&nbsp;                data.isPureRecognition(),</b>
+&nbsp;                safeTotal,
+&nbsp;                safeTotal,
+&nbsp;                safeTotal,
+&nbsp;                safeTotal * RecognitionStrengthRewardFormula
+&nbsp;                        .MOVEMENT_AND_ATTACK_SPEED_SHARE,
+&nbsp;                safeTotal * RecognitionStrengthRewardFormula
+&nbsp;                        .MOVEMENT_AND_ATTACK_SPEED_SHARE,
+&nbsp;                safeTotal * RecognitionStrengthRewardFormula
+&nbsp;                        .KNOCKBACK_RESISTANCE_SHARE
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean applyExpectedModifiers(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionStrengthRewardFormula.Reward reward
+&nbsp;    ) {
+<b class="fc">&nbsp;        float oldMaximum = player.getMaxHealth();</b>
+<b class="fc">&nbsp;        float oldHealth = player.getHealth();</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean changed = false;</b>
+<b class="fc">&nbsp;        changed |= reconcile(</b>
+<b class="fc">&nbsp;                player.getAttribute(Attributes.MAX_HEALTH),</b>
+&nbsp;                MAX_HEALTH_MODIFIER_ID,
+<b class="fc">&nbsp;                reward.maxHealthMultiplier(),</b>
+&nbsp;                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+&nbsp;        );
+<b class="fc">&nbsp;        changed |= reconcile(</b>
+<b class="fc">&nbsp;                player.getAttribute(Attributes.ATTACK_DAMAGE),</b>
+&nbsp;                ATTACK_DAMAGE_MODIFIER_ID,
+<b class="fc">&nbsp;                reward.attackDamageMultiplier(),</b>
+&nbsp;                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+&nbsp;        );
+<b class="fc">&nbsp;        changed |= reconcile(</b>
+<b class="fc">&nbsp;                player.getAttribute(Attributes.MOVEMENT_SPEED),</b>
+&nbsp;                MOVEMENT_SPEED_MODIFIER_ID,
+<b class="fc">&nbsp;                reward.movementSpeedMultiplier(),</b>
+&nbsp;                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+&nbsp;        );
+<b class="fc">&nbsp;        changed |= reconcile(</b>
+<b class="fc">&nbsp;                player.getAttribute(Attributes.ATTACK_SPEED),</b>
+&nbsp;                ATTACK_SPEED_MODIFIER_ID,
+<b class="fc">&nbsp;                reward.attackSpeedMultiplier(),</b>
+&nbsp;                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+&nbsp;        );
+<b class="fc">&nbsp;        changed |= reconcile(</b>
+<b class="fc">&nbsp;                player.getAttribute(Attributes.KNOCKBACK_RESISTANCE),</b>
+&nbsp;                KNOCKBACK_RESISTANCE_MODIFIER_ID,
+<b class="fc">&nbsp;                reward.knockbackResistanceAddition(),</b>
+&nbsp;                AttributeModifier.Operation.ADD_VALUE
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (changed) {</b>
+<b class="nc">&nbsp;            preserveHealthRatio(player, oldHealth, oldMaximum);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean reconcile(
+&nbsp;            AttributeInstance instance,
+&nbsp;            ResourceLocation id,
+&nbsp;            double amount,
+&nbsp;            AttributeModifier.Operation operation
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (instance == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        AttributeModifier existing = instance.getModifier(id);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (existing != null</b>
+<b class="pc">&nbsp;                &amp;&amp; approximately(existing.amount(), amount)</b>
+<b class="pc">&nbsp;                &amp;&amp; existing.operation() == operation) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        instance.addOrReplacePermanentModifier(</b>
+&nbsp;                new AttributeModifier(id, amount, operation)
+&nbsp;        );
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean remove(
+&nbsp;            AttributeInstance instance,
+&nbsp;            ResourceLocation id
+&nbsp;    ) {
+<b class="nc">&nbsp;        return instance != null &amp;&amp; instance.removeModifier(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; findMismatches(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionStrengthRewardFormula.Reward reward
+&nbsp;    ) {
+<b class="nc">&nbsp;        List&lt;String&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        check(result, &quot;max_health&quot;, player.getAttribute(Attributes.MAX_HEALTH), MAX_HEALTH_MODIFIER_ID, reward.maxHealthMultiplier(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);</b>
+<b class="nc">&nbsp;        check(result, &quot;attack_damage&quot;, player.getAttribute(Attributes.ATTACK_DAMAGE), ATTACK_DAMAGE_MODIFIER_ID, reward.attackDamageMultiplier(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);</b>
+<b class="nc">&nbsp;        check(result, &quot;movement_speed&quot;, player.getAttribute(Attributes.MOVEMENT_SPEED), MOVEMENT_SPEED_MODIFIER_ID, reward.movementSpeedMultiplier(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);</b>
+<b class="nc">&nbsp;        check(result, &quot;attack_speed&quot;, player.getAttribute(Attributes.ATTACK_SPEED), ATTACK_SPEED_MODIFIER_ID, reward.attackSpeedMultiplier(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);</b>
+<b class="nc">&nbsp;        check(result, &quot;knockback_resistance&quot;, player.getAttribute(Attributes.KNOCKBACK_RESISTANCE), KNOCKBACK_RESISTANCE_MODIFIER_ID, reward.knockbackResistanceAddition(), AttributeModifier.Operation.ADD_VALUE);</b>
+&nbsp;
+<b class="nc">&nbsp;        return List.copyOf(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void check(
+&nbsp;            List&lt;String&gt; result,
+&nbsp;            String name,
+&nbsp;            AttributeInstance instance,
+&nbsp;            ResourceLocation id,
+&nbsp;            double amount,
+&nbsp;            AttributeModifier.Operation operation
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (instance == null) {</b>
+<b class="nc">&nbsp;            result.add(name + &quot; attribute unavailable&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AttributeModifier modifier = instance.getModifier(id);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (modifier == null) {</b>
+<b class="nc">&nbsp;            result.add(name + &quot; modifier missing&quot;);</b>
+<b class="nc">&nbsp;        } else if (!approximately(modifier.amount(), amount)</b>
+<b class="nc">&nbsp;                || modifier.operation() != operation) {</b>
+<b class="nc">&nbsp;            result.add(name + &quot; modifier differs&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void preserveHealthRatio(
+&nbsp;            ServerPlayer player,
+&nbsp;            float oldHealth,
+&nbsp;            float oldMaximum
+&nbsp;    ) {
+<b class="nc">&nbsp;        float newMaximum = player.getMaxHealth();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (newMaximum &lt;= 0.0F) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (oldHealth &lt;= 0.0F || oldMaximum &lt;= 0.0F) {</b>
+<b class="nc">&nbsp;            player.setHealth(Math.min(player.getHealth(), newMaximum));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        float ratio = Math.max(</b>
+&nbsp;                0.0F,
+<b class="nc">&nbsp;                Math.min(1.0F, oldHealth / oldMaximum)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.setHealth(</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        1.0F,
+<b class="nc">&nbsp;                        Math.min(newMaximum, newMaximum * ratio)</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean approximately(
+&nbsp;            double first,
+&nbsp;            double second
+&nbsp;    ) {
+<b class="pc">&nbsp;        return Math.abs(first - second) &lt;= 0.000_000_1D;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ResourceLocation id(String path) {
+<b class="fc">&nbsp;        return ResourceLocation.fromNamespaceAndPath(</b>
+&nbsp;                MoosTensuraAddon.MODID,
+&nbsp;                path
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionStrengthRewardSnapshot emptySnapshot() {
+<b class="nc">&nbsp;        return new RecognitionStrengthRewardSnapshot(</b>
+&nbsp;                false,
+&nbsp;                false,
+&nbsp;                0,
+&nbsp;                false,
+&nbsp;                &quot;&quot;,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                false,
+&nbsp;                true,
+<b class="nc">&nbsp;                List.of(),</b>
+<b class="nc">&nbsp;                zeroReward()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionStrengthRewardFormula.Reward zeroReward() {
+<b class="nc">&nbsp;        return new RecognitionStrengthRewardFormula.Reward(</b>
+&nbsp;                RecognitionStrengthRewardFormula.PROFILE_VERSION,
+&nbsp;                RecognitionStrengthRewardFormula.PROFILE_ID,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                false,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record ReconcileResult(</b>
+&nbsp;            boolean supported,
+&nbsp;            boolean changed,
+&nbsp;            boolean active,
+&nbsp;            String message
+&nbsp;    ) {
+<b class="fc">&nbsp;        public ReconcileResult {</b>
+<b class="pc">&nbsp;            message = message == null ? &quot;&quot; : message.trim();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static ReconcileResult rejected(String message) {
+<b class="nc">&nbsp;            return new ReconcileResult(false, false, false, message);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

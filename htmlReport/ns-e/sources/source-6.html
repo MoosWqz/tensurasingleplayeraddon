@@ -1,0 +1,1147 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionBalanceReloadListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionBalanceReloadListener (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionBalanceReloadListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (23/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    51.7%
+  </span>
+  <span class="absValue">
+    (31/60)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.2%
+  </span>
+  <span class="absValue">
+    (215/241)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import com.google.gson.GsonBuilder;
+&nbsp;import com.google.gson.JsonArray;
+&nbsp;import com.google.gson.JsonElement;
+&nbsp;import com.google.gson.JsonObject;
+&nbsp;import com.google.gson.JsonParseException;
+&nbsp;import com.google.gson.JsonPrimitive;
+&nbsp;import com.mojang.logging.LogUtils;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.packs.resources.ResourceManager;
+&nbsp;import net.minecraft.server.packs.resources
+&nbsp;        .SimpleJsonResourceReloadListener;
+&nbsp;import net.minecraft.util.profiling.ProfilerFiller;
+&nbsp;import org.slf4j.Logger;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * Loads the canonical recognition balance definition from:
+&nbsp; *
+&nbsp; * data/moostensuraaddon/recognition_balance/default.json
+&nbsp; *
+&nbsp; * Datapacks override the built-in file by providing the exact same resource
+&nbsp; * location. A candidate is parsed and validated completely before it replaces
+&nbsp; * the active snapshot. Invalid reloads leave the previous valid balance active.
+&nbsp; */
+&nbsp;public final class RecognitionBalanceReloadListener
+&nbsp;        extends SimpleJsonResourceReloadListener {
+&nbsp;
+&nbsp;    private static final Logger LOGGER =
+<b class="fc">&nbsp;            LogUtils.getLogger();</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Every constructor dependency must be initialized before INSTANCE.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final Gson GSON =</b>
+&nbsp;            new GsonBuilder()
+<b class="fc">&nbsp;                    .disableHtmlEscaping()</b>
+<b class="fc">&nbsp;                    .create();</b>
+&nbsp;
+&nbsp;    private static final String DIRECTORY =
+&nbsp;            &quot;recognition_balance&quot;;
+&nbsp;
+<b class="fc">&nbsp;    private static final ResourceLocation CANONICAL_RESOURCE =</b>
+<b class="fc">&nbsp;            ResourceLocation.fromNamespaceAndPath(</b>
+&nbsp;                    MoosTensuraAddon.MODID,
+&nbsp;                    &quot;default&quot;
+&nbsp;            );
+&nbsp;
+&nbsp;    private static final int MAX_SKILL_TIERS =
+&nbsp;            16;
+&nbsp;
+&nbsp;    public static final RecognitionBalanceReloadListener
+<b class="fc">&nbsp;            INSTANCE =</b>
+&nbsp;            new RecognitionBalanceReloadListener();
+&nbsp;
+&nbsp;    private RecognitionBalanceReloadListener() {
+<b class="fc">&nbsp;        super(</b>
+&nbsp;                GSON,
+&nbsp;                DIRECTORY
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void apply(
+&nbsp;            Map&lt;ResourceLocation, JsonElement&gt; resources,
+&nbsp;            ResourceManager resourceManager,
+&nbsp;            ProfilerFiller profiler
+&nbsp;    ) {
+<b class="fc">&nbsp;        JsonElement canonicalElement =</b>
+<b class="fc">&nbsp;                resources.get(</b>
+&nbsp;                        CANONICAL_RESOURCE
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (canonicalElement == null) {</b>
+&nbsp;            RecognitionBalanceManager.State active =
+<b class="nc">&nbsp;                    RecognitionBalanceManager.getState();</b>
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.error(</b>
+&nbsp;                    &quot;Recognition balance resource {} was not found. &quot;
+&nbsp;                            + &quot;Keeping revision {} from {}.&quot;,
+&nbsp;                    CANONICAL_RESOURCE,
+<b class="nc">&nbsp;                    active.revision(),</b>
+<b class="nc">&nbsp;                    active.snapshot().sourceId()</b>
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (resources.size() &gt; 1) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(</b>
+&nbsp;                    &quot;Found {} recognition balance files. Only the canonical &quot;
+&nbsp;                            + &quot;resource {} is used; {} additional file(s) were &quot;
+&nbsp;                            + &quot;ignored.&quot;,
+<b class="nc">&nbsp;                    resources.size(),</b>
+&nbsp;                    CANONICAL_RESOURCE,
+<b class="nc">&nbsp;                    resources.size() - 1</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            RecognitionBalanceSnapshot candidate =</b>
+<b class="fc">&nbsp;                    parseSnapshot(</b>
+&nbsp;                            CANONICAL_RESOURCE,
+&nbsp;                            canonicalElement
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            RecognitionBalanceManager.State installed =</b>
+<b class="fc">&nbsp;                    RecognitionBalanceManager.install(</b>
+&nbsp;                            candidate
+&nbsp;                    );
+&nbsp;
+&nbsp;            /*
+&nbsp;             * Cached GUI payloads contain scores and threshold values from the
+&nbsp;             * previous definition. Clear them only after a successful install.
+&nbsp;             */
+<b class="fc">&nbsp;            RecognitionProgressScreenService.clearAll();</b>
+&nbsp;
+<b class="fc">&nbsp;            LOGGER.info(</b>
+&nbsp;                    &quot;Loaded recognition balance revision {} from {}.&quot;,
+<b class="fc">&nbsp;                    installed.revision(),</b>
+<b class="fc">&nbsp;                    installed.snapshot().sourceId()</b>
+&nbsp;            );
+&nbsp;        } catch (RuntimeException exception) {
+&nbsp;            RecognitionBalanceManager.State active =
+<b class="nc">&nbsp;                    RecognitionBalanceManager.getState();</b>
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.error(</b>
+&nbsp;                    &quot;Failed to load recognition balance {}. Keeping revision &quot;
+&nbsp;                            + &quot;{} from {}.&quot;,
+&nbsp;                    CANONICAL_RESOURCE,
+<b class="nc">&nbsp;                    active.revision(),</b>
+<b class="nc">&nbsp;                    active.snapshot().sourceId(),</b>
+&nbsp;                    exception
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot parseSnapshot(
+&nbsp;            ResourceLocation resourceId,
+&nbsp;            JsonElement rootElement
+&nbsp;    ) {
+<b class="fc">&nbsp;        JsonObject root =</b>
+<b class="fc">&nbsp;                requireObject(</b>
+&nbsp;                        rootElement,
+&nbsp;                        &quot;root&quot;
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        int schemaVersion =</b>
+<b class="fc">&nbsp;                requireInteger(</b>
+&nbsp;                        root,
+&nbsp;                        &quot;schema_version&quot;,
+&nbsp;                        1,
+&nbsp;                        RecognitionBalanceSnapshot.SCHEMA_VERSION
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (schemaVersion</b>
+&nbsp;                != RecognitionBalanceSnapshot.SCHEMA_VERSION) {
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;Unsupported recognition balance schema version &quot;
+&nbsp;                            + schemaVersion
+&nbsp;                            + &quot;. Expected &quot;
+&nbsp;                            + RecognitionBalanceSnapshot.SCHEMA_VERSION
+&nbsp;                            + &quot;.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionBalanceSnapshot.Selection selection =</b>
+<b class="fc">&nbsp;                parseSelection(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;selection&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+&nbsp;        RecognitionBalanceSnapshot.IdentityDistribution
+<b class="fc">&nbsp;                identityDistribution =</b>
+<b class="fc">&nbsp;                parseIdentityDistribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;identity_distribution&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionBalanceSnapshot.IdentityStrength identityStrength =</b>
+<b class="fc">&nbsp;                parseIdentityStrength(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;identity_strength&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionBalanceSnapshot.Good good =</b>
+<b class="fc">&nbsp;                parseGood(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;good&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionBalanceSnapshot.Evil evil =</b>
+<b class="fc">&nbsp;                parseEvil(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;evil&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionBalanceSnapshot.Order order =</b>
+<b class="fc">&nbsp;                parseOrder(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;order&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionBalanceSnapshot.Freedom freedom =</b>
+<b class="fc">&nbsp;                parseFreedom(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;freedom&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionBalanceSnapshot.Mastery mastery =</b>
+<b class="fc">&nbsp;                parseMastery(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;mastery&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionBalanceSnapshot.Discovery discovery =</b>
+<b class="fc">&nbsp;                parseDiscovery(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;discovery&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionBalanceSnapshot.Neutrality neutrality =</b>
+<b class="fc">&nbsp;                parseNeutrality(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;neutrality&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionBalanceSnapshot.RawPaths rawPaths =</b>
+<b class="fc">&nbsp;                parseRawPaths(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                root,
+&nbsp;                                &quot;raw_paths&quot;
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        validateCrossFieldRules(</b>
+&nbsp;                selection,
+&nbsp;                identityDistribution
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot(</b>
+<b class="fc">&nbsp;                resourceId.toString(),</b>
+&nbsp;                selection,
+&nbsp;                identityDistribution,
+&nbsp;                identityStrength,
+&nbsp;                good,
+&nbsp;                evil,
+&nbsp;                order,
+&nbsp;                freedom,
+&nbsp;                mastery,
+&nbsp;                discovery,
+&nbsp;                neutrality,
+&nbsp;                rawPaths
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.Selection
+&nbsp;    parseSelection(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.Selection(</b>
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;established_threshold&quot;,
+&nbsp;                        1.0D,
+&nbsp;                        10_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;pure_threshold&quot;,
+&nbsp;                        1.0D,
+&nbsp;                        10_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;dominance_ratio&quot;,
+&nbsp;                        1.0D,
+&nbsp;                        100.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;raw_pure_threshold&quot;,
+&nbsp;                        1.0D,
+&nbsp;                        10_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;raw_dominance_ratio&quot;,
+&nbsp;                        1.0D,
+&nbsp;                        100.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;minimum_directional_morality_evidence&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        10_000.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.IdentityDistribution
+&nbsp;    parseIdentityDistribution(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.IdentityDistribution(</b>
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;universal_share&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        1.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;focused_share&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        1.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;minimum_focus_affinity&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        10_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;secondary_focus_ratio&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        1.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.IdentityStrength
+&nbsp;    parseIdentityStrength(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.IdentityStrength(</b>
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;maximum&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        10_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;mastery_weight&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;discovery_weight&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;major_enemy_types&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;identity_strength.major_enemy_types&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.Good parseGood(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.Good(</b>
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;true_hero_modifier&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        10_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;raid_victories&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;good.raid_victories&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;villagers_cured&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;good.villagers_cured&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;civilians_defended&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;good.civilians_defended&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;malevolent_boss_types_defeated&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;good.malevolent_boss_types_defeated&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.Evil parseEvil(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.Evil(</b>
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;true_demon_lord_modifier&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        10_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;civilian_kills&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;evil.civilian_kills&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;passive_baby_kills&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;evil.passive_baby_kills&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;owned_companion_kills&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;evil.owned_companion_kills&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;owned_subordinate_kills&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;evil.owned_subordinate_kills&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;benevolent_boss_types_killed&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;evil.benevolent_boss_types_killed&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.Order parseOrder(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.Order(</b>
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;subordinate_roster_primary&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;order.subordinate_roster_primary&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;subordinate_roster_established&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;order.subordinate_roster_established&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;subordinate_assisted_major_victories&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;order.subordinate_assisted_major_victories&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;unique_subordinates_empowered&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;order.unique_subordinates_empowered&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;mass_grants_performed&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;order.mass_grants_performed&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;global_take_backs_performed&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;order.global_take_backs_performed&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.Freedom parseFreedom(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.Freedom(</b>
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;solo_major_enemy_types_defeated&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;freedom.solo_major_enemy_types_defeated&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;discovery_milestones&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;freedom.discovery_milestones&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.Mastery parseMastery(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        JsonArray tierArray =</b>
+<b class="fc">&nbsp;                requireArray(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;skill_tiers&quot;
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (tierArray.size() == 0) {</b>
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;mastery.skill_tiers must contain at least one tier.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (tierArray.size() &gt; MAX_SKILL_TIERS) {</b>
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;mastery.skill_tiers may contain at most &quot;
+&nbsp;                            + MAX_SKILL_TIERS
+&nbsp;                            + &quot; tiers.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        List&lt;RecognitionBalanceSnapshot.SkillTier&gt; tiers =</b>
+&nbsp;                new ArrayList&lt;&gt;(
+<b class="fc">&nbsp;                        tierArray.size()</b>
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        for (int index = 0;</b>
+<b class="fc">&nbsp;             index &lt; tierArray.size();</b>
+<b class="fc">&nbsp;             index++) {</b>
+&nbsp;
+<b class="fc">&nbsp;            JsonObject tierObject =</b>
+<b class="fc">&nbsp;                    requireObject(</b>
+<b class="fc">&nbsp;                            tierArray.get(index),</b>
+&nbsp;                            &quot;mastery.skill_tiers[&quot;
+&nbsp;                                    + index
+&nbsp;                                    + &quot;]&quot;
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            tiers.add(</b>
+&nbsp;                    new RecognitionBalanceSnapshot.SkillTier(
+<b class="fc">&nbsp;                            requireInteger(</b>
+&nbsp;                                    tierObject,
+&nbsp;                                    &quot;entries&quot;,
+&nbsp;                                    1,
+&nbsp;                                    1_000_000
+&nbsp;                            ),
+<b class="fc">&nbsp;                            requireDouble(</b>
+&nbsp;                                    tierObject,
+&nbsp;                                    &quot;points_per_entry&quot;,
+&nbsp;                                    0.0D,
+&nbsp;                                    10_000.0D
+&nbsp;                            )
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.Mastery(</b>
+&nbsp;                tiers,
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;skill_maximum&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;mastered_skill_categories&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;mastery.mastered_skill_categories&quot;
+&nbsp;                ),
+<b class="fc">&nbsp;                parseEpContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;highest_ep&quot;
+&nbsp;                        )
+&nbsp;                ),
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;major_enemy_types_defeated&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;mastery.major_enemy_types_defeated&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.Discovery
+&nbsp;    parseDiscovery(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.Discovery(</b>
+<b class="fc">&nbsp;                parseContribution(</b>
+<b class="fc">&nbsp;                        requireObject(</b>
+&nbsp;                                object,
+&nbsp;                                &quot;milestones&quot;
+&nbsp;                        ),
+&nbsp;                        &quot;discovery.milestones&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.Neutrality
+&nbsp;    parseNeutrality(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        JsonObject morality =</b>
+<b class="fc">&nbsp;                requireObject(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;morality&quot;
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        JsonObject behaviour =</b>
+<b class="fc">&nbsp;                requireObject(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;behaviour&quot;
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.Neutrality(</b>
+&nbsp;                new RecognitionBalanceSnapshot.NeutralMorality(
+<b class="fc">&nbsp;                        requireDouble(</b>
+&nbsp;                                morality,
+&nbsp;                                &quot;balance_weight&quot;,
+&nbsp;                                0.0D,
+&nbsp;                                100.0D
+&nbsp;                        ),
+<b class="fc">&nbsp;                        requireDouble(</b>
+&nbsp;                                morality,
+&nbsp;                                &quot;discovery_weight&quot;,
+&nbsp;                                0.0D,
+&nbsp;                                100.0D
+&nbsp;                        ),
+<b class="fc">&nbsp;                        requireDouble(</b>
+&nbsp;                                morality,
+&nbsp;                                &quot;moral_volume_divisor&quot;,
+&nbsp;                                0.000_001D,
+&nbsp;                                1_000_000.0D
+&nbsp;                        ),
+<b class="fc">&nbsp;                        requireDouble(</b>
+&nbsp;                                morality,
+&nbsp;                                &quot;maximum&quot;,
+&nbsp;                                0.0D,
+&nbsp;                                100_000.0D
+&nbsp;                        )
+&nbsp;                ),
+&nbsp;                new RecognitionBalanceSnapshot.NeutralBehaviour(
+<b class="fc">&nbsp;                        requireDouble(</b>
+&nbsp;                                behaviour,
+&nbsp;                                &quot;balance_weight&quot;,
+&nbsp;                                0.0D,
+&nbsp;                                100.0D
+&nbsp;                        ),
+<b class="fc">&nbsp;                        requireDouble(</b>
+&nbsp;                                behaviour,
+&nbsp;                                &quot;posture_base&quot;,
+&nbsp;                                0.0D,
+&nbsp;                                100_000.0D
+&nbsp;                        ),
+<b class="fc">&nbsp;                        requireDouble(</b>
+&nbsp;                                behaviour,
+&nbsp;                                &quot;behaviour_volume_divisor&quot;,
+&nbsp;                                0.000_001D,
+&nbsp;                                1_000_000.0D
+&nbsp;                        ),
+<b class="fc">&nbsp;                        requireDouble(</b>
+&nbsp;                                behaviour,
+&nbsp;                                &quot;maximum&quot;,
+&nbsp;                                0.0D,
+&nbsp;                                100_000.0D
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.RawPaths parseRawPaths(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.RawPaths(</b>
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;moral_weight&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;temperament_weight&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;overlap_weight&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;contradiction_factor&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;contradiction_maximum&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;true_neutral_discovery_factor&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;true_neutral_discovery_maximum&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;chaotic_neutral_discovery_factor&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;chaotic_neutral_discovery_maximum&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100_000.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.Contribution
+&nbsp;    parseContribution(
+&nbsp;            JsonObject object,
+&nbsp;            String path
+&nbsp;    ) {
+<b class="fc">&nbsp;        double pointsPerEntry =</b>
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;points_per_entry&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100_000.0D
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        double maximum =</b>
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;maximum&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100_000.0D
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (pointsPerEntry &gt; 0.0D</b>
+&nbsp;                &amp;&amp; maximum &lt;= 0.0D) {
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    path
+&nbsp;                            + &quot;.maximum must be positive when &quot;
+&nbsp;                            + &quot;points_per_entry is positive.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.Contribution(</b>
+&nbsp;                pointsPerEntry,
+&nbsp;                maximum
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionBalanceSnapshot.EpContribution
+&nbsp;    parseEpContribution(
+&nbsp;            JsonObject object
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionBalanceSnapshot.EpContribution(</b>
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;ep_per_unit&quot;,
+&nbsp;                        0.000_001D,
+&nbsp;                        1_000_000_000_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;points_per_unit&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100_000.0D
+&nbsp;                ),
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        object,
+&nbsp;                        &quot;maximum&quot;,
+&nbsp;                        0.0D,
+&nbsp;                        100_000.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateCrossFieldRules(
+&nbsp;            RecognitionBalanceSnapshot.Selection selection,
+&nbsp;            RecognitionBalanceSnapshot.IdentityDistribution
+&nbsp;                    identityDistribution
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (selection.pureThreshold()</b>
+<b class="pc">&nbsp;                &lt; selection.establishedThreshold()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;selection.pure_threshold must be greater than or equal &quot;
+&nbsp;                            + &quot;to selection.established_threshold.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        double convertedIdentityShare =</b>
+<b class="fc">&nbsp;                identityDistribution.universalShare()</b>
+<b class="fc">&nbsp;                        + identityDistribution.focusedShare();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (convertedIdentityShare &gt; 1.0D + 0.000_001D) {</b>
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;identity_distribution universal_share + focused_share &quot;
+&nbsp;                            + &quot;cannot exceed 1.0.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static JsonObject requireObject(
+&nbsp;            JsonObject parent,
+&nbsp;            String key
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (parent == null</b>
+&nbsp;                || key == null
+<b class="pc">&nbsp;                || !parent.has(key)) {</b>
+&nbsp;
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;Missing required object &#39;&quot;
+&nbsp;                            + key
+&nbsp;                            + &quot;&#39;.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return requireObject(</b>
+<b class="fc">&nbsp;                parent.get(key),</b>
+&nbsp;                key
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static JsonObject requireObject(
+&nbsp;            JsonElement element,
+&nbsp;            String path
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (element == null</b>
+<b class="pc">&nbsp;                || !element.isJsonObject()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;Expected JSON object at &#39;&quot;
+&nbsp;                            + path
+&nbsp;                            + &quot;&#39;.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return element.getAsJsonObject();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static JsonArray requireArray(
+&nbsp;            JsonObject parent,
+&nbsp;            String key
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (parent == null</b>
+&nbsp;                || key == null
+<b class="pc">&nbsp;                || !parent.has(key)) {</b>
+&nbsp;
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;Missing required array &#39;&quot;
+&nbsp;                            + key
+&nbsp;                            + &quot;&#39;.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        JsonElement element =</b>
+<b class="fc">&nbsp;                parent.get(key);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (element == null</b>
+<b class="pc">&nbsp;                || !element.isJsonArray()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;Expected JSON array at &#39;&quot;
+&nbsp;                            + key
+&nbsp;                            + &quot;&#39;.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return element.getAsJsonArray();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int requireInteger(
+&nbsp;            JsonObject parent,
+&nbsp;            String key,
+&nbsp;            int minimum,
+&nbsp;            int maximum
+&nbsp;    ) {
+<b class="fc">&nbsp;        double rawValue =</b>
+<b class="fc">&nbsp;                requireDouble(</b>
+&nbsp;                        parent,
+&nbsp;                        key,
+&nbsp;                        minimum,
+&nbsp;                        maximum
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (rawValue != Math.rint(rawValue)) {</b>
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;Field &#39;&quot;
+&nbsp;                            + key
+&nbsp;                            + &quot;&#39; must be an integer.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return (int) rawValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double requireDouble(
+&nbsp;            JsonObject parent,
+&nbsp;            String key,
+&nbsp;            double minimum,
+&nbsp;            double maximum
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (parent == null</b>
+&nbsp;                || key == null
+<b class="pc">&nbsp;                || !parent.has(key)) {</b>
+&nbsp;
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;Missing required numeric field &#39;&quot;
+&nbsp;                            + key
+&nbsp;                            + &quot;&#39;.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        JsonElement element =</b>
+<b class="fc">&nbsp;                parent.get(key);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (element == null</b>
+<b class="pc">&nbsp;                || !element.isJsonPrimitive()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;Field &#39;&quot;
+&nbsp;                            + key
+&nbsp;                            + &quot;&#39; must be numeric.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        JsonPrimitive primitive =</b>
+<b class="fc">&nbsp;                element.getAsJsonPrimitive();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!primitive.isNumber()) {</b>
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;Field &#39;&quot;
+&nbsp;                            + key
+&nbsp;                            + &quot;&#39; must be numeric.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        double value =</b>
+<b class="fc">&nbsp;                primitive.getAsDouble();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!Double.isFinite(value)</b>
+&nbsp;                || value &lt; minimum
+&nbsp;                || value &gt; maximum) {
+&nbsp;
+<b class="nc">&nbsp;            throw new JsonParseException(</b>
+&nbsp;                    &quot;Field &#39;&quot;
+&nbsp;                            + key
+&nbsp;                            + &quot;&#39; must be between &quot;
+&nbsp;                            + minimum
+&nbsp;                            + &quot; and &quot;
+&nbsp;                            + maximum
+&nbsp;                            + &quot;.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

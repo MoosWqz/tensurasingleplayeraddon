@@ -1,0 +1,385 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SkillUiSelectionModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen.skillui</a>
+</div>
+
+<h1>Coverage Summary for Class: SkillUiSelectionModel (com.mooswqz.moostensuraaddon.client.screen.skillui)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SkillUiSelectionModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/75)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SkillUiSelectionModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SkillUiSelectionModel$ToggleResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen.skillui;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * Shared single- and multi-selection state with a strict selection ceiling.
+&nbsp; */
+&nbsp;public final class SkillUiSelectionModel {
+&nbsp;
+&nbsp;    public static final int DEFAULT_MAX_MULTI_SELECTION = 64;
+&nbsp;
+&nbsp;    private final SkillUiSelectionMode mode;
+&nbsp;    private final int maximumSelection;
+<b class="nc">&nbsp;    private final LinkedHashSet&lt;String&gt; selectedSkillIds =</b>
+&nbsp;            new LinkedHashSet&lt;&gt;();
+&nbsp;
+&nbsp;    public SkillUiSelectionModel(
+&nbsp;            SkillUiSelectionMode mode
+&nbsp;    ) {
+<b class="nc">&nbsp;        this(</b>
+&nbsp;                mode,
+<b class="nc">&nbsp;                mode == SkillUiSelectionMode.SINGLE</b>
+<b class="nc">&nbsp;                        ? 1</b>
+<b class="nc">&nbsp;                        : DEFAULT_MAX_MULTI_SELECTION</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public SkillUiSelectionModel(
+&nbsp;            SkillUiSelectionMode mode,
+&nbsp;            int maximumSelection
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        this.mode = mode == null</b>
+<b class="nc">&nbsp;                ? SkillUiSelectionMode.READ_ONLY</b>
+<b class="nc">&nbsp;                : mode;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.maximumSelection = switch (this.mode) {</b>
+<b class="nc">&nbsp;            case READ_ONLY -&gt; 0;</b>
+<b class="nc">&nbsp;            case SINGLE -&gt; 1;</b>
+<b class="nc">&nbsp;            case MULTI -&gt; Math.max(</b>
+&nbsp;                    1,
+&nbsp;                    maximumSelection
+&nbsp;            );
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public SkillUiSelectionMode mode() {
+<b class="nc">&nbsp;        return mode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int maximumSelection() {
+<b class="nc">&nbsp;        return maximumSelection;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int selectedCount() {
+<b class="nc">&nbsp;        return selectedSkillIds.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isSelected(
+&nbsp;            String skillId
+&nbsp;    ) {
+<b class="nc">&nbsp;        return skillId != null</b>
+<b class="nc">&nbsp;                &amp;&amp; selectedSkillIds.contains(skillId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Set&lt;String&gt; selectedSkillIds() {
+<b class="nc">&nbsp;        return Collections.unmodifiableSet(</b>
+&nbsp;                new LinkedHashSet&lt;&gt;(
+&nbsp;                        selectedSkillIds
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public ToggleResult toggle(
+&nbsp;            SkillUiEntry entry
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (entry == null) {</b>
+<b class="nc">&nbsp;            return ToggleResult.NO_ENTRY;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (mode == SkillUiSelectionMode.READ_ONLY) {</b>
+<b class="nc">&nbsp;            return ToggleResult.READ_ONLY;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!entry.selectable()) {</b>
+<b class="nc">&nbsp;            return ToggleResult.NOT_SELECTABLE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String skillId = entry.skillId();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selectedSkillIds.remove(skillId)) {</b>
+<b class="nc">&nbsp;            return ToggleResult.DESELECTED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (mode == SkillUiSelectionMode.SINGLE) {</b>
+<b class="nc">&nbsp;            selectedSkillIds.clear();</b>
+<b class="nc">&nbsp;            selectedSkillIds.add(skillId);</b>
+<b class="nc">&nbsp;            return ToggleResult.SELECTED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (selectedSkillIds.size() &gt;= maximumSelection) {</b>
+<b class="nc">&nbsp;            return ToggleResult.LIMIT_REACHED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        selectedSkillIds.add(skillId);</b>
+<b class="nc">&nbsp;        return ToggleResult.SELECTED;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int selectAllVisible(
+&nbsp;            Collection&lt;SkillUiEntry&gt; visibleEntries
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (mode != SkillUiSelectionMode.MULTI</b>
+&nbsp;                || visibleEntries == null
+<b class="nc">&nbsp;                || visibleEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int previousCount = selectedSkillIds.size();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (SkillUiEntry entry : visibleEntries) {</b>
+<b class="nc">&nbsp;            if (entry == null</b>
+<b class="nc">&nbsp;                    || !entry.selectable()</b>
+<b class="nc">&nbsp;                    || selectedSkillIds.contains(</b>
+<b class="nc">&nbsp;                    entry.skillId()</b>
+&nbsp;            )) {
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (selectedSkillIds.size()</b>
+&nbsp;                    &gt;= maximumSelection) {
+&nbsp;                break;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            selectedSkillIds.add(</b>
+<b class="nc">&nbsp;                    entry.skillId()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return selectedSkillIds.size()</b>
+&nbsp;                - previousCount;
+&nbsp;    }
+&nbsp;
+&nbsp;    public void replaceSelection(
+&nbsp;            Collection&lt;String&gt; skillIds,
+&nbsp;            Collection&lt;SkillUiEntry&gt; availableEntries
+&nbsp;    ) {
+<b class="nc">&nbsp;        selectedSkillIds.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (mode == SkillUiSelectionMode.READ_ONLY</b>
+&nbsp;                || skillIds == null
+<b class="nc">&nbsp;                || skillIds.isEmpty()</b>
+&nbsp;                || availableEntries == null
+<b class="nc">&nbsp;                || availableEntries.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; selectableIds = availableEntries</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .filter(entry -&gt; entry != null</b>
+<b class="nc">&nbsp;                        &amp;&amp; entry.selectable())</b>
+<b class="nc">&nbsp;                .map(SkillUiEntry::skillId)</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String skillId : skillIds) {</b>
+<b class="nc">&nbsp;            if (skillId == null</b>
+<b class="nc">&nbsp;                    || !selectableIds.contains(skillId)) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            selectedSkillIds.add(skillId);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (selectedSkillIds.size()</b>
+&nbsp;                    &gt;= maximumSelection) {
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void retainAvailable(
+&nbsp;            Collection&lt;SkillUiEntry&gt; availableEntries
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (availableEntries == null) {</b>
+<b class="nc">&nbsp;            selectedSkillIds.clear();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;String&gt; selectableIds = availableEntries</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .filter(entry -&gt; entry != null</b>
+<b class="nc">&nbsp;                        &amp;&amp; entry.selectable())</b>
+<b class="nc">&nbsp;                .map(SkillUiEntry::skillId)</b>
+<b class="nc">&nbsp;                .collect(</b>
+<b class="nc">&nbsp;                        java.util.stream.Collectors.toSet()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        selectedSkillIds.retainAll(</b>
+&nbsp;                selectableIds
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clear() {
+<b class="nc">&nbsp;        selectedSkillIds.clear();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum ToggleResult {</b>
+<b class="nc">&nbsp;        SELECTED,</b>
+<b class="nc">&nbsp;        DESELECTED,</b>
+<b class="nc">&nbsp;        READ_ONLY,</b>
+<b class="nc">&nbsp;        NOT_SELECTABLE,</b>
+<b class="nc">&nbsp;        LIMIT_REACHED,</b>
+<b class="nc">&nbsp;        NO_ENTRY</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

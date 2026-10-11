@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionReleasePolicy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionReleasePolicy (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionReleasePolicy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;/**
+&nbsp; * Immutable release policy for recognition in Moos Tensura Addon 1.4.0.
+&nbsp; *
+&nbsp; * &lt;p&gt;Recognition is both an identity system and a permanent power milestone.
+&nbsp; * The reward is explicit, alignment-neutral and frozen for the incarnation.
+&nbsp; * Later deeds may shape the player&#39;s Legacy descriptor, but do not silently
+&nbsp; * rewrite or stack the base recognition-strength reward.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionReleasePolicy {
+&nbsp;
+&nbsp;    public static final int POLICY_VERSION =
+&nbsp;            2;
+&nbsp;
+&nbsp;    public static final String POLICY_ID =
+&nbsp;            RecognitionStrengthRewardFormula.PROFILE_ID;
+&nbsp;
+&nbsp;    public static final String DISPLAY_NAME =
+&nbsp;            &quot;Recognition Strength&quot;;
+&nbsp;
+&nbsp;    public static final int EXPECTED_RESULT_VERSION =
+&nbsp;            1;
+&nbsp;
+&nbsp;    public static final int EXPECTED_RULES_VERSION =
+&nbsp;            2;
+&nbsp;
+&nbsp;    public static final int EXPECTED_REWARD_PROFILE_VERSION =
+&nbsp;            RecognitionStrengthRewardFormula.PROFILE_VERSION;
+&nbsp;
+&nbsp;    public static final int EXPECTED_PURE_PATHS =
+&nbsp;            9;
+&nbsp;
+&nbsp;    public static final int EXPECTED_REQUIRED_ADJACENT_CROSSES =
+&nbsp;            24;
+&nbsp;
+&nbsp;    public static final double MIN_FREEDOM_ORDER_RATIO =
+&nbsp;            0.85D;
+&nbsp;
+&nbsp;    public static final double MAX_FREEDOM_ORDER_RATIO =
+&nbsp;            1.05D;
+&nbsp;
+&nbsp;    private RecognitionReleasePolicy() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean grantsAttributeModifiers() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean grantsCombatMultipliers() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean grantsHistoryModifierPower() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean requiresTrueHeroForPureGood() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean requiresTrueDemonLordForPureEvil() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean requiresAwakeningForTrueNeutral() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean awakeningActsAsDirectionalEvidence() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static double guidanceProgress(
+&nbsp;            double rewardAmount
+&nbsp;    ) {
+<b class="nc">&nbsp;        double maximum = RecognitionStrengthRewardFormula</b>
+<b class="nc">&nbsp;                .maximumReward(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!Double.isFinite(rewardAmount)</b>
+&nbsp;                || rewardAmount &lt;= 0.0D
+&nbsp;                || maximum &lt;= 0.0D) {
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(</b>
+&nbsp;                100.0D,
+&nbsp;                rewardAmount / maximum * 100.0D
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String playerFacingSummary(
+&nbsp;            boolean recognitionCommitted
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (recognitionCommitted) {</b>
+<b class="nc">&nbsp;            return &quot;Your recognized name, title, path colour and strength are permanent for this incarnation. Legacy may continue to evolve, but it does not rewrite or stack the frozen base reward.&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;Recognition bestows a name, title, path colour, lasting strength and an evolving legacy. Its power reflects the identity proven before the altar; Pure recognition earns a small bonus, while no alignment is inherently stronger.&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String rewardProfileSummary() {
+<b class="nc">&nbsp;        return &quot;Reward profile 2 grants 10–20% permanent recognition strength from frozen Identity Strength, with a 2.5% Pure bonus for a maximum of 22.5%. Health and attack damage receive the full reward; movement and attack speed receive half; knockback resistance receives one quarter.&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String awakeningPolicySummary() {
+<b class="nc">&nbsp;        return &quot;True Hero and True Demon Lord strengthen matching directional evidence, but they are not hard requirements for Pure Good or Pure Evil. True Neutral has no awakening gate.&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

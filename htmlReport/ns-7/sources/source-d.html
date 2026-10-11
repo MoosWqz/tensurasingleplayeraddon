@@ -1,0 +1,796 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionIdentityHistoryDebugCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionIdentityHistoryDebugCommand (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionIdentityHistoryDebugCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.3%
+  </span>
+  <span class="absValue">
+    (1/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.3%
+  </span>
+  <span class="absValue">
+    (10/233)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryDebugCommand$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    3.2%
+  </span>
+  <span class="absValue">
+    (1/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.3%
+  </span>
+  <span class="absValue">
+    (10/234)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionIdentityHistoryModifier;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionIdentityHistoryResolution;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionIdentityHistoryResolver;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionIdentityHistoryService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionIdentityHistorySnapshot;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionIdentityHistoryValidationHarness;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.commands.Commands;
+&nbsp;import net.minecraft.commands.arguments.EntityArgument;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;/**
+&nbsp; * Debug-only diagnostics for versioned identity-history persistence.
+&nbsp; */
+&nbsp;public final class RecognitionIdentityHistoryDebugCommand {
+&nbsp;
+&nbsp;    private RecognitionIdentityHistoryDebugCommand() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * /moostensura debug history
+&nbsp;     * /moostensura debug history &amp;lt;player&amp;gt;
+&nbsp;     * /moostensura debug history validate
+&nbsp;     */
+&nbsp;    public static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createDebugNode() {
+<b class="fc">&nbsp;        return Commands.literal(&quot;history&quot;)</b>
+<b class="fc">&nbsp;                .requires(</b>
+&nbsp;                        DebugModeService::canUseDebugTools
+&nbsp;                )
+<b class="fc">&nbsp;                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                        context.getSource(),</b>
+<b class="nc">&nbsp;                        context.getSource().getPlayerOrException()</b>
+&nbsp;                ))
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;validate&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt; validate(</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+&nbsp;                                ))
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.argument(</b>
+&nbsp;                                        &quot;player&quot;,
+<b class="fc">&nbsp;                                        EntityArgument.player()</b>
+&nbsp;                                )
+<b class="fc">&nbsp;                                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                                        context.getSource(),</b>
+<b class="nc">&nbsp;                                        EntityArgument.getPlayer(</b>
+&nbsp;                                                context,
+&nbsp;                                                &quot;player&quot;
+&nbsp;                                        )
+&nbsp;                                ))
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int inspect(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer target
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = target.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolution resolution =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryResolver.resolve(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Identity History: &quot;
+<b class="nc">&nbsp;                        + target.getGameProfile().getName(),</b>
+&nbsp;                ChatFormatting.LIGHT_PURPLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Read-only inspection. No decay, migration, deed recording or modifier storage was performed.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Persistence&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;History version&quot;,
+<b class="nc">&nbsp;                snapshot.storedVersion()</b>
+&nbsp;                        + &quot; / current &quot;
+<b class="nc">&nbsp;                        + snapshot.currentVersion(),</b>
+<b class="nc">&nbsp;                snapshot.futureVersion()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.YELLOW</b>
+<b class="nc">&nbsp;                        : snapshot.initialized()</b>
+<b class="nc">&nbsp;                          ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                          : ChatFormatting.GRAY</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Migration state&quot;,
+<b class="nc">&nbsp;                snapshot.migrationState().displayName(),</b>
+<b class="nc">&nbsp;                switch (snapshot.migrationState()) {</b>
+<b class="nc">&nbsp;                    case CURRENT -&gt; ChatFormatting.GREEN;</b>
+&nbsp;                    case UNINITIALIZED, UNVERSIONED_PAYLOAD,
+&nbsp;                         LEGACY_VERSION -&gt;
+<b class="nc">&nbsp;                            ChatFormatting.YELLOW;</b>
+<b class="nc">&nbsp;                    case FUTURE_VERSION -&gt; ChatFormatting.AQUA;</b>
+<b class="nc">&nbsp;                    case INVALID_DATA -&gt; ChatFormatting.RED;</b>
+&nbsp;                }
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Migration source&quot;,
+<b class="nc">&nbsp;                displayStoredText(snapshot.migrationSource()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;History modifier&quot;,
+<b class="nc">&nbsp;                displayModifier(snapshot),</b>
+<b class="nc">&nbsp;                snapshot.knownModifier().isPresent()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.AQUA</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Frozen committed modifier&quot;,
+<b class="nc">&nbsp;                data.getContradictionModifier(),</b>
+&nbsp;                ChatFormatting.DARK_AQUA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;History and frozen committed modifiers are intentionally separate. Identity-history events never rewrite committed recognition.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Current resolution&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Resolved candidate&quot;,
+<b class="nc">&nbsp;                resolution.modifierId()</b>
+&nbsp;                        + &quot; (&quot;
+<b class="nc">&nbsp;                        + resolution.modifierDisplayName()</b>
+&nbsp;                        + &quot;)&quot;,
+<b class="nc">&nbsp;                resolution.hasModifier()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.AQUA</b>
+<b class="nc">&nbsp;                        : ChatFormatting.GRAY</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Original axes&quot;,
+&nbsp;                &quot;moral=&quot;
+<b class="nc">&nbsp;                        + displayDirection(</b>
+<b class="nc">&nbsp;                        resolution.originalMoralDirection()</b>
+&nbsp;                )
+&nbsp;                        + &quot;, temperament=&quot;
+<b class="nc">&nbsp;                        + displayDirection(</b>
+<b class="nc">&nbsp;                        resolution.originalTemperamentDirection()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Current clear axes&quot;,
+&nbsp;                &quot;moral=&quot;
+<b class="nc">&nbsp;                        + displayDirection(</b>
+<b class="nc">&nbsp;                        resolution.currentMoralDirection()</b>
+&nbsp;                )
+&nbsp;                        + &quot;, temperament=&quot;
+<b class="nc">&nbsp;                        + displayDirection(</b>
+<b class="nc">&nbsp;                        resolution.currentTemperamentDirection()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Stored established axes&quot;,
+&nbsp;                &quot;moral=&quot;
+<b class="nc">&nbsp;                        + displayDirection(</b>
+<b class="nc">&nbsp;                        resolution.storedMoralDirection()</b>
+&nbsp;                )
+&nbsp;                        + &quot;, temperament=&quot;
+<b class="nc">&nbsp;                        + displayDirection(</b>
+<b class="nc">&nbsp;                        resolution.storedTemperamentDirection()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.DARK_AQUA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Resolution flags&quot;,
+&nbsp;                &quot;moral contradiction=&quot;
+<b class="nc">&nbsp;                        + resolution.moralContradiction()</b>
+&nbsp;                        + &quot;, temperament contradiction=&quot;
+<b class="nc">&nbsp;                        + resolution.temperamentContradiction()</b>
+&nbsp;                        + &quot;, returned=&quot;
+<b class="nc">&nbsp;                        + resolution.anyReturnedAxis()</b>
+&nbsp;                        + &quot;, contested=&quot;
+<b class="nc">&nbsp;                        + resolution.anyContestedAxis(),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Reason&quot;,
+<b class="nc">&nbsp;                resolution.reason(),</b>
+<b class="nc">&nbsp;                resolution.hasModifier()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.YELLOW</b>
+<b class="nc">&nbsp;                        : ChatFormatting.GRAY</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Player guidance: &quot;
+<b class="nc">&nbsp;                                        + resolution.summary()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!snapshot.rawModifierId().equals(</b>
+<b class="nc">&nbsp;                resolution.modifierId()</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Stored and resolved modifiers differ. A known candidate is stored only after the next qualifying deed; unknown future IDs remain preserved.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (String evidenceLine : resolution.evidence()) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;- &quot; + evidenceLine
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Moral history&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendMomentum(</b>
+&nbsp;                source,
+&nbsp;                &quot;Good&quot;,
+<b class="nc">&nbsp;                snapshot.goodMomentum(),</b>
+<b class="nc">&nbsp;                snapshot.highestGoodCommitment(),</b>
+<b class="nc">&nbsp;                snapshot.lastGoodDeedGameTime(),</b>
+&nbsp;                ChatFormatting.GREEN
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendMomentum(</b>
+&nbsp;                source,
+&nbsp;                &quot;Evil&quot;,
+<b class="nc">&nbsp;                snapshot.evilMomentum(),</b>
+<b class="nc">&nbsp;                snapshot.highestEvilCommitment(),</b>
+<b class="nc">&nbsp;                snapshot.lastEvilDeedGameTime(),</b>
+&nbsp;                ChatFormatting.RED
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Moral reversals&quot;,
+<b class="nc">&nbsp;                Integer.toString(snapshot.moralReversalCount()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Temperament history&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendMomentum(</b>
+&nbsp;                source,
+&nbsp;                &quot;Order&quot;,
+<b class="nc">&nbsp;                snapshot.orderMomentum(),</b>
+<b class="nc">&nbsp;                snapshot.highestOrderCommitment(),</b>
+<b class="nc">&nbsp;                snapshot.lastOrderDeedGameTime(),</b>
+&nbsp;                ChatFormatting.GREEN
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendMomentum(</b>
+&nbsp;                source,
+&nbsp;                &quot;Freedom&quot;,
+<b class="nc">&nbsp;                snapshot.freedomMomentum(),</b>
+<b class="nc">&nbsp;                snapshot.highestFreedomCommitment(),</b>
+<b class="nc">&nbsp;                snapshot.lastFreedomDeedGameTime(),</b>
+&nbsp;                ChatFormatting.AQUA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Temperament reversals&quot;,
+<b class="nc">&nbsp;                Integer.toString(snapshot.temperamentReversalCount()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Lazy decay rules&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Momentum cap&quot;,
+<b class="nc">&nbsp;                format(RecognitionIdentityHistoryService.MAXIMUM_MOMENTUM),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Maximum deed weight&quot;,
+<b class="nc">&nbsp;                format(RecognitionIdentityHistoryService.MAXIMUM_DEED_WEIGHT),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Decay grace&quot;,
+<b class="nc">&nbsp;                formatTicks(</b>
+&nbsp;                        RecognitionIdentityHistoryService.DECAY_GRACE_TICKS
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Decay rate&quot;,
+<b class="nc">&nbsp;                format(RecognitionIdentityHistoryService.DECAY_PER_INTERVAL)</b>
+&nbsp;                        + &quot; per &quot;
+<b class="nc">&nbsp;                        + formatTicks(</b>
+&nbsp;                        RecognitionIdentityHistoryService.DECAY_INTERVAL_TICKS
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;No tick handler exists. Moral deeds decay Good/Evil; temperament deeds decay Order/Freedom.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!snapshot.validationIssues().isEmpty()) {</b>
+<b class="nc">&nbsp;            sendHeader(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Validation issues&quot;,
+&nbsp;                    ChatFormatting.RED
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            for (String issue : snapshot.validationIssues()) {</b>
+<b class="nc">&nbsp;                source.sendFailure(</b>
+<b class="nc">&nbsp;                        Component.literal(&quot;- &quot; + issue)</b>
+<b class="nc">&nbsp;                                .withStyle(ChatFormatting.RED)</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;No identity-history validation issues detected.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.GREEN),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!snapshot.initialized()) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;The login migration hook initializes this namespace once. Missing version 0 values are safe defaults.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return snapshot.valid() ? 1 : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int validate(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+&nbsp;        RecognitionIdentityHistoryValidationHarness.Report report =
+<b class="nc">&nbsp;                RecognitionIdentityHistoryValidationHarness.run();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Identity History Validation&quot;,
+&nbsp;                ChatFormatting.LIGHT_PURPLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Temporary RecognitionData only. No player or world data was modified.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;History schema&quot;,
+<b class="nc">&nbsp;                Integer.toString(report.historyVersion()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Checks&quot;,
+<b class="nc">&nbsp;                report.passedChecks()</b>
+&nbsp;                        + &quot; passed / &quot;
+<b class="nc">&nbsp;                        + report.failedChecks()</b>
+&nbsp;                        + &quot; failed&quot;,
+<b class="nc">&nbsp;                report.passed()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.RED</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        for (RecognitionIdentityHistoryValidationHarness.Check check :
+<b class="nc">&nbsp;                report.checks()) {</b>
+<b class="nc">&nbsp;            MutableComponent line = Component.literal(</b>
+<b class="nc">&nbsp;                            check.passed()</b>
+<b class="nc">&nbsp;                                    ? &quot;[PASS] &quot;</b>
+<b class="nc">&nbsp;                                    : &quot;[FAIL] &quot;</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                    .withStyle(</b>
+<b class="nc">&nbsp;                            check.passed()</b>
+<b class="nc">&nbsp;                                    ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                    : ChatFormatting.RED</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            line.append(</b>
+<b class="nc">&nbsp;                    Component.literal(check.name())</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.WHITE)</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            if (!check.detail().isBlank()) {</b>
+<b class="nc">&nbsp;                line.append(</b>
+<b class="nc">&nbsp;                        Component.literal(&quot; — &quot; + check.detail())</b>
+<b class="nc">&nbsp;                                .withStyle(ChatFormatting.DARK_GRAY)</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; line,</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (String warning : report.warnings()) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(&quot;Warning: &quot; + warning)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                report.passed()</b>
+<b class="nc">&nbsp;                                        ? &quot;Identity-history validation PASS.&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;Identity-history validation FAILED.&quot;</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                report.passed()</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.RED,</b>
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return report.passed() ? 1 : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendMomentum(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String label,
+&nbsp;            double current,
+&nbsp;            double highest,
+&nbsp;            long lastGameTime,
+&nbsp;            ChatFormatting color
+&nbsp;    ) {
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                label,
+<b class="nc">&nbsp;                format(current)</b>
+&nbsp;                        + &quot; current / &quot;
+<b class="nc">&nbsp;                        + format(highest)</b>
+&nbsp;                        + &quot; historical peak / last deed &quot;
+<b class="nc">&nbsp;                        + formatStoredGameTime(lastGameTime),</b>
+&nbsp;                color
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String displayModifier(
+&nbsp;            RecognitionIdentityHistorySnapshot snapshot
+&nbsp;    ) {
+<b class="nc">&nbsp;        return snapshot.knownModifier()</b>
+<b class="nc">&nbsp;                .map(modifier -&gt;</b>
+<b class="nc">&nbsp;                        modifier.id()</b>
+&nbsp;                                + &quot; (&quot;
+<b class="nc">&nbsp;                                + modifier.displayName()</b>
+&nbsp;                                + &quot;)&quot;
+&nbsp;                )
+<b class="nc">&nbsp;                .orElse(</b>
+<b class="nc">&nbsp;                        snapshot.rawModifierId()</b>
+&nbsp;                                + &quot; [unknown preserved]&quot;
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String displayDirection(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null || value.isBlank()</b>
+<b class="nc">&nbsp;                ? &quot;neutral/none&quot;</b>
+<b class="nc">&nbsp;                : value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String displayStoredText(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null || value.isBlank()</b>
+<b class="nc">&nbsp;                ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                : value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatStoredGameTime(
+&nbsp;            long gameTime
+&nbsp;    ) {
+<b class="nc">&nbsp;        return gameTime &lt;= 0L</b>
+<b class="nc">&nbsp;                ? &quot;never&quot;</b>
+&nbsp;                : gameTime
+&nbsp;                  + &quot; ticks (&quot;
+<b class="nc">&nbsp;                  + String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.2f Minecraft days&quot;,
+<b class="nc">&nbsp;                (double) gameTime / 24_000.0D</b>
+&nbsp;        )
+<b class="nc">&nbsp;                  + &quot;)&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatTicks(
+&nbsp;            long ticks
+&nbsp;    ) {
+<b class="nc">&nbsp;        return ticks</b>
+&nbsp;                + &quot; ticks (&quot;
+<b class="nc">&nbsp;                + String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.2f Minecraft days&quot;,
+<b class="nc">&nbsp;                (double) ticks / 24_000.0D</b>
+&nbsp;        )
+&nbsp;                + &quot;)&quot;;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String format(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.1f&quot;,
+<b class="nc">&nbsp;                !Double.isFinite(value) || value &lt; 0.0D</b>
+<b class="nc">&nbsp;                        ? 0.0D</b>
+<b class="nc">&nbsp;                        : value</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendHeader(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String text,
+&nbsp;            ChatFormatting color
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(text)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                color,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendValue(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String label,
+&nbsp;            String value,
+&nbsp;            ChatFormatting valueColor
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent message = Component.literal(label + &quot;: &quot;)</b>
+<b class="nc">&nbsp;                .withStyle(ChatFormatting.GRAY);</b>
+&nbsp;
+<b class="nc">&nbsp;        message.append(</b>
+<b class="nc">&nbsp;                Component.literal(value == null ? &quot;&quot; : value)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                valueColor == null</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.WHITE</b>
+<b class="nc">&nbsp;                                        : valueColor</b>
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; message,</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

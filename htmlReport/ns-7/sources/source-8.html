@@ -1,0 +1,680 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PlayerGuidanceService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: PlayerGuidanceService (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PlayerGuidanceService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/165)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionBalanceSnapshot;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionEvaluation;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionEvidenceBreakdown;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionNamingEligibility;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionNamingService;
+&nbsp;import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.util.GranterActions;
+&nbsp;import com.mooswqz.moostensuraaddon.util.GreatSageAwakeningHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.util.TensuraPlayerStateHelper;
+&nbsp;import io.github.manasmods.manascore.skill.api.SkillAPI;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.network.chat.ClickEvent;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.HoverEvent;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builds a compact guide from the player&#39;s authoritative progression state.
+&nbsp; */
+&nbsp;public final class PlayerGuidanceService {
+&nbsp;
+&nbsp;    private PlayerGuidanceService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int sendGuide(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (source == null || player == null) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData recognition = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+<b class="nc">&nbsp;        GranterProgressData granterProgress = player.getData(</b>
+&nbsp;                AttachmentRegistry.GRANTER_PROGRESS_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean recognitionCommitted = recognition.isNamingCommitted();</b>
+<b class="nc">&nbsp;        boolean namedOrRecognized = recognitionCommitted</b>
+<b class="nc">&nbsp;                || TensuraPlayerStateHelper.isNamedOrEndowed(player);</b>
+<b class="nc">&nbsp;        boolean hasSage = GreatSageAwakeningHelper</b>
+<b class="nc">&nbsp;                .findSage(player)</b>
+<b class="nc">&nbsp;                .isPresent();</b>
+<b class="nc">&nbsp;        boolean hasGreatSage = GranterActions.hasGreatSage(player);</b>
+<b class="nc">&nbsp;        boolean hasGranter = hasSkill(</b>
+&nbsp;                player,
+<b class="nc">&nbsp;                SkillRegistry.GRANTER.get().getRegistryName()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        boolean hasBenevolent = hasSkill(</b>
+&nbsp;                player,
+&nbsp;                SkillRegistry.BENEVOLENT_EMPOWERMENT
+<b class="nc">&nbsp;                        .get()</b>
+<b class="nc">&nbsp;                        .getRegistryName()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        boolean hasGovernance = hasSkill(</b>
+&nbsp;                player,
+&nbsp;                SkillRegistry.ABSOLUTE_GOVERNANCE
+<b class="nc">&nbsp;                        .get()</b>
+<b class="nc">&nbsp;                        .getRegistryName()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        PlayerGuidancePolicy.Stage stage = PlayerGuidancePolicy.resolve(</b>
+<b class="nc">&nbsp;                AddonIncarnationState.isResetGuardActive(player),</b>
+&nbsp;                namedOrRecognized,
+&nbsp;                hasSage,
+&nbsp;                hasGreatSage,
+&nbsp;                hasGranter,
+&nbsp;                hasBenevolent,
+&nbsp;                hasGovernance
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.translatable(</b>
+&nbsp;                                &quot;message.moostensuraaddon.guide.header&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.translatable(</b>
+&nbsp;                                &quot;message.moostensuraaddon.guide.stage.&quot;
+<b class="nc">&nbsp;                                        + stage.id()</b>
+&nbsp;                                        + &quot;.title&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GOLD),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.translatable(</b>
+&nbsp;                                &quot;message.moostensuraaddon.guide.stage.&quot;
+<b class="nc">&nbsp;                                        + stage.id()</b>
+&nbsp;                                        + &quot;.detail&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (stage == PlayerGuidancePolicy.Stage.AWAKEN_GREAT_SAGE) {</b>
+<b class="nc">&nbsp;            sendCommandLink(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;message.moostensuraaddon.guide.link.sage&quot;,
+&nbsp;                    &quot;/moostensura guide sage&quot;,
+&nbsp;                    &quot;message.moostensuraaddon.guide.link.sage.hover&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (recognitionCommitted) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.translatable(</b>
+&nbsp;                                    &quot;message.moostensuraaddon.guide.recognition.committed&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.LIGHT_PURPLE),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.translatable(</b>
+&nbsp;                                    &quot;message.moostensuraaddon.guide.recognition.developing&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.DARK_AQUA),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendCommandLink(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.link.paths&quot;,
+&nbsp;                &quot;/moostensura paths&quot;,
+&nbsp;                &quot;message.moostensuraaddon.guide.link.paths.hover&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendCommandLink(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.link.mastery&quot;,
+&nbsp;                &quot;/moostensura guide mastery&quot;,
+&nbsp;                &quot;message.moostensuraaddon.guide.link.mastery.hover&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (hasGranter || hasBenevolent || hasGovernance) {</b>
+<b class="nc">&nbsp;            int grants = Math.max(</b>
+&nbsp;                    0,
+<b class="nc">&nbsp;                    granterProgress.getSuccessfulGrants()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            int subordinates = Math.max(</b>
+&nbsp;                    0,
+<b class="nc">&nbsp;                    granterProgress.getRecognizedSubordinateCount()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.translatable(</b>
+&nbsp;                                    &quot;message.moostensuraaddon.guide.authority_progress&quot;,
+<b class="nc">&nbsp;                                    grants,</b>
+<b class="nc">&nbsp;                                    subordinates</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.DARK_AQUA),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.translatable(</b>
+&nbsp;                                &quot;message.moostensuraaddon.guide.help_hint&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Rebuilds the authoritative recognition snapshot and explains the live
+&nbsp;     * Mastery total source by source. The values therefore reflect the
+&nbsp;     * server&#39;s current recognition-balance datapack rather than duplicated
+&nbsp;     * documentation constants.
+&nbsp;     */
+&nbsp;    public static int sendMasteryGuide(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (source == null || player == null) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionNamingEligibility eligibility =</b>
+<b class="nc">&nbsp;                RecognitionNamingService.evaluate(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvaluation evaluation =</b>
+<b class="nc">&nbsp;                eligibility.evaluation();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvidenceBreakdown.Dimension mastery =</b>
+&nbsp;                RecognitionEvidenceBreakdown
+<b class="nc">&nbsp;                        .calculate(</b>
+<b class="nc">&nbsp;                                player.getData(</b>
+&nbsp;                                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                                ),
+<b class="nc">&nbsp;                                evaluation.getBalance()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .mastery();</b>
+&nbsp;
+<b class="nc">&nbsp;        double maximum = mastery.entries()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .mapToDouble(</b>
+&nbsp;                        RecognitionEvidenceBreakdown.Entry::maximum
+&nbsp;                )
+<b class="nc">&nbsp;                .sum();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.mastery.header&quot;,
+&nbsp;                ChatFormatting.AQUA,
+&nbsp;                true
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.mastery.role&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.mastery.total&quot;,
+&nbsp;                ChatFormatting.GOLD,
+&nbsp;                true,
+<b class="nc">&nbsp;                formatScore(mastery.total()),</b>
+<b class="nc">&nbsp;                formatScore(maximum)</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        for (RecognitionEvidenceBreakdown.Entry entry :
+<b class="nc">&nbsp;                mastery.entries()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            sendTranslatedLine(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;message.moostensuraaddon.guide.mastery.component&quot;,
+&nbsp;                    ChatFormatting.YELLOW,
+&nbsp;                    false,
+<b class="nc">&nbsp;                    entry.label(),</b>
+<b class="nc">&nbsp;                    entry.rawValue(),</b>
+<b class="nc">&nbsp;                    formatScore(entry.contribution()),</b>
+<b class="nc">&nbsp;                    formatScore(entry.maximum())</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.mastery.skills_not_total&quot;,
+&nbsp;                ChatFormatting.DARK_AQUA,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.mastery.skill_tiers&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false,
+<b class="nc">&nbsp;                buildSkillTierSummary(</b>
+<b class="nc">&nbsp;                        evaluation.getBalance().mastery()</b>
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.mastery.skill_rules&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.mastery.category_rules&quot;,
+&nbsp;                ChatFormatting.GRAY,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        sendTranslatedLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;message.moostensuraaddon.guide.mastery.identity_rule&quot;,
+&nbsp;                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (eligibility.recognitionCommitted()) {</b>
+<b class="nc">&nbsp;            sendTranslatedLine(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;message.moostensuraaddon.guide.mastery.committed&quot;,
+&nbsp;                    ChatFormatting.DARK_GRAY,
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int sendHelp(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (source == null) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.translatable(</b>
+&nbsp;                                &quot;message.moostensuraaddon.help.header&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHelpLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;/moostensura guide&quot;,
+&nbsp;                &quot;message.moostensuraaddon.help.guide&quot;,
+&nbsp;                ChatFormatting.AQUA
+&nbsp;        );
+<b class="nc">&nbsp;        sendHelpLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;/moostensura guide mastery&quot;,
+&nbsp;                &quot;message.moostensuraaddon.help.mastery&quot;,
+&nbsp;                ChatFormatting.AQUA
+&nbsp;        );
+<b class="nc">&nbsp;        sendHelpLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;/moostensura paths&quot;,
+&nbsp;                &quot;message.moostensuraaddon.help.paths&quot;,
+&nbsp;                ChatFormatting.AQUA
+&nbsp;        );
+<b class="nc">&nbsp;        sendHelpLine(</b>
+&nbsp;                source,
+&nbsp;                &quot;/moostensura help&quot;,
+&nbsp;                &quot;message.moostensuraaddon.help.help&quot;,
+&nbsp;                ChatFormatting.AQUA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (source.hasPermission(2)) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.translatable(</b>
+&nbsp;                                    &quot;message.moostensuraaddon.help.admin_header&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                    false
+&nbsp;            );
+<b class="nc">&nbsp;            sendHelpLine(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;/moostensura lifecycle [player]&quot;,
+&nbsp;                    &quot;message.moostensuraaddon.help.lifecycle&quot;,
+&nbsp;                    ChatFormatting.YELLOW
+&nbsp;            );
+<b class="nc">&nbsp;            sendHelpLine(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;/moostensura unname&quot;,
+&nbsp;                    &quot;message.moostensuraaddon.help.unname&quot;,
+&nbsp;                    ChatFormatting.RED
+&nbsp;            );
+<b class="nc">&nbsp;            sendHelpLine(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;/moostensura resetconfig&quot;,
+&nbsp;                    &quot;message.moostensuraaddon.help.resetconfig&quot;,
+&nbsp;                    ChatFormatting.RED
+&nbsp;            );
+<b class="nc">&nbsp;            sendHelpLine(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;/moostensura reset &lt;player&gt;&quot;,
+&nbsp;                    &quot;message.moostensuraaddon.help.reset&quot;,
+&nbsp;                    ChatFormatting.RED
+&nbsp;            );
+<b class="nc">&nbsp;            sendHelpLine(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;/moostensura debug status&quot;,
+&nbsp;                    &quot;message.moostensuraaddon.help.debug_status&quot;,
+&nbsp;                    ChatFormatting.YELLOW
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (source.hasPermission(</b>
+&nbsp;                DebugModeService.DANGEROUS_DEBUG_PERMISSION_LEVEL
+&nbsp;        )) {
+<b class="nc">&nbsp;            sendHelpLine(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;/moostensura debug enable&quot;,
+&nbsp;                    &quot;message.moostensuraaddon.help.debug_enable&quot;,
+&nbsp;                    ChatFormatting.YELLOW
+&nbsp;            );
+<b class="nc">&nbsp;            sendHelpLine(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;/moostensura debug disable&quot;,
+&nbsp;                    &quot;message.moostensuraaddon.help.debug_disable&quot;,
+&nbsp;                    ChatFormatting.YELLOW
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasSkill(
+&nbsp;            ServerPlayer player,
+&nbsp;            net.minecraft.resources.ResourceLocation skillId
+&nbsp;    ) {
+<b class="nc">&nbsp;        return player != null</b>
+&nbsp;                &amp;&amp; skillId != null
+<b class="nc">&nbsp;                &amp;&amp; SkillAPI.getSkillsFrom(player)</b>
+<b class="nc">&nbsp;                .getSkill(skillId)</b>
+<b class="nc">&nbsp;                .isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String buildSkillTierSummary(
+&nbsp;            RecognitionBalanceSnapshot.Mastery mastery
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (mastery == null || mastery.skillTiers().isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;none&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; tiers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        int firstSkill = 1;</b>
+&nbsp;
+&nbsp;        for (RecognitionBalanceSnapshot.SkillTier tier :
+<b class="nc">&nbsp;                mastery.skillTiers()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            int entries = Math.max(0, tier.entries());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (entries &lt;= 0) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            int lastSkill = firstSkill + entries - 1;</b>
+&nbsp;
+<b class="nc">&nbsp;            tiers.add(</b>
+&nbsp;                    &quot;#&quot;
+&nbsp;                            + firstSkill
+&nbsp;                            + &quot;–&quot;
+&nbsp;                            + lastSkill
+&nbsp;                            + &quot;: +&quot;
+<b class="nc">&nbsp;                            + formatScore(tier.pointsPerEntry())</b>
+&nbsp;                            + &quot; each&quot;
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            firstSkill = lastSkill + 1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (tiers.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;none&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return String.join(&quot;; &quot;, tiers)</b>
+&nbsp;                + &quot;; after #&quot;
+&nbsp;                + (firstSkill - 1)
+&nbsp;                + &quot;: +0&quot;;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatScore(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        double safeValue = Double.isFinite(value)</b>
+<b class="nc">&nbsp;                ? Math.max(0.0D, value)</b>
+<b class="nc">&nbsp;                : 0.0D;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Math.abs(safeValue - Math.rint(safeValue))</b>
+&nbsp;                &lt; 0.000_001D) {
+<b class="nc">&nbsp;            return String.format(</b>
+&nbsp;                    Locale.US,
+&nbsp;                    &quot;%.0f&quot;,
+<b class="nc">&nbsp;                    safeValue</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                        Locale.US,
+&nbsp;                        &quot;%.2f&quot;,
+<b class="nc">&nbsp;                        safeValue</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .replaceAll(&quot;0+$&quot;, &quot;&quot;)</b>
+<b class="nc">&nbsp;                .replaceAll(&quot;\\.$&quot;, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendTranslatedLine(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String translationKey,
+&nbsp;            ChatFormatting color,
+&nbsp;            boolean bold,
+&nbsp;            Object... arguments
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent line = Component.translatable(</b>
+&nbsp;                translationKey,
+&nbsp;                arguments
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (bold) {</b>
+<b class="nc">&nbsp;            line.withStyle(</b>
+&nbsp;                    color,
+&nbsp;                    ChatFormatting.BOLD
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            line.withStyle(color);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(() -&gt; line, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendCommandLink(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String labelKey,
+&nbsp;            String command,
+&nbsp;            String hoverKey
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent link = Component.translatable(labelKey)</b>
+<b class="nc">&nbsp;                .withStyle(style -&gt; style</b>
+<b class="nc">&nbsp;                        .withColor(ChatFormatting.AQUA)</b>
+<b class="nc">&nbsp;                        .withUnderlined(true)</b>
+<b class="nc">&nbsp;                        .withClickEvent(</b>
+&nbsp;                                new ClickEvent(
+&nbsp;                                        ClickEvent.Action.RUN_COMMAND,
+&nbsp;                                        command
+&nbsp;                                )
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withHoverEvent(</b>
+&nbsp;                                new HoverEvent(
+&nbsp;                                        HoverEvent.Action.SHOW_TEXT,
+<b class="nc">&nbsp;                                        Component.translatable(hoverKey)</b>
+&nbsp;                                )
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(() -&gt; link, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendHelpLine(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String command,
+&nbsp;            String descriptionKey,
+&nbsp;            ChatFormatting commandColor
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(command)</b>
+<b class="nc">&nbsp;                        .withStyle(commandColor)</b>
+<b class="nc">&nbsp;                        .append(</b>
+<b class="nc">&nbsp;                                Component.literal(&quot; - &quot;)</b>
+<b class="nc">&nbsp;                                        .withStyle(ChatFormatting.GRAY)</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .append(</b>
+<b class="nc">&nbsp;                                Component.translatable(descriptionKey)</b>
+<b class="nc">&nbsp;                                        .withStyle(ChatFormatting.GRAY)</b>
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,254 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionAttributionPolicy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionAttributionPolicy (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionAttributionPolicy</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (4/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (5/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionAttributionPolicy$ActorKind</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionAttributionPolicy$NegativeDeed</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (4/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (11/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;/**
+&nbsp; * Pure precedence rules for combat ownership and negative recognition deeds.
+&nbsp; *
+&nbsp; * &lt;p&gt;The policy intentionally has no &quot;named entity&quot; input. A custom name is
+&nbsp; * presentation metadata, not proof that a mob belongs to a player.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionAttributionPolicy {
+&nbsp;
+&nbsp;    private RecognitionAttributionPolicy() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ActorKind classifyActor(
+&nbsp;            boolean playerProjectile,
+&nbsp;            boolean directPlayer,
+&nbsp;            boolean tensuraSubordinate,
+&nbsp;            boolean ownedCompanion
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (playerProjectile) {</b>
+<b class="nc">&nbsp;            return ActorKind.PLAYER_PROJECTILE;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (directPlayer) {</b>
+<b class="nc">&nbsp;            return ActorKind.DIRECT_PLAYER;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (tensuraSubordinate) {</b>
+<b class="nc">&nbsp;            return ActorKind.TENSURA_SUBORDINATE;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (ownedCompanion) {</b>
+<b class="nc">&nbsp;            return ActorKind.OWNED_COMPANION;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return ActorKind.NONE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static NegativeDeed classifyNegativeDeed(
+&nbsp;            boolean ownedSubordinate,
+&nbsp;            boolean ownedCompanion,
+&nbsp;            boolean civilian,
+&nbsp;            boolean benevolentBoss,
+&nbsp;            boolean passiveBaby
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (ownedSubordinate) {</b>
+<b class="nc">&nbsp;            return NegativeDeed.OWNED_SUBORDINATE_KILLED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (ownedCompanion) {</b>
+<b class="nc">&nbsp;            return NegativeDeed.OWNED_COMPANION_KILLED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (civilian) {</b>
+<b class="nc">&nbsp;            return NegativeDeed.CIVILIAN_KILLED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (benevolentBoss) {</b>
+<b class="nc">&nbsp;            return NegativeDeed.BENEVOLENT_BOSS_KILLED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (passiveBaby) {</b>
+<b class="nc">&nbsp;            return NegativeDeed.PASSIVE_BABY_KILLED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return NegativeDeed.NONE;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum ActorKind {</b>
+<b class="fc">&nbsp;        NONE,</b>
+<b class="fc">&nbsp;        DIRECT_PLAYER,</b>
+<b class="fc">&nbsp;        PLAYER_PROJECTILE,</b>
+<b class="fc">&nbsp;        OWNED_COMPANION,</b>
+<b class="fc">&nbsp;        TENSURA_SUBORDINATE</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum NegativeDeed {</b>
+<b class="nc">&nbsp;        NONE,</b>
+<b class="nc">&nbsp;        OWNED_SUBORDINATE_KILLED,</b>
+<b class="nc">&nbsp;        OWNED_COMPANION_KILLED,</b>
+<b class="nc">&nbsp;        CIVILIAN_KILLED,</b>
+<b class="nc">&nbsp;        BENEVOLENT_BOSS_KILLED,</b>
+<b class="nc">&nbsp;        PASSIVE_BABY_KILLED</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

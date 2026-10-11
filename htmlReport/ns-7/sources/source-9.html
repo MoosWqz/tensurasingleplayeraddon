@@ -1,0 +1,802 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionAttributionDebugCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionAttributionDebugCommand (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionAttributionDebugCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (4/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.8%
+  </span>
+  <span class="absValue">
+    (1/55)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.2%
+  </span>
+  <span class="absValue">
+    (22/238)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionAttributionDebugCommand$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionAttributionDebugCommand$ProbeCheck</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionAttributionDebugCommand$ResetFixture</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    12.9%
+  </span>
+  <span class="absValue">
+    (4/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.8%
+  </span>
+  <span class="absValue">
+    (1/55)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.1%
+  </span>
+  <span class="absValue">
+    (22/241)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+&nbsp;import com.mojang.brigadier.exceptions.CommandSyntaxException;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.CivilianDefenseTracker;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionAttributionValidationHarness;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatCreditTracker;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionStatKeys;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionSubordinateCombatTracker;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.commands.Commands;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;
+&nbsp;/** Controlled attribution and new-incarnation regression fixtures. */
+&nbsp;public final class RecognitionAttributionDebugCommand {
+&nbsp;
+&nbsp;    private static final int MAX_PENDING_RESET_FIXTURES = 64;
+&nbsp;    private static final long RESET_FIXTURE_LIFETIME_NANOS =
+&nbsp;            10L * 60L * 1_000_000_000L;
+&nbsp;
+<b class="fc">&nbsp;    private static final String[] RESET_COUNTER_KEYS = {</b>
+&nbsp;            RecognitionStatKeys.CIVILIANS_DEFENDED,
+&nbsp;            RecognitionStatKeys.CIVILIAN_KILLS,
+&nbsp;            RecognitionStatKeys.PASSIVE_BABY_KILLS,
+&nbsp;            RecognitionStatKeys.OWNED_COMPANION_KILLS,
+&nbsp;            RecognitionStatKeys.OWNED_SUBORDINATE_KILLS,
+&nbsp;            RecognitionStatKeys.SUBORDINATE_ASSISTED_MAJOR_VICTORIES
+&nbsp;    };
+&nbsp;
+<b class="fc">&nbsp;    private static final String[] RESET_COLLECTION_KEYS = {</b>
+&nbsp;            RecognitionStatKeys.MAJOR_ENEMY_TYPES_DEFEATED,
+&nbsp;            RecognitionStatKeys.SOLO_MAJOR_ENEMY_TYPES_DEFEATED,
+&nbsp;            RecognitionStatKeys.MALEVOLENT_BOSS_TYPES_DEFEATED,
+&nbsp;            RecognitionStatKeys.BENEVOLENT_BOSS_TYPES_KILLED
+&nbsp;    };
+&nbsp;
+&nbsp;    private static final Map&lt;UUID, ResetFixture&gt;
+<b class="fc">&nbsp;            RESET_FIXTURES = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private RecognitionAttributionDebugCommand() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void forgetResetFixture(UUID playerUuid) {
+<b class="pc">&nbsp;        if (playerUuid != null) {</b>
+<b class="fc">&nbsp;            RESET_FIXTURES.remove(playerUuid);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clearResetFixtures() {
+<b class="fc">&nbsp;        RESET_FIXTURES.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createDebugNode() {
+<b class="fc">&nbsp;        return Commands.literal(&quot;attribution&quot;)</b>
+<b class="fc">&nbsp;                .requires(DebugModeService::canUseDebugTools)</b>
+<b class="fc">&nbsp;                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                        context.getSource()</b>
+&nbsp;                ))
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;validate&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt; validate(</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+&nbsp;                                ))
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;reset&quot;)</b>
+<b class="fc">&nbsp;                                .requires(</b>
+&nbsp;                                        DebugModeService
+&nbsp;                                                ::canUseDangerousDebugTools
+&nbsp;                                )
+<b class="fc">&nbsp;                                .executes(context -&gt; requestResetFixture(</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+&nbsp;                                ))
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;confirm&quot;)</b>
+<b class="fc">&nbsp;                                                .executes(context -&gt; installResetFixture(</b>
+<b class="nc">&nbsp;                                                        context.getSource()</b>
+&nbsp;                                                ))
+&nbsp;                                )
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;probe&quot;)</b>
+<b class="fc">&nbsp;                                                .executes(context -&gt; probeResetFixture(</b>
+<b class="nc">&nbsp;                                                        context.getSource()</b>
+&nbsp;                                                ))
+&nbsp;                                )
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int inspect(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCombatCreditTracker.RuntimeSnapshot combat =</b>
+<b class="nc">&nbsp;                RecognitionCombatCreditTracker.inspect(</b>
+<b class="nc">&nbsp;                        source.getServer(),</b>
+<b class="nc">&nbsp;                        player.getUUID()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionSubordinateCombatTracker.RuntimeSnapshot subordinate =</b>
+<b class="nc">&nbsp;                RecognitionSubordinateCombatTracker.inspect(</b>
+<b class="nc">&nbsp;                        player.getUUID()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        CivilianDefenseTracker.RuntimeSnapshot civilian =</b>
+<b class="nc">&nbsp;                CivilianDefenseTracker.inspect(</b>
+<b class="nc">&nbsp;                        source.getServer()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(source, &quot;Recognition Attribution Runtime&quot;);</b>
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Recent combat credits&quot;,
+<b class="nc">&nbsp;                combat.recentCredits()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + combat.maximumRecentCredits()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Selected-player credits&quot;,
+<b class="nc">&nbsp;                Integer.toString(combat.selectedPlayerCredits())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Processed death guards&quot;,
+<b class="nc">&nbsp;                combat.processedDeaths()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + combat.maximumProcessedDeaths()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Subordinate participation&quot;,
+<b class="nc">&nbsp;                subordinate.activeMajorEnemies()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + subordinate.maximumActiveMajorEnemies()</b>
+&nbsp;                        + &quot; (player: &quot;
+<b class="nc">&nbsp;                        + subordinate.selectedOwnerRecords()</b>
+&nbsp;                        + &quot;)&quot;
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Civilian encounters&quot;,
+<b class="nc">&nbsp;                civilian.activeAggressors()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + civilian.maximumActiveAggressors()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Environmental credit window&quot;,
+<b class="nc">&nbsp;                RecognitionCombatCreditTracker.creditWindowTicks()</b>
+&nbsp;                        + &quot; ticks&quot;
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Duplicate-death window&quot;,
+<b class="nc">&nbsp;                RecognitionCombatCreditTracker.duplicateWindowTicks()</b>
+&nbsp;                        + &quot; ticks&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int validate(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+&nbsp;        RecognitionAttributionValidationHarness.Report report =
+<b class="nc">&nbsp;                RecognitionAttributionValidationHarness.validate();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(source, &quot;Recognition Attribution Validation&quot;);</b>
+&nbsp;
+&nbsp;        for (RecognitionAttributionValidationHarness.Check check :
+<b class="nc">&nbsp;                report.checks()) {</b>
+<b class="nc">&nbsp;            sendCheck(</b>
+&nbsp;                    source,
+<b class="nc">&nbsp;                    check.passed(),</b>
+<b class="nc">&nbsp;                    check.name(),</b>
+<b class="nc">&nbsp;                    check.detail()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Checks&quot;,
+<b class="nc">&nbsp;                report.passedChecks()</b>
+&nbsp;                        + &quot; passed / &quot;
+<b class="nc">&nbsp;                        + report.failedChecks()</b>
+&nbsp;                        + &quot; failed&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return report.passed() ? 1 : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int requestResetFixture(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+&nbsp;
+<b class="nc">&nbsp;        AdminConfirmationTracker.arm(</b>
+&nbsp;                source,
+&nbsp;                AdminConfirmationTracker.Action
+&nbsp;                        .INSTALL_ATTRIBUTION_RESET_FIXTURE,
+<b class="nc">&nbsp;                player.getUUID()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendFailure(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                &quot;This installs artificial life-bound recognition counters and runtime attribution state. Use only in a disposable test world.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Run /moostensura debug attribution reset confirm within 30 seconds.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int installResetFixture(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+<b class="nc">&nbsp;        AdminConfirmationTracker.Result confirmation =</b>
+<b class="nc">&nbsp;                AdminConfirmationTracker.consume(</b>
+&nbsp;                        source,
+&nbsp;                        AdminConfirmationTracker.Action
+&nbsp;                                .INSTALL_ATTRIBUTION_RESET_FIXTURE,
+<b class="nc">&nbsp;                        player.getUUID()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!confirmation.confirmed()) {</b>
+<b class="nc">&nbsp;            return rejectConfirmation(source, confirmation);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (data.isWriteBlockedByFutureVersion()) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;Future recognition data is preserved read-only.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AddonIncarnationState.Snapshot lifecycle =</b>
+<b class="nc">&nbsp;                AddonIncarnationState.inspect(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0;</b>
+<b class="nc">&nbsp;             index &lt; RESET_COUNTER_KEYS.length;</b>
+<b class="nc">&nbsp;             index++) {</b>
+<b class="nc">&nbsp;            data.setCounter(</b>
+&nbsp;                    RESET_COUNTER_KEYS[index],
+&nbsp;                    index + 2
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (String key : RESET_COLLECTION_KEYS) {</b>
+<b class="nc">&nbsp;            data.addUniqueValue(</b>
+&nbsp;                    key,
+&nbsp;                    &quot;moostensuraaddon:reset_fixture&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.LAST_EVIL_DEED_GAME_TIME,
+<b class="nc">&nbsp;                Long.toString(</b>
+<b class="nc">&nbsp;                        player.getServer().overworld().getGameTime()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCombatCreditTracker.installResetFixture(player);</b>
+<b class="nc">&nbsp;        RecognitionSubordinateCombatTracker.installResetFixture(player);</b>
+<b class="nc">&nbsp;        CivilianDefenseTracker.installResetFixture(</b>
+<b class="nc">&nbsp;                player.getServer()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        pruneResetFixtures();</b>
+&nbsp;
+<b class="nc">&nbsp;        RESET_FIXTURES.put(</b>
+<b class="nc">&nbsp;                player.getUUID(),</b>
+&nbsp;                new ResetFixture(
+<b class="nc">&nbsp;                        lifecycle.lifeToken(),</b>
+<b class="nc">&nbsp;                        lifecycle.resetSequence(),</b>
+<b class="nc">&nbsp;                        System.nanoTime()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Attribution reset fixture installed. Use Tensura&#39;s Character Reset Scroll normally, then run /moostensura debug attribution reset probe.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GREEN,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int probeResetFixture(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+<b class="nc">&nbsp;        ResetFixture fixture = RESET_FIXTURES.get(</b>
+<b class="nc">&nbsp;                player.getUUID()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (fixture == null) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;No attribution reset fixture is awaiting a probe.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+<b class="nc">&nbsp;        AddonIncarnationState.Snapshot lifecycle =</b>
+<b class="nc">&nbsp;                AddonIncarnationState.inspect(player);</b>
+<b class="nc">&nbsp;        RecognitionCombatCreditTracker.RuntimeSnapshot combat =</b>
+<b class="nc">&nbsp;                RecognitionCombatCreditTracker.inspect(</b>
+<b class="nc">&nbsp;                        source.getServer(),</b>
+<b class="nc">&nbsp;                        player.getUUID()</b>
+&nbsp;                );
+<b class="nc">&nbsp;        RecognitionSubordinateCombatTracker.RuntimeSnapshot subordinate =</b>
+<b class="nc">&nbsp;                RecognitionSubordinateCombatTracker.inspect(</b>
+<b class="nc">&nbsp;                        player.getUUID()</b>
+&nbsp;                );
+<b class="nc">&nbsp;        CivilianDefenseTracker.RuntimeSnapshot civilian =</b>
+<b class="nc">&nbsp;                CivilianDefenseTracker.inspect(</b>
+<b class="nc">&nbsp;                        source.getServer()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ProbeCheck&gt; checks = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        checks.add(new ProbeCheck(</b>
+&nbsp;                &quot;Life token changed&quot;,
+<b class="nc">&nbsp;                !fixture.lifeToken().equals(lifecycle.lifeToken())</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new ProbeCheck(</b>
+&nbsp;                &quot;Reset sequence increased&quot;,
+<b class="nc">&nbsp;                lifecycle.resetSequence() &gt; fixture.resetSequence()</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new ProbeCheck(</b>
+&nbsp;                &quot;Recognition incarnation matches new life&quot;,
+<b class="nc">&nbsp;                lifecycle.lifeToken().equals(data.getIncarnationId())</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new ProbeCheck(</b>
+&nbsp;                &quot;Life-bound counters cleared&quot;,
+<b class="nc">&nbsp;                allCountersAreZero(data)</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new ProbeCheck(</b>
+&nbsp;                &quot;Life-bound collections cleared&quot;,
+<b class="nc">&nbsp;                allCollectionsAreEmpty(data)</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new ProbeCheck(</b>
+&nbsp;                &quot;Identity-history timestamps cleared&quot;,
+<b class="nc">&nbsp;                data.getString(</b>
+&nbsp;                        RecognitionStatKeys.LAST_EVIL_DEED_GAME_TIME
+<b class="nc">&nbsp;                ).isBlank()</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new ProbeCheck(</b>
+&nbsp;                &quot;Recent player credit cleared&quot;,
+<b class="nc">&nbsp;                combat.selectedPlayerCredits() == 0</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new ProbeCheck(</b>
+&nbsp;                &quot;Subordinate participation cleared&quot;,
+<b class="nc">&nbsp;                subordinate.selectedOwnerRecords() == 0</b>
+&nbsp;        ));
+<b class="nc">&nbsp;        checks.add(new ProbeCheck(</b>
+&nbsp;                &quot;Civilian encounter window cleared&quot;,
+<b class="nc">&nbsp;                civilian.activeAggressors() == 0</b>
+&nbsp;        ));
+&nbsp;
+<b class="nc">&nbsp;        boolean cleanBeforeNewLifeWrite = checks.stream()</b>
+<b class="nc">&nbsp;                .allMatch(ProbeCheck::passed);</b>
+<b class="nc">&nbsp;        boolean newLifeIsolated = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (cleanBeforeNewLifeWrite) {</b>
+<b class="nc">&nbsp;            data.incrementCounter(</b>
+&nbsp;                    RecognitionStatKeys.CIVILIANS_DEFENDED
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            newLifeIsolated = data.getCounter(</b>
+&nbsp;                    RecognitionStatKeys.CIVILIANS_DEFENDED
+&nbsp;            ) == 1
+<b class="nc">&nbsp;                    &amp;&amp; data.getCounter(</b>
+&nbsp;                    RecognitionStatKeys.CIVILIAN_KILLS
+&nbsp;            ) == 0
+<b class="nc">&nbsp;                    &amp;&amp; allCollectionsAreEmpty(data);</b>
+&nbsp;
+<b class="nc">&nbsp;            data.setCounter(</b>
+&nbsp;                    RecognitionStatKeys.CIVILIANS_DEFENDED,
+&nbsp;                    0
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        checks.add(new ProbeCheck(</b>
+&nbsp;                &quot;New-life progress remains isolated&quot;,
+&nbsp;                newLifeIsolated
+&nbsp;        ));
+&nbsp;
+<b class="nc">&nbsp;        boolean passed = checks.stream()</b>
+<b class="nc">&nbsp;                .allMatch(ProbeCheck::passed);</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(source, &quot;Attribution Character Reset Probe&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ProbeCheck check : checks) {</b>
+<b class="nc">&nbsp;            sendCheck(</b>
+&nbsp;                    source,
+<b class="nc">&nbsp;                    check.passed(),</b>
+<b class="nc">&nbsp;                    check.name(),</b>
+<b class="nc">&nbsp;                    check.passed()</b>
+<b class="nc">&nbsp;                            ? &quot;Invariant satisfied.&quot;</b>
+<b class="nc">&nbsp;                            : &quot;Invariant failed.&quot;</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                passed</b>
+<b class="nc">&nbsp;                                        ? &quot;Attribution and reincarnation fixture PASS.&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;Attribution and reincarnation fixture FAIL.&quot;</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                passed</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.RED,</b>
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (passed) {</b>
+<b class="nc">&nbsp;            RESET_FIXTURES.remove(player.getUUID());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return passed ? 1 : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean allCountersAreZero(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        for (String key : RESET_COUNTER_KEYS) {</b>
+<b class="nc">&nbsp;            if (data.getCounter(key) != 0) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void pruneResetFixtures() {
+<b class="nc">&nbsp;        long now = System.nanoTime();</b>
+&nbsp;
+<b class="nc">&nbsp;        RESET_FIXTURES.entrySet().removeIf(</b>
+<b class="nc">&nbsp;                entry -&gt; now - entry.getValue().installedNanos()</b>
+&nbsp;                        &gt; RESET_FIXTURE_LIFETIME_NANOS
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        while (RESET_FIXTURES.size()</b>
+&nbsp;                &gt;= MAX_PENDING_RESET_FIXTURES) {
+<b class="nc">&nbsp;            UUID oldest = RESET_FIXTURES.entrySet()</b>
+<b class="nc">&nbsp;                    .stream()</b>
+<b class="nc">&nbsp;                    .min(</b>
+<b class="nc">&nbsp;                            java.util.Comparator.comparingLong(</b>
+<b class="nc">&nbsp;                                    entry -&gt; entry.getValue()</b>
+<b class="nc">&nbsp;                                            .installedNanos()</b>
+&nbsp;                            )
+&nbsp;                    )
+<b class="nc">&nbsp;                    .map(Map.Entry::getKey)</b>
+<b class="nc">&nbsp;                    .orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (oldest == null) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            RESET_FIXTURES.remove(oldest);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean allCollectionsAreEmpty(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        for (String key : RESET_COLLECTION_KEYS) {</b>
+<b class="nc">&nbsp;            if (data.getUniqueValueCount(key) != 0) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int rejectConfirmation(
+&nbsp;            CommandSourceStack source,
+&nbsp;            AdminConfirmationTracker.Result confirmation
+&nbsp;    ) {
+<b class="nc">&nbsp;        String explanation = switch (confirmation.status()) {</b>
+<b class="nc">&nbsp;            case EXPIRED -&gt; &quot;The fixture confirmation expired.&quot;;</b>
+&nbsp;            case DIFFERENT_ACTION -&gt;
+<b class="nc">&nbsp;                    &quot;A different destructive action was awaiting confirmation.&quot;;</b>
+&nbsp;            case DIFFERENT_TARGET -&gt;
+<b class="nc">&nbsp;                    &quot;The fixture confirmation belonged to another player.&quot;;</b>
+&nbsp;            case MISSING, CONFIRMED -&gt;
+<b class="nc">&nbsp;                    &quot;No matching fixture confirmation exists.&quot;;</b>
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        source.sendFailure(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                explanation
+&nbsp;                                        + &quot; Run /moostensura debug attribution reset first.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.RED)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendCheck(
+&nbsp;            CommandSourceStack source,
+&nbsp;            boolean passed,
+&nbsp;            String name,
+&nbsp;            String detail
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                (passed ? &quot;[PASS] &quot; : &quot;[FAIL] &quot;)</b>
+&nbsp;                                        + name
+&nbsp;                                        + &quot; — &quot;
+&nbsp;                                        + detail
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                passed</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.RED</b>
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendHeader(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String text
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(text)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendValue(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String label,
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent message =</b>
+<b class="nc">&nbsp;                Component.literal(label + &quot;: &quot;)</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY);</b>
+&nbsp;
+<b class="nc">&nbsp;        message.append(</b>
+<b class="nc">&nbsp;                Component.literal(value)</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.WHITE)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(() -&gt; message, false);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record ResetFixture(</b>
+&nbsp;            String lifeToken,
+&nbsp;            int resetSequence,
+&nbsp;            long installedNanos
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record ProbeCheck(</b>
+&nbsp;            String name,
+&nbsp;            boolean passed
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

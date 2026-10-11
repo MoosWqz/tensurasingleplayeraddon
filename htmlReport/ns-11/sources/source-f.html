@@ -1,0 +1,578 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionEvidenceValidationHarness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionEvidenceValidationHarness (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionEvidenceValidationHarness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/135)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionEvidenceValidationHarness$Check</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/136)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionBalanceSnapshot;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionEvidenceBreakdown;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionStatKeys;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Focused policy validation for the read-only recognition evidence inspector.
+&nbsp; */
+&nbsp;public final class RecognitionEvidenceValidationHarness {
+&nbsp;
+&nbsp;    private static final double EPSILON = 0.000_001D;
+&nbsp;
+&nbsp;    private RecognitionEvidenceValidationHarness() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void main(String[] args) {
+<b class="nc">&nbsp;        List&lt;Check&gt; checks = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        validateEmptyData(checks);</b>
+<b class="nc">&nbsp;        validateMoralitySources(checks);</b>
+<b class="nc">&nbsp;        validateCaps(checks);</b>
+<b class="nc">&nbsp;        validateTemperamentSources(checks);</b>
+<b class="nc">&nbsp;        validateMasteryAndIdentity(checks);</b>
+<b class="nc">&nbsp;        validateNoMutation(checks);</b>
+&nbsp;
+<b class="nc">&nbsp;        long passed = checks.stream()</b>
+<b class="nc">&nbsp;                .filter(Check::passed)</b>
+<b class="nc">&nbsp;                .count();</b>
+&nbsp;
+<b class="nc">&nbsp;        System.out.println(</b>
+&nbsp;                &quot;Recognition evidence breakdown validation: &quot;
+&nbsp;                        + passed
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + checks.size()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        for (Check check : checks) {</b>
+<b class="nc">&nbsp;            System.out.println(</b>
+<b class="nc">&nbsp;                    (check.passed() ? &quot;[PASS] &quot; : &quot;[FAIL] &quot;)</b>
+<b class="nc">&nbsp;                            + check.name()</b>
+&nbsp;                            + &quot; — &quot;
+<b class="nc">&nbsp;                            + check.detail()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (passed != checks.size()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(</b>
+&nbsp;                    &quot;Recognition evidence validation failed.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateEmptyData(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionEvidenceBreakdown breakdown =</b>
+<b class="nc">&nbsp;                RecognitionEvidenceBreakdown.calculate(</b>
+&nbsp;                        new RecognitionData(),
+<b class="nc">&nbsp;                        RecognitionBalanceSnapshot.createDefaults()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Empty data has zero Good&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        breakdown.good().total(),</b>
+&nbsp;                        0.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                Double.toString(</b>
+<b class="nc">&nbsp;                        breakdown.good().total()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Empty data has zero Evil&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        breakdown.evil().total(),</b>
+&nbsp;                        0.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                Double.toString(</b>
+<b class="nc">&nbsp;                        breakdown.evil().total()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Empty data has zero Identity Strength&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        breakdown.identityStrength().total(),</b>
+&nbsp;                        0.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                Double.toString(</b>
+<b class="nc">&nbsp;                        breakdown.identityStrength().total()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateMoralitySources(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setFlag(</b>
+&nbsp;                RecognitionStatKeys.TRUE_HERO,
+&nbsp;                true
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.RAID_VICTORIES,
+&nbsp;                2
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.VILLAGERS_CURED,
+&nbsp;                2
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.CIVILIANS_DEFENDED,
+&nbsp;                3
+&nbsp;        );
+<b class="nc">&nbsp;        data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .MALEVOLENT_BOSS_TYPES_DEFEATED,
+&nbsp;                &quot;test:boss_a&quot;
+&nbsp;        );
+<b class="nc">&nbsp;        data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .MALEVOLENT_BOSS_TYPES_DEFEATED,
+&nbsp;                &quot;test:boss_b&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setFlag(</b>
+&nbsp;                RecognitionStatKeys.TRUE_DEMON_LORD,
+&nbsp;                true
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.CIVILIAN_KILLS,
+&nbsp;                2
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.PASSIVE_BABY_KILLS,
+&nbsp;                3
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.OWNED_COMPANION_KILLS,
+&nbsp;                1
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.OWNED_SUBORDINATE_KILLS,
+&nbsp;                1
+&nbsp;        );
+<b class="nc">&nbsp;        data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .BENEVOLENT_BOSS_TYPES_KILLED,
+&nbsp;                &quot;test:benevolent&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvidenceBreakdown breakdown =</b>
+<b class="nc">&nbsp;                RecognitionEvidenceBreakdown.calculate(</b>
+&nbsp;                        data,
+<b class="nc">&nbsp;                        RecognitionBalanceSnapshot.createDefaults()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Good sources use default balance exactly&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        breakdown.good().total(),</b>
+&nbsp;                        58.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                Double.toString(</b>
+<b class="nc">&nbsp;                        breakdown.good().total()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Evil sources use default balance exactly&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        breakdown.evil().total(),</b>
+&nbsp;                        54.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                Double.toString(</b>
+<b class="nc">&nbsp;                        breakdown.evil().total()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateCaps(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.CIVILIAN_KILLS,
+&nbsp;                1_000
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.RAID_VICTORIES,
+&nbsp;                1_000
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvidenceBreakdown breakdown =</b>
+<b class="nc">&nbsp;                RecognitionEvidenceBreakdown.calculate(</b>
+&nbsp;                        data,
+<b class="nc">&nbsp;                        RecognitionBalanceSnapshot.createDefaults()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Civilian-kill contribution respects its cap&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        breakdown.evil().entries().get(1)</b>
+<b class="nc">&nbsp;                                .contribution(),</b>
+&nbsp;                        30.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                Double.toString(</b>
+<b class="nc">&nbsp;                        breakdown.evil().entries().get(1)</b>
+<b class="nc">&nbsp;                                .contribution()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Raid-victory contribution respects its cap&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        breakdown.good().entries().get(1)</b>
+<b class="nc">&nbsp;                                .contribution(),</b>
+&nbsp;                        24.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                Double.toString(</b>
+<b class="nc">&nbsp;                        breakdown.good().entries().get(1)</b>
+<b class="nc">&nbsp;                                .contribution()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateTemperamentSources(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.CURRENT_SUBORDINATES,
+&nbsp;                2
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_SUBORDINATES,
+&nbsp;                5
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .SUBORDINATE_ASSISTED_MAJOR_VICTORIES,
+&nbsp;                2
+&nbsp;        );
+<b class="nc">&nbsp;        data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .UNIQUE_SUBORDINATES_EMPOWERED,
+&nbsp;                &quot;subordinate-a&quot;
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.MASS_GRANTS_PERFORMED,
+&nbsp;                1
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .GLOBAL_TAKE_BACKS_PERFORMED,
+&nbsp;                1
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .SOLO_MAJOR_ENEMY_TYPES_DEFEATED,
+&nbsp;                &quot;test:major-a&quot;
+&nbsp;        );
+<b class="nc">&nbsp;        data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys.DISCOVERY_MILESTONES,
+&nbsp;                &quot;test:discovery-a&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvidenceBreakdown breakdown =</b>
+<b class="nc">&nbsp;                RecognitionEvidenceBreakdown.calculate(</b>
+&nbsp;                        data,
+<b class="nc">&nbsp;                        RecognitionBalanceSnapshot.createDefaults()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Order uses the highest recognized subordinate roster&quot;,
+<b class="nc">&nbsp;                breakdown.order().entries().get(0)</b>
+<b class="nc">&nbsp;                        .rawValue()</b>
+<b class="nc">&nbsp;                        .startsWith(&quot;5 &quot;),</b>
+<b class="nc">&nbsp;                breakdown.order().entries().get(0)</b>
+<b class="nc">&nbsp;                        .rawValue()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Freedom combines solo victories and discovery&quot;,
+<b class="nc">&nbsp;                breakdown.freedom().total() &gt; 0.0D,</b>
+<b class="nc">&nbsp;                Double.toString(</b>
+<b class="nc">&nbsp;                        breakdown.freedom().total()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateMasteryAndIdentity(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.MASTERED_SKILLS,
+&nbsp;                20
+&nbsp;        );
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .MASTERED_SKILL_CATEGORIES,
+&nbsp;                4
+&nbsp;        );
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_EP,
+&nbsp;                5_000_000.0D
+&nbsp;        );
+<b class="nc">&nbsp;        data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .MAJOR_ENEMY_TYPES_DEFEATED,
+&nbsp;                &quot;test:major-a&quot;
+&nbsp;        );
+<b class="nc">&nbsp;        data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys.DISCOVERY_MILESTONES,
+&nbsp;                &quot;test:discovery-a&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvidenceBreakdown breakdown =</b>
+<b class="nc">&nbsp;                RecognitionEvidenceBreakdown.calculate(</b>
+&nbsp;                        data,
+<b class="nc">&nbsp;                        RecognitionBalanceSnapshot.createDefaults()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Mastery is positive for developed data&quot;,
+<b class="nc">&nbsp;                breakdown.mastery().total() &gt; 0.0D,</b>
+<b class="nc">&nbsp;                Double.toString(</b>
+<b class="nc">&nbsp;                        breakdown.mastery().total()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Identity Strength is derived and capped&quot;,
+<b class="nc">&nbsp;                breakdown.identityStrength().total() &gt; 0.0D</b>
+<b class="nc">&nbsp;                        &amp;&amp; breakdown.identityStrength().total()</b>
+<b class="nc">&nbsp;                        &lt;= RecognitionBalanceSnapshot.createDefaults()</b>
+<b class="nc">&nbsp;                        .identityStrength()</b>
+<b class="nc">&nbsp;                        .maximum(),</b>
+<b class="nc">&nbsp;                Double.toString(</b>
+<b class="nc">&nbsp;                        breakdown.identityStrength().total()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateNoMutation(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.CIVILIAN_KILLS,
+&nbsp;                2
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int before = data.getCounter(</b>
+&nbsp;                RecognitionStatKeys.CIVILIAN_KILLS
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvidenceBreakdown.calculate(</b>
+&nbsp;                data,
+<b class="nc">&nbsp;                RecognitionBalanceSnapshot.createDefaults()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int after = data.getCounter(</b>
+&nbsp;                RecognitionStatKeys.CIVILIAN_KILLS
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Inspector calculation is read-only&quot;,
+&nbsp;                before == after,
+&nbsp;                before + &quot; -&gt; &quot; + after
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void add(
+&nbsp;            List&lt;Check&gt; checks,
+&nbsp;            String name,
+&nbsp;            boolean passed,
+&nbsp;            String detail
+&nbsp;    ) {
+<b class="nc">&nbsp;        checks.add(</b>
+&nbsp;                new Check(
+&nbsp;                        name,
+&nbsp;                        passed,
+&nbsp;                        detail
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean approximately(
+&nbsp;            double first,
+&nbsp;            double second
+&nbsp;    ) {
+<b class="nc">&nbsp;        return Math.abs(first - second)</b>
+&nbsp;                &lt;= EPSILON;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record Check(</b>
+&nbsp;            String name,
+&nbsp;            boolean passed,
+&nbsp;            String detail
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1714 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionDebugCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionDebugCommand (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionDebugCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.8%
+  </span>
+  <span class="absValue">
+    (2/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.3%
+  </span>
+  <span class="absValue">
+    (29/545)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionDebugCommand$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    4.7%
+  </span>
+  <span class="absValue">
+    (2/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.3%
+  </span>
+  <span class="absValue">
+    (29/546)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mojang.brigadier.CommandDispatcher;
+&nbsp;import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+&nbsp;import com.mojang.brigadier.tree.CommandNode;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionAuthorityProgress;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionBalanceSnapshot;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionDimensions;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionEvaluation;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionEvidenceBreakdown;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionNamingCandidate;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionNamingEligibility;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionNamingService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionPath;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionPathEvaluator;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionPathSelection;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionStatKeys;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.TensuraRecognitionStateHelper;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.commands.Commands;
+&nbsp;import net.minecraft.commands.arguments.EntityArgument;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;public final class RecognitionDebugCommand {
+&nbsp;
+&nbsp;    private RecognitionDebugCommand() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Registers the canonical nested debug inspector; the old standalone alias is not registered.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method intentionally supports both command-registration layouts
+&nbsp;     * used during the recognition development line. When the canonical
+&nbsp;     * {@code /moostensura debug} node already exists, the recognition branch is
+&nbsp;     * attached once. The legacy {@code /checkrecognition} alias is also
+&nbsp;     * registered once and remains protected by the normal debug-mode and
+&nbsp;     * permission checks.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static void register(
+&nbsp;            CommandDispatcher&lt;CommandSourceStack&gt; dispatcher
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (dispatcher == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;A command dispatcher is required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CommandNode&lt;CommandSourceStack&gt; moosTensuraRoot =</b>
+<b class="nc">&nbsp;                dispatcher.getRoot()</b>
+<b class="nc">&nbsp;                        .getChild(&quot;moostensura&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (moosTensuraRoot != null) {</b>
+<b class="nc">&nbsp;            CommandNode&lt;CommandSourceStack&gt; debugRoot =</b>
+<b class="nc">&nbsp;                    moosTensuraRoot.getChild(&quot;debug&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (debugRoot != null</b>
+<b class="nc">&nbsp;                    &amp;&amp; debugRoot.getChild(&quot;recognition&quot;) == null) {</b>
+<b class="nc">&nbsp;                debugRoot.addChild(</b>
+<b class="nc">&nbsp;                        createDebugNode().build()</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (dispatcher.getRoot()</b>
+<b class="nc">&nbsp;                .getChild(&quot;checkrecognition&quot;) == null) {</b>
+<b class="nc">&nbsp;            registerLegacyAlias(dispatcher);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates the canonical nested debug branch:
+&nbsp;     *
+&nbsp;     * /moostensura debug recognition
+&nbsp;     * /moostensura debug recognition &lt;player&gt;
+&nbsp;     * /moostensura debug recognition probe
+&nbsp;     * /moostensura debug recognition probe &lt;player&gt;
+&nbsp;     */
+&nbsp;    public static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createDebugNode() {
+<b class="fc">&nbsp;        return createInspectionNode(</b>
+&nbsp;                &quot;recognition&quot;
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated standalone compatibility alias retained for source compatibility.
+&nbsp;     *
+&nbsp;     * The root is always registered server-side, but its requirement hides it
+&nbsp;     * from command suggestions and rejects execution unless debug mode is on
+&nbsp;     * and the source has the standard debug permission level.
+&nbsp;     */
+&nbsp;    public static void registerLegacyAlias(
+&nbsp;            CommandDispatcher&lt;CommandSourceStack&gt; dispatcher
+&nbsp;    ) {
+<b class="nc">&nbsp;        dispatcher.register(</b>
+<b class="nc">&nbsp;                createInspectionNode(</b>
+&nbsp;                        &quot;checkrecognition&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createInspectionNode(
+&nbsp;            String literal
+&nbsp;    ) {
+<b class="fc">&nbsp;        return Commands.literal(literal)</b>
+<b class="fc">&nbsp;                .requires(</b>
+&nbsp;                        DebugModeService
+&nbsp;                                ::canUseDebugTools
+&nbsp;                )
+<b class="fc">&nbsp;                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                        context.getSource(),</b>
+<b class="nc">&nbsp;                        context.getSource()</b>
+<b class="nc">&nbsp;                                .getPlayerOrException()</b>
+&nbsp;                ))
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;probe&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt; probe(</b>
+<b class="nc">&nbsp;                                        context.getSource(),</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+<b class="nc">&nbsp;                                                .getPlayerOrException()</b>
+&nbsp;                                ))
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.argument(</b>
+&nbsp;                                                        &quot;player&quot;,
+<b class="fc">&nbsp;                                                        EntityArgument.player()</b>
+&nbsp;                                                )
+<b class="fc">&nbsp;                                                .executes(context -&gt; probe(</b>
+<b class="nc">&nbsp;                                                        context.getSource(),</b>
+<b class="nc">&nbsp;                                                        EntityArgument.getPlayer(</b>
+&nbsp;                                                                context,
+&nbsp;                                                                &quot;player&quot;
+&nbsp;                                                        )
+&nbsp;                                                ))
+&nbsp;                                )
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;evidence&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt; inspectEvidence(</b>
+<b class="nc">&nbsp;                                        context.getSource(),</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+<b class="nc">&nbsp;                                                .getPlayerOrException(),</b>
+&nbsp;                                        false
+&nbsp;                                ))
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;full&quot;)</b>
+<b class="fc">&nbsp;                                                .executes(context -&gt; inspectEvidence(</b>
+<b class="nc">&nbsp;                                                        context.getSource(),</b>
+<b class="nc">&nbsp;                                                        context.getSource()</b>
+<b class="nc">&nbsp;                                                                .getPlayerOrException(),</b>
+&nbsp;                                                        true
+&nbsp;                                                ))
+<b class="fc">&nbsp;                                                .then(</b>
+<b class="fc">&nbsp;                                                        Commands.argument(</b>
+&nbsp;                                                                        &quot;player&quot;,
+<b class="fc">&nbsp;                                                                        EntityArgument.player()</b>
+&nbsp;                                                                )
+<b class="fc">&nbsp;                                                                .executes(context -&gt; inspectEvidence(</b>
+<b class="nc">&nbsp;                                                                        context.getSource(),</b>
+<b class="nc">&nbsp;                                                                        EntityArgument.getPlayer(</b>
+&nbsp;                                                                                context,
+&nbsp;                                                                                &quot;player&quot;
+&nbsp;                                                                        ),
+&nbsp;                                                                        true
+&nbsp;                                                                ))
+&nbsp;                                                )
+&nbsp;                                )
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.argument(</b>
+&nbsp;                                                        &quot;player&quot;,
+<b class="fc">&nbsp;                                                        EntityArgument.player()</b>
+&nbsp;                                                )
+<b class="fc">&nbsp;                                                .executes(context -&gt; inspectEvidence(</b>
+<b class="nc">&nbsp;                                                        context.getSource(),</b>
+<b class="nc">&nbsp;                                                        EntityArgument.getPlayer(</b>
+&nbsp;                                                                context,
+&nbsp;                                                                &quot;player&quot;
+&nbsp;                                                        ),
+&nbsp;                                                        false
+&nbsp;                                                ))
+&nbsp;                                )
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.argument(</b>
+&nbsp;                                        &quot;player&quot;,
+<b class="fc">&nbsp;                                        EntityArgument.player()</b>
+&nbsp;                                )
+<b class="fc">&nbsp;                                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                                        context.getSource(),</b>
+<b class="nc">&nbsp;                                        EntityArgument.getPlayer(</b>
+&nbsp;                                                context,
+&nbsp;                                                &quot;player&quot;
+&nbsp;                                        )
+&nbsp;                                ))
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int inspect(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer target
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = target.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        TensuraRecognitionStateHelper.Snapshot liveSnapshot =</b>
+<b class="nc">&nbsp;                TensuraRecognitionStateHelper.synchronize(</b>
+&nbsp;                        target,
+&nbsp;                        data
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionAuthorityProgress.synchronize(</b>
+&nbsp;                target,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvaluation evaluation =</b>
+<b class="nc">&nbsp;                RecognitionPathEvaluator.evaluate(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot balance =</b>
+<b class="nc">&nbsp;                evaluation.getBalance();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionNamingEligibility namingEligibility =</b>
+<b class="nc">&nbsp;                RecognitionNamingService.evaluate(</b>
+&nbsp;                        target,
+&nbsp;                        data,
+&nbsp;                        evaluation
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionDimensions dimensions =</b>
+<b class="nc">&nbsp;                evaluation.getDimensions();</b>
+&nbsp;
+<b class="nc">&nbsp;        String playerName =</b>
+<b class="nc">&nbsp;                target.getGameProfile().getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Recognition Debug: &quot; + playerName,
+&nbsp;                ChatFormatting.LIGHT_PURPLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendActiveBalance(</b>
+&nbsp;                source,
+&nbsp;                evaluation
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Baseline data&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Highest XP level&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .HIGHEST_EXPERIENCE_LEVEL
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Current EP&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        data.getMeasurement(</b>
+&nbsp;                                RecognitionStatKeys.CURRENT_EP
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Highest EP&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        data.getMeasurement(</b>
+&nbsp;                                RecognitionStatKeys.HIGHEST_EP
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Mastered skills&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys.MASTERED_SKILLS
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Skill categories&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .MASTERED_SKILL_CATEGORIES
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;TH stored&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        data.getFlag(</b>
+&nbsp;                                RecognitionStatKeys.TRUE_HERO
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;TH detected now&quot;,
+<b class="nc">&nbsp;                liveSnapshot.detectedTrueHero()</b>
+<b class="nc">&nbsp;                        + formatSource(</b>
+<b class="nc">&nbsp;                        liveSnapshot.trueHeroSource()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;TDL stored&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        data.getFlag(</b>
+&nbsp;                                RecognitionStatKeys.TRUE_DEMON_LORD
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;TDL detected now&quot;,
+<b class="nc">&nbsp;                liveSnapshot.detectedTrueDemonLord()</b>
+<b class="nc">&nbsp;                        + formatSource(</b>
+<b class="nc">&nbsp;                        liveSnapshot.trueDemonLordSource()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Tracked deeds&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Raid victories&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys.RAID_VICTORIES
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Villagers cured&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys.VILLAGERS_CURED
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Civilians defended&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys.CIVILIANS_DEFENDED
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Civilian kills&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys.CIVILIAN_KILLS
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Passive baby kills&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys.PASSIVE_BABY_KILLS
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Owned companion kills&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .OWNED_COMPANION_KILLS
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Owned subordinate kills&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .OWNED_SUBORDINATE_KILLS
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Distinct major enemies&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getUniqueValueCount(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .MAJOR_ENEMY_TYPES_DEFEATED
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Solo major enemy types&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getUniqueValueCount(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .SOLO_MAJOR_ENEMY_TYPES_DEFEATED
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Subordinate-assisted major victories&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .SUBORDINATE_ASSISTED_MAJOR_VICTORIES
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Current subordinate roster&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys.CURRENT_SUBORDINATES
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Highest subordinate count&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys.HIGHEST_SUBORDINATES
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Unique subordinates empowered&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getUniqueValueCount(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .UNIQUE_SUBORDINATES_EMPOWERED
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Mass Grants performed&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .MASS_GRANTS_PERFORMED
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Global Take Backs performed&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .GLOBAL_TAKE_BACKS_PERFORMED
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Skills seized&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys.SKILLS_SEIZED
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Discovery milestones&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getUniqueValueCount(</b>
+&nbsp;                                RecognitionStatKeys.DISCOVERY_MILESTONES
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Calculated dimensions&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Good&quot;,
+<b class="nc">&nbsp;                format(dimensions.good())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Evil&quot;,
+<b class="nc">&nbsp;                format(dimensions.evil())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Order&quot;,
+<b class="nc">&nbsp;                format(dimensions.order())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Freedom&quot;,
+<b class="nc">&nbsp;                format(dimensions.freedom())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Mastery&quot;,
+<b class="nc">&nbsp;                format(dimensions.mastery())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Discovery&quot;,
+<b class="nc">&nbsp;                format(dimensions.discovery())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Identity strength&quot;,
+<b class="nc">&nbsp;                format(dimensions.identityStrength())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendPathRanking(</b>
+&nbsp;                source,
+&nbsp;                evaluation
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendCurrentSelection(</b>
+&nbsp;                source,
+&nbsp;                evaluation,
+&nbsp;                balance
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendNamingEligibility(</b>
+&nbsp;                source,
+&nbsp;                target,
+&nbsp;                namingEligibility
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int inspectEvidence(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer target,
+&nbsp;            boolean full
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (target == null) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;Target player could not be found.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data = target.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Refresh only the same authoritative snapshots already used by the
+&nbsp;         * normal recognition debug command. The inspector never changes deed
+&nbsp;         * counters, collections, committed paths or titles.
+&nbsp;         */
+<b class="nc">&nbsp;        TensuraRecognitionStateHelper.synchronize(</b>
+&nbsp;                target,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionAuthorityProgress.synchronize(</b>
+&nbsp;                target,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvaluation evaluation =</b>
+<b class="nc">&nbsp;                RecognitionPathEvaluator.evaluate(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvidenceBreakdown breakdown =</b>
+<b class="nc">&nbsp;                RecognitionEvidenceBreakdown.calculate(</b>
+&nbsp;                        data,
+<b class="nc">&nbsp;                        evaluation.getBalance()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Recognition Evidence: &quot;
+<b class="nc">&nbsp;                        + target.getGameProfile().getName(),</b>
+&nbsp;                ChatFormatting.LIGHT_PURPLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Read-only developer inspection. No recognition data is modified.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Incarnation and committed result&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Data version&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        data.getDataVersion()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Recognition incarnation&quot;,
+<b class="nc">&nbsp;                emptyAsNone(</b>
+<b class="nc">&nbsp;                        data.getString(</b>
+&nbsp;                                RecognitionStatKeys.INCARNATION_ID
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Committed&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        data.isNamingCommitted()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Pure&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        data.isPureRecognition()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Reveal pending&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        data.isRevealPending()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Committed primary&quot;,
+<b class="nc">&nbsp;                data.getCommittedPrimaryPath()</b>
+<b class="nc">&nbsp;                        .map(RecognitionPath::getId)</b>
+<b class="nc">&nbsp;                        .orElse(&quot;none&quot;)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Committed secondary&quot;,
+<b class="nc">&nbsp;                data.getCommittedSecondaryPath()</b>
+<b class="nc">&nbsp;                        .map(RecognitionPath::getId)</b>
+<b class="nc">&nbsp;                        .orElse(&quot;none&quot;)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Bestowed title&quot;,
+<b class="nc">&nbsp;                emptyAsNone(</b>
+<b class="nc">&nbsp;                        data.getBestowedTitle()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Balance source&quot;,
+<b class="nc">&nbsp;                evaluation.getBalance()</b>
+<b class="nc">&nbsp;                        .sourceId()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Balance revision&quot;,
+<b class="nc">&nbsp;                Long.toString(</b>
+<b class="nc">&nbsp;                        evaluation.getBalanceRevision()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendEvidenceDimension(</b>
+&nbsp;                source,
+<b class="nc">&nbsp;                breakdown.good(),</b>
+&nbsp;                ChatFormatting.GREEN,
+&nbsp;                true
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendEvidenceDimension(</b>
+&nbsp;                source,
+<b class="nc">&nbsp;                breakdown.evil(),</b>
+&nbsp;                ChatFormatting.RED,
+&nbsp;                true
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (full) {</b>
+<b class="nc">&nbsp;            sendEvidenceDimension(</b>
+&nbsp;                    source,
+<b class="nc">&nbsp;                    breakdown.order(),</b>
+&nbsp;                    ChatFormatting.GOLD,
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendEvidenceDimension(</b>
+&nbsp;                    source,
+<b class="nc">&nbsp;                    breakdown.freedom(),</b>
+&nbsp;                    ChatFormatting.AQUA,
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendEvidenceDimension(</b>
+&nbsp;                    source,
+<b class="nc">&nbsp;                    breakdown.mastery(),</b>
+&nbsp;                    ChatFormatting.LIGHT_PURPLE,
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendEvidenceDimension(</b>
+&nbsp;                    source,
+<b class="nc">&nbsp;                    breakdown.discovery(),</b>
+&nbsp;                    ChatFormatting.BLUE,
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendEvidenceDimension(</b>
+&nbsp;                    source,
+<b class="nc">&nbsp;                    breakdown.identityStrength(),</b>
+&nbsp;                    ChatFormatting.WHITE,
+&nbsp;                    true
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            sendHeader(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Calculated dimension totals&quot;,
+&nbsp;                    ChatFormatting.GOLD
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Good&quot;,
+<b class="nc">&nbsp;                    format(</b>
+<b class="nc">&nbsp;                            breakdown.good().total()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Evil&quot;,
+<b class="nc">&nbsp;                    format(</b>
+<b class="nc">&nbsp;                            breakdown.evil().total()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Order&quot;,
+<b class="nc">&nbsp;                    format(</b>
+<b class="nc">&nbsp;                            breakdown.order().total()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Freedom&quot;,
+<b class="nc">&nbsp;                    format(</b>
+<b class="nc">&nbsp;                            breakdown.freedom().total()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Mastery&quot;,
+<b class="nc">&nbsp;                    format(</b>
+<b class="nc">&nbsp;                            breakdown.mastery().total()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Discovery&quot;,
+<b class="nc">&nbsp;                    format(</b>
+<b class="nc">&nbsp;                            breakdown.discovery().total()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Identity strength&quot;,
+<b class="nc">&nbsp;                    format(</b>
+<b class="nc">&nbsp;                            breakdown.identityStrength().total()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvidenceBreakdown.Consistency consistency =</b>
+<b class="nc">&nbsp;                breakdown.compare(</b>
+<b class="nc">&nbsp;                        evaluation.getDimensions()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!consistency.matches()) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;Evidence breakdown mismatch: &quot;
+<b class="nc">&nbsp;                                            + consistency.dimensionId()</b>
+&nbsp;                                            + &quot; differs by &quot;
+<b class="nc">&nbsp;                                            + format(</b>
+<b class="nc">&nbsp;                                            consistency.difference()</b>
+&nbsp;                                    )
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Breakdown matches the active evaluator dimensions.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.DARK_GREEN),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendTopPathCandidates(</b>
+&nbsp;                source,
+&nbsp;                evaluation,
+&nbsp;                3
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendCurrentSelection(</b>
+&nbsp;                source,
+&nbsp;                evaluation,
+<b class="nc">&nbsp;                evaluation.getBalance()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!full) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Use /moostensura debug recognition evidence full for every weighted source.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendEvidenceDimension(
+&nbsp;            CommandSourceStack source,
+&nbsp;            RecognitionEvidenceBreakdown.Dimension dimension,
+&nbsp;            ChatFormatting color,
+&nbsp;            boolean includeZeroEntries
+&nbsp;    ) {
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+<b class="nc">&nbsp;                dimension.displayName()</b>
+&nbsp;                        + &quot; evidence — total &quot;
+<b class="nc">&nbsp;                        + format(dimension.total()),</b>
+&nbsp;                color
+&nbsp;        );
+&nbsp;
+&nbsp;        for (RecognitionEvidenceBreakdown.Entry entry :
+<b class="nc">&nbsp;                dimension.entries()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!includeZeroEntries</b>
+<b class="nc">&nbsp;                    &amp;&amp; entry.contribution() &lt;= 0.0D) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            StringBuilder value = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;            value.append(entry.rawValue())</b>
+<b class="nc">&nbsp;                    .append(&quot; -&gt; +&quot;)</b>
+<b class="nc">&nbsp;                    .append(</b>
+<b class="nc">&nbsp;                            format(entry.contribution())</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (entry.maximum() &gt; 0.0D) {</b>
+<b class="nc">&nbsp;                value.append(&quot; / &quot;)</b>
+<b class="nc">&nbsp;                        .append(</b>
+<b class="nc">&nbsp;                                format(entry.maximum())</b>
+&nbsp;                        );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(&quot;- &quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.DARK_GRAY)</b>
+<b class="nc">&nbsp;                            .append(</b>
+<b class="nc">&nbsp;                                    Component.literal(</b>
+<b class="nc">&nbsp;                                                    entry.label()</b>
+&nbsp;                                            )
+<b class="nc">&nbsp;                                            .withStyle(</b>
+&nbsp;                                                    ChatFormatting.GRAY
+&nbsp;                                            )
+&nbsp;                            )
+<b class="nc">&nbsp;                            .append(</b>
+<b class="nc">&nbsp;                                    Component.literal(</b>
+&nbsp;                                                    &quot; [&quot;
+<b class="nc">&nbsp;                                                            + entry.statKey()</b>
+&nbsp;                                                            + &quot;]: &quot;
+&nbsp;                                            )
+<b class="nc">&nbsp;                                            .withStyle(</b>
+&nbsp;                                                    ChatFormatting.DARK_GRAY
+&nbsp;                                            )
+&nbsp;                            )
+<b class="nc">&nbsp;                            .append(</b>
+<b class="nc">&nbsp;                                    Component.literal(</b>
+<b class="nc">&nbsp;                                                    value.toString()</b>
+&nbsp;                                            )
+<b class="nc">&nbsp;                                            .withStyle(color)</b>
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendTopPathCandidates(
+&nbsp;            CommandSourceStack source,
+&nbsp;            RecognitionEvaluation evaluation,
+&nbsp;            int maximumEntries
+&nbsp;    ) {
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Top path candidates&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Map.Entry&lt;RecognitionPath, Double&gt;&gt; rankedPaths =</b>
+&nbsp;                new ArrayList&lt;&gt;(
+<b class="nc">&nbsp;                        evaluation.getPathScores()</b>
+<b class="nc">&nbsp;                                .entrySet()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        rankedPaths.sort(</b>
+<b class="nc">&nbsp;                Map.Entry.&lt;RecognitionPath, Double&gt;comparingByValue()</b>
+<b class="nc">&nbsp;                        .reversed()</b>
+<b class="nc">&nbsp;                        .thenComparing(</b>
+<b class="nc">&nbsp;                                entry -&gt; entry.getKey().ordinal()</b>
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int count = Math.min(</b>
+<b class="nc">&nbsp;                Math.max(1, maximumEntries),</b>
+<b class="nc">&nbsp;                rankedPaths.size()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0;</b>
+<b class="nc">&nbsp;             index &lt; count;</b>
+<b class="nc">&nbsp;             index++) {</b>
+&nbsp;
+<b class="nc">&nbsp;            Map.Entry&lt;RecognitionPath, Double&gt; entry =</b>
+<b class="nc">&nbsp;                    rankedPaths.get(index);</b>
+&nbsp;
+<b class="nc">&nbsp;            RecognitionPath path = entry.getKey();</b>
+&nbsp;
+<b class="nc">&nbsp;            String value =</b>
+<b class="nc">&nbsp;                    format(entry.getValue())</b>
+&nbsp;                            + &quot; (raw &quot;
+<b class="nc">&nbsp;                            + format(</b>
+<b class="nc">&nbsp;                            evaluation.getRawPathScore(path)</b>
+&nbsp;                    )
+&nbsp;                            + &quot; + identity &quot;
+<b class="nc">&nbsp;                            + format(</b>
+<b class="nc">&nbsp;                            evaluation.getIdentityBoost(path)</b>
+&nbsp;                    )
+&nbsp;                            + &quot;)&quot;;
+&nbsp;
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    (index + 1)
+&nbsp;                            + &quot;. &quot;
+<b class="nc">&nbsp;                            + path.getId(),</b>
+&nbsp;                    value
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String emptyAsNone(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null || value.isBlank()</b>
+<b class="nc">&nbsp;                ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                : value.trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendActiveBalance(
+&nbsp;            CommandSourceStack source,
+&nbsp;            RecognitionEvaluation evaluation
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot balance =</b>
+<b class="nc">&nbsp;                evaluation.getBalance();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.Selection selection =</b>
+<b class="nc">&nbsp;                balance.selection();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Active datapack balance&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Source&quot;,
+<b class="nc">&nbsp;                balance.sourceId()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Revision&quot;,
+<b class="nc">&nbsp;                Long.toString(</b>
+<b class="nc">&nbsp;                        evaluation.getBalanceRevision()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Established threshold&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        selection.establishedThreshold()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Pure threshold&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        selection.pureThreshold()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Final dominance ratio&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        selection.dominanceRatio()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Raw pure threshold&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        selection.rawPureThreshold()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Raw dominance ratio&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        selection.rawDominanceRatio()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Directional morality minimum&quot;,
+<b class="nc">&nbsp;                format(</b>
+&nbsp;                        selection
+<b class="nc">&nbsp;                                .minimumDirectionalMoralityEvidence()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;TH / TDL modifiers&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        balance.good()</b>
+<b class="nc">&nbsp;                                .trueHeroModifier()</b>
+&nbsp;                )
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + format(</b>
+<b class="nc">&nbsp;                        balance.evil()</b>
+<b class="nc">&nbsp;                                .trueDemonLordModifier()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Identity shares&quot;,
+&nbsp;                &quot;universal &quot;
+<b class="nc">&nbsp;                        + format(</b>
+<b class="nc">&nbsp;                        balance.identityDistribution()</b>
+<b class="nc">&nbsp;                                .universalShare()</b>
+&nbsp;                )
+&nbsp;                        + &quot;, focused &quot;
+<b class="nc">&nbsp;                        + format(</b>
+<b class="nc">&nbsp;                        balance.identityDistribution()</b>
+<b class="nc">&nbsp;                                .focusedShare()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendPathRanking(
+&nbsp;            CommandSourceStack source,
+&nbsp;            RecognitionEvaluation evaluation
+&nbsp;    ) {
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Path ranking&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Map.Entry&lt;RecognitionPath, Double&gt;&gt; rankedPaths =</b>
+&nbsp;                new ArrayList&lt;&gt;(
+<b class="nc">&nbsp;                        evaluation.getPathScores().entrySet()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        rankedPaths.sort(</b>
+<b class="nc">&nbsp;                Map.Entry.&lt;RecognitionPath, Double&gt;comparingByValue()</b>
+<b class="nc">&nbsp;                        .reversed()</b>
+<b class="nc">&nbsp;                        .thenComparing(</b>
+<b class="nc">&nbsp;                                entry -&gt; entry.getKey().ordinal()</b>
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0;</b>
+<b class="nc">&nbsp;             index &lt; rankedPaths.size();</b>
+<b class="nc">&nbsp;             index++) {</b>
+&nbsp;
+<b class="nc">&nbsp;            Map.Entry&lt;RecognitionPath, Double&gt; entry =</b>
+<b class="nc">&nbsp;                    rankedPaths.get(index);</b>
+&nbsp;
+<b class="nc">&nbsp;            int position = index + 1;</b>
+&nbsp;
+&nbsp;            ChatFormatting color;
+&nbsp;
+<b class="nc">&nbsp;            if (position == 1) {</b>
+<b class="nc">&nbsp;                color = ChatFormatting.GREEN;</b>
+<b class="nc">&nbsp;            } else if (position == 2) {</b>
+<b class="nc">&nbsp;                color = ChatFormatting.AQUA;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                color = ChatFormatting.GRAY;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            RecognitionPath path = entry.getKey();</b>
+&nbsp;
+<b class="nc">&nbsp;            double finalScore = entry.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            double rawScore =</b>
+<b class="nc">&nbsp;                    evaluation.getRawPathScore(path);</b>
+&nbsp;
+<b class="nc">&nbsp;            double identityBoost =</b>
+<b class="nc">&nbsp;                    evaluation.getIdentityBoost(path);</b>
+&nbsp;
+<b class="nc">&nbsp;            String line =</b>
+&nbsp;                    position
+&nbsp;                            + &quot;. &quot;
+<b class="nc">&nbsp;                            + path.getId()</b>
+&nbsp;                            + &quot;: &quot;
+<b class="nc">&nbsp;                            + format(finalScore)</b>
+&nbsp;                            + &quot; (raw &quot;
+<b class="nc">&nbsp;                            + format(rawScore)</b>
+&nbsp;                            + &quot; + identity &quot;
+<b class="nc">&nbsp;                            + format(identityBoost)</b>
+&nbsp;                            + &quot;)&quot;;
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(line)</b>
+<b class="nc">&nbsp;                            .withStyle(color),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendCurrentSelection(
+&nbsp;            CommandSourceStack source,
+&nbsp;            RecognitionEvaluation evaluation,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Current selection&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (evaluation.getSelection().isEmpty()) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;No valid selection yet. Two final paths must reach &quot;
+<b class="nc">&nbsp;                                            + format(</b>
+<b class="nc">&nbsp;                                            balance.selection()</b>
+<b class="nc">&nbsp;                                                    .establishedThreshold()</b>
+&nbsp;                                    )
+&nbsp;                                            + &quot;, or one path must reach &quot;
+<b class="nc">&nbsp;                                            + format(</b>
+<b class="nc">&nbsp;                                            balance.selection()</b>
+<b class="nc">&nbsp;                                                    .pureThreshold()</b>
+&nbsp;                                    )
+&nbsp;                                            + &quot; with at least &quot;
+<b class="nc">&nbsp;                                            + format(</b>
+<b class="nc">&nbsp;                                            balance.selection()</b>
+<b class="nc">&nbsp;                                                    .rawPureThreshold()</b>
+&nbsp;                                    )
+&nbsp;                                            + &quot; raw affinity and sufficient dominance.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPathSelection selection =</b>
+<b class="nc">&nbsp;                evaluation.getSelection().orElseThrow();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selection.pure()) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Pure &quot;
+<b class="nc">&nbsp;                                            + selection.primaryPath().getId()</b>
+&nbsp;                                            + &quot; (&quot;
+<b class="nc">&nbsp;                                            + format(</b>
+<b class="nc">&nbsp;                                            selection.primaryScore()</b>
+&nbsp;                                    )
+&nbsp;                                            + &quot;)&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.GREEN,
+&nbsp;                                    ChatFormatting.BOLD
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Primary: &quot;
+<b class="nc">&nbsp;                                        + selection.primaryPath().getId()</b>
+&nbsp;                                        + &quot; (&quot;
+<b class="nc">&nbsp;                                        + format(</b>
+<b class="nc">&nbsp;                                        selection.primaryScore()</b>
+&nbsp;                                )
+&nbsp;                                        + &quot;)&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GREEN),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Secondary: &quot;
+<b class="nc">&nbsp;                                        + selection.secondaryPath().getId()</b>
+&nbsp;                                        + &quot; (&quot;
+<b class="nc">&nbsp;                                        + format(</b>
+<b class="nc">&nbsp;                                        selection.secondaryScore()</b>
+&nbsp;                                )
+&nbsp;                                        + &quot;)&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendNamingEligibility(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer target,
+&nbsp;            RecognitionNamingEligibility eligibility
+&nbsp;    ) {
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Naming eligibility&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;State&quot;,
+<b class="nc">&nbsp;                eligibility.status().getId()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Native named&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        eligibility.nativeNamed()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Native name&quot;,
+<b class="nc">&nbsp;                eligibility.nativeName().isBlank()</b>
+<b class="nc">&nbsp;                        ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                        : eligibility.nativeName()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Recognition committed&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        eligibility.recognitionCommitted()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Level requirement&quot;,
+<b class="nc">&nbsp;                eligibility.currentLevel()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + eligibility.requiredLevel()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Eligible now&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        eligibility.eligible()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionNamingCandidate candidate =</b>
+<b class="nc">&nbsp;                eligibility.candidate();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (candidate == null) {</b>
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Candidate paths&quot;,
+&nbsp;                    &quot;none&quot;
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Candidate title&quot;,
+&nbsp;                    &quot;none&quot;
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Candidate paths&quot;,
+<b class="nc">&nbsp;                    candidate.getPathSummary()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            sendValue(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Candidate title&quot;,
+<b class="nc">&nbsp;                    candidate.formatDisplayName(</b>
+<b class="nc">&nbsp;                            target.getGameProfile().getName()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String explanation = switch (eligibility.status()) {</b>
+&nbsp;            case READY -&gt;
+<b class="nc">&nbsp;                    &quot;The player can begin the naming ritual.&quot;;</b>
+&nbsp;
+&nbsp;            case ALREADY_COMMITTED -&gt;
+<b class="nc">&nbsp;                    &quot;A naming result has already been committed for this incarnation.&quot;;</b>
+&nbsp;
+&nbsp;            case ALREADY_NAMED -&gt;
+<b class="nc">&nbsp;                    &quot;Tensura already considers this player named or endowed.&quot;;</b>
+&nbsp;
+&nbsp;            case NOT_ENOUGH_LEVEL -&gt;
+<b class="nc">&nbsp;                    &quot;The player has not reached the minimum level requirement.&quot;;</b>
+&nbsp;
+&nbsp;            case NO_RECOGNITION_SELECTION -&gt;
+<b class="nc">&nbsp;                    &quot;The recognition paths have not formed a valid selection yet.&quot;;</b>
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(explanation)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                eligibility.eligible()</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.YELLOW</b>
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int probe(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer target
+&nbsp;    ) {
+<b class="nc">&nbsp;        TensuraRecognitionStateHelper.Snapshot snapshot =</b>
+<b class="nc">&nbsp;                TensuraRecognitionStateHelper.inspect(target);</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Tensura Awakening Probe: &quot;
+<b class="nc">&nbsp;                        + target.getGameProfile().getName(),</b>
+&nbsp;                ChatFormatting.LIGHT_PURPLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Detected TH&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        snapshot.detectedTrueHero()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;TH source&quot;,
+<b class="nc">&nbsp;                snapshot.trueHeroSource().isBlank()</b>
+<b class="nc">&nbsp;                        ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                        : snapshot.trueHeroSource()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Detected TDL&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        snapshot.detectedTrueDemonLord()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;TDL source&quot;,
+<b class="nc">&nbsp;                snapshot.trueDemonLordSource().isBlank()</b>
+<b class="nc">&nbsp;                        ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                        : snapshot.trueDemonLordSource()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (snapshot.evidence().isEmpty()) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;No recognized TH/TDL evidence was exposed by the inspected Tensura storages.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Detected evidence&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        for (String evidence : snapshot.evidence()) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(&quot;- &quot; + evidence)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendHeader(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String text,
+&nbsp;            ChatFormatting color
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(text)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                color,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendValue(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String label,
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(label + &quot;: &quot;)</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY)</b>
+<b class="nc">&nbsp;                        .append(</b>
+<b class="nc">&nbsp;                                Component.literal(value)</b>
+<b class="nc">&nbsp;                                        .withStyle(</b>
+&nbsp;                                                ChatFormatting.WHITE
+&nbsp;                                        )
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatSource(String source) {
+<b class="nc">&nbsp;        if (source == null || source.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot; [&quot; + source + &quot;]&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String format(double value) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.1f&quot;,
+<b class="nc">&nbsp;                value</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

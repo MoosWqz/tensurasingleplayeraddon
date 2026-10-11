@@ -1,0 +1,2007 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionData</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.attachment</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionData (com.mooswqz.moostensuraaddon.attachment)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionData</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.4%
+  </span>
+  <span class="absValue">
+    (53/81)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25.9%
+  </span>
+  <span class="absValue">
+    (67/259)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.5%
+  </span>
+  <span class="absValue">
+    (239/549)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionData$PersistentState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    64.6%
+  </span>
+  <span class="absValue">
+    (53/82)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25.9%
+  </span>
+  <span class="absValue">
+    (67/259)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.5%
+  </span>
+  <span class="absValue">
+    (239/550)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.attachment;
+&nbsp;
+&nbsp;import com.mojang.serialization.Codec;
+&nbsp;import com.mojang.serialization.codecs.RecordCodecBuilder;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionBalanceManager;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCommitRecord;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCommittedResult;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionPath;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionPathSelection;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionStatKeys;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;public class RecognitionData {
+&nbsp;
+&nbsp;    private static final int LEGACY_DATA_VERSION =
+&nbsp;            1;
+&nbsp;
+&nbsp;    public static final int CURRENT_DATA_VERSION =
+&nbsp;            2;
+&nbsp;
+&nbsp;    private static final String LEGACY_MIGRATION_SOURCE =
+&nbsp;            &quot;v1_to_v2&quot;;
+&nbsp;
+<b class="fc">&nbsp;    private static final Codec&lt;Map&lt;String, Integer&gt;&gt; INTEGER_MAP_CODEC =</b>
+<b class="fc">&nbsp;            Codec.unboundedMap(Codec.STRING, Codec.INT);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Codec&lt;Map&lt;String, Double&gt;&gt; DOUBLE_MAP_CODEC =</b>
+<b class="fc">&nbsp;            Codec.unboundedMap(Codec.STRING, Codec.DOUBLE);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Codec&lt;Map&lt;String, Boolean&gt;&gt; BOOLEAN_MAP_CODEC =</b>
+<b class="fc">&nbsp;            Codec.unboundedMap(Codec.STRING, Codec.BOOL);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Codec&lt;Map&lt;String, String&gt;&gt; STRING_MAP_CODEC =</b>
+<b class="fc">&nbsp;            Codec.unboundedMap(Codec.STRING, Codec.STRING);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Codec&lt;Map&lt;String, List&lt;String&gt;&gt;&gt; STRING_LIST_MAP_CODEC =</b>
+<b class="fc">&nbsp;            Codec.unboundedMap(</b>
+&nbsp;                    Codec.STRING,
+<b class="fc">&nbsp;                    Codec.STRING.listOf()</b>
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;    public static final Codec&lt;RecognitionData&gt; CODEC =</b>
+<b class="fc">&nbsp;            RecordCodecBuilder.create(instance -&gt; instance.group(</b>
+&nbsp;                    Codec.INT
+<b class="fc">&nbsp;                            .optionalFieldOf(</b>
+&nbsp;                                    &quot;data_version&quot;,
+<b class="fc">&nbsp;                                    LEGACY_DATA_VERSION</b>
+&nbsp;                            )
+<b class="fc">&nbsp;                            .forGetter(</b>
+&nbsp;                                    RecognitionData::getDataVersion
+&nbsp;                            ),
+&nbsp;
+&nbsp;                    INTEGER_MAP_CODEC
+<b class="fc">&nbsp;                            .optionalFieldOf(</b>
+&nbsp;                                    &quot;counters&quot;,
+<b class="fc">&nbsp;                                    Map.of()</b>
+&nbsp;                            )
+<b class="fc">&nbsp;                            .forGetter(</b>
+&nbsp;                                    RecognitionData::getCountersForCodec
+&nbsp;                            ),
+&nbsp;
+&nbsp;                    DOUBLE_MAP_CODEC
+<b class="fc">&nbsp;                            .optionalFieldOf(</b>
+&nbsp;                                    &quot;measurements&quot;,
+<b class="fc">&nbsp;                                    Map.of()</b>
+&nbsp;                            )
+<b class="fc">&nbsp;                            .forGetter(</b>
+&nbsp;                                    RecognitionData::getMeasurementsForCodec
+&nbsp;                            ),
+&nbsp;
+&nbsp;                    BOOLEAN_MAP_CODEC
+<b class="fc">&nbsp;                            .optionalFieldOf(</b>
+&nbsp;                                    &quot;flags&quot;,
+<b class="fc">&nbsp;                                    Map.of()</b>
+&nbsp;                            )
+<b class="fc">&nbsp;                            .forGetter(</b>
+&nbsp;                                    RecognitionData::getFlagsForCodec
+&nbsp;                            ),
+&nbsp;
+&nbsp;                    STRING_MAP_CODEC
+<b class="fc">&nbsp;                            .optionalFieldOf(</b>
+&nbsp;                                    &quot;strings&quot;,
+<b class="fc">&nbsp;                                    Map.of()</b>
+&nbsp;                            )
+<b class="fc">&nbsp;                            .forGetter(</b>
+&nbsp;                                    RecognitionData::getStringsForCodec
+&nbsp;                            ),
+&nbsp;
+&nbsp;                    STRING_LIST_MAP_CODEC
+<b class="fc">&nbsp;                            .optionalFieldOf(</b>
+&nbsp;                                    &quot;collections&quot;,
+<b class="fc">&nbsp;                                    Map.of()</b>
+&nbsp;                            )
+<b class="fc">&nbsp;                            .forGetter(</b>
+&nbsp;                                    RecognitionData::getCollectionsForCodec
+&nbsp;                            )
+<b class="fc">&nbsp;            ).apply(</b>
+&nbsp;                    instance,
+&nbsp;                    RecognitionData::new
+&nbsp;            ));
+&nbsp;
+&nbsp;    private int dataVersion;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Debug-fixture-only guard that preserves an artificial raw legacy
+&nbsp;     * payload until it has passed through the real attachment codec once.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;The field is deliberately not part of {@link #CODEC}. A normal
+&nbsp;     * version-1 save therefore loads with this guard disabled and immediately
+&nbsp;     * follows the production v1-to-v2 migration path.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    private final boolean preserveRawLegacyUntilCodecReload;
+&nbsp;
+&nbsp;    private final Map&lt;String, Integer&gt; counters;
+&nbsp;    private final Map&lt;String, Double&gt; measurements;
+&nbsp;    private final Map&lt;String, Boolean&gt; flags;
+&nbsp;    private final Map&lt;String, String&gt; strings;
+&nbsp;    private final Map&lt;String, List&lt;String&gt;&gt; collections;
+&nbsp;
+&nbsp;    public RecognitionData() {
+<b class="nc">&nbsp;        this(</b>
+&nbsp;                CURRENT_DATA_VERSION,
+<b class="nc">&nbsp;                Map.of(),</b>
+<b class="nc">&nbsp;                Map.of(),</b>
+<b class="nc">&nbsp;                Map.of(),</b>
+<b class="nc">&nbsp;                Map.of(),</b>
+<b class="nc">&nbsp;                Map.of()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public RecognitionData(
+&nbsp;            int dataVersion,
+&nbsp;            Map&lt;String, Integer&gt; counters,
+&nbsp;            Map&lt;String, Double&gt; measurements,
+&nbsp;            Map&lt;String, Boolean&gt; flags,
+&nbsp;            Map&lt;String, String&gt; strings,
+&nbsp;            Map&lt;String, List&lt;String&gt;&gt; collections
+&nbsp;    ) {
+<b class="fc">&nbsp;        this(</b>
+&nbsp;                dataVersion,
+&nbsp;                counters,
+&nbsp;                measurements,
+&nbsp;                flags,
+&nbsp;                strings,
+&nbsp;                collections,
+&nbsp;                true
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    RecognitionData(
+&nbsp;            int dataVersion,
+&nbsp;            Map&lt;String, Integer&gt; counters,
+&nbsp;            Map&lt;String, Double&gt; measurements,
+&nbsp;            Map&lt;String, Boolean&gt; flags,
+&nbsp;            Map&lt;String, String&gt; strings,
+&nbsp;            Map&lt;String, List&lt;String&gt;&gt; collections,
+&nbsp;            boolean migrateOnLoad
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        this.dataVersion =</b>
+<b class="fc">&nbsp;                Math.max(</b>
+&nbsp;                        LEGACY_DATA_VERSION,
+&nbsp;                        dataVersion
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        this.preserveRawLegacyUntilCodecReload =</b>
+&nbsp;                !migrateOnLoad
+&nbsp;                        &amp;&amp; this.dataVersion
+&nbsp;                        &lt; CURRENT_DATA_VERSION;
+&nbsp;
+<b class="fc">&nbsp;        this.counters =</b>
+<b class="fc">&nbsp;                sanitizeIntegerMap(</b>
+&nbsp;                        counters
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        this.measurements =</b>
+<b class="fc">&nbsp;                sanitizeDoubleMap(</b>
+&nbsp;                        measurements
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        this.flags =</b>
+<b class="fc">&nbsp;                sanitizeBooleanMap(</b>
+&nbsp;                        flags
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        this.strings =</b>
+<b class="fc">&nbsp;                sanitizeStringMap(</b>
+&nbsp;                        strings
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        this.collections =</b>
+<b class="fc">&nbsp;                sanitizeCollectionMap(</b>
+&nbsp;                        collections
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (migrateOnLoad</b>
+<b class="pc">&nbsp;                &amp;&amp; !isWriteBlockedByFutureVersion()) {</b>
+<b class="fc">&nbsp;            migrateToCurrentVersion();</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (migrateOnLoad</b>
+<b class="pc">&nbsp;                &amp;&amp; !isWriteBlockedByFutureVersion()) {</b>
+<b class="fc">&nbsp;            repairCurrentCommittedRecordDefaults();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getDataVersion() {
+<b class="fc">&nbsp;        return dataVersion;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns whether this payload was written by recognition semantics newer
+&nbsp;     * than this build understands.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Unknown future schema, result, rules and reward-profile versions are
+&nbsp;     * read-only. Older builds may inspect and re-save them, but must not
+&nbsp;     * reinterpret, repair, reset or append progression to their maps.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public boolean isWriteBlockedByFutureVersion() {
+<b class="pc">&nbsp;        return dataVersion &gt; CURRENT_DATA_VERSION</b>
+<b class="pc">&nbsp;                || getCounter(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_RESULT_VERSION
+&nbsp;        ) &gt; RecognitionCommitRecord.CURRENT_RESULT_VERSION
+<b class="pc">&nbsp;                || getCounter(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_RULES_VERSION
+&nbsp;        ) &gt; RecognitionCommitRecord.CURRENT_RULES_VERSION
+<b class="pc">&nbsp;                || getCounter(</b>
+&nbsp;                RecognitionStatKeys.REWARD_PROFILE_VERSION
+&nbsp;                ) &gt; RecognitionCommitRecord.CURRENT_REWARD_PROFILE_VERSION;
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isMutationWriteBlocked() {
+<b class="pc">&nbsp;        return preserveRawLegacyUntilCodecReload</b>
+<b class="fc">&nbsp;                || isWriteBlockedByFutureVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getCounter(
+&nbsp;            String key
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!isValidKey(key)) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return Math.max(</b>
+&nbsp;                0,
+<b class="fc">&nbsp;                counters.getOrDefault(</b>
+&nbsp;                        key,
+<b class="fc">&nbsp;                        0</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCounter(
+&nbsp;            String key,
+&nbsp;            int value
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!isValidKey(key)</b>
+<b class="pc">&nbsp;                || isMutationWriteBlocked()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        counters.put(</b>
+&nbsp;                key,
+<b class="fc">&nbsp;                Math.max(</b>
+&nbsp;                        0,
+&nbsp;                        value
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        markCurrentVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCounterMaximum(
+&nbsp;            String key,
+&nbsp;            int value
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!isValidKey(key)</b>
+<b class="pc">&nbsp;                || isMutationWriteBlocked()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        int safeValue =</b>
+<b class="fc">&nbsp;                Math.max(</b>
+&nbsp;                        0,
+&nbsp;                        value
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (safeValue &gt; getCounter(key)) {</b>
+<b class="nc">&nbsp;            counters.put(</b>
+&nbsp;                    key,
+<b class="nc">&nbsp;                    safeValue</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            markCurrentVersion();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public int incrementCounter(
+&nbsp;            String key
+&nbsp;    ) {
+<b class="nc">&nbsp;        return addToCounter(</b>
+&nbsp;                key,
+&nbsp;                1
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public int addToCounter(
+&nbsp;            String key,
+&nbsp;            int amount
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!isValidKey(key)</b>
+&nbsp;                || amount == 0
+<b class="nc">&nbsp;                || isMutationWriteBlocked()) {</b>
+<b class="nc">&nbsp;            return getCounter(key);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long result =</b>
+<b class="nc">&nbsp;                (long) getCounter(key)</b>
+&nbsp;                        + amount;
+&nbsp;
+&nbsp;        int safeResult;
+&nbsp;
+<b class="nc">&nbsp;        if (result &lt;= 0L) {</b>
+<b class="nc">&nbsp;            safeResult = 0;</b>
+<b class="nc">&nbsp;        } else if (result</b>
+&nbsp;                &gt;= Integer.MAX_VALUE) {
+<b class="nc">&nbsp;            safeResult =</b>
+&nbsp;                    Integer.MAX_VALUE;
+&nbsp;        } else {
+<b class="nc">&nbsp;            safeResult =</b>
+&nbsp;                    (int) result;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        counters.put(</b>
+&nbsp;                key,
+<b class="nc">&nbsp;                safeResult</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;
+<b class="nc">&nbsp;        return safeResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getMeasurement(
+&nbsp;            String key
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!isValidKey(key)) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        double value =</b>
+<b class="fc">&nbsp;                measurements.getOrDefault(</b>
+&nbsp;                        key,
+<b class="fc">&nbsp;                        0.0D</b>
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (!Double.isFinite(value)</b>
+&nbsp;                || value &lt; 0.0D) {
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMeasurement(
+&nbsp;            String key,
+&nbsp;            double value
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!isValidKey(key)</b>
+<b class="pc">&nbsp;                || isMutationWriteBlocked()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        measurements.put(</b>
+&nbsp;                key,
+<b class="fc">&nbsp;                sanitizeMeasurement(</b>
+&nbsp;                        value
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        markCurrentVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMeasurementMaximum(
+&nbsp;            String key,
+&nbsp;            double value
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!isValidKey(key)</b>
+<b class="pc">&nbsp;                || isMutationWriteBlocked()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        double safeValue =</b>
+<b class="fc">&nbsp;                sanitizeMeasurement(</b>
+&nbsp;                        value
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (safeValue &gt; getMeasurement(key)) {</b>
+<b class="nc">&nbsp;            measurements.put(</b>
+&nbsp;                    key,
+<b class="nc">&nbsp;                    safeValue</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            markCurrentVersion();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getFlag(
+&nbsp;            String key
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!isValidKey(key)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return flags.getOrDefault(</b>
+&nbsp;                key,
+<b class="fc">&nbsp;                false</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFlag(
+&nbsp;            String key,
+&nbsp;            boolean value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!isValidKey(key)</b>
+<b class="nc">&nbsp;                || isMutationWriteBlocked()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        flags.put(</b>
+&nbsp;                key,
+<b class="nc">&nbsp;                value</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getString(
+&nbsp;            String key
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!isValidKey(key)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String value =</b>
+<b class="fc">&nbsp;                strings.get(key);</b>
+&nbsp;
+<b class="fc">&nbsp;        return value == null</b>
+<b class="fc">&nbsp;                ? &quot;&quot;</b>
+<b class="fc">&nbsp;                : value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setString(
+&nbsp;            String key,
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!isValidKey(key)</b>
+<b class="nc">&nbsp;                || isMutationWriteBlocked()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        putStringDirect(</b>
+&nbsp;                key,
+&nbsp;                value
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean addUniqueValue(
+&nbsp;            String collectionKey,
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!isValidKey(collectionKey)</b>
+&nbsp;                || value == null
+<b class="nc">&nbsp;                || value.isBlank()</b>
+<b class="nc">&nbsp;                || isMutationWriteBlocked()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String cleanedValue =</b>
+<b class="nc">&nbsp;                value.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; values =</b>
+<b class="nc">&nbsp;                collections.computeIfAbsent(</b>
+&nbsp;                        collectionKey,
+&nbsp;                        ignored -&gt;
+<b class="nc">&nbsp;                                new ArrayList&lt;&gt;()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (values.contains(</b>
+&nbsp;                cleanedValue
+&nbsp;        )) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        values.add(</b>
+&nbsp;                cleanedValue
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean containsUniqueValue(
+&nbsp;            String collectionKey,
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!isValidKey(collectionKey)</b>
+&nbsp;                || value == null
+<b class="nc">&nbsp;                || value.isBlank()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; values =</b>
+<b class="nc">&nbsp;                collections.get(</b>
+&nbsp;                        collectionKey
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return values != null</b>
+<b class="nc">&nbsp;                &amp;&amp; values.contains(</b>
+<b class="nc">&nbsp;                value.trim()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getUniqueValueCount(
+&nbsp;            String collectionKey
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!isValidKey(collectionKey)) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        List&lt;String&gt; values =</b>
+<b class="fc">&nbsp;                collections.get(</b>
+&nbsp;                        collectionKey
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        return values == null</b>
+<b class="fc">&nbsp;                ? 0</b>
+<b class="nc">&nbsp;                : values.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getUniqueValues(
+&nbsp;            String collectionKey
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!isValidKey(collectionKey)) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; values =</b>
+<b class="nc">&nbsp;                collections.get(</b>
+&nbsp;                        collectionKey
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (values == null</b>
+<b class="nc">&nbsp;                || values.isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Collections.unmodifiableList(</b>
+&nbsp;                new ArrayList&lt;&gt;(
+&nbsp;                        values
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean removeUniqueValue(
+&nbsp;            String collectionKey,
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!isValidKey(collectionKey)</b>
+&nbsp;                || value == null
+<b class="nc">&nbsp;                || value.isBlank()</b>
+<b class="nc">&nbsp;                || isMutationWriteBlocked()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; values =</b>
+<b class="nc">&nbsp;                collections.get(</b>
+&nbsp;                        collectionKey
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (values == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean removed =</b>
+<b class="nc">&nbsp;                values.remove(</b>
+<b class="nc">&nbsp;                        value.trim()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!removed) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (values.isEmpty()) {</b>
+<b class="nc">&nbsp;            collections.remove(</b>
+&nbsp;                    collectionKey
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        markCurrentVersion();</b>
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isNamingCommitted() {
+<b class="fc">&nbsp;        return getFlag(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .NAMING_COMMITTED
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isPureRecognition() {
+<b class="fc">&nbsp;        return getFlag(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .PURE_RECOGNITION
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isRevealPending() {
+<b class="nc">&nbsp;        return getFlag(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .REVEAL_PENDING
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCommittedPrimaryPathId() {
+<b class="fc">&nbsp;        return getString(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .PRIMARY_PATH
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCommittedSecondaryPathId() {
+<b class="fc">&nbsp;        return getString(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .SECONDARY_PATH
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;RecognitionPath&gt;
+&nbsp;    getCommittedPrimaryPath() {
+<b class="nc">&nbsp;        return RecognitionPath.byId(</b>
+<b class="nc">&nbsp;                getCommittedPrimaryPathId()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;RecognitionPath&gt;
+&nbsp;    getCommittedSecondaryPath() {
+<b class="nc">&nbsp;        return RecognitionPath.byId(</b>
+<b class="nc">&nbsp;                getCommittedSecondaryPathId()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getBestowedTitle() {
+<b class="fc">&nbsp;        return getString(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .BESTOWED_TITLE
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFrozenDisplayName() {
+<b class="fc">&nbsp;        return getString(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .FROZEN_DISPLAY_NAME
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getContradictionModifier() {
+<b class="fc">&nbsp;        String modifier =</b>
+<b class="fc">&nbsp;                getString(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .CONTRADICTION_MODIFIER
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        return modifier.isBlank()</b>
+&nbsp;                ? RecognitionCommitRecord
+<b class="nc">&nbsp;                  .NO_CONTRADICTION</b>
+<b class="fc">&nbsp;                : modifier;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getIncarnationId() {
+<b class="fc">&nbsp;        return getString(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .INCARNATION_ID
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getRecognitionResultVersion() {
+<b class="fc">&nbsp;        return getCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .RECOGNITION_RESULT_VERSION
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getRecognitionRulesVersion() {
+<b class="fc">&nbsp;        return getCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .RECOGNITION_RULES_VERSION
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getRewardProfileVersion() {
+<b class="fc">&nbsp;        return getCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .REWARD_PROFILE_VERSION
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getBalanceSourceAtCommit() {
+<b class="fc">&nbsp;        return getString(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .BALANCE_SOURCE_AT_COMMIT
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public long getBalanceRevisionAtCommit() {
+<b class="fc">&nbsp;        return getStoredLong(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .BALANCE_REVISION_AT_COMMIT
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public long getCommitTimestampEpochMillis() {
+<b class="fc">&nbsp;        return getStoredLong(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .COMMIT_TIMESTAMP_EPOCH_MILLIS
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRecognitionMigrationSource() {
+<b class="fc">&nbsp;        return getString(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .RECOGNITION_MIGRATION_SOURCE
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compatibility commitment route used by the current altar runtime.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;It now captures every non-player-specific version and balance field.
+&nbsp;     * Frozen display name and a missing incarnation ID are completed later by
+&nbsp;     * {@link #completeCommittedPlayerMetadata(String, String)} when a player
+&nbsp;     * context is available. The method signature remains unchanged, so older
+&nbsp;     * altar call sites continue to compile.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public boolean commitNaming(
+&nbsp;            RecognitionPathSelection selection,
+&nbsp;            String bestowedTitle
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (selection == null</b>
+&nbsp;                || bestowedTitle == null
+<b class="nc">&nbsp;                || bestowedTitle.isBlank()</b>
+<b class="nc">&nbsp;                || isNamingCommitted()</b>
+<b class="nc">&nbsp;                || isMutationWriteBlocked()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        RecognitionBalanceManager.State balanceState =
+<b class="nc">&nbsp;                RecognitionBalanceManager.getState();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCommitRecord record =</b>
+&nbsp;                RecognitionCommitRecord
+<b class="nc">&nbsp;                        .fromSelection(</b>
+&nbsp;                                selection,
+&nbsp;                                bestowedTitle,
+&nbsp;                                &quot;&quot;,
+&nbsp;                                balanceState
+<b class="nc">&nbsp;                                        .snapshot()</b>
+<b class="nc">&nbsp;                                        .sourceId(),</b>
+&nbsp;                                balanceState
+<b class="nc">&nbsp;                                        .revision(),</b>
+<b class="nc">&nbsp;                                System.currentTimeMillis(),</b>
+<b class="nc">&nbsp;                                getIncarnationId()</b>
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        return commitNaming(</b>
+&nbsp;                record
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes a fully prepared recognition result as one transaction.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;The committed flag is written last. A defensive rollback restores all
+&nbsp;     * maps and the previous data version if an unexpected runtime exception
+&nbsp;     * occurs while applying the record.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public boolean commitNaming(
+&nbsp;            RecognitionCommitRecord record
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (record == null</b>
+<b class="nc">&nbsp;                || isNamingCommitted()</b>
+<b class="nc">&nbsp;                || isMutationWriteBlocked()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, Integer&gt; countersBackup =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;(
+&nbsp;                        counters
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, Double&gt; measurementsBackup =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;(
+&nbsp;                        measurements
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, Boolean&gt; flagsBackup =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;(
+&nbsp;                        flags
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, String&gt; stringsBackup =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;(
+&nbsp;                        strings
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; collectionsBackup =</b>
+<b class="nc">&nbsp;                deepCopyCollections(</b>
+&nbsp;                        collections
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        int dataVersionBackup =</b>
+&nbsp;                dataVersion;
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            counters.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .RECOGNITION_RESULT_VERSION,
+<b class="nc">&nbsp;                    record.resultVersion()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            counters.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .RECOGNITION_RULES_VERSION,
+<b class="nc">&nbsp;                    record.rulesVersion()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            counters.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .REWARD_PROFILE_VERSION,
+<b class="nc">&nbsp;                    record.rewardProfileVersion()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            measurements.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .PRIMARY_SCORE_AT_COMMIT,
+<b class="nc">&nbsp;                    record.primaryScore()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            measurements.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .SECONDARY_SCORE_AT_COMMIT,
+<b class="nc">&nbsp;                    record.secondaryScore()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            putStringDirect(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .PRIMARY_PATH,
+<b class="nc">&nbsp;                    record.primaryPathId()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            putStringDirect(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .SECONDARY_PATH,
+<b class="nc">&nbsp;                    record.secondaryPathId()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            putStringDirect(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .BESTOWED_TITLE,
+<b class="nc">&nbsp;                    record.bestowedTitle()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            putStringDirect(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .FROZEN_DISPLAY_NAME,
+<b class="nc">&nbsp;                    record.frozenDisplayName()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            putStringDirect(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .CONTRADICTION_MODIFIER,
+<b class="nc">&nbsp;                    record.contradictionModifier()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            putStringDirect(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .BALANCE_SOURCE_AT_COMMIT,
+<b class="nc">&nbsp;                    record.balanceSource()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            putStoredLongDirect(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .BALANCE_REVISION_AT_COMMIT,
+<b class="nc">&nbsp;                    record.balanceRevision()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            putStoredLongDirect(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .COMMIT_TIMESTAMP_EPOCH_MILLIS,
+<b class="nc">&nbsp;                    record.committedAtEpochMillis()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            putStringDirect(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .INCARNATION_ID,
+<b class="nc">&nbsp;                    record.incarnationId()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            putStringDirect(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .RECOGNITION_MIGRATION_SOURCE,
+&nbsp;                    RecognitionCommitRecord
+&nbsp;                            .NATIVE_MIGRATION_SOURCE
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            flags.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .PURE_RECOGNITION,
+<b class="nc">&nbsp;                    record.pure()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            flags.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .REVEAL_PENDING,
+<b class="nc">&nbsp;                    true</b>
+&nbsp;            );
+&nbsp;
+&nbsp;            /*
+&nbsp;             * Published last so no observer can see a committed record before
+&nbsp;             * the frozen fields have been written.
+&nbsp;             */
+<b class="nc">&nbsp;            flags.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .NAMING_COMMITTED,
+<b class="nc">&nbsp;                    true</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            markCurrentVersion();</b>
+&nbsp;
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } catch (RuntimeException exception) {
+<b class="nc">&nbsp;            restoreMap(</b>
+&nbsp;                    counters,
+&nbsp;                    countersBackup
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            restoreMap(</b>
+&nbsp;                    measurements,
+&nbsp;                    measurementsBackup
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            restoreMap(</b>
+&nbsp;                    flags,
+&nbsp;                    flagsBackup
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            restoreMap(</b>
+&nbsp;                    strings,
+&nbsp;                    stringsBackup
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            collections.clear();</b>
+<b class="nc">&nbsp;            collections.putAll(</b>
+<b class="nc">&nbsp;                    deepCopyCollections(</b>
+&nbsp;                            collectionsBackup
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            dataVersion =</b>
+&nbsp;                    dataVersionBackup;
+&nbsp;
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fills only player-context fields that were unavailable to a legacy
+&nbsp;     * commitment or v1 migration.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Existing non-blank values are never overwritten.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public boolean completeCommittedPlayerMetadata(
+&nbsp;            String frozenDisplayName,
+&nbsp;            String incarnationId
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!isNamingCommitted()</b>
+<b class="nc">&nbsp;                || isMutationWriteBlocked()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean changed =</b>
+&nbsp;                false;
+&nbsp;
+<b class="nc">&nbsp;        if (getFrozenDisplayName()</b>
+<b class="nc">&nbsp;                .isBlank()</b>
+&nbsp;                &amp;&amp; frozenDisplayName != null
+<b class="nc">&nbsp;                &amp;&amp; !frozenDisplayName.isBlank()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            strings.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .FROZEN_DISPLAY_NAME,
+<b class="nc">&nbsp;                    frozenDisplayName.trim()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            changed = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (getIncarnationId()</b>
+<b class="nc">&nbsp;                .isBlank()</b>
+&nbsp;                &amp;&amp; incarnationId != null
+<b class="nc">&nbsp;                &amp;&amp; !incarnationId.isBlank()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            strings.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .INCARNATION_ID,
+<b class="nc">&nbsp;                    incarnationId.trim()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            changed = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (changed) {</b>
+<b class="nc">&nbsp;            markCurrentVersion();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RecognitionCommittedResult
+&nbsp;    getCommittedResult() {
+<b class="fc">&nbsp;        boolean committed =</b>
+<b class="fc">&nbsp;                isNamingCommitted();</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;String&gt; issues =</b>
+&nbsp;                new ArrayList&lt;&gt;();
+&nbsp;
+<b class="fc">&nbsp;        String primaryId =</b>
+<b class="fc">&nbsp;                getCommittedPrimaryPathId();</b>
+&nbsp;
+<b class="fc">&nbsp;        String secondaryId =</b>
+<b class="fc">&nbsp;                getCommittedSecondaryPathId();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (committed) {</b>
+<b class="pc">&nbsp;            if (primaryId.isBlank()) {</b>
+<b class="nc">&nbsp;                issues.add(</b>
+&nbsp;                        &quot;Missing committed primary path ID.&quot;
+&nbsp;                );
+<b class="fc">&nbsp;            } else if (RecognitionPath.byId(</b>
+&nbsp;                    primaryId
+<b class="pc">&nbsp;            ).isEmpty()) {</b>
+<b class="nc">&nbsp;                issues.add(</b>
+&nbsp;                        &quot;Unknown committed primary path ID: &quot;
+&nbsp;                                + primaryId
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (isPureRecognition()) {</b>
+<b class="pc">&nbsp;                if (!secondaryId.isBlank()) {</b>
+<b class="nc">&nbsp;                    issues.add(</b>
+&nbsp;                            &quot;Pure recognition unexpectedly stores a secondary path ID.&quot;
+&nbsp;                    );
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (secondaryId.isBlank()) {</b>
+<b class="nc">&nbsp;                    issues.add(</b>
+&nbsp;                            &quot;Combined recognition is missing a secondary path ID.&quot;
+&nbsp;                    );
+<b class="nc">&nbsp;                } else if (RecognitionPath.byId(</b>
+&nbsp;                        secondaryId
+<b class="nc">&nbsp;                ).isEmpty()) {</b>
+<b class="nc">&nbsp;                    issues.add(</b>
+&nbsp;                            &quot;Unknown committed secondary path ID: &quot;
+&nbsp;                                    + secondaryId
+&nbsp;                    );
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (getBestowedTitle().isBlank()) {</b>
+<b class="nc">&nbsp;                issues.add(</b>
+&nbsp;                        &quot;Missing frozen bestowed title.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (getRecognitionResultVersion()</b>
+&nbsp;                    &lt; 1) {
+<b class="nc">&nbsp;                issues.add(</b>
+&nbsp;                        &quot;Missing recognition result version.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (getRecognitionRulesVersion()</b>
+&nbsp;                    &lt; 1) {
+<b class="nc">&nbsp;                issues.add(</b>
+&nbsp;                        &quot;Missing recognition rules version.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (getRewardProfileVersion()</b>
+&nbsp;                    &lt; 1) {
+<b class="nc">&nbsp;                issues.add(</b>
+&nbsp;                        &quot;Missing reward profile version.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (getFrozenDisplayName().isBlank()) {</b>
+<b class="nc">&nbsp;                issues.add(</b>
+&nbsp;                        &quot;Frozen display name awaits player-context backfill.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (getIncarnationId().isBlank()) {</b>
+<b class="nc">&nbsp;                issues.add(</b>
+&nbsp;                        &quot;Incarnation ID awaits player-context backfill.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return new RecognitionCommittedResult(</b>
+&nbsp;                committed,
+&nbsp;                dataVersion,
+<b class="fc">&nbsp;                getRecognitionResultVersion(),</b>
+<b class="fc">&nbsp;                getRecognitionRulesVersion(),</b>
+<b class="fc">&nbsp;                getRewardProfileVersion(),</b>
+&nbsp;                primaryId,
+&nbsp;                secondaryId,
+<b class="fc">&nbsp;                isPureRecognition(),</b>
+<b class="fc">&nbsp;                getContradictionModifier(),</b>
+<b class="fc">&nbsp;                getBestowedTitle(),</b>
+<b class="fc">&nbsp;                getFrozenDisplayName(),</b>
+<b class="fc">&nbsp;                getBalanceSourceAtCommit(),</b>
+<b class="fc">&nbsp;                getBalanceRevisionAtCommit(),</b>
+<b class="fc">&nbsp;                getCommitTimestampEpochMillis(),</b>
+<b class="fc">&nbsp;                getIncarnationId(),</b>
+<b class="fc">&nbsp;                getMeasurement(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .PRIMARY_SCORE_AT_COMMIT
+&nbsp;                ),
+<b class="fc">&nbsp;                getMeasurement(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .SECONDARY_SCORE_AT_COMMIT
+&nbsp;                ),
+<b class="fc">&nbsp;                getRecognitionMigrationSource(),</b>
+&nbsp;                issues
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public void markRevealPresented() {
+<b class="nc">&nbsp;        setFlag(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .REVEAL_PENDING,
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Clears the complete frozen naming result while preserving this life&#39;s
+&nbsp;     * deeds, progression counters, identity history and incarnation ID.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This is intentionally narrower than {@link #resetForNewIncarnation}
+&nbsp;     * and exists for the protected administrator unname/retest route.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public void clearNamingCommitPreservingLifeProgress() {
+<b class="nc">&nbsp;        if (isMutationWriteBlocked()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        counters.remove(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_RESULT_VERSION
+&nbsp;        );
+<b class="nc">&nbsp;        counters.remove(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_RULES_VERSION
+&nbsp;        );
+<b class="nc">&nbsp;        counters.remove(</b>
+&nbsp;                RecognitionStatKeys.REWARD_PROFILE_VERSION
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        measurements.remove(</b>
+&nbsp;                RecognitionStatKeys.PRIMARY_SCORE_AT_COMMIT
+&nbsp;        );
+<b class="nc">&nbsp;        measurements.remove(</b>
+&nbsp;                RecognitionStatKeys.SECONDARY_SCORE_AT_COMMIT
+&nbsp;        );
+<b class="nc">&nbsp;        measurements.remove(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_STRENGTH_AT_COMMIT
+&nbsp;        );
+<b class="nc">&nbsp;        measurements.remove(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_STRENGTH_MAXIMUM_AT_COMMIT
+&nbsp;        );
+<b class="nc">&nbsp;        measurements.remove(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_STRENGTH_REWARD
+&nbsp;        );
+<b class="nc">&nbsp;        measurements.remove(</b>
+&nbsp;                RecognitionStatKeys.ENDOWMENT_MAXIMUM_EXTRA_EP_AT_COMMIT
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        flags.remove(</b>
+&nbsp;                RecognitionStatKeys.NAMING_COMMITTED
+&nbsp;        );
+<b class="nc">&nbsp;        flags.remove(</b>
+&nbsp;                RecognitionStatKeys.PURE_RECOGNITION
+&nbsp;        );
+<b class="nc">&nbsp;        flags.remove(</b>
+&nbsp;                RecognitionStatKeys.REVEAL_PENDING
+&nbsp;        );
+<b class="nc">&nbsp;        flags.remove(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED
+&nbsp;        );
+<b class="nc">&nbsp;        flags.remove(</b>
+&nbsp;                RecognitionStatKeys.ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.PRIMARY_PATH
+&nbsp;        );
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.SECONDARY_PATH
+&nbsp;        );
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.BESTOWED_TITLE
+&nbsp;        );
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.FROZEN_DISPLAY_NAME
+&nbsp;        );
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.CONTRADICTION_MODIFIER
+&nbsp;        );
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.BALANCE_SOURCE_AT_COMMIT
+&nbsp;        );
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.BALANCE_REVISION_AT_COMMIT
+&nbsp;        );
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.COMMIT_TIMESTAMP_EPOCH_MILLIS
+&nbsp;        );
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_MIGRATION_SOURCE
+&nbsp;        );
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.RECOGNITION_REWARD_MIGRATION_SOURCE
+&nbsp;        );
+<b class="nc">&nbsp;        strings.remove(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        dataVersion = CURRENT_DATA_VERSION;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetForNewIncarnation(
+&nbsp;            String incarnationId
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (isMutationWriteBlocked()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        counters.clear();</b>
+<b class="nc">&nbsp;        measurements.clear();</b>
+<b class="nc">&nbsp;        flags.clear();</b>
+<b class="nc">&nbsp;        strings.clear();</b>
+<b class="nc">&nbsp;        collections.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        dataVersion =</b>
+&nbsp;                CURRENT_DATA_VERSION;
+&nbsp;
+<b class="nc">&nbsp;        if (incarnationId != null</b>
+<b class="nc">&nbsp;                &amp;&amp; !incarnationId.isBlank()) {</b>
+<b class="nc">&nbsp;            strings.put(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .INCARNATION_ID,
+<b class="nc">&nbsp;                    incarnationId.trim()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void migrateToCurrentVersion() {
+<b class="pc">&nbsp;        while (dataVersion</b>
+&nbsp;                &lt; CURRENT_DATA_VERSION) {
+<b class="nc">&nbsp;            switch (dataVersion) {</b>
+&nbsp;                case 1 -&gt;
+<b class="nc">&nbsp;                        migrateV1ToV2();</b>
+&nbsp;
+&nbsp;                default -&gt;
+<b class="nc">&nbsp;                        throw new IllegalStateException(</b>
+&nbsp;                                &quot;No recognition-data migration exists from version &quot;
+&nbsp;                                        + dataVersion
+&nbsp;                                        + &quot;.&quot;
+&nbsp;                        );
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void migrateV1ToV2() {
+<b class="nc">&nbsp;        if (flags.getOrDefault(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .NAMING_COMMITTED,
+<b class="nc">&nbsp;                false</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            canonicalizeKnownStoredPath(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .PRIMARY_PATH
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            canonicalizeKnownStoredPath(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .SECONDARY_PATH
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            counters.putIfAbsent(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .RECOGNITION_RESULT_VERSION,
+<b class="nc">&nbsp;                    RecognitionCommitRecord</b>
+&nbsp;                            .CURRENT_RESULT_VERSION
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            counters.putIfAbsent(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .RECOGNITION_RULES_VERSION,
+<b class="nc">&nbsp;                    RecognitionCommitRecord</b>
+&nbsp;                            .CURRENT_RULES_VERSION
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            counters.putIfAbsent(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .REWARD_PROFILE_VERSION,
+<b class="nc">&nbsp;                    RecognitionCommitRecord</b>
+&nbsp;                            .CURRENT_REWARD_PROFILE_VERSION
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            strings.putIfAbsent(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .CONTRADICTION_MODIFIER,
+&nbsp;                    RecognitionCommitRecord
+&nbsp;                            .NO_CONTRADICTION
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            strings.putIfAbsent(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .BALANCE_SOURCE_AT_COMMIT,
+&nbsp;                    RecognitionCommitRecord
+&nbsp;                            .UNKNOWN_BALANCE_SOURCE
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            strings.putIfAbsent(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .BALANCE_REVISION_AT_COMMIT,
+&nbsp;                    &quot;0&quot;
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            strings.putIfAbsent(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .COMMIT_TIMESTAMP_EPOCH_MILLIS,
+&nbsp;                    &quot;0&quot;
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            strings.putIfAbsent(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .RECOGNITION_MIGRATION_SOURCE,
+&nbsp;                    LEGACY_MIGRATION_SOURCE
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            measurements.putIfAbsent(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .PRIMARY_SCORE_AT_COMMIT,
+<b class="nc">&nbsp;                    0.0D</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            measurements.putIfAbsent(</b>
+&nbsp;                    RecognitionStatKeys
+&nbsp;                            .SECONDARY_SCORE_AT_COMMIT,
+<b class="nc">&nbsp;                    0.0D</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        dataVersion = 2;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Repairs absent v2 metadata without changing any frozen path or title.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This handles interrupted development builds and hand-edited saves.
+&nbsp;     * It is intentionally not run for data from a future schema version.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    private void repairCurrentCommittedRecordDefaults() {
+<b class="pc">&nbsp;        if (!flags.getOrDefault(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .NAMING_COMMITTED,
+<b class="fc">&nbsp;                false</b>
+&nbsp;        )) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        canonicalizeKnownStoredPath(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .PRIMARY_PATH
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        canonicalizeKnownStoredPath(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .SECONDARY_PATH
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        counters.putIfAbsent(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .RECOGNITION_RESULT_VERSION,
+<b class="fc">&nbsp;                RecognitionCommitRecord</b>
+&nbsp;                        .CURRENT_RESULT_VERSION
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        counters.putIfAbsent(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .RECOGNITION_RULES_VERSION,
+<b class="fc">&nbsp;                RecognitionCommitRecord</b>
+&nbsp;                        .CURRENT_RULES_VERSION
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        counters.putIfAbsent(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .REWARD_PROFILE_VERSION,
+<b class="fc">&nbsp;                RecognitionCommitRecord</b>
+&nbsp;                        .CURRENT_REWARD_PROFILE_VERSION
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        strings.putIfAbsent(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .CONTRADICTION_MODIFIER,
+&nbsp;                RecognitionCommitRecord
+&nbsp;                        .NO_CONTRADICTION
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        strings.putIfAbsent(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .BALANCE_SOURCE_AT_COMMIT,
+&nbsp;                RecognitionCommitRecord
+&nbsp;                        .UNKNOWN_BALANCE_SOURCE
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        strings.putIfAbsent(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .BALANCE_REVISION_AT_COMMIT,
+&nbsp;                &quot;0&quot;
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        strings.putIfAbsent(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .COMMIT_TIMESTAMP_EPOCH_MILLIS,
+&nbsp;                &quot;0&quot;
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        strings.putIfAbsent(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .RECOGNITION_MIGRATION_SOURCE,
+<b class="pc">&nbsp;                dataVersion &lt; CURRENT_DATA_VERSION</b>
+<b class="nc">&nbsp;                        ? LEGACY_MIGRATION_SOURCE</b>
+&nbsp;                        : RecognitionCommitRecord
+<b class="fc">&nbsp;                          .NATIVE_MIGRATION_SOURCE</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        measurements.putIfAbsent(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .PRIMARY_SCORE_AT_COMMIT,
+<b class="fc">&nbsp;                0.0D</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        measurements.putIfAbsent(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .SECONDARY_SCORE_AT_COMMIT,
+<b class="fc">&nbsp;                0.0D</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void canonicalizeKnownStoredPath(
+&nbsp;            String key
+&nbsp;    ) {
+<b class="fc">&nbsp;        String rawId =</b>
+<b class="fc">&nbsp;                strings.get(key);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (rawId == null</b>
+<b class="pc">&nbsp;                || rawId.isBlank()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String canonical =</b>
+&nbsp;                RecognitionPath
+<b class="fc">&nbsp;                        .canonicalizeStoredId(</b>
+&nbsp;                                rawId
+&nbsp;                        );
+&nbsp;
+<b class="pc">&nbsp;        if (!canonical.isBlank()) {</b>
+<b class="fc">&nbsp;            strings.put(</b>
+&nbsp;                    key,
+&nbsp;                    canonical
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, Integer&gt;
+&nbsp;    getCountersForCodec() {
+<b class="fc">&nbsp;        return Map.copyOf(</b>
+&nbsp;                counters
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, Double&gt;
+&nbsp;    getMeasurementsForCodec() {
+<b class="fc">&nbsp;        return Map.copyOf(</b>
+&nbsp;                measurements
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, Boolean&gt;
+&nbsp;    getFlagsForCodec() {
+<b class="fc">&nbsp;        return Map.copyOf(</b>
+&nbsp;                flags
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, String&gt;
+&nbsp;    getStringsForCodec() {
+<b class="fc">&nbsp;        return Map.copyOf(</b>
+&nbsp;                strings
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, List&lt;String&gt;&gt;
+&nbsp;    getCollectionsForCodec() {
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; result =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="fc">&nbsp;        collections.forEach(</b>
+&nbsp;                (key, values) -&gt;
+<b class="nc">&nbsp;                        result.put(</b>
+&nbsp;                                key,
+<b class="nc">&nbsp;                                List.copyOf(</b>
+&nbsp;                                        values
+&nbsp;                                )
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    PersistentState persistentStateForFixture() {
+<b class="nc">&nbsp;        return new PersistentState(</b>
+&nbsp;                dataVersion,
+<b class="nc">&nbsp;                Map.copyOf(counters),</b>
+<b class="nc">&nbsp;                Map.copyOf(measurements),</b>
+<b class="nc">&nbsp;                Map.copyOf(flags),</b>
+<b class="nc">&nbsp;                Map.copyOf(strings),</b>
+<b class="nc">&nbsp;                getCollectionsForCodec()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    record PersistentState(</b>
+&nbsp;            int dataVersion,
+&nbsp;            Map&lt;String, Integer&gt; counters,
+&nbsp;            Map&lt;String, Double&gt; measurements,
+&nbsp;            Map&lt;String, Boolean&gt; flags,
+&nbsp;            Map&lt;String, String&gt; strings,
+&nbsp;            Map&lt;String, List&lt;String&gt;&gt; collections
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+&nbsp;    private void markCurrentVersion() {
+<b class="fc">&nbsp;        dataVersion =</b>
+<b class="fc">&nbsp;                Math.max(</b>
+&nbsp;                        dataVersion,
+&nbsp;                        CURRENT_DATA_VERSION
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private long getStoredLong(
+&nbsp;            String key
+&nbsp;    ) {
+<b class="fc">&nbsp;        String rawValue =</b>
+<b class="fc">&nbsp;                getString(key);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (rawValue.isBlank()) {</b>
+<b class="nc">&nbsp;            return 0L;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            long value =</b>
+<b class="fc">&nbsp;                    Long.parseLong(</b>
+&nbsp;                            rawValue
+&nbsp;                    );
+&nbsp;
+<b class="fc">&nbsp;            return Math.max(</b>
+&nbsp;                    0L,
+&nbsp;                    value
+&nbsp;            );
+&nbsp;        } catch (NumberFormatException ignored) {
+<b class="nc">&nbsp;            return 0L;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putStoredLongDirect(
+&nbsp;            String key,
+&nbsp;            long value
+&nbsp;    ) {
+<b class="nc">&nbsp;        strings.put(</b>
+&nbsp;                key,
+<b class="nc">&nbsp;                Long.toString(</b>
+<b class="nc">&nbsp;                        Math.max(</b>
+&nbsp;                                0L,
+&nbsp;                                value
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putStringDirect(
+&nbsp;            String key,
+&nbsp;            String value
+&nbsp;    ) {
+&nbsp;        String safeValue =
+<b class="nc">&nbsp;                value == null</b>
+<b class="nc">&nbsp;                        ? &quot;&quot;</b>
+<b class="nc">&nbsp;                        : value.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (safeValue.isEmpty()) {</b>
+<b class="nc">&nbsp;            strings.remove(</b>
+&nbsp;                    key
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            strings.put(</b>
+&nbsp;                    key,
+&nbsp;                    safeValue
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static &lt;K, V&gt; void restoreMap(
+&nbsp;            Map&lt;K, V&gt; target,
+&nbsp;            Map&lt;K, V&gt; backup
+&nbsp;    ) {
+<b class="nc">&nbsp;        target.clear();</b>
+<b class="nc">&nbsp;        target.putAll(</b>
+&nbsp;                backup
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, List&lt;String&gt;&gt;
+&nbsp;    deepCopyCollections(
+&nbsp;            Map&lt;String, List&lt;String&gt;&gt; source
+&nbsp;    ) {
+<b class="nc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; result =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;        if (source == null) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.forEach(</b>
+&nbsp;                (key, values) -&gt;
+<b class="nc">&nbsp;                        result.put(</b>
+&nbsp;                                key,
+<b class="nc">&nbsp;                                values == null</b>
+<b class="nc">&nbsp;                                        ? new ArrayList&lt;&gt;()</b>
+<b class="nc">&nbsp;                                        : new ArrayList&lt;&gt;(</b>
+&nbsp;                                        values
+&nbsp;                                )
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, Integer&gt;
+&nbsp;    sanitizeIntegerMap(
+&nbsp;            Map&lt;String, Integer&gt; source
+&nbsp;    ) {
+<b class="fc">&nbsp;        Map&lt;String, Integer&gt; result =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="pc">&nbsp;        if (source == null) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        source.forEach(</b>
+&nbsp;                (key, value) -&gt; {
+<b class="pc">&nbsp;                    if (isValidKey(key)</b>
+&nbsp;                            &amp;&amp; value != null) {
+<b class="fc">&nbsp;                        result.put(</b>
+&nbsp;                                key,
+<b class="fc">&nbsp;                                Math.max(</b>
+&nbsp;                                        0,
+<b class="fc">&nbsp;                                        value</b>
+&nbsp;                                )
+&nbsp;                        );
+&nbsp;                    }
+&nbsp;                }
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, Double&gt;
+&nbsp;    sanitizeDoubleMap(
+&nbsp;            Map&lt;String, Double&gt; source
+&nbsp;    ) {
+<b class="fc">&nbsp;        Map&lt;String, Double&gt; result =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="pc">&nbsp;        if (source == null) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        source.forEach(</b>
+&nbsp;                (key, value) -&gt; {
+<b class="pc">&nbsp;                    if (isValidKey(key)</b>
+&nbsp;                            &amp;&amp; value != null) {
+<b class="fc">&nbsp;                        result.put(</b>
+&nbsp;                                key,
+<b class="fc">&nbsp;                                sanitizeMeasurement(</b>
+<b class="fc">&nbsp;                                        value</b>
+&nbsp;                                )
+&nbsp;                        );
+&nbsp;                    }
+&nbsp;                }
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, Boolean&gt;
+&nbsp;    sanitizeBooleanMap(
+&nbsp;            Map&lt;String, Boolean&gt; source
+&nbsp;    ) {
+<b class="fc">&nbsp;        Map&lt;String, Boolean&gt; result =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="pc">&nbsp;        if (source == null) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        source.forEach(</b>
+&nbsp;                (key, value) -&gt; {
+<b class="pc">&nbsp;                    if (isValidKey(key)</b>
+&nbsp;                            &amp;&amp; value != null) {
+<b class="fc">&nbsp;                        result.put(</b>
+&nbsp;                                key,
+&nbsp;                                value
+&nbsp;                        );
+&nbsp;                    }
+&nbsp;                }
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, String&gt;
+&nbsp;    sanitizeStringMap(
+&nbsp;            Map&lt;String, String&gt; source
+&nbsp;    ) {
+<b class="fc">&nbsp;        Map&lt;String, String&gt; result =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="pc">&nbsp;        if (source == null) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        source.forEach(</b>
+&nbsp;                (key, value) -&gt; {
+<b class="pc">&nbsp;                    if (!isValidKey(key)</b>
+&nbsp;                            || value == null
+<b class="pc">&nbsp;                            || value.isBlank()) {</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;
+<b class="fc">&nbsp;                    result.put(</b>
+&nbsp;                            key,
+<b class="fc">&nbsp;                            value.trim()</b>
+&nbsp;                    );
+&nbsp;                }
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, List&lt;String&gt;&gt;
+&nbsp;    sanitizeCollectionMap(
+&nbsp;            Map&lt;String, List&lt;String&gt;&gt; source
+&nbsp;    ) {
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; result =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="pc">&nbsp;        if (source == null) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        source.forEach(</b>
+&nbsp;                (key, values) -&gt; {
+<b class="nc">&nbsp;                    if (!isValidKey(key)</b>
+&nbsp;                            || values == null) {
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    List&lt;String&gt; cleanedValues =</b>
+&nbsp;                            new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;                    for (String value : values) {</b>
+<b class="nc">&nbsp;                        if (value == null</b>
+<b class="nc">&nbsp;                                || value.isBlank()) {</b>
+&nbsp;                            continue;
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        String cleanedValue =</b>
+<b class="nc">&nbsp;                                value.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;                        if (!cleanedValues.contains(</b>
+&nbsp;                                cleanedValue
+&nbsp;                        )) {
+<b class="nc">&nbsp;                            cleanedValues.add(</b>
+&nbsp;                                    cleanedValue
+&nbsp;                            );
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if (!cleanedValues.isEmpty()) {</b>
+<b class="nc">&nbsp;                        result.put(</b>
+&nbsp;                                key,
+&nbsp;                                cleanedValues
+&nbsp;                        );
+&nbsp;                    }
+&nbsp;                }
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeMeasurement(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!Double.isFinite(value)</b>
+&nbsp;                || value &lt; 0.0D) {
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isValidKey(
+&nbsp;            String key
+&nbsp;    ) {
+<b class="pc">&nbsp;        return key != null</b>
+<b class="fc">&nbsp;                &amp;&amp; !key.isBlank();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

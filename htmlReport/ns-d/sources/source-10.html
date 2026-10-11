@@ -1,0 +1,279 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SyncRecognitionBenefitsPayload</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.network</a>
+</div>
+
+<h1>Coverage Summary for Class: SyncRecognitionBenefitsPayload (com.mooswqz.moostensuraaddon.network)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SyncRecognitionBenefitsPayload</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (3/27)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SyncRecognitionBenefitsPayload$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.3%
+  </span>
+  <span class="absValue">
+    (1/30)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (2/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7%
+  </span>
+  <span class="absValue">
+    (4/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.network;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import net.minecraft.network.RegistryFriendlyByteBuf;
+&nbsp;import net.minecraft.network.codec.StreamCodec;
+&nbsp;import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;
+&nbsp;/**
+&nbsp; * Client readout of the server-authoritative reward snapshot.
+&nbsp; */
+<b class="nc">&nbsp;public record SyncRecognitionBenefitsPayload(</b>
+&nbsp;        String stateId,
+&nbsp;        boolean nativeEndowmentAnchored,
+&nbsp;        boolean attributeStateMatches,
+&nbsp;        int rewardProfileVersion,
+&nbsp;        double frozenIdentityStrength,
+&nbsp;        double identityStrengthMaximum,
+&nbsp;        double totalStrength,
+&nbsp;        double maxHealthMultiplier,
+&nbsp;        double attackDamageMultiplier,
+&nbsp;        double movementSpeedMultiplier,
+&nbsp;        double attackSpeedMultiplier,
+&nbsp;        double knockbackResistanceAddition
+&nbsp;) implements CustomPacketPayload {
+&nbsp;
+&nbsp;    private static final int MAX_STATE_ID_LENGTH = 32;
+&nbsp;
+<b class="fc">&nbsp;    public static final Type&lt;SyncRecognitionBenefitsPayload&gt; TYPE =</b>
+&nbsp;            new Type&lt;&gt;(
+<b class="fc">&nbsp;                    ResourceLocation.fromNamespaceAndPath(</b>
+&nbsp;                            MoosTensuraAddon.MODID,
+&nbsp;                            &quot;sync_recognition_benefits&quot;
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+&nbsp;    public static final StreamCodec&lt;
+&nbsp;            RegistryFriendlyByteBuf,
+&nbsp;            SyncRecognitionBenefitsPayload
+<b class="fc">&nbsp;            &gt; STREAM_CODEC = new StreamCodec&lt;&gt;() {</b>
+&nbsp;        @Override
+&nbsp;        public SyncRecognitionBenefitsPayload decode(
+&nbsp;                RegistryFriendlyByteBuf buffer
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new SyncRecognitionBenefitsPayload(</b>
+<b class="nc">&nbsp;                    buffer.readUtf(MAX_STATE_ID_LENGTH),</b>
+<b class="nc">&nbsp;                    buffer.readBoolean(),</b>
+<b class="nc">&nbsp;                    buffer.readBoolean(),</b>
+<b class="nc">&nbsp;                    buffer.readVarInt(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void encode(
+&nbsp;                RegistryFriendlyByteBuf buffer,
+&nbsp;                SyncRecognitionBenefitsPayload payload
+&nbsp;        ) {
+<b class="nc">&nbsp;            buffer.writeUtf(</b>
+<b class="nc">&nbsp;                    payload.stateId(),</b>
+&nbsp;                    MAX_STATE_ID_LENGTH
+&nbsp;            );
+<b class="nc">&nbsp;            buffer.writeBoolean(</b>
+<b class="nc">&nbsp;                    payload.nativeEndowmentAnchored()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            buffer.writeBoolean(</b>
+<b class="nc">&nbsp;                    payload.attributeStateMatches()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            buffer.writeVarInt(</b>
+<b class="nc">&nbsp;                    payload.rewardProfileVersion()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            buffer.writeDouble(payload.frozenIdentityStrength());</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.identityStrengthMaximum());</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.totalStrength());</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.maxHealthMultiplier());</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.attackDamageMultiplier());</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.movementSpeedMultiplier());</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.attackSpeedMultiplier());</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.knockbackResistanceAddition());</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+<b class="nc">&nbsp;    public SyncRecognitionBenefitsPayload {</b>
+<b class="nc">&nbsp;        stateId = sanitizeStateId(stateId);</b>
+<b class="nc">&nbsp;        rewardProfileVersion = Math.max(0, rewardProfileVersion);</b>
+<b class="nc">&nbsp;        frozenIdentityStrength = sanitize(frozenIdentityStrength);</b>
+<b class="nc">&nbsp;        identityStrengthMaximum = sanitize(identityStrengthMaximum);</b>
+<b class="nc">&nbsp;        totalStrength = sanitize(totalStrength);</b>
+<b class="nc">&nbsp;        maxHealthMultiplier = sanitize(maxHealthMultiplier);</b>
+<b class="nc">&nbsp;        attackDamageMultiplier = sanitize(attackDamageMultiplier);</b>
+<b class="nc">&nbsp;        movementSpeedMultiplier = sanitize(movementSpeedMultiplier);</b>
+<b class="nc">&nbsp;        attackSpeedMultiplier = sanitize(attackSpeedMultiplier);</b>
+<b class="nc">&nbsp;        knockbackResistanceAddition = sanitize(</b>
+&nbsp;                knockbackResistanceAddition
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Type&lt;? extends CustomPacketPayload&gt; type() {
+<b class="nc">&nbsp;        return TYPE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String sanitizeStateId(String value) {
+<b class="nc">&nbsp;        String safe = value == null</b>
+<b class="nc">&nbsp;                ? &quot;synchronizing&quot;</b>
+<b class="nc">&nbsp;                : value.trim().toLowerCase(java.util.Locale.ROOT);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (safe.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;synchronizing&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return safe.length() &lt;= MAX_STATE_ID_LENGTH</b>
+<b class="nc">&nbsp;                ? safe</b>
+<b class="nc">&nbsp;                : safe.substring(0, MAX_STATE_ID_LENGTH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitize(double value) {
+<b class="nc">&nbsp;        return Double.isFinite(value) &amp;&amp; value &gt; 0.0D</b>
+<b class="nc">&nbsp;                ? value</b>
+<b class="nc">&nbsp;                : 0.0D;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

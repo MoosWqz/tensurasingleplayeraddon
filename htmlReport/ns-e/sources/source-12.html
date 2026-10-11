@@ -1,0 +1,624 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionDisplayNameService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionDisplayNameService (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionDisplayNameService</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (9/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.6%
+  </span>
+  <span class="absValue">
+    (43/76)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.7%
+  </span>
+  <span class="absValue">
+    (107/136)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionDisplayNameService$VisibleRecognitionName</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    78.6%
+  </span>
+  <span class="absValue">
+    (11/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.6%
+  </span>
+  <span class="absValue">
+    (43/76)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.4%
+  </span>
+  <span class="absValue">
+    (112/141)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;public final class RecognitionDisplayNameService {
+&nbsp;
+&nbsp;    public static final int MAX_TITLE_LENGTH =
+&nbsp;            64;
+&nbsp;
+&nbsp;    public static final int MAX_NATIVE_NAME_LENGTH =
+&nbsp;            64;
+&nbsp;
+&nbsp;    private static final int FALLBACK_COLOR =
+&nbsp;            0x5DD9E8;
+&nbsp;
+&nbsp;    private RecognitionDisplayNameService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the complete, server-authoritative recognition display state.
+&nbsp;     *
+&nbsp;     * The stored committed paths are used instead of recalculating the
+&nbsp;     * player&#39;s current alignment. Therefore, the recognition color remains
+&nbsp;     * fixed after the naming ritual.
+&nbsp;     */
+&nbsp;    public static Optional&lt;VisibleRecognitionName&gt;
+&nbsp;    getVisibleRecognition(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionData data =</b>
+<b class="fc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        return getVisibleRecognition(data);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;VisibleRecognitionName&gt;
+&nbsp;    getVisibleRecognition(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (data == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (data.isWriteBlockedByFutureVersion()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        boolean committed =</b>
+<b class="fc">&nbsp;                data.getFlag(</b>
+&nbsp;                        RecognitionStatKeys.NAMING_COMMITTED
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        boolean revealPending =</b>
+<b class="fc">&nbsp;                data.getFlag(</b>
+&nbsp;                        RecognitionStatKeys.REVEAL_PENDING
+&nbsp;                );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Never reveal the recognition name or its styling before the ritual
+&nbsp;         * has been successfully presented.
+&nbsp;         */
+<b class="pc">&nbsp;        if (!committed || revealPending) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String title =</b>
+<b class="fc">&nbsp;                sanitizeTitle(</b>
+<b class="fc">&nbsp;                        data.getString(</b>
+&nbsp;                                RecognitionStatKeys.BESTOWED_TITLE
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (title.isBlank()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="fc">&nbsp;                findPathById(</b>
+<b class="fc">&nbsp;                        data.getString(</b>
+&nbsp;                                RecognitionStatKeys.PRIMARY_PATH
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionPath secondaryPath =</b>
+<b class="fc">&nbsp;                findPathById(</b>
+<b class="fc">&nbsp;                        data.getString(</b>
+&nbsp;                                RecognitionStatKeys.SECONDARY_PATH
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        boolean pure =</b>
+<b class="fc">&nbsp;                data.getFlag(</b>
+&nbsp;                        RecognitionStatKeys.PURE_RECOGNITION
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        int rgbColor =</b>
+&nbsp;                RecognitionNameColorService
+<b class="fc">&nbsp;                        .getRecognitionColor(</b>
+&nbsp;                                primaryPath,
+&nbsp;                                secondaryPath,
+&nbsp;                                pure
+&nbsp;                        );
+&nbsp;
+<b class="fc">&nbsp;        return Optional.of(</b>
+&nbsp;                new VisibleRecognitionName(
+&nbsp;                        title,
+&nbsp;                        rgbColor,
+&nbsp;                        pure
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retained for callers that only need the visible title text.
+&nbsp;     */
+&nbsp;    public static Optional&lt;String&gt; getVisibleTitle(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        return getVisibleRecognition(player)</b>
+<b class="nc">&nbsp;                .map(</b>
+&nbsp;                        VisibleRecognitionName::title
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;String&gt; getVisibleTitle(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        return getVisibleRecognition(data)</b>
+<b class="nc">&nbsp;                .map(</b>
+&nbsp;                        VisibleRecognitionName::title
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Backwards-compatible overload using the neutral fallback color.
+&nbsp;     */
+&nbsp;    public static MutableComponent appendTitle(
+&nbsp;            Component existingDisplayName,
+&nbsp;            String rawTitle
+&nbsp;    ) {
+<b class="nc">&nbsp;        return appendTitle(</b>
+&nbsp;                existingDisplayName,
+&nbsp;                rawTitle,
+&nbsp;                FALLBACK_COLOR,
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builds one uniformly styled recognition display name.
+&nbsp;     *
+&nbsp;     * The existing visible text is rebuilt as one component so an explicit
+&nbsp;     * white color on the original username cannot override the recognition
+&nbsp;     * color.
+&nbsp;     */
+&nbsp;    public static MutableComponent appendTitle(
+&nbsp;            Component existingDisplayName,
+&nbsp;            String rawTitle,
+&nbsp;            int rgbColor,
+&nbsp;            boolean bold
+&nbsp;    ) {
+&nbsp;        String existingText =
+<b class="pc">&nbsp;                existingDisplayName == null</b>
+<b class="nc">&nbsp;                        ? &quot;&quot;</b>
+<b class="fc">&nbsp;                        : normalizeWhitespace(</b>
+<b class="fc">&nbsp;                        existingDisplayName.getString()</b>
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        String title =</b>
+<b class="fc">&nbsp;                sanitizeTitle(rawTitle);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (title.isBlank()) {</b>
+<b class="nc">&nbsp;            return existingDisplayName == null</b>
+<b class="nc">&nbsp;                    ? Component.empty()</b>
+<b class="nc">&nbsp;                    : existingDisplayName.copy();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String expectedSuffix =</b>
+&nbsp;                &quot; &quot; + title;
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Display names can be refreshed repeatedly. Remove an already
+&nbsp;         * appended title before reconstructing the complete component.
+&nbsp;         */
+<b class="pc">&nbsp;        if (existingText.endsWith(</b>
+&nbsp;                expectedSuffix
+&nbsp;        )) {
+<b class="nc">&nbsp;            existingText =</b>
+<b class="nc">&nbsp;                    existingText.substring(</b>
+&nbsp;                                    0,
+<b class="nc">&nbsp;                                    existingText.length()</b>
+<b class="nc">&nbsp;                                            - expectedSuffix.length()</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                            .trim();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        String completeName =
+<b class="pc">&nbsp;                existingText.isBlank()</b>
+<b class="nc">&nbsp;                        ? title</b>
+&nbsp;                        : existingText
+&nbsp;                          + &quot; &quot;
+<b class="fc">&nbsp;                          + title;</b>
+&nbsp;
+<b class="fc">&nbsp;        int safeColor =</b>
+&nbsp;                rgbColor
+&nbsp;                        &amp; 0xFFFFFF;
+&nbsp;
+<b class="fc">&nbsp;        MutableComponent result =</b>
+<b class="fc">&nbsp;                Component.literal(</b>
+&nbsp;                                completeName
+&nbsp;                        )
+<b class="fc">&nbsp;                        .withColor(</b>
+&nbsp;                                safeColor
+&nbsp;                        );
+&nbsp;
+<b class="pc">&nbsp;        if (bold) {</b>
+<b class="fc">&nbsp;            result.withStyle(</b>
+&nbsp;                    ChatFormatting.BOLD
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates the complete native Tensura name used by Tensura&#39;s menus.
+&nbsp;     *
+&nbsp;     * Tensura stores this value as plain text, so the RGB formatting applies
+&nbsp;     * to Minecraft display components but not to Tensura&#39;s stored String.
+&nbsp;     */
+&nbsp;    public static String buildNativeTensuraName(
+&nbsp;            String accountName,
+&nbsp;            String rawTitle
+&nbsp;    ) {
+<b class="fc">&nbsp;        String safeAccountName =</b>
+<b class="fc">&nbsp;                sanitizeAccountName(</b>
+&nbsp;                        accountName
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        String safeTitle =</b>
+<b class="fc">&nbsp;                sanitizeTitle(</b>
+&nbsp;                        rawTitle
+&nbsp;                );
+&nbsp;
+&nbsp;        String result;
+&nbsp;
+<b class="pc">&nbsp;        if (safeAccountName.isBlank()) {</b>
+<b class="nc">&nbsp;            result = safeTitle;</b>
+<b class="pc">&nbsp;        } else if (safeTitle.isBlank()) {</b>
+<b class="nc">&nbsp;            result = safeAccountName;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            result =</b>
+&nbsp;                    safeAccountName
+&nbsp;                            + &quot; &quot;
+&nbsp;                            + safeTitle;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return truncate(</b>
+&nbsp;                result,
+&nbsp;                MAX_NATIVE_NAME_LENGTH
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String sanitizeTitle(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (value == null || value.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        StringBuilder result =</b>
+&nbsp;                new StringBuilder();
+&nbsp;
+<b class="fc">&nbsp;        for (int index = 0;</b>
+<b class="fc">&nbsp;             index &lt; value.length();</b>
+<b class="fc">&nbsp;             index++) {</b>
+&nbsp;
+<b class="fc">&nbsp;            char character =</b>
+<b class="fc">&nbsp;                    value.charAt(index);</b>
+&nbsp;
+&nbsp;            /*
+&nbsp;             * Remove legacy formatting injection, control characters and
+&nbsp;             * multiline content before the value reaches another client.
+&nbsp;             */
+<b class="pc">&nbsp;            if (character == &#39;\u00A7&#39;) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (Character.isISOControl(</b>
+&nbsp;                    character
+&nbsp;            )) {
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            result.append(</b>
+&nbsp;                    character
+&nbsp;            );
+&nbsp;
+<b class="pc">&nbsp;            if (result.length()</b>
+&nbsp;                    &gt;= MAX_TITLE_LENGTH) {
+&nbsp;
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return normalizeWhitespace(</b>
+<b class="fc">&nbsp;                result.toString()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionPath findPathById(
+&nbsp;            String rawPathId
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (rawPathId == null</b>
+<b class="fc">&nbsp;                || rawPathId.isBlank()) {</b>
+&nbsp;
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String normalized =</b>
+<b class="fc">&nbsp;                rawPathId.trim();</b>
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="pc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="fc">&nbsp;            if (path.getId()</b>
+<b class="fc">&nbsp;                    .equalsIgnoreCase(</b>
+&nbsp;                            normalized
+&nbsp;                    )) {
+&nbsp;
+<b class="fc">&nbsp;                return path;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String sanitizeAccountName(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (value == null || value.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        StringBuilder result =</b>
+&nbsp;                new StringBuilder();
+&nbsp;
+<b class="fc">&nbsp;        for (int index = 0;</b>
+<b class="fc">&nbsp;             index &lt; value.length();</b>
+<b class="fc">&nbsp;             index++) {</b>
+&nbsp;
+<b class="fc">&nbsp;            char character =</b>
+<b class="fc">&nbsp;                    value.charAt(index);</b>
+&nbsp;
+<b class="pc">&nbsp;            if (character == &#39;\u00A7&#39;</b>
+<b class="pc">&nbsp;                    || Character.isISOControl(</b>
+&nbsp;                    character
+&nbsp;            )) {
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            result.append(</b>
+&nbsp;                    character
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return normalizeWhitespace(</b>
+<b class="fc">&nbsp;                result.toString()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String normalizeWhitespace(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (value == null || value.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        StringBuilder result =</b>
+&nbsp;                new StringBuilder();
+&nbsp;
+<b class="fc">&nbsp;        boolean previousWasWhitespace =</b>
+&nbsp;                false;
+&nbsp;
+<b class="fc">&nbsp;        for (int index = 0;</b>
+<b class="fc">&nbsp;             index &lt; value.length();</b>
+<b class="fc">&nbsp;             index++) {</b>
+&nbsp;
+<b class="fc">&nbsp;            char character =</b>
+<b class="fc">&nbsp;                    value.charAt(index);</b>
+&nbsp;
+<b class="fc">&nbsp;            if (Character.isWhitespace(</b>
+&nbsp;                    character
+&nbsp;            )) {
+<b class="pc">&nbsp;                if (!previousWasWhitespace</b>
+<b class="pc">&nbsp;                        &amp;&amp; !result.isEmpty()) {</b>
+&nbsp;
+<b class="fc">&nbsp;                    result.append(&#39; &#39;);</b>
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                previousWasWhitespace = true;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            result.append(</b>
+&nbsp;                    character
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            previousWasWhitespace = false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return result.toString()</b>
+<b class="fc">&nbsp;                .trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String truncate(
+&nbsp;            String value,
+&nbsp;            int maximumLength
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (value == null || value.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        int safeMaximum =</b>
+<b class="fc">&nbsp;                Math.max(</b>
+&nbsp;                        1,
+&nbsp;                        maximumLength
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (value.length()</b>
+&nbsp;                &lt;= safeMaximum) {
+&nbsp;
+<b class="fc">&nbsp;            return value;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return value.substring(</b>
+&nbsp;                        0,
+&nbsp;                        safeMaximum
+&nbsp;                )
+<b class="nc">&nbsp;                .trim();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public record VisibleRecognitionName(</b>
+&nbsp;            String title,
+&nbsp;            int rgbColor,
+&nbsp;            boolean bold
+&nbsp;    ) {
+&nbsp;
+<b class="fc">&nbsp;        public VisibleRecognitionName {</b>
+<b class="fc">&nbsp;            title =</b>
+&nbsp;                    RecognitionDisplayNameService
+<b class="fc">&nbsp;                            .sanitizeTitle(</b>
+&nbsp;                                    title
+&nbsp;                            );
+&nbsp;
+<b class="fc">&nbsp;            rgbColor =</b>
+&nbsp;                    rgbColor
+&nbsp;                            &amp; 0xFFFFFF;
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,205 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionPathEvidenceGate</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionPathEvidenceGate (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionPathEvidenceGate</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import java.util.EnumMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;public final class RecognitionPathEvidenceGate {
+&nbsp;
+&nbsp;    /*
+&nbsp;     * One tiny deed should not be enough to establish an entire moral
+&nbsp;     * identity.
+&nbsp;     *
+&nbsp;     * Examples:
+&nbsp;     * - One baby-animal kill gives only 1 Evil and cannot establish Evil.
+&nbsp;     * - One civilian kill gives 6 Evil and can establish Evil.
+&nbsp;     * - One raid victory gives 8 Good and can establish Good.
+&nbsp;     * - TH and TDL provide 15 directional evidence and therefore qualify.
+&nbsp;     */
+&nbsp;    public static final double MIN_DIRECTIONAL_MORALITY_EVIDENCE =
+&nbsp;            6.0D;
+&nbsp;
+&nbsp;    private RecognitionPathEvidenceGate() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Map&lt;RecognitionPath, Double&gt; apply(
+&nbsp;            RecognitionDimensions dimensions,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; scores
+&nbsp;    ) {
+<b class="nc">&nbsp;        EnumMap&lt;RecognitionPath, Double&gt; gatedScores =</b>
+&nbsp;                new EnumMap&lt;&gt;(RecognitionPath.class);
+&nbsp;
+<b class="nc">&nbsp;        for (RecognitionPath path : RecognitionPath.values()) {</b>
+<b class="nc">&nbsp;            double score = getSafeScore(scores, path);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!hasRequiredEvidence(path, dimensions)) {</b>
+<b class="nc">&nbsp;                score = 0.0D;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            gatedScores.put(path, score);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Map.copyOf(gatedScores);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean hasRequiredEvidence(
+&nbsp;            RecognitionPath path,
+&nbsp;            RecognitionDimensions dimensions
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null || dimensions == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String pathName = path.name();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (pathName.endsWith(&quot;_GOOD&quot;)) {</b>
+<b class="nc">&nbsp;            return dimensions.good()</b>
+&nbsp;                    &gt;= MIN_DIRECTIONAL_MORALITY_EVIDENCE;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (pathName.endsWith(&quot;_EVIL&quot;)) {</b>
+<b class="nc">&nbsp;            return dimensions.evil()</b>
+&nbsp;                    &gt;= MIN_DIRECTIONAL_MORALITY_EVIDENCE;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Lawful Neutral, True Neutral and Chaotic Neutral are not tied to
+&nbsp;         * either directional morality and remain available.
+&nbsp;         */
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double getSafeScore(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; scores,
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (scores == null || path == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Double value = scores.get(path);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (value == null</b>
+<b class="nc">&nbsp;                || !Double.isFinite(value)</b>
+<b class="nc">&nbsp;                || value &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

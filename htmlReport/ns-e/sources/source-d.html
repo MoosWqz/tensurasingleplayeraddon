@@ -1,0 +1,418 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionCommitRecord</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionCommitRecord (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionCommitRecord</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/94)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;/**
+&nbsp; * Complete immutable input for one recognition commitment.
+&nbsp; *
+&nbsp; * &lt;p&gt;The object is fully validated before {@code RecognitionData} mutates its
+&nbsp; * maps, allowing the saved result to be written as one server-thread
+&nbsp; * transaction with rollback protection.&lt;/p&gt;
+&nbsp; */
+<b class="nc">&nbsp;public record RecognitionCommitRecord(</b>
+&nbsp;        String primaryPathId,
+&nbsp;        String secondaryPathId,
+&nbsp;        boolean pure,
+&nbsp;        String contradictionModifier,
+&nbsp;        String bestowedTitle,
+&nbsp;        String frozenDisplayName,
+&nbsp;        int resultVersion,
+&nbsp;        int rulesVersion,
+&nbsp;        int rewardProfileVersion,
+&nbsp;        String balanceSource,
+&nbsp;        long balanceRevision,
+&nbsp;        long committedAtEpochMillis,
+&nbsp;        String incarnationId,
+&nbsp;        double primaryScore,
+&nbsp;        double secondaryScore
+&nbsp;) {
+&nbsp;
+&nbsp;    public static final int CURRENT_RESULT_VERSION =
+&nbsp;            1;
+&nbsp;
+&nbsp;    public static final int CURRENT_RULES_VERSION =
+&nbsp;            2;
+&nbsp;
+&nbsp;    public static final int CURRENT_REWARD_PROFILE_VERSION =
+&nbsp;            RecognitionStrengthRewardFormula.PROFILE_VERSION;
+&nbsp;
+&nbsp;    public static final String NO_CONTRADICTION =
+&nbsp;            &quot;none&quot;;
+&nbsp;
+&nbsp;    public static final String UNKNOWN_BALANCE_SOURCE =
+&nbsp;            &quot;legacy_unknown&quot;;
+&nbsp;
+&nbsp;    public static final String NATIVE_MIGRATION_SOURCE =
+&nbsp;            &quot;native_v2&quot;;
+&nbsp;
+<b class="nc">&nbsp;    public RecognitionCommitRecord {</b>
+<b class="nc">&nbsp;        primaryPathId =</b>
+<b class="nc">&nbsp;                RecognitionPath.canonicalizeStoredId(</b>
+&nbsp;                        primaryPathId
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="nc">&nbsp;                RecognitionPath.byId(</b>
+&nbsp;                                primaryPathId
+&nbsp;                        )
+<b class="nc">&nbsp;                        .orElseThrow(() -&gt;</b>
+<b class="nc">&nbsp;                                new IllegalArgumentException(</b>
+&nbsp;                                        &quot;A recognition commitment requires a known primary path.&quot;
+&nbsp;                                )
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        secondaryPathId =</b>
+<b class="nc">&nbsp;                RecognitionPath.canonicalizeStoredId(</b>
+&nbsp;                        secondaryPathId
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (pure) {</b>
+<b class="nc">&nbsp;            secondaryPathId = &quot;&quot;;</b>
+<b class="nc">&nbsp;            secondaryScore = 0.0D;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            RecognitionPath secondaryPath =</b>
+<b class="nc">&nbsp;                    RecognitionPath.byId(</b>
+&nbsp;                                    secondaryPathId
+&nbsp;                            )
+<b class="nc">&nbsp;                            .orElseThrow(() -&gt;</b>
+<b class="nc">&nbsp;                                    new IllegalArgumentException(</b>
+&nbsp;                                            &quot;A combined recognition commitment requires a known secondary path.&quot;
+&nbsp;                                    )
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;            if (secondaryPath == primaryPath) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(</b>
+&nbsp;                        &quot;Primary and secondary recognition paths must differ.&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        contradictionModifier =</b>
+<b class="nc">&nbsp;                normalizeIdentifier(</b>
+&nbsp;                        contradictionModifier,
+&nbsp;                        NO_CONTRADICTION
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        bestowedTitle =</b>
+<b class="nc">&nbsp;                cleanRequiredText(</b>
+&nbsp;                        bestowedTitle,
+&nbsp;                        &quot;A recognition commitment requires a bestowed title.&quot;
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        frozenDisplayName =</b>
+<b class="nc">&nbsp;                cleanOptionalText(</b>
+&nbsp;                        frozenDisplayName
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        resultVersion =</b>
+<b class="nc">&nbsp;                requirePositiveVersion(</b>
+&nbsp;                        resultVersion,
+&nbsp;                        &quot;resultVersion&quot;
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        rulesVersion =</b>
+<b class="nc">&nbsp;                requirePositiveVersion(</b>
+&nbsp;                        rulesVersion,
+&nbsp;                        &quot;rulesVersion&quot;
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        rewardProfileVersion =</b>
+<b class="nc">&nbsp;                requirePositiveVersion(</b>
+&nbsp;                        rewardProfileVersion,
+&nbsp;                        &quot;rewardProfileVersion&quot;
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        balanceSource =</b>
+<b class="nc">&nbsp;                cleanOptionalText(</b>
+&nbsp;                        balanceSource
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (balanceSource.isBlank()) {</b>
+<b class="nc">&nbsp;            balanceSource =</b>
+&nbsp;                    UNKNOWN_BALANCE_SOURCE;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        balanceRevision =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        0L,
+&nbsp;                        balanceRevision
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        committedAtEpochMillis =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        0L,
+&nbsp;                        committedAtEpochMillis
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        incarnationId =</b>
+<b class="nc">&nbsp;                cleanOptionalText(</b>
+&nbsp;                        incarnationId
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        primaryScore =</b>
+<b class="nc">&nbsp;                sanitizeScore(</b>
+&nbsp;                        primaryScore
+&nbsp;                );
+&nbsp;
+&nbsp;        secondaryScore =
+<b class="nc">&nbsp;                pure</b>
+<b class="nc">&nbsp;                        ? 0.0D</b>
+<b class="nc">&nbsp;                        : sanitizeScore(</b>
+&nbsp;                        secondaryScore
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RecognitionCommitRecord fromSelection(
+&nbsp;            RecognitionPathSelection selection,
+&nbsp;            String bestowedTitle,
+&nbsp;            String frozenDisplayName,
+&nbsp;            String balanceSource,
+&nbsp;            long balanceRevision,
+&nbsp;            long committedAtEpochMillis,
+&nbsp;            String incarnationId
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (selection == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;A recognition selection is required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionCommitRecord(</b>
+<b class="nc">&nbsp;                selection.primaryPath()</b>
+<b class="nc">&nbsp;                        .getId(),</b>
+<b class="nc">&nbsp;                selection.hasSecondaryPath()</b>
+<b class="nc">&nbsp;                        ? selection.secondaryPath()</b>
+<b class="nc">&nbsp;                        .getId()</b>
+<b class="nc">&nbsp;                        : &quot;&quot;,</b>
+<b class="nc">&nbsp;                selection.pure(),</b>
+&nbsp;                NO_CONTRADICTION,
+&nbsp;                bestowedTitle,
+&nbsp;                frozenDisplayName,
+&nbsp;                CURRENT_RESULT_VERSION,
+&nbsp;                CURRENT_RULES_VERSION,
+&nbsp;                CURRENT_REWARD_PROFILE_VERSION,
+&nbsp;                balanceSource,
+&nbsp;                balanceRevision,
+&nbsp;                committedAtEpochMillis,
+&nbsp;                incarnationId,
+<b class="nc">&nbsp;                selection.primaryScore(),</b>
+<b class="nc">&nbsp;                selection.pure()</b>
+<b class="nc">&nbsp;                        ? 0.0D</b>
+<b class="nc">&nbsp;                        : selection.secondaryScore()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public RecognitionPathSelection toSelection() {
+<b class="nc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="nc">&nbsp;                RecognitionPath.byId(</b>
+&nbsp;                                primaryPathId
+&nbsp;                        )
+<b class="nc">&nbsp;                        .orElseThrow();</b>
+&nbsp;
+&nbsp;        RecognitionPath secondaryPath =
+<b class="nc">&nbsp;                pure</b>
+<b class="nc">&nbsp;                        ? null</b>
+<b class="nc">&nbsp;                        : RecognitionPath.byId(</b>
+&nbsp;                                secondaryPathId
+&nbsp;                        )
+<b class="nc">&nbsp;                        .orElseThrow();</b>
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionPathSelection(</b>
+&nbsp;                primaryPath,
+&nbsp;                secondaryPath,
+&nbsp;                pure,
+&nbsp;                primaryScore,
+&nbsp;                secondaryScore
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int requirePositiveVersion(
+&nbsp;            int value,
+&nbsp;            String fieldName
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (value &lt; 1) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    fieldName
+&nbsp;                            + &quot; must be at least 1.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String cleanRequiredText(
+&nbsp;            String value,
+&nbsp;            String errorMessage
+&nbsp;    ) {
+<b class="nc">&nbsp;        String cleaned =</b>
+<b class="nc">&nbsp;                cleanOptionalText(</b>
+&nbsp;                        value
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (cleaned.isBlank()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    errorMessage
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return cleaned;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String cleanOptionalText(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : value.trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String normalizeIdentifier(
+&nbsp;            String value,
+&nbsp;            String fallback
+&nbsp;    ) {
+<b class="nc">&nbsp;        String cleaned =</b>
+<b class="nc">&nbsp;                cleanOptionalText(</b>
+&nbsp;                        value
+&nbsp;                )
+<b class="nc">&nbsp;                        .toLowerCase(</b>
+&nbsp;                                java.util.Locale.ROOT
+&nbsp;                        )
+<b class="nc">&nbsp;                        .replace(&#39;-&#39;, &#39;_&#39;)</b>
+<b class="nc">&nbsp;                        .replace(&#39; &#39;, &#39;_&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (cleaned.contains(&quot;__&quot;)) {</b>
+<b class="nc">&nbsp;            cleaned =</b>
+<b class="nc">&nbsp;                    cleaned.replace(</b>
+&nbsp;                            &quot;__&quot;,
+&nbsp;                            &quot;_&quot;
+&nbsp;                    );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return cleaned.isBlank()</b>
+<b class="nc">&nbsp;                ? fallback</b>
+<b class="nc">&nbsp;                : cleaned;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeScore(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return !Double.isFinite(value)</b>
+<b class="nc">&nbsp;                || value &lt; 0.0D</b>
+<b class="nc">&nbsp;                ? 0.0D</b>
+<b class="nc">&nbsp;                : value;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

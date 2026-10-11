@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionIdentityHistoryResolution</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionIdentityHistoryResolution (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionIdentityHistoryResolution</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Immutable, read-only explanation of the modifier currently implied by a
+&nbsp; * player&#39;s committed recognition and later identity history.
+&nbsp; *
+&nbsp; * &lt;p&gt;The record contains only derived information. Creating one never mutates
+&nbsp; * recognition data, applies decay, records a deed or rewrites a committed
+&nbsp; * result.&lt;/p&gt;
+&nbsp; */
+<b class="nc">&nbsp;public record RecognitionIdentityHistoryResolution(</b>
+&nbsp;        RecognitionIdentityHistoryModifier modifier,
+&nbsp;        boolean committedIdentityAvailable,
+&nbsp;        String originalMoralDirection,
+&nbsp;        String originalTemperamentDirection,
+&nbsp;        String currentMoralDirection,
+&nbsp;        String currentTemperamentDirection,
+&nbsp;        String storedMoralDirection,
+&nbsp;        String storedTemperamentDirection,
+&nbsp;        boolean moralContradiction,
+&nbsp;        boolean temperamentContradiction,
+&nbsp;        boolean moralReturned,
+&nbsp;        boolean temperamentReturned,
+&nbsp;        boolean moralContested,
+&nbsp;        boolean temperamentContested,
+&nbsp;        int guidanceProgress,
+&nbsp;        int color,
+&nbsp;        String summary,
+&nbsp;        String reason,
+&nbsp;        List&lt;String&gt; evidence
+&nbsp;) {
+&nbsp;
+<b class="nc">&nbsp;    public RecognitionIdentityHistoryResolution {</b>
+<b class="nc">&nbsp;        modifier = modifier == null</b>
+<b class="nc">&nbsp;                ? RecognitionIdentityHistoryModifier.NONE</b>
+<b class="nc">&nbsp;                : modifier;</b>
+&nbsp;
+<b class="nc">&nbsp;        originalMoralDirection = clean(originalMoralDirection);</b>
+<b class="nc">&nbsp;        originalTemperamentDirection = clean(originalTemperamentDirection);</b>
+<b class="nc">&nbsp;        currentMoralDirection = clean(currentMoralDirection);</b>
+<b class="nc">&nbsp;        currentTemperamentDirection = clean(currentTemperamentDirection);</b>
+<b class="nc">&nbsp;        storedMoralDirection = clean(storedMoralDirection);</b>
+<b class="nc">&nbsp;        storedTemperamentDirection = clean(storedTemperamentDirection);</b>
+&nbsp;
+<b class="nc">&nbsp;        guidanceProgress = Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                Math.min(100, guidanceProgress)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        color &amp;= 0xFFFFFF;</b>
+&nbsp;
+<b class="nc">&nbsp;        summary = summary == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : summary.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        reason = reason == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : reason.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        evidence = evidence == null</b>
+<b class="nc">&nbsp;                ? List.of()</b>
+<b class="nc">&nbsp;                : List.copyOf(evidence);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String modifierId() {
+<b class="nc">&nbsp;        return modifier.id();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String modifierDisplayName() {
+<b class="nc">&nbsp;        return modifier.displayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasModifier() {
+<b class="nc">&nbsp;        return modifier != RecognitionIdentityHistoryModifier.NONE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean anyReturnedAxis() {
+<b class="nc">&nbsp;        return moralReturned || temperamentReturned;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean anyContestedAxis() {
+<b class="nc">&nbsp;        return moralContested || temperamentContested;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String clean(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : value.trim();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

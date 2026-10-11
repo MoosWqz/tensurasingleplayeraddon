@@ -1,0 +1,2223 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionIdentityHistoryValidationHarness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionIdentityHistoryValidationHarness (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionIdentityHistoryValidationHarness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/218)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/646)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryValidationHarness$Check</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryValidationHarness$Report</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/226)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/657)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * Deterministic, manually invoked validation for versioned identity history and event integration.
+&nbsp; *
+&nbsp; * &lt;p&gt;Every scenario uses temporary {@link RecognitionData}. No player, world,
+&nbsp; * attachment, advancement or committed recognition is modified.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionIdentityHistoryValidationHarness {
+&nbsp;
+&nbsp;    private static final double EPSILON = 1.0E-6D;
+&nbsp;
+&nbsp;    private RecognitionIdentityHistoryValidationHarness() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Report run() {
+<b class="nc">&nbsp;        List&lt;Check&gt; checks = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; warnings = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        validateFreshMigration(checks);</b>
+<b class="nc">&nbsp;        validateUnversionedRepair(checks);</b>
+<b class="nc">&nbsp;        validateV1Migration(checks);</b>
+<b class="nc">&nbsp;        validateFuturePreservation(checks);</b>
+<b class="nc">&nbsp;        validateLazyMoralDecay(checks);</b>
+<b class="nc">&nbsp;        validateIncrementalDecayAnchors(checks);</b>
+<b class="nc">&nbsp;        validateAxisIsolation(checks);</b>
+<b class="nc">&nbsp;        validateCapsAndPeaks(checks);</b>
+<b class="nc">&nbsp;        validateExplicitReversalCounters(checks);</b>
+<b class="nc">&nbsp;        validateEventIntegration(checks);</b>
+<b class="nc">&nbsp;        validateAuthorityCounterIntegration(checks);</b>
+<b class="nc">&nbsp;        validateAutomaticReversalDetection(checks);</b>
+<b class="nc">&nbsp;        validateModifierResolution(checks);</b>
+<b class="nc">&nbsp;        validateModifierPersistence(checks);</b>
+<b class="nc">&nbsp;        validateModifierIdentifiers(checks);</b>
+<b class="nc">&nbsp;        validateCommittedFieldsUnchanged(checks);</b>
+<b class="nc">&nbsp;        validateRecognitionEvaluationUnchanged(checks, warnings);</b>
+<b class="nc">&nbsp;        validateIncarnationReset(checks);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean passed = checks.stream().allMatch(Check::passed);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new Report(</b>
+&nbsp;                passed,
+&nbsp;                RecognitionIdentityHistoryService.CURRENT_HISTORY_VERSION,
+&nbsp;                checks,
+&nbsp;                warnings
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateFreshMigration(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot before =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.MigrationResult result =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot after =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Fresh data begins uninitialized&quot;,
+<b class="nc">&nbsp;                before.migrationState()</b>
+&nbsp;                        == RecognitionIdentityHistoryService.MigrationState.UNINITIALIZED,
+<b class="nc">&nbsp;                before.migrationState().displayName()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Fresh data initializes the current native history version&quot;,
+&nbsp;                result == RecognitionIdentityHistoryService.MigrationResult.INITIALIZED_NATIVE
+<b class="nc">&nbsp;                        &amp;&amp; after.storedVersion()</b>
+&nbsp;                        == RecognitionIdentityHistoryService.CURRENT_HISTORY_VERSION
+<b class="nc">&nbsp;                        &amp;&amp; after.migrationState()</b>
+&nbsp;                        == RecognitionIdentityHistoryService.MigrationState.CURRENT,
+&nbsp;                &quot;result=&quot; + result
+<b class="nc">&nbsp;                        + &quot;, version=&quot; + after.storedVersion()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Fresh initialization records the native history source&quot;,
+&nbsp;                RecognitionIdentityHistoryService.MIGRATION_SOURCE_NATIVE
+<b class="nc">&nbsp;                        .equals(after.migrationSource()),</b>
+<b class="nc">&nbsp;                after.migrationSource()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Fresh initialization installs semantic none modifier&quot;,
+<b class="nc">&nbsp;                RecognitionIdentityHistoryModifier.NONE.id()</b>
+<b class="nc">&nbsp;                        .equals(after.rawModifierId()),</b>
+<b class="nc">&nbsp;                after.rawModifierId()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.MigrationResult second =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;History migration is idempotent&quot;,
+&nbsp;                second == RecognitionIdentityHistoryService.MigrationResult.ALREADY_CURRENT,
+<b class="nc">&nbsp;                second.name()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateUnversionedRepair(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.GOOD_MOMENTUM,
+&nbsp;                31.0D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_GOOD_COMMITMENT,
+&nbsp;                12.0D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot before =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.MigrationResult result =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot after =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Unversioned payload is detected without mutation&quot;,
+<b class="nc">&nbsp;                before.migrationState()</b>
+&nbsp;                        == RecognitionIdentityHistoryService.MigrationState.UNVERSIONED_PAYLOAD,
+<b class="nc">&nbsp;                before.migrationState().displayName()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Unversioned migration preserves momentum and repairs peak&quot;,
+&nbsp;                result == RecognitionIdentityHistoryService.MigrationResult.MIGRATED_FROM_UNVERSIONED
+<b class="nc">&nbsp;                        &amp;&amp; approximately(after.goodMomentum(), 31.0D)</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(after.highestGoodCommitment(), 31.0D),</b>
+<b class="nc">&nbsp;                &quot;momentum=&quot; + after.goodMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, peak=&quot; + after.highestGoodCommitment()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateV1Migration(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_VERSION,
+&nbsp;                1
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.GOOD_MOMENTUM,
+&nbsp;                24.0D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_GOOD_COMMITMENT,
+&nbsp;                24.0D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.LAST_GOOD_DEED_GAME_TIME,
+&nbsp;                &quot;12000&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot before =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.MigrationResult result =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot after =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;History version 1 is identified as a legacy namespace&quot;,
+<b class="nc">&nbsp;                before.migrationState()</b>
+&nbsp;                        == RecognitionIdentityHistoryService.MigrationState.LEGACY_VERSION,
+<b class="nc">&nbsp;                before.migrationState().displayName()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Version 1 migrates to version 2 without losing momentum&quot;,
+&nbsp;                result == RecognitionIdentityHistoryService.MigrationResult.MIGRATED_FROM_V1
+<b class="nc">&nbsp;                        &amp;&amp; after.storedVersion()</b>
+&nbsp;                        == RecognitionIdentityHistoryService.CURRENT_HISTORY_VERSION
+<b class="nc">&nbsp;                        &amp;&amp; approximately(after.goodMomentum(), 24.0D)</b>
+&nbsp;                        &amp;&amp; RecognitionIdentityHistoryService.MIGRATION_SOURCE_V1
+<b class="nc">&nbsp;                        .equals(after.migrationSource()),</b>
+&nbsp;                &quot;result=&quot; + result
+<b class="nc">&nbsp;                        + &quot;, version=&quot; + after.storedVersion()</b>
+<b class="nc">&nbsp;                        + &quot;, momentum=&quot; + after.goodMomentum()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Version 1 migration seeds the incremental decay anchor&quot;,
+<b class="nc">&nbsp;                &quot;12000&quot;.equals(</b>
+<b class="nc">&nbsp;                        data.getString(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .GOOD_DECAY_ANCHOR_GAME_TIME
+&nbsp;                        )
+&nbsp;                )
+&nbsp;                        &amp;&amp; RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="nc">&nbsp;                        .id()</b>
+<b class="nc">&nbsp;                        .equals(</b>
+<b class="nc">&nbsp;                                data.getString(</b>
+&nbsp;                                        RecognitionStatKeys
+&nbsp;                                                .MORAL_ESTABLISHED_DIRECTION
+&nbsp;                                )
+&nbsp;                        ),
+&nbsp;                &quot;anchor=&quot;
+<b class="nc">&nbsp;                        + data.getString(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .GOOD_DECAY_ANCHOR_GAME_TIME
+&nbsp;                )
+&nbsp;                        + &quot;, direction=&quot;
+<b class="nc">&nbsp;                        + data.getString(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .MORAL_ESTABLISHED_DIRECTION
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateFuturePreservation(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_VERSION,
+&nbsp;                RecognitionIdentityHistoryService.CURRENT_HISTORY_VERSION + 5
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.GOOD_MOMENTUM,
+&nbsp;                44.0D
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER,
+&nbsp;                &quot;future_semantic_modifier&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.MigrationResult migration =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.MutationResult mutation =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionIdentityHistoryService.MoralDirection.GOOD,
+&nbsp;                        10.0D,
+&nbsp;                        50_000L
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Future history versions are preserved and write-blocked&quot;,
+&nbsp;                migration == RecognitionIdentityHistoryService.MigrationResult.FUTURE_VERSION_PRESERVED
+<b class="nc">&nbsp;                        &amp;&amp; !mutation.applied()</b>
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.futureVersion()</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(snapshot.goodMomentum(), 44.0D)</b>
+<b class="nc">&nbsp;                        &amp;&amp; &quot;future_semantic_modifier&quot;.equals(snapshot.rawModifierId()),</b>
+&nbsp;                &quot;migration=&quot; + migration
+<b class="nc">&nbsp;                        + &quot;, mutationApplied=&quot; + mutation.applied()</b>
+<b class="nc">&nbsp;                        + &quot;, modifier=&quot; + snapshot.rawModifierId()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateLazyMoralDecay(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        long firstTime = 10_000L;</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryService.MoralDirection.GOOD,
+&nbsp;                20.0D,
+&nbsp;                firstTime
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        long secondTime = firstTime</b>
+&nbsp;                + RecognitionIdentityHistoryService.DECAY_GRACE_TICKS
+&nbsp;                + RecognitionIdentityHistoryService.DECAY_INTERVAL_TICKS * 2L;
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.MutationResult result =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionIdentityHistoryService.MoralDirection.GOOD,
+&nbsp;                        5.0D,
+&nbsp;                        secondTime
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        double expected = 20.0D</b>
+&nbsp;                - RecognitionIdentityHistoryService.DECAY_PER_INTERVAL * 2.0D
+&nbsp;                + 5.0D;
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Moral momentum decays lazily when the next moral deed arrives&quot;,
+<b class="nc">&nbsp;                result.applied()</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(snapshot.goodMomentum(), expected)</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        result.totalDecayApplied(),</b>
+&nbsp;                        RecognitionIdentityHistoryService.DECAY_PER_INTERVAL * 2.0D
+&nbsp;                ),
+&nbsp;                &quot;expected=&quot; + expected
+<b class="nc">&nbsp;                        + &quot;, actual=&quot; + snapshot.goodMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, decay=&quot; + result.totalDecayApplied()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Historical Good peak survives later decay&quot;,
+<b class="nc">&nbsp;                approximately(snapshot.highestGoodCommitment(), 20.0D),</b>
+<b class="nc">&nbsp;                Double.toString(snapshot.highestGoodCommitment())</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateIncrementalDecayAnchors(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        long firstTime = 1_000L;</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryService.MoralDirection.GOOD,
+&nbsp;                20.0D,
+&nbsp;                firstTime
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        long firstOpposingTime = firstTime</b>
+&nbsp;                + RecognitionIdentityHistoryService.DECAY_GRACE_TICKS
+&nbsp;                + RecognitionIdentityHistoryService.DECAY_INTERVAL_TICKS;
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryService.MoralDirection.EVIL,
+&nbsp;                3.0D,
+&nbsp;                firstOpposingTime
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot afterFirst =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        long secondOpposingTime =</b>
+&nbsp;                firstOpposingTime + 1_000L;
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryService.MoralDirection.EVIL,
+&nbsp;                3.0D,
+&nbsp;                secondOpposingTime
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot afterSecond =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        double expectedAfterFirst =</b>
+&nbsp;                20.0D
+&nbsp;                        - RecognitionIdentityHistoryService
+&nbsp;                        .DECAY_PER_INTERVAL;
+&nbsp;
+<b class="nc">&nbsp;        double incrementalSecondDecay =</b>
+&nbsp;                1_000.0D
+&nbsp;                        / RecognitionIdentityHistoryService
+&nbsp;                        .DECAY_INTERVAL_TICKS
+&nbsp;                        * RecognitionIdentityHistoryService
+&nbsp;                        .DECAY_PER_INTERVAL;
+&nbsp;
+<b class="nc">&nbsp;        double expectedAfterSecond =</b>
+&nbsp;                expectedAfterFirst
+&nbsp;                        - incrementalSecondDecay;
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;The first lazy evaluation applies the elapsed decay once&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        afterFirst.goodMomentum(),</b>
+&nbsp;                        expectedAfterFirst
+&nbsp;                ),
+&nbsp;                &quot;expected=&quot; + expectedAfterFirst
+<b class="nc">&nbsp;                        + &quot;, actual=&quot; + afterFirst.goodMomentum()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Incremental anchors prevent repeated subtraction of old elapsed time&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        afterSecond.goodMomentum(),</b>
+&nbsp;                        expectedAfterSecond
+&nbsp;                ),
+&nbsp;                &quot;expected=&quot; + expectedAfterSecond
+<b class="nc">&nbsp;                        + &quot;, actual=&quot; + afterSecond.goodMomentum()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateAxisIsolation(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.recordTemperamentDeed(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryService.TemperamentDirection.ORDER,
+&nbsp;                20.0D,
+&nbsp;                1_000L
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        long muchLater = 1_000L</b>
+&nbsp;                + RecognitionIdentityHistoryService.DECAY_GRACE_TICKS
+&nbsp;                + RecognitionIdentityHistoryService.DECAY_INTERVAL_TICKS * 3L;
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryService.MoralDirection.EVIL,
+&nbsp;                8.0D,
+&nbsp;                muchLater
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot afterMoral =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.recordTemperamentDeed(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryService.TemperamentDirection.FREEDOM,
+&nbsp;                4.0D,
+&nbsp;                muchLater
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot afterTemperament =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Moral deeds do not decay the temperament axis&quot;,
+<b class="nc">&nbsp;                approximately(afterMoral.orderMomentum(), 20.0D),</b>
+<b class="nc">&nbsp;                Double.toString(afterMoral.orderMomentum())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Temperament deeds lazily decay both Order and Freedom sides&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        afterTemperament.orderMomentum(),</b>
+&nbsp;                        20.0D
+&nbsp;                                - RecognitionIdentityHistoryService.DECAY_PER_INTERVAL * 3.0D
+&nbsp;                )
+<b class="nc">&nbsp;                        &amp;&amp; approximately(afterTemperament.freedomMomentum(), 4.0D),</b>
+<b class="nc">&nbsp;                &quot;order=&quot; + afterTemperament.orderMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, freedom=&quot; + afterTemperament.freedomMomentum()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateCapsAndPeaks(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; 10; index++) {</b>
+<b class="nc">&nbsp;            RecognitionIdentityHistoryService.recordTemperamentDeed(</b>
+&nbsp;                    data,
+&nbsp;                    RecognitionIdentityHistoryService.TemperamentDirection.FREEDOM,
+&nbsp;                    500.0D,
+&nbsp;                    10_000L
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Deed weights and momentum are capped safely&quot;,
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        snapshot.freedomMomentum(),</b>
+&nbsp;                        RecognitionIdentityHistoryService.MAXIMUM_MOMENTUM
+&nbsp;                )
+<b class="nc">&nbsp;                        &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        snapshot.highestFreedomCommitment(),</b>
+&nbsp;                        RecognitionIdentityHistoryService.MAXIMUM_MOMENTUM
+&nbsp;                ),
+<b class="nc">&nbsp;                &quot;momentum=&quot; + snapshot.freedomMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, peak=&quot; + snapshot.highestFreedomCommitment()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateExplicitReversalCounters(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        int moralOne = RecognitionIdentityHistoryService</b>
+<b class="nc">&nbsp;                .registerMoralReversal(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        int moralTwo = RecognitionIdentityHistoryService</b>
+<b class="nc">&nbsp;                .registerMoralReversal(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        int temperament = RecognitionIdentityHistoryService</b>
+<b class="nc">&nbsp;                .registerTemperamentReversal(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Reversal counters persist independently&quot;,
+&nbsp;                moralOne == 1
+&nbsp;                        &amp;&amp; moralTwo == 2
+&nbsp;                        &amp;&amp; temperament == 1
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.moralReversalCount() == 2</b>
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.temperamentReversalCount() == 1,</b>
+<b class="nc">&nbsp;                &quot;moral=&quot; + snapshot.moralReversalCount()</b>
+<b class="nc">&nbsp;                        + &quot;, temperament=&quot; + snapshot.temperamentReversalCount()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateEventIntegration(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.EventResult good =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionIdentityHistoryIntegration
+&nbsp;                                .TrackedDeed
+&nbsp;                                .VILLAGER_CURED,
+&nbsp;                        10_000L
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.EventResult evil =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionIdentityHistoryIntegration
+&nbsp;                                .TrackedDeed
+&nbsp;                                .PASSIVE_BABY_KILLED,
+&nbsp;                        10_000L
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.EventResult order =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                        data,
+&nbsp;                        RecognitionIdentityHistoryIntegration
+&nbsp;                                .TrackedDeed
+&nbsp;                                .SUBORDINATE_ASSISTED_MAJOR_VICTORY,
+&nbsp;                        10_000L
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.EventResult freedom =</b>
+&nbsp;                RecognitionIdentityHistoryIntegration
+<b class="nc">&nbsp;                        .recordIndependenceMilestone(</b>
+&nbsp;                                data,
+&nbsp;                                5.0D,
+&nbsp;                                10_000L
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Tracked deeds apply their semantic axis weights&quot;,
+<b class="nc">&nbsp;                good.applied()</b>
+<b class="nc">&nbsp;                        &amp;&amp; evil.applied()</b>
+<b class="nc">&nbsp;                        &amp;&amp; order.applied()</b>
+<b class="nc">&nbsp;                        &amp;&amp; freedom.applied()</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(snapshot.goodMomentum(), 6.0D)</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(snapshot.evilMomentum(), 2.0D)</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(snapshot.orderMomentum(), 6.0D)</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(snapshot.freedomMomentum(), 5.0D),</b>
+<b class="nc">&nbsp;                &quot;good=&quot; + snapshot.goodMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, evil=&quot; + snapshot.evilMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, order=&quot; + snapshot.orderMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, freedom=&quot; + snapshot.freedomMomentum()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData scaled = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.EventResult raids =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.recordOccurrences(</b>
+&nbsp;                        scaled,
+&nbsp;                        RecognitionIdentityHistoryIntegration
+&nbsp;                                .TrackedDeed
+&nbsp;                                .RAID_VICTORY,
+&nbsp;                        4,
+&nbsp;                        20_000L
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot scaledSnapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(scaled);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Batched event deltas use the service deed-weight safety cap&quot;,
+<b class="nc">&nbsp;                raids.applied()</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        raids.appliedWeight(),</b>
+&nbsp;                        RecognitionIdentityHistoryService
+&nbsp;                                .MAXIMUM_DEED_WEIGHT
+&nbsp;                )
+<b class="nc">&nbsp;                        &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        scaledSnapshot.goodMomentum(),</b>
+&nbsp;                        RecognitionIdentityHistoryService
+&nbsp;                                .MAXIMUM_DEED_WEIGHT
+&nbsp;                ),
+<b class="nc">&nbsp;                &quot;appliedWeight=&quot; + raids.appliedWeight()</b>
+<b class="nc">&nbsp;                        + &quot;, momentum=&quot; + scaledSnapshot.goodMomentum()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Event integration does not resolve a live modifier&quot;,
+<b class="nc">&nbsp;                RecognitionIdentityHistoryModifier.NONE.id()</b>
+<b class="nc">&nbsp;                        .equals(snapshot.rawModifierId())</b>
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.moralReversalCount() == 0</b>
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.temperamentReversalCount() == 0,</b>
+<b class="nc">&nbsp;                &quot;modifier=&quot; + snapshot.rawModifierId()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateAuthorityCounterIntegration(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .UNIQUE_SUBORDINATES_EMPOWERED,
+&nbsp;                &quot;legacy-subordinate&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.MASS_GRANTS_PERFORMED,
+&nbsp;                2
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.GLOBAL_TAKE_BACKS_PERFORMED,
+&nbsp;                1
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.SKILLS_SEIZED,
+&nbsp;                3
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.AuthoritySyncResult baseline =</b>
+&nbsp;                RecognitionIdentityHistoryIntegration
+<b class="nc">&nbsp;                        .synchronizeAuthorityCounters(</b>
+&nbsp;                                data,
+&nbsp;                                10_000L
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot afterBaseline =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Existing authority totals initialize baselines without retroactive chronology&quot;,
+<b class="nc">&nbsp;                !baseline.changed()</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(afterBaseline.orderMomentum(), 0.0D)</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(afterBaseline.evilMomentum(), 0.0D),</b>
+<b class="nc">&nbsp;                &quot;order=&quot; + afterBaseline.orderMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, evil=&quot; + afterBaseline.evilMomentum()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .UNIQUE_SUBORDINATES_EMPOWERED,
+&nbsp;                &quot;new-subordinate&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.MASS_GRANTS_PERFORMED,
+&nbsp;                3
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.GLOBAL_TAKE_BACKS_PERFORMED,
+&nbsp;                3
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.SKILLS_SEIZED,
+&nbsp;                4
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.AuthoritySyncResult delta =</b>
+&nbsp;                RecognitionIdentityHistoryIntegration
+<b class="nc">&nbsp;                        .synchronizeAuthorityCounters(</b>
+&nbsp;                                data,
+&nbsp;                                10_000L
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot afterDelta =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        double expectedOrder = 4.0D</b>
+&nbsp;                + 6.0D
+&nbsp;                + 10.0D;
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;New authority counter deltas are consumed once into history&quot;,
+<b class="nc">&nbsp;                delta.changed()</b>
+<b class="nc">&nbsp;                        &amp;&amp; delta.empoweredSubordinateDelta() == 1</b>
+<b class="nc">&nbsp;                        &amp;&amp; delta.massGrantDelta() == 1</b>
+<b class="nc">&nbsp;                        &amp;&amp; delta.globalTakeBackDelta() == 2</b>
+<b class="nc">&nbsp;                        &amp;&amp; delta.skillSeizedDelta() == 1</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        afterDelta.orderMomentum(),</b>
+&nbsp;                        expectedOrder
+&nbsp;                )
+<b class="nc">&nbsp;                        &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        afterDelta.evilMomentum(),</b>
+&nbsp;                        8.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                &quot;order=&quot; + afterDelta.orderMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, evil=&quot; + afterDelta.evilMomentum()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.AuthoritySyncResult repeated =</b>
+&nbsp;                RecognitionIdentityHistoryIntegration
+<b class="nc">&nbsp;                        .synchronizeAuthorityCounters(</b>
+&nbsp;                                data,
+&nbsp;                                10_000L
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot afterRepeated =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Unchanged authority counters cannot be consumed twice&quot;,
+<b class="nc">&nbsp;                !repeated.changed()</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        afterRepeated.orderMomentum(),</b>
+&nbsp;                        expectedOrder
+&nbsp;                )
+<b class="nc">&nbsp;                        &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        afterRepeated.evilMomentum(),</b>
+&nbsp;                        8.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                &quot;order=&quot; + afterRepeated.orderMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, evil=&quot; + afterRepeated.evilMomentum()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateAutomaticReversalDetection(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData moral = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; 4; index++) {</b>
+<b class="nc">&nbsp;            RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                    moral,
+&nbsp;                    RecognitionIdentityHistoryIntegration
+&nbsp;                            .TrackedDeed
+&nbsp;                            .VILLAGER_CURED,
+&nbsp;                    10_000L
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot goodEstablished =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(moral);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Initial moral establishment does not count as a reversal&quot;,
+<b class="nc">&nbsp;                goodEstablished.moralReversalCount() == 0</b>
+&nbsp;                        &amp;&amp; RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="nc">&nbsp;                        .id()</b>
+<b class="nc">&nbsp;                        .equals(</b>
+<b class="nc">&nbsp;                                moral.getString(</b>
+&nbsp;                                        RecognitionStatKeys
+&nbsp;                                                .MORAL_ESTABLISHED_DIRECTION
+&nbsp;                                )
+&nbsp;                        ),
+&nbsp;                &quot;direction=&quot;
+<b class="nc">&nbsp;                        + moral.getString(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .MORAL_ESTABLISHED_DIRECTION
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.EventResult evilReversal =</b>
+&nbsp;                RecognitionIdentityHistoryIntegration.EventResult
+<b class="nc">&nbsp;                        .rejected(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; 3; index++) {</b>
+<b class="nc">&nbsp;            evilReversal =</b>
+<b class="nc">&nbsp;                    RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                            moral,
+&nbsp;                            RecognitionIdentityHistoryIntegration
+&nbsp;                                    .TrackedDeed
+&nbsp;                                    .OWNED_SUBORDINATE_KILLED,
+&nbsp;                            10_000L
+&nbsp;                    );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot evilEstablished =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(moral);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Replacing established Good with established Evil registers one reversal&quot;,
+<b class="nc">&nbsp;                evilReversal.reversalRegistered()</b>
+<b class="nc">&nbsp;                        &amp;&amp; evilEstablished.moralReversalCount() == 1</b>
+&nbsp;                        &amp;&amp; RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="nc">&nbsp;                        .id()</b>
+<b class="nc">&nbsp;                        .equals(</b>
+<b class="nc">&nbsp;                                moral.getString(</b>
+&nbsp;                                        RecognitionStatKeys
+&nbsp;                                                .MORAL_ESTABLISHED_DIRECTION
+&nbsp;                                )
+&nbsp;                        ),
+<b class="nc">&nbsp;                &quot;reversals=&quot; + evilEstablished.moralReversalCount()</b>
+&nbsp;                        + &quot;, direction=&quot;
+<b class="nc">&nbsp;                        + moral.getString(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .MORAL_ESTABLISHED_DIRECTION
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.EventResult repeatedEvil =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                        moral,
+&nbsp;                        RecognitionIdentityHistoryIntegration
+&nbsp;                                .TrackedDeed
+&nbsp;                                .OWNED_SUBORDINATE_KILLED,
+&nbsp;                        10_000L
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Continuing in the same established direction does not farm reversals&quot;,
+<b class="nc">&nbsp;                !repeatedEvil.reversalRegistered()</b>
+&nbsp;                        &amp;&amp; RecognitionIdentityHistoryService
+<b class="nc">&nbsp;                        .inspect(moral)</b>
+<b class="nc">&nbsp;                        .moralReversalCount() == 1,</b>
+&nbsp;                &quot;reversals=&quot;
+&nbsp;                        + RecognitionIdentityHistoryService
+<b class="nc">&nbsp;                        .inspect(moral)</b>
+<b class="nc">&nbsp;                        .moralReversalCount()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.EventResult redemption =</b>
+&nbsp;                RecognitionIdentityHistoryIntegration.EventResult
+<b class="nc">&nbsp;                        .rejected(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; 5; index++) {</b>
+<b class="nc">&nbsp;            redemption =</b>
+<b class="nc">&nbsp;                    RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                            moral,
+&nbsp;                            RecognitionIdentityHistoryIntegration
+&nbsp;                                    .TrackedDeed
+&nbsp;                                    .RAID_VICTORY,
+&nbsp;                            10_000L
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (redemption.reversalRegistered()) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;A later clear return to Good registers the next moral reversal&quot;,
+<b class="nc">&nbsp;                redemption.reversalRegistered()</b>
+&nbsp;                        &amp;&amp; RecognitionIdentityHistoryService
+<b class="nc">&nbsp;                        .inspect(moral)</b>
+<b class="nc">&nbsp;                        .moralReversalCount() == 2</b>
+&nbsp;                        &amp;&amp; RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="nc">&nbsp;                        .id()</b>
+<b class="nc">&nbsp;                        .equals(</b>
+<b class="nc">&nbsp;                                moral.getString(</b>
+&nbsp;                                        RecognitionStatKeys
+&nbsp;                                                .MORAL_ESTABLISHED_DIRECTION
+&nbsp;                                )
+&nbsp;                        ),
+&nbsp;                &quot;reversals=&quot;
+&nbsp;                        + RecognitionIdentityHistoryService
+<b class="nc">&nbsp;                        .inspect(moral)</b>
+<b class="nc">&nbsp;                        .moralReversalCount()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData temperament = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; 4; index++) {</b>
+<b class="nc">&nbsp;            RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                    temperament,
+&nbsp;                    RecognitionIdentityHistoryIntegration
+&nbsp;                            .TrackedDeed
+&nbsp;                            .SUBORDINATE_ASSISTED_MAJOR_VICTORY,
+&nbsp;                    10_000L
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.EventResult defiance =</b>
+&nbsp;                RecognitionIdentityHistoryIntegration.EventResult
+<b class="nc">&nbsp;                        .rejected(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; 5; index++) {</b>
+<b class="nc">&nbsp;            defiance =</b>
+<b class="nc">&nbsp;                    RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                            temperament,
+&nbsp;                            RecognitionIdentityHistoryIntegration
+&nbsp;                                    .TrackedDeed
+&nbsp;                                    .SOLO_MAJOR_VICTORY,
+&nbsp;                            10_000L
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (defiance.reversalRegistered()) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot temperamentSnapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(</b>
+&nbsp;                        temperament
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Order-to-Freedom reversal detection is independent from morality&quot;,
+<b class="nc">&nbsp;                defiance.reversalRegistered()</b>
+&nbsp;                        &amp;&amp; temperamentSnapshot
+<b class="nc">&nbsp;                        .temperamentReversalCount() == 1</b>
+<b class="nc">&nbsp;                        &amp;&amp; temperamentSnapshot.moralReversalCount() == 0</b>
+&nbsp;                        &amp;&amp; RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="nc">&nbsp;                        .id()</b>
+<b class="nc">&nbsp;                        .equals(</b>
+<b class="nc">&nbsp;                                temperament.getString(</b>
+&nbsp;                                        RecognitionStatKeys
+&nbsp;                                                .TEMPERAMENT_ESTABLISHED_DIRECTION
+&nbsp;                                )
+&nbsp;                        ),
+<b class="nc">&nbsp;                &quot;moral=&quot; + temperamentSnapshot.moralReversalCount()</b>
+&nbsp;                        + &quot;, temperament=&quot;
+&nbsp;                        + temperamentSnapshot
+<b class="nc">&nbsp;                        .temperamentReversalCount()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateModifierResolution(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData uncommitted = new RecognitionData();</b>
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.ensureCurrent(uncommitted);</b>
+&nbsp;
+<b class="nc">&nbsp;        setMoralHistory(</b>
+&nbsp;                uncommitted,
+&nbsp;                0.0D,
+&nbsp;                32.0D,
+&nbsp;                30.0D,
+&nbsp;                32.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolution uncommittedResolution =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryResolver.resolve(</b>
+&nbsp;                        uncommitted
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;History modifiers require a frozen committed identity&quot;,
+<b class="nc">&nbsp;                !uncommittedResolution.committedIdentityAvailable()</b>
+<b class="nc">&nbsp;                        &amp;&amp; uncommittedResolution.modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.NONE,
+<b class="nc">&nbsp;                uncommittedResolution.reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData isolatedDeed = committedData(</b>
+&nbsp;                RecognitionPath.LAWFUL_GOOD,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                isolatedDeed,
+&nbsp;                RecognitionIdentityHistoryIntegration
+&nbsp;                        .TrackedDeed
+&nbsp;                        .OWNED_SUBORDINATE_KILLED,
+&nbsp;                1_000L
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolution isolatedResolution =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryResolver.resolve(</b>
+&nbsp;                        isolatedDeed
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;One isolated deed cannot create a history modifier&quot;,
+<b class="nc">&nbsp;                isolatedResolution.modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.NONE,
+<b class="nc">&nbsp;                isolatedResolution.reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData fallen = committedData(</b>
+&nbsp;                RecognitionPath.LAWFUL_GOOD,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setMoralHistory(</b>
+&nbsp;                fallen,
+&nbsp;                4.0D,
+&nbsp;                34.0D,
+&nbsp;                36.0D,
+&nbsp;                34.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Good recognition can resolve to Fallen&quot;,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(fallen)</b>
+<b class="nc">&nbsp;                        .modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.FALLEN,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(fallen)</b>
+<b class="nc">&nbsp;                        .reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData redeemed = committedData(</b>
+&nbsp;                RecognitionPath.LAWFUL_EVIL,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setMoralHistory(</b>
+&nbsp;                redeemed,
+&nbsp;                35.0D,
+&nbsp;                3.0D,
+&nbsp;                35.0D,
+&nbsp;                38.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Evil recognition can resolve to Redeemed&quot;,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(redeemed)</b>
+<b class="nc">&nbsp;                        .modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.REDEEMED,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(redeemed)</b>
+<b class="nc">&nbsp;                        .reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData oathbreaker = committedData(</b>
+&nbsp;                RecognitionPath.LAWFUL_NEUTRAL,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setTemperamentHistory(</b>
+&nbsp;                oathbreaker,
+&nbsp;                3.0D,
+&nbsp;                35.0D,
+&nbsp;                37.0D,
+&nbsp;                35.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Lawful recognition can resolve to Oathbreaker&quot;,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(oathbreaker)</b>
+<b class="nc">&nbsp;                        .modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.OATHBREAKER,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(oathbreaker)</b>
+<b class="nc">&nbsp;                        .reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData crowned = committedData(</b>
+&nbsp;                RecognitionPath.CHAOTIC_NEUTRAL,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setTemperamentHistory(</b>
+&nbsp;                crowned,
+&nbsp;                36.0D,
+&nbsp;                4.0D,
+&nbsp;                36.0D,
+&nbsp;                40.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .ORDER
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Chaotic recognition can resolve to Crowned or Bound&quot;,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(crowned)</b>
+<b class="nc">&nbsp;                        .modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier
+&nbsp;                        .CROWNED_OR_BOUND,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(crowned)</b>
+<b class="nc">&nbsp;                        .reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData defiant = committedData(</b>
+&nbsp;                RecognitionPath.NEUTRAL_GOOD,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setTemperamentHistory(</b>
+&nbsp;                defiant,
+&nbsp;                3.0D,
+&nbsp;                34.0D,
+&nbsp;                32.0D,
+&nbsp;                34.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Neutral temperament can resolve to Defiant after real Order history&quot;,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(defiant)</b>
+<b class="nc">&nbsp;                        .modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.DEFIANT,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(defiant)</b>
+<b class="nc">&nbsp;                        .reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData neutralBound = committedData(</b>
+&nbsp;                RecognitionPath.NEUTRAL_EVIL,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setTemperamentHistory(</b>
+&nbsp;                neutralBound,
+&nbsp;                34.0D,
+&nbsp;                3.0D,
+&nbsp;                34.0D,
+&nbsp;                32.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .ORDER
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Neutral temperament can resolve to Crowned or Bound after Freedom history&quot;,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(neutralBound)</b>
+<b class="nc">&nbsp;                        .modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier
+&nbsp;                        .CROWNED_OR_BOUND,
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolve(neutralBound)</b>
+<b class="nc">&nbsp;                        .reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData fractured = committedData(</b>
+&nbsp;                RecognitionPath.LAWFUL_GOOD,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setMoralHistory(</b>
+&nbsp;                fractured,
+&nbsp;                2.0D,
+&nbsp;                36.0D,
+&nbsp;                38.0D,
+&nbsp;                36.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setTemperamentHistory(</b>
+&nbsp;                fractured,
+&nbsp;                2.0D,
+&nbsp;                35.0D,
+&nbsp;                37.0D,
+&nbsp;                35.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolution fracturedResolution =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryResolver.resolve(</b>
+&nbsp;                        fractured
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Two simultaneous identity contradictions resolve to Fractured&quot;,
+<b class="nc">&nbsp;                fracturedResolution.modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.FRACTURED
+<b class="nc">&nbsp;                        &amp;&amp; fracturedResolution.moralContradiction()</b>
+<b class="nc">&nbsp;                        &amp;&amp; fracturedResolution.temperamentContradiction(),</b>
+<b class="nc">&nbsp;                fracturedResolution.reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData contested = committedData(</b>
+&nbsp;                RecognitionPath.LAWFUL_GOOD,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setMoralHistory(</b>
+&nbsp;                contested,
+&nbsp;                24.0D,
+&nbsp;                22.0D,
+&nbsp;                35.0D,
+&nbsp;                34.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setTemperamentHistory(</b>
+&nbsp;                contested,
+&nbsp;                23.0D,
+&nbsp;                21.0D,
+&nbsp;                34.0D,
+&nbsp;                33.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolution contestedResolution =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryResolver.resolve(</b>
+&nbsp;                        contested
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Two unresolved contested axes resolve to Fractured&quot;,
+<b class="nc">&nbsp;                contestedResolution.modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.FRACTURED
+<b class="nc">&nbsp;                        &amp;&amp; contestedResolution.moralContested()</b>
+<b class="nc">&nbsp;                        &amp;&amp; contestedResolution.temperamentContested(),</b>
+<b class="nc">&nbsp;                contestedResolution.reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData reconciledMoral = committedData(</b>
+&nbsp;                RecognitionPath.NEUTRAL_GOOD,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setMoralHistory(</b>
+&nbsp;                reconciledMoral,
+&nbsp;                36.0D,
+&nbsp;                3.0D,
+&nbsp;                36.0D,
+&nbsp;                34.0D,
+&nbsp;                2,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolution reconciledMoralResolution =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryResolver.resolve(</b>
+&nbsp;                        reconciledMoral
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Returning to the original moral direction after two reversals resolves to Reconciled&quot;,
+<b class="nc">&nbsp;                reconciledMoralResolution.modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.RECONCILED
+<b class="nc">&nbsp;                        &amp;&amp; reconciledMoralResolution.moralReturned(),</b>
+<b class="nc">&nbsp;                reconciledMoralResolution.reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData reconciledTemperament = committedData(</b>
+&nbsp;                RecognitionPath.CHAOTIC_NEUTRAL,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setTemperamentHistory(</b>
+&nbsp;                reconciledTemperament,
+&nbsp;                3.0D,
+&nbsp;                36.0D,
+&nbsp;                34.0D,
+&nbsp;                36.0D,
+&nbsp;                2,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolution reconciledTemperamentResolution =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryResolver.resolve(</b>
+&nbsp;                        reconciledTemperament
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Returning to the original temperament after two reversals resolves to Reconciled&quot;,
+<b class="nc">&nbsp;                reconciledTemperamentResolution.modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.RECONCILED
+&nbsp;                        &amp;&amp; reconciledTemperamentResolution
+<b class="nc">&nbsp;                        .temperamentReturned(),</b>
+<b class="nc">&nbsp;                reconciledTemperamentResolution.reason()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData crossingOrigin = committedData(</b>
+&nbsp;                RecognitionPath.LAWFUL_NEUTRAL,
+&nbsp;                RecognitionPath.LAWFUL_GOOD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setMoralHistory(</b>
+&nbsp;                crossingOrigin,
+&nbsp;                2.0D,
+&nbsp;                34.0D,
+&nbsp;                35.0D,
+&nbsp;                34.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolution crossingResolution =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryResolver.resolve(</b>
+&nbsp;                        crossingOrigin
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;A directional secondary path supplies the frozen axis for a crossing&quot;,
+<b class="nc">&nbsp;                crossingResolution.modifier()</b>
+&nbsp;                        == RecognitionIdentityHistoryModifier.FALLEN
+&nbsp;                        &amp;&amp; RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="nc">&nbsp;                        .id()</b>
+<b class="nc">&nbsp;                        .equals(</b>
+&nbsp;                                crossingResolution
+<b class="nc">&nbsp;                                        .originalMoralDirection()</b>
+&nbsp;                        ),
+&nbsp;                &quot;original moral=&quot;
+&nbsp;                        + crossingResolution
+<b class="nc">&nbsp;                        .originalMoralDirection()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateModifierPersistence(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData fallen = committedData(</b>
+&nbsp;                RecognitionPath.LAWFUL_GOOD,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setMoralHistory(</b>
+&nbsp;                fallen,
+&nbsp;                2.0D,
+&nbsp;                35.0D,
+&nbsp;                36.0D,
+&nbsp;                35.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String primaryBefore = fallen.getString(</b>
+&nbsp;                RecognitionStatKeys.PRIMARY_PATH
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String titleBefore = fallen.getString(</b>
+&nbsp;                RecognitionStatKeys.BESTOWED_TITLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String frozenModifierBefore = fallen.getString(</b>
+&nbsp;                RecognitionStatKeys.CONTRADICTION_MODIFIER
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolver.StoreResult firstStore =</b>
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolveAndStoreAfterDeed(fallen);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolver.StoreResult secondStore =</b>
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolveAndStoreAfterDeed(fallen);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;A resolved known modifier is stored after a qualifying deed&quot;,
+<b class="nc">&nbsp;                firstStore.changed()</b>
+<b class="nc">&nbsp;                        &amp;&amp; RecognitionIdentityHistoryModifier.FALLEN.id()</b>
+<b class="nc">&nbsp;                        .equals(</b>
+<b class="nc">&nbsp;                                fallen.getString(</b>
+&nbsp;                                        RecognitionStatKeys
+&nbsp;                                                .IDENTITY_HISTORY_MODIFIER
+&nbsp;                                )
+&nbsp;                        ),
+<b class="nc">&nbsp;                firstStore.detail()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Storing the same resolved modifier is idempotent&quot;,
+<b class="nc">&nbsp;                !secondStore.changed()</b>
+<b class="nc">&nbsp;                        &amp;&amp; RecognitionIdentityHistoryModifier.FALLEN.id()</b>
+<b class="nc">&nbsp;                        .equals(secondStore.storedModifierId()),</b>
+<b class="nc">&nbsp;                secondStore.detail()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;History modifier storage never rewrites frozen recognition&quot;,
+<b class="nc">&nbsp;                primaryBefore.equals(</b>
+<b class="nc">&nbsp;                        fallen.getString(</b>
+&nbsp;                                RecognitionStatKeys.PRIMARY_PATH
+&nbsp;                        )
+&nbsp;                )
+<b class="nc">&nbsp;                        &amp;&amp; titleBefore.equals(</b>
+<b class="nc">&nbsp;                        fallen.getString(</b>
+&nbsp;                                RecognitionStatKeys.BESTOWED_TITLE
+&nbsp;                        )
+&nbsp;                )
+<b class="nc">&nbsp;                        &amp;&amp; frozenModifierBefore.equals(</b>
+<b class="nc">&nbsp;                        fallen.getString(</b>
+&nbsp;                                RecognitionStatKeys.CONTRADICTION_MODIFIER
+&nbsp;                        )
+&nbsp;                ),
+&nbsp;                &quot;committed identity preserved&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData unknown = committedData(</b>
+&nbsp;                RecognitionPath.LAWFUL_GOOD,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        setMoralHistory(</b>
+&nbsp;                unknown,
+&nbsp;                2.0D,
+&nbsp;                35.0D,
+&nbsp;                36.0D,
+&nbsp;                35.0D,
+&nbsp;                1,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="nc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        unknown.setString(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER,
+&nbsp;                &quot;future_modifier_id&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolver.StoreResult unknownStore =</b>
+&nbsp;                RecognitionIdentityHistoryResolver
+<b class="nc">&nbsp;                        .resolveAndStoreAfterDeed(unknown);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Automatic resolution preserves unknown future modifier IDs&quot;,
+<b class="nc">&nbsp;                unknownStore.unknownModifierPreserved()</b>
+<b class="nc">&nbsp;                        &amp;&amp; &quot;future_modifier_id&quot;.equals(</b>
+<b class="nc">&nbsp;                        unknown.getString(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .IDENTITY_HISTORY_MODIFIER
+&nbsp;                        )
+&nbsp;                ),
+<b class="nc">&nbsp;                unknownStore.detail()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData eventDriven = committedData(</b>
+&nbsp;                RecognitionPath.LAWFUL_GOOD,
+&nbsp;                null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; 4; index++) {</b>
+<b class="nc">&nbsp;            RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                    eventDriven,
+&nbsp;                    RecognitionIdentityHistoryIntegration
+&nbsp;                            .TrackedDeed
+&nbsp;                            .RAID_VICTORY,
+&nbsp;                    10_000L
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; 4; index++) {</b>
+<b class="nc">&nbsp;            RecognitionIdentityHistoryIntegration.record(</b>
+&nbsp;                    eventDriven,
+&nbsp;                    RecognitionIdentityHistoryIntegration
+&nbsp;                            .TrackedDeed
+&nbsp;                            .OWNED_SUBORDINATE_KILLED,
+&nbsp;                    10_000L
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Event integration resolves the modifier only after qualifying deeds&quot;,
+<b class="nc">&nbsp;                RecognitionIdentityHistoryModifier.FALLEN.id()</b>
+<b class="nc">&nbsp;                        .equals(</b>
+<b class="nc">&nbsp;                                eventDriven.getString(</b>
+&nbsp;                                        RecognitionStatKeys
+&nbsp;                                                .IDENTITY_HISTORY_MODIFIER
+&nbsp;                                )
+&nbsp;                        )
+<b class="nc">&nbsp;                        &amp;&amp; eventDriven.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.MORAL_REVERSAL_COUNT
+&nbsp;                ) == 1,
+&nbsp;                &quot;modifier=&quot;
+<b class="nc">&nbsp;                        + eventDriven.getString(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .IDENTITY_HISTORY_MODIFIER
+&nbsp;                )
+&nbsp;                        + &quot;, reversals=&quot;
+<b class="nc">&nbsp;                        + eventDriven.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.MORAL_REVERSAL_COUNT
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionData committedData(
+&nbsp;            RecognitionPath primary,
+&nbsp;            RecognitionPath secondary
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setFlag(</b>
+&nbsp;                RecognitionStatKeys.NAMING_COMMITTED,
+&nbsp;                true
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setFlag(</b>
+&nbsp;                RecognitionStatKeys.PURE_RECOGNITION,
+&nbsp;                secondary == null
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.PRIMARY_PATH,
+<b class="nc">&nbsp;                primary == null ? &quot;&quot; : primary.getId()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.SECONDARY_PATH,
+<b class="nc">&nbsp;                secondary == null ? &quot;&quot; : secondary.getId()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.BESTOWED_TITLE,
+&nbsp;                &quot;the Validation Bearer&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.CONTRADICTION_MODIFIER,
+<b class="nc">&nbsp;                RecognitionIdentityHistoryModifier.NONE.id()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return data;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void setMoralHistory(
+&nbsp;            RecognitionData data,
+&nbsp;            double goodMomentum,
+&nbsp;            double evilMomentum,
+&nbsp;            double highestGood,
+&nbsp;            double highestEvil,
+&nbsp;            int reversals,
+&nbsp;            String storedDirection
+&nbsp;    ) {
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.GOOD_MOMENTUM,
+&nbsp;                goodMomentum
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.EVIL_MOMENTUM,
+&nbsp;                evilMomentum
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_GOOD_COMMITMENT,
+&nbsp;                highestGood
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_EVIL_COMMITMENT,
+&nbsp;                highestEvil
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.MORAL_REVERSAL_COUNT,
+&nbsp;                reversals
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.MORAL_ESTABLISHED_DIRECTION,
+&nbsp;                storedDirection
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void setTemperamentHistory(
+&nbsp;            RecognitionData data,
+&nbsp;            double orderMomentum,
+&nbsp;            double freedomMomentum,
+&nbsp;            double highestOrder,
+&nbsp;            double highestFreedom,
+&nbsp;            int reversals,
+&nbsp;            String storedDirection
+&nbsp;    ) {
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.ORDER_MOMENTUM,
+&nbsp;                orderMomentum
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.FREEDOM_MOMENTUM,
+&nbsp;                freedomMomentum
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_ORDER_COMMITMENT,
+&nbsp;                highestOrder
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_FREEDOM_COMMITMENT,
+&nbsp;                highestFreedom
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.TEMPERAMENT_REVERSAL_COUNT,
+&nbsp;                reversals
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.TEMPERAMENT_ESTABLISHED_DIRECTION,
+&nbsp;                storedDirection
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateModifierIdentifiers(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        boolean allRoundTrip = true;</b>
+&nbsp;
+&nbsp;        for (RecognitionIdentityHistoryModifier modifier :
+<b class="nc">&nbsp;                RecognitionIdentityHistoryModifier.values()) {</b>
+<b class="nc">&nbsp;            allRoundTrip &amp;= RecognitionIdentityHistoryModifier</b>
+<b class="nc">&nbsp;                    .byId(modifier.id())</b>
+<b class="nc">&nbsp;                    .orElse(null) == modifier;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.IDENTITY_HISTORY_MODIFIER,
+&nbsp;                &quot;future_modifier_id&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.ensureCurrent(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Stable modifier IDs round-trip without enum ordinals&quot;,
+&nbsp;                allRoundTrip,
+&nbsp;                &quot;known modifiers=&quot;
+<b class="nc">&nbsp;                        + RecognitionIdentityHistoryModifier.values().length</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Unknown future modifier IDs are preserved&quot;,
+<b class="nc">&nbsp;                &quot;future_modifier_id&quot;.equals(snapshot.rawModifierId())</b>
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.knownModifier().isEmpty(),</b>
+<b class="nc">&nbsp;                snapshot.rawModifierId()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateCommittedFieldsUnchanged(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        data.setFlag(</b>
+&nbsp;                RecognitionStatKeys.NAMING_COMMITTED,
+&nbsp;                true
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setFlag(</b>
+&nbsp;                RecognitionStatKeys.PURE_RECOGNITION,
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.PRIMARY_PATH,
+<b class="nc">&nbsp;                RecognitionPath.LAWFUL_EVIL.getId()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.SECONDARY_PATH,
+<b class="nc">&nbsp;                RecognitionPath.LAWFUL_NEUTRAL.getId()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.BESTOWED_TITLE,
+&nbsp;                &quot;the Dread Sovereign&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys.CONTRADICTION_MODIFIER,
+&nbsp;                &quot;none&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String primaryBefore = data.getString(RecognitionStatKeys.PRIMARY_PATH);</b>
+<b class="nc">&nbsp;        String secondaryBefore = data.getString(RecognitionStatKeys.SECONDARY_PATH);</b>
+<b class="nc">&nbsp;        String titleBefore = data.getString(RecognitionStatKeys.BESTOWED_TITLE);</b>
+<b class="nc">&nbsp;        String frozenModifierBefore = data.getString(</b>
+&nbsp;                RecognitionStatKeys.CONTRADICTION_MODIFIER
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryService.MoralDirection.GOOD,
+&nbsp;                20.0D,
+&nbsp;                1_000L
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.registerMoralReversal(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.setResolvedModifier(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryModifier.REDEEMED
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;History mutations never rewrite frozen committed identity&quot;,
+<b class="nc">&nbsp;                primaryBefore.equals(data.getString(RecognitionStatKeys.PRIMARY_PATH))</b>
+<b class="nc">&nbsp;                        &amp;&amp; secondaryBefore.equals(data.getString(RecognitionStatKeys.SECONDARY_PATH))</b>
+<b class="nc">&nbsp;                        &amp;&amp; titleBefore.equals(data.getString(RecognitionStatKeys.BESTOWED_TITLE))</b>
+<b class="nc">&nbsp;                        &amp;&amp; frozenModifierBefore.equals(</b>
+<b class="nc">&nbsp;                        data.getString(RecognitionStatKeys.CONTRADICTION_MODIFIER)</b>
+&nbsp;                ),
+&nbsp;                &quot;committed path/title/modifier preserved&quot;
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateRecognitionEvaluationUnchanged(
+&nbsp;            List&lt;Check&gt; checks,
+&nbsp;            List&lt;String&gt; warnings
+&nbsp;    ) {
+&nbsp;        try {
+<b class="nc">&nbsp;            RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;            data.setCounter(</b>
+&nbsp;                    RecognitionStatKeys.CIVILIANS_DEFENDED,
+&nbsp;                    12
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            data.setCounter(</b>
+&nbsp;                    RecognitionStatKeys.CIVILIAN_KILLS,
+&nbsp;                    2
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            data.setCounter(</b>
+&nbsp;                    RecognitionStatKeys.HIGHEST_SUBORDINATES,
+&nbsp;                    8
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            data.addUniqueValue(</b>
+&nbsp;                    RecognitionStatKeys.DISCOVERY_MILESTONES,
+&nbsp;                    &quot;minecraft:the_nether&quot;
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            RecognitionEvaluation before =</b>
+<b class="nc">&nbsp;                    RecognitionPathEvaluator.evaluate(data);</b>
+&nbsp;
+<b class="nc">&nbsp;            RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                    data,
+&nbsp;                    RecognitionIdentityHistoryService.MoralDirection.EVIL,
+&nbsp;                    23.0D,
+&nbsp;                    100_000L
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            RecognitionIdentityHistoryService.recordTemperamentDeed(</b>
+&nbsp;                    data,
+&nbsp;                    RecognitionIdentityHistoryService.TemperamentDirection.FREEDOM,
+&nbsp;                    21.0D,
+&nbsp;                    100_000L
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            RecognitionIdentityHistoryService.registerMoralReversal(data);</b>
+<b class="nc">&nbsp;            RecognitionIdentityHistoryService.registerTemperamentReversal(data);</b>
+&nbsp;
+<b class="nc">&nbsp;            RecognitionEvaluation after =</b>
+<b class="nc">&nbsp;                    RecognitionPathEvaluator.evaluate(data);</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean scoresEqual = scoreMapsEqual(</b>
+<b class="nc">&nbsp;                    before.getPathScores(),</b>
+<b class="nc">&nbsp;                    after.getPathScores()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            boolean selectionsEqual = selectionSignature(before)</b>
+<b class="nc">&nbsp;                    .equals(selectionSignature(after));</b>
+&nbsp;
+<b class="nc">&nbsp;            addCheck(</b>
+&nbsp;                    checks,
+&nbsp;                    &quot;History foundation does not affect live path evaluation&quot;,
+&nbsp;                    scoresEqual &amp;&amp; selectionsEqual,
+<b class="nc">&nbsp;                    &quot;before=&quot; + selectionSignature(before)</b>
+<b class="nc">&nbsp;                            + &quot;, after=&quot; + selectionSignature(after)</b>
+&nbsp;            );
+&nbsp;        } catch (RuntimeException exception) {
+<b class="nc">&nbsp;            addCheck(</b>
+&nbsp;                    checks,
+&nbsp;                    &quot;History foundation does not affect live path evaluation&quot;,
+&nbsp;                    false,
+<b class="nc">&nbsp;                    exception.getClass().getSimpleName()</b>
+<b class="nc">&nbsp;                            + &quot;: &quot; + exception.getMessage()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            warnings.add(</b>
+&nbsp;                    &quot;Path-isolation validation raised an exception; inspect the current evaluator integration.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateIncarnationReset(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data = new RecognitionData();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                data,
+&nbsp;                RecognitionIdentityHistoryService.MoralDirection.GOOD,
+&nbsp;                17.0D,
+&nbsp;                1_000L
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryService.registerMoralReversal(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        data.resetForNewIncarnation(&quot;validation-incarnation&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        addCheck(</b>
+&nbsp;                checks,
+&nbsp;                &quot;New-incarnation reset clears contradiction history&quot;,
+<b class="nc">&nbsp;                snapshot.storedVersion() == 0</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(snapshot.goodMomentum(), 0.0D)</b>
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.moralReversalCount() == 0</b>
+<b class="nc">&nbsp;                        &amp;&amp; snapshot.migrationState()</b>
+&nbsp;                        == RecognitionIdentityHistoryService.MigrationState.UNINITIALIZED,
+<b class="nc">&nbsp;                &quot;version=&quot; + snapshot.storedVersion()</b>
+<b class="nc">&nbsp;                        + &quot;, momentum=&quot; + snapshot.goodMomentum()</b>
+<b class="nc">&nbsp;                        + &quot;, reversals=&quot; + snapshot.moralReversalCount()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean scoreMapsEqual(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; first,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; second
+&nbsp;    ) {
+<b class="nc">&nbsp;        for (RecognitionPath path : RecognitionPath.values()) {</b>
+<b class="nc">&nbsp;            if (!approximately(</b>
+<b class="nc">&nbsp;                    first.getOrDefault(path, 0.0D),</b>
+<b class="nc">&nbsp;                    second.getOrDefault(path, 0.0D)</b>
+&nbsp;            )) {
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String selectionSignature(
+&nbsp;            RecognitionEvaluation evaluation
+&nbsp;    ) {
+<b class="nc">&nbsp;        return evaluation.getSelection()</b>
+<b class="nc">&nbsp;                .map(selection -&gt;</b>
+<b class="nc">&nbsp;                        selection.primaryPath().getId()</b>
+&nbsp;                                + &quot;/&quot;
+&nbsp;                                + (
+<b class="nc">&nbsp;                                selection.hasSecondaryPath()</b>
+<b class="nc">&nbsp;                                        ? selection.secondaryPath().getId()</b>
+<b class="nc">&nbsp;                                        : &quot;none&quot;</b>
+&nbsp;                        )
+&nbsp;                                + &quot;/&quot;
+<b class="nc">&nbsp;                                + selection.pure()</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .orElse(&quot;none&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addCheck(
+&nbsp;            List&lt;Check&gt; checks,
+&nbsp;            String name,
+&nbsp;            boolean passed,
+&nbsp;            String detail
+&nbsp;    ) {
+<b class="nc">&nbsp;        checks.add(</b>
+&nbsp;                new Check(
+&nbsp;                        name,
+&nbsp;                        passed,
+<b class="nc">&nbsp;                        detail == null ? &quot;&quot; : detail</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean approximately(
+&nbsp;            double first,
+&nbsp;            double second
+&nbsp;    ) {
+<b class="nc">&nbsp;        return Math.abs(first - second) &lt;= EPSILON;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Check(</b>
+&nbsp;            String name,
+&nbsp;            boolean passed,
+&nbsp;            String detail
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public Check {</b>
+<b class="nc">&nbsp;            name = name == null ? &quot;Unnamed check&quot; : name;</b>
+<b class="nc">&nbsp;            detail = detail == null ? &quot;&quot; : detail;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Report(</b>
+&nbsp;            boolean passed,
+&nbsp;            int historyVersion,
+&nbsp;            List&lt;Check&gt; checks,
+&nbsp;            List&lt;String&gt; warnings
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public Report {</b>
+<b class="nc">&nbsp;            historyVersion = Math.max(1, historyVersion);</b>
+<b class="nc">&nbsp;            checks = checks == null ? List.of() : List.copyOf(checks);</b>
+<b class="nc">&nbsp;            warnings = warnings == null ? List.of() : List.copyOf(warnings);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public long passedChecks() {
+<b class="nc">&nbsp;            return checks.stream().filter(Check::passed).count();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public long failedChecks() {
+<b class="nc">&nbsp;            return checks.size() - passedChecks();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

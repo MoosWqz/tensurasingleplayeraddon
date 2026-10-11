@@ -1,0 +1,440 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionEvaluation</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionEvaluation (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionEvaluation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.EnumMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * Immutable result of one recognition evaluation.
+&nbsp; *
+&nbsp; * &lt;p&gt;Rules version 2 retains the existing raw, identity and final path maps,
+&nbsp; * while also exposing the axis components used by component-aware
+&nbsp; * qualification.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionEvaluation {
+&nbsp;
+&nbsp;    private final RecognitionDimensions dimensions;
+&nbsp;    private final RecognitionPathComponents components;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Scores before identity strength is applied.
+&nbsp;     *
+&nbsp;     * These represent paths the player has genuinely lived toward after the
+&nbsp;     * component evidence gate is applied.
+&nbsp;     */
+&nbsp;    private final Map&lt;RecognitionPath, Double&gt; rawPathScores;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Identity resonance assigned to each component-supported path.
+&nbsp;     */
+&nbsp;    private final Map&lt;RecognitionPath, Double&gt; identityBoosts;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Raw affinity + identity resonance.
+&nbsp;     */
+&nbsp;    private final Map&lt;RecognitionPath, Double&gt; pathScores;
+&nbsp;
+&nbsp;    private final Optional&lt;RecognitionPathSelection&gt; selection;
+&nbsp;    private final RecognitionBalanceSnapshot balance;
+&nbsp;    private final long balanceRevision;
+&nbsp;
+&nbsp;    public RecognitionEvaluation(
+&nbsp;            RecognitionDimensions dimensions,
+&nbsp;            RecognitionPathComponents components,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; rawPathScores,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; identityBoosts,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; pathScores,
+&nbsp;            Optional&lt;RecognitionPathSelection&gt; selection,
+&nbsp;            RecognitionBalanceSnapshot balance,
+&nbsp;            long balanceRevision
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        this.dimensions =</b>
+<b class="nc">&nbsp;                dimensions == null</b>
+<b class="nc">&nbsp;                        ? emptyDimensions()</b>
+<b class="nc">&nbsp;                        : dimensions;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.balance =</b>
+<b class="nc">&nbsp;                balance == null</b>
+&nbsp;                        ? RecognitionBalanceSnapshot
+<b class="nc">&nbsp;                        .createDefaults()</b>
+<b class="nc">&nbsp;                        : balance;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.components =</b>
+<b class="nc">&nbsp;                components == null</b>
+&nbsp;                        ? RecognitionPathComponents
+<b class="nc">&nbsp;                        .calculate(</b>
+&nbsp;                                this.dimensions,
+&nbsp;                                this.balance
+&nbsp;                        )
+<b class="nc">&nbsp;                        : components;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.rawPathScores =</b>
+<b class="nc">&nbsp;                sanitizeScores(</b>
+&nbsp;                        rawPathScores
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        this.identityBoosts =</b>
+<b class="nc">&nbsp;                sanitizeScores(</b>
+&nbsp;                        identityBoosts
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        this.pathScores =</b>
+<b class="nc">&nbsp;                sanitizeScores(</b>
+&nbsp;                        pathScores
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        this.selection =</b>
+<b class="nc">&nbsp;                selection == null</b>
+<b class="nc">&nbsp;                        ? Optional.empty()</b>
+<b class="nc">&nbsp;                        : selection;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.balanceRevision =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        0L,
+&nbsp;                        balanceRevision
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compatibility constructor for legacy recognition call sites.
+&nbsp;     */
+&nbsp;    public RecognitionEvaluation(
+&nbsp;            RecognitionDimensions dimensions,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; rawPathScores,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; identityBoosts,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; pathScores,
+&nbsp;            Optional&lt;RecognitionPathSelection&gt; selection,
+&nbsp;            RecognitionBalanceSnapshot balance,
+&nbsp;            long balanceRevision
+&nbsp;    ) {
+<b class="nc">&nbsp;        this(</b>
+&nbsp;                dimensions,
+<b class="nc">&nbsp;                RecognitionPathComponents.calculate(</b>
+&nbsp;                        dimensions,
+&nbsp;                        balance
+&nbsp;                ),
+&nbsp;                rawPathScores,
+&nbsp;                identityBoosts,
+&nbsp;                pathScores,
+&nbsp;                selection,
+&nbsp;                balance,
+&nbsp;                balanceRevision
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compatibility constructor for older call sites without a balance
+&nbsp;     * snapshot.
+&nbsp;     */
+&nbsp;    public RecognitionEvaluation(
+&nbsp;            RecognitionDimensions dimensions,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; rawPathScores,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; identityBoosts,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; pathScores,
+&nbsp;            Optional&lt;RecognitionPathSelection&gt; selection
+&nbsp;    ) {
+<b class="nc">&nbsp;        this(</b>
+&nbsp;                dimensions,
+<b class="nc">&nbsp;                RecognitionPathComponents.calculate(</b>
+&nbsp;                        dimensions,
+&nbsp;                        RecognitionBalanceSnapshot
+<b class="nc">&nbsp;                                .createDefaults()</b>
+&nbsp;                ),
+&nbsp;                rawPathScores,
+&nbsp;                identityBoosts,
+&nbsp;                pathScores,
+&nbsp;                selection,
+&nbsp;                RecognitionBalanceSnapshot
+<b class="nc">&nbsp;                        .createDefaults(),</b>
+&nbsp;                0L
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compatibility constructor for the original score-only model.
+&nbsp;     */
+&nbsp;    public RecognitionEvaluation(
+&nbsp;            RecognitionDimensions dimensions,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; pathScores,
+&nbsp;            Optional&lt;RecognitionPathSelection&gt; selection
+&nbsp;    ) {
+<b class="nc">&nbsp;        this(</b>
+&nbsp;                dimensions,
+<b class="nc">&nbsp;                RecognitionPathComponents.calculate(</b>
+&nbsp;                        dimensions,
+&nbsp;                        RecognitionBalanceSnapshot
+<b class="nc">&nbsp;                                .createDefaults()</b>
+&nbsp;                ),
+&nbsp;                pathScores,
+<b class="nc">&nbsp;                createEmptyScoreMap(),</b>
+&nbsp;                pathScores,
+&nbsp;                selection,
+&nbsp;                RecognitionBalanceSnapshot
+<b class="nc">&nbsp;                        .createDefaults(),</b>
+&nbsp;                0L
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public RecognitionDimensions getDimensions() {
+<b class="nc">&nbsp;        return dimensions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RecognitionPathComponents getComponents() {
+<b class="nc">&nbsp;        return components;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;RecognitionPath, Double&gt; getRawPathScores() {
+<b class="nc">&nbsp;        return rawPathScores;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getRawPathScore(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return rawPathScores.getOrDefault(</b>
+&nbsp;                path,
+<b class="nc">&nbsp;                0.0D</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;RecognitionPath, Double&gt; getIdentityBoosts() {
+<b class="nc">&nbsp;        return identityBoosts;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getIdentityBoost(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return identityBoosts.getOrDefault(</b>
+&nbsp;                path,
+<b class="nc">&nbsp;                0.0D</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;RecognitionPath, Double&gt; getPathScores() {
+<b class="nc">&nbsp;        return pathScores;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getPathScore(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return pathScores.getOrDefault(</b>
+&nbsp;                path,
+<b class="nc">&nbsp;                0.0D</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;RecognitionPathSelection&gt; getSelection() {
+<b class="nc">&nbsp;        return selection;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RecognitionBalanceSnapshot getBalance() {
+<b class="nc">&nbsp;        return balance;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public long getBalanceRevision() {
+<b class="nc">&nbsp;        return balanceRevision;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RecognitionComponentQualificationRules
+&nbsp;    getComponentQualificationRules() {
+<b class="nc">&nbsp;        return RecognitionComponentQualificationRules</b>
+<b class="nc">&nbsp;                .from(</b>
+<b class="nc">&nbsp;                        balance.selection()</b>
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionDimensions emptyDimensions() {
+<b class="nc">&nbsp;        return new RecognitionDimensions(</b>
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;RecognitionPath, Double&gt; sanitizeScores(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; source
+&nbsp;    ) {
+<b class="nc">&nbsp;        EnumMap&lt;RecognitionPath, Double&gt; result =</b>
+&nbsp;                new EnumMap&lt;&gt;(
+&nbsp;                        RecognitionPath.class
+&nbsp;                );
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            double score = 0.0D;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (source != null) {</b>
+<b class="nc">&nbsp;                Double rawScore =</b>
+<b class="nc">&nbsp;                        source.get(path);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (rawScore != null</b>
+<b class="nc">&nbsp;                        &amp;&amp; Double.isFinite(rawScore)</b>
+<b class="nc">&nbsp;                        &amp;&amp; rawScore &gt; 0.0D) {</b>
+&nbsp;
+<b class="nc">&nbsp;                    score = rawScore;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            result.put(</b>
+&nbsp;                    path,
+<b class="nc">&nbsp;                    score</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Collections.unmodifiableMap(</b>
+&nbsp;                result
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;RecognitionPath, Double&gt;
+&nbsp;    createEmptyScoreMap() {
+<b class="nc">&nbsp;        EnumMap&lt;RecognitionPath, Double&gt; result =</b>
+&nbsp;                new EnumMap&lt;&gt;(
+&nbsp;                        RecognitionPath.class
+&nbsp;                );
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            result.put(</b>
+&nbsp;                    path,
+<b class="nc">&nbsp;                    0.0D</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

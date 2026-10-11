@@ -1,0 +1,610 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionCombatCreditTracker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionCombatCreditTracker (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionCombatCreditTracker</td>
+<td class="coverageStat">
+  <span class="percent">
+    52.2%
+  </span>
+  <span class="absValue">
+    (12/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.6%
+  </span>
+  <span class="absValue">
+    (14/62)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.8%
+  </span>
+  <span class="absValue">
+    (49/133)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionCombatCreditTracker$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionCombatCreditTracker$DeathResolution</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.8%
+  </span>
+  <span class="absValue">
+    (9/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionCombatCreditTracker$DeathStatus</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionCombatCreditTracker$RuntimeSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    61.3%
+  </span>
+  <span class="absValue">
+    (19/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (17/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.5%
+  </span>
+  <span class="absValue">
+    (67/154)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatAttribution.CombatCredit;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatAttribution.CombatCreditType;
+&nbsp;import net.minecraft.server.MinecraftServer;
+&nbsp;import net.minecraft.server.level.ServerLevel;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.damagesource.DamageSource;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.WeakHashMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * Server-isolated recent player damage and exactly-once death attribution.
+&nbsp; */
+&nbsp;public final class RecognitionCombatCreditTracker {
+&nbsp;
+&nbsp;    private static final String DEBUG_FIXTURE_DIMENSION =
+&nbsp;            &quot;moostensuraaddon:attribution_reset_fixture&quot;;
+&nbsp;
+&nbsp;    private static final Map&lt;MinecraftServer, RecognitionCombatCreditLedger&gt;
+<b class="fc">&nbsp;            SERVER_LEDGERS = new WeakHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private RecognitionCombatCreditTracker() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void recordIncomingDamage(
+&nbsp;            LivingEntity victim,
+&nbsp;            DamageSource source
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (victim == null</b>
+&nbsp;                || source == null
+<b class="pc">&nbsp;                || !(victim.level()</b>
+<b class="fc">&nbsp;                instanceof ServerLevel serverLevel)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Optional&lt;CombatCredit&gt; credit =</b>
+<b class="fc">&nbsp;                RecognitionCombatAttribution.resolve(source);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (credit.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long gameTime = getServerGameTime(serverLevel);</b>
+&nbsp;
+<b class="nc">&nbsp;        ledgerFor(serverLevel.getServer()).record(</b>
+<b class="nc">&nbsp;                keyOf(victim),</b>
+<b class="nc">&nbsp;                toLedgerCredit(credit.orElseThrow()),</b>
+&nbsp;                gameTime
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static DeathResolution consumeDeath(
+&nbsp;            LivingEntity victim,
+&nbsp;            DamageSource source
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (victim == null</b>
+<b class="pc">&nbsp;                || !(victim.level()</b>
+<b class="fc">&nbsp;                instanceof ServerLevel serverLevel)) {</b>
+<b class="nc">&nbsp;            return DeathResolution.noCredit(</b>
+&nbsp;                    DeathStatus.NO_CREDIT
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        MinecraftServer server = serverLevel.getServer();</b>
+<b class="fc">&nbsp;        Optional&lt;RecognitionCombatCreditLedger.PlayerCredit&gt; direct =</b>
+<b class="fc">&nbsp;                RecognitionCombatAttribution.resolve(source)</b>
+<b class="fc">&nbsp;                        .map(</b>
+&nbsp;                                RecognitionCombatCreditTracker
+&nbsp;                                        ::toLedgerCredit
+&nbsp;                        );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionCombatCreditLedger.Resolution resolution =</b>
+<b class="fc">&nbsp;                ledgerFor(server).consumeDeath(</b>
+<b class="fc">&nbsp;                        keyOf(victim),</b>
+&nbsp;                        direct,
+<b class="fc">&nbsp;                        getServerGameTime(serverLevel),</b>
+<b class="nc">&nbsp;                        playerUuid -&gt; currentLifeToken(</b>
+&nbsp;                                server,
+&nbsp;                                playerUuid
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (resolution.credit().isEmpty()) {</b>
+<b class="fc">&nbsp;            return DeathResolution.noCredit(</b>
+<b class="fc">&nbsp;                    toDeathStatus(resolution.status())</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCombatCreditLedger.PlayerCredit stored =</b>
+<b class="nc">&nbsp;                resolution.credit().orElseThrow();</b>
+&nbsp;
+<b class="nc">&nbsp;        ServerPlayer player = server</b>
+<b class="nc">&nbsp;                .getPlayerList()</b>
+<b class="nc">&nbsp;                .getPlayer(stored.playerUuid());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return DeathResolution.noCredit(</b>
+&nbsp;                    DeathStatus.STALE_LIFE
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new DeathResolution(</b>
+<b class="nc">&nbsp;                toDeathStatus(resolution.status()),</b>
+<b class="nc">&nbsp;                Optional.of(</b>
+&nbsp;                        new CombatCredit(
+&nbsp;                                player,
+<b class="nc">&nbsp;                                toCombatCreditType(</b>
+<b class="nc">&nbsp;                                        stored.actorKind()</b>
+&nbsp;                                )
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void cleanup(MinecraftServer server) {
+<b class="pc">&nbsp;        if (server == null || server.overworld() == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionCombatCreditLedger ledger = existingLedger(server);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (ledger != null) {</b>
+<b class="nc">&nbsp;            ledger.cleanup(server.overworld().getGameTime());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clearForPlayer(ServerPlayer player) {
+<b class="nc">&nbsp;        if (player == null || player.getServer() == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCombatCreditLedger ledger = existingLedger(</b>
+<b class="nc">&nbsp;                player.getServer()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (ledger != null) {</b>
+<b class="nc">&nbsp;            ledger.clearPlayer(player.getUUID());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clearServer(MinecraftServer server) {
+<b class="pc">&nbsp;        if (server == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        synchronized (SERVER_LEDGERS) {</b>
+<b class="fc">&nbsp;            SERVER_LEDGERS.remove(server);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clearAll() {
+<b class="fc">&nbsp;        synchronized (SERVER_LEDGERS) {</b>
+<b class="fc">&nbsp;            SERVER_LEDGERS.clear();</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RuntimeSnapshot inspect(
+&nbsp;            MinecraftServer server,
+&nbsp;            UUID selectedPlayer
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionCombatCreditLedger ledger = existingLedger(server);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (ledger == null) {</b>
+<b class="nc">&nbsp;            return new RuntimeSnapshot(</b>
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    RecognitionCombatCreditLedger.MAX_RECENT_CREDITS,
+&nbsp;                    RecognitionCombatCreditLedger.MAX_PROCESSED_DEATHS,
+<b class="nc">&nbsp;                    serverLedgerCount()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCombatCreditLedger.Snapshot snapshot =</b>
+<b class="nc">&nbsp;                ledger.inspect(selectedPlayer);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new RuntimeSnapshot(</b>
+<b class="nc">&nbsp;                snapshot.recentCredits(),</b>
+<b class="nc">&nbsp;                snapshot.processedDeaths(),</b>
+<b class="nc">&nbsp;                snapshot.selectedPlayerCredits(),</b>
+<b class="nc">&nbsp;                snapshot.maximumRecentCredits(),</b>
+<b class="nc">&nbsp;                snapshot.maximumProcessedDeaths(),</b>
+<b class="nc">&nbsp;                serverLedgerCount()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Installs one synthetic credit used only by the reset fixture. */
+&nbsp;    public static void installResetFixture(ServerPlayer player) {
+<b class="nc">&nbsp;        if (player == null || player.getServer() == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long gameTime = player.getServer().overworld() == null</b>
+<b class="nc">&nbsp;                ? player.serverLevel().getGameTime()</b>
+<b class="nc">&nbsp;                : player.getServer().overworld().getGameTime();</b>
+&nbsp;
+<b class="nc">&nbsp;        ledgerFor(player.getServer()).record(</b>
+&nbsp;                new RecognitionCombatCreditLedger.VictimKey(
+&nbsp;                        DEBUG_FIXTURE_DIMENSION,
+<b class="nc">&nbsp;                        UUID.randomUUID()</b>
+&nbsp;                ),
+&nbsp;                new RecognitionCombatCreditLedger.PlayerCredit(
+<b class="nc">&nbsp;                        player.getUUID(),</b>
+<b class="nc">&nbsp;                        AddonIncarnationState.load(player)</b>
+<b class="nc">&nbsp;                                .getLifeToken(),</b>
+&nbsp;                        RecognitionAttributionPolicy.ActorKind.DIRECT_PLAYER
+&nbsp;                ),
+&nbsp;                gameTime
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static long creditWindowTicks() {
+<b class="nc">&nbsp;        return RecognitionCombatCreditLedger.CREDIT_WINDOW_TICKS;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static long duplicateWindowTicks() {
+<b class="nc">&nbsp;        return RecognitionCombatCreditLedger.DUPLICATE_WINDOW_TICKS;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionCombatCreditLedger.PlayerCredit
+&nbsp;    toLedgerCredit(CombatCredit credit) {
+<b class="nc">&nbsp;        ServerPlayer player = credit.player();</b>
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionCombatCreditLedger.PlayerCredit(</b>
+<b class="nc">&nbsp;                player.getUUID(),</b>
+<b class="nc">&nbsp;                AddonIncarnationState.load(player)</b>
+<b class="nc">&nbsp;                        .getLifeToken(),</b>
+<b class="nc">&nbsp;                toActorKind(credit.type())</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionAttributionPolicy.ActorKind toActorKind(
+&nbsp;            CombatCreditType type
+&nbsp;    ) {
+<b class="pc">&nbsp;        return switch (type) {</b>
+&nbsp;            case DIRECT_PLAYER -&gt;
+<b class="nc">&nbsp;                    RecognitionAttributionPolicy.ActorKind.DIRECT_PLAYER;</b>
+&nbsp;            case PLAYER_PROJECTILE -&gt;
+<b class="nc">&nbsp;                    RecognitionAttributionPolicy.ActorKind.PLAYER_PROJECTILE;</b>
+&nbsp;            case OWNED_COMPANION -&gt;
+<b class="nc">&nbsp;                    RecognitionAttributionPolicy.ActorKind.OWNED_COMPANION;</b>
+&nbsp;            case TENSURA_SUBORDINATE -&gt;
+<b class="nc">&nbsp;                    RecognitionAttributionPolicy.ActorKind.TENSURA_SUBORDINATE;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static CombatCreditType toCombatCreditType(
+&nbsp;            RecognitionAttributionPolicy.ActorKind kind
+&nbsp;    ) {
+<b class="pc">&nbsp;        return switch (kind) {</b>
+&nbsp;            case PLAYER_PROJECTILE -&gt;
+<b class="nc">&nbsp;                    CombatCreditType.PLAYER_PROJECTILE;</b>
+&nbsp;            case OWNED_COMPANION -&gt;
+<b class="nc">&nbsp;                    CombatCreditType.OWNED_COMPANION;</b>
+&nbsp;            case TENSURA_SUBORDINATE -&gt;
+<b class="nc">&nbsp;                    CombatCreditType.TENSURA_SUBORDINATE;</b>
+&nbsp;            case NONE, DIRECT_PLAYER -&gt;
+<b class="nc">&nbsp;                    CombatCreditType.DIRECT_PLAYER;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static DeathStatus toDeathStatus(
+&nbsp;            RecognitionCombatCreditLedger.ResolutionStatus status
+&nbsp;    ) {
+<b class="pc">&nbsp;        return switch (status) {</b>
+<b class="nc">&nbsp;            case CREDITED -&gt; DeathStatus.CREDITED;</b>
+<b class="fc">&nbsp;            case NO_CREDIT -&gt; DeathStatus.NO_CREDIT;</b>
+<b class="nc">&nbsp;            case EXPIRED -&gt; DeathStatus.EXPIRED;</b>
+<b class="nc">&nbsp;            case STALE_LIFE -&gt; DeathStatus.STALE_LIFE;</b>
+&nbsp;            case DUPLICATE_SUPPRESSED -&gt;
+<b class="nc">&nbsp;                    DeathStatus.DUPLICATE_SUPPRESSED;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String currentLifeToken(
+&nbsp;            MinecraftServer server,
+&nbsp;            UUID playerUuid
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (server == null || playerUuid == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ServerPlayer player = server</b>
+<b class="nc">&nbsp;                .getPlayerList()</b>
+<b class="nc">&nbsp;                .getPlayer(playerUuid);</b>
+&nbsp;
+<b class="nc">&nbsp;        return player == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : AddonIncarnationState.load(player)</b>
+<b class="nc">&nbsp;                .getLifeToken();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionCombatCreditLedger.VictimKey keyOf(
+&nbsp;            LivingEntity victim
+&nbsp;    ) {
+<b class="fc">&nbsp;        return new RecognitionCombatCreditLedger.VictimKey(</b>
+<b class="fc">&nbsp;                victim.level()</b>
+<b class="fc">&nbsp;                        .dimension()</b>
+<b class="fc">&nbsp;                        .location()</b>
+<b class="fc">&nbsp;                        .toString(),</b>
+<b class="fc">&nbsp;                victim.getUUID()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static long getServerGameTime(
+&nbsp;            ServerLevel level
+&nbsp;    ) {
+<b class="pc">&nbsp;        return level.getServer().overworld() == null</b>
+<b class="nc">&nbsp;                ? level.getGameTime()</b>
+<b class="fc">&nbsp;                : level.getServer()</b>
+<b class="fc">&nbsp;                .overworld()</b>
+<b class="fc">&nbsp;                .getGameTime();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionCombatCreditLedger ledgerFor(
+&nbsp;            MinecraftServer server
+&nbsp;    ) {
+<b class="fc">&nbsp;        synchronized (SERVER_LEDGERS) {</b>
+<b class="fc">&nbsp;            return SERVER_LEDGERS.computeIfAbsent(</b>
+&nbsp;                    server,
+<b class="fc">&nbsp;                    ignored -&gt; new RecognitionCombatCreditLedger()</b>
+&nbsp;            );
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionCombatCreditLedger existingLedger(
+&nbsp;            MinecraftServer server
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (server == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        synchronized (SERVER_LEDGERS) {</b>
+<b class="fc">&nbsp;            return SERVER_LEDGERS.get(server);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int serverLedgerCount() {
+<b class="nc">&nbsp;        synchronized (SERVER_LEDGERS) {</b>
+<b class="nc">&nbsp;            return SERVER_LEDGERS.size();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public record DeathResolution(</b>
+&nbsp;            DeathStatus status,
+&nbsp;            Optional&lt;CombatCredit&gt; credit
+&nbsp;    ) {
+<b class="fc">&nbsp;        public DeathResolution {</b>
+<b class="pc">&nbsp;            status = status == null</b>
+<b class="nc">&nbsp;                    ? DeathStatus.NO_CREDIT</b>
+<b class="fc">&nbsp;                    : status;</b>
+<b class="pc">&nbsp;            credit = credit == null</b>
+<b class="nc">&nbsp;                    ? Optional.empty()</b>
+<b class="fc">&nbsp;                    : credit;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static DeathResolution noCredit(
+&nbsp;                DeathStatus status
+&nbsp;        ) {
+<b class="fc">&nbsp;            return new DeathResolution(</b>
+&nbsp;                    status,
+<b class="fc">&nbsp;                    Optional.empty()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean duplicateSuppressed() {
+<b class="pc">&nbsp;            return status</b>
+&nbsp;                    == DeathStatus.DUPLICATE_SUPPRESSED;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum DeathStatus {</b>
+<b class="fc">&nbsp;        CREDITED,</b>
+<b class="fc">&nbsp;        NO_CREDIT,</b>
+<b class="fc">&nbsp;        EXPIRED,</b>
+<b class="fc">&nbsp;        STALE_LIFE,</b>
+<b class="fc">&nbsp;        DUPLICATE_SUPPRESSED</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record RuntimeSnapshot(</b>
+&nbsp;            int recentCredits,
+&nbsp;            int processedDeaths,
+&nbsp;            int selectedPlayerCredits,
+&nbsp;            int maximumRecentCredits,
+&nbsp;            int maximumProcessedDeaths,
+&nbsp;            int trackedServerLedgers
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

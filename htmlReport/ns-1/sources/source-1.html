@@ -1,0 +1,151 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MoosTensuraAddon</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon</a>
+</div>
+
+<h1>Coverage Summary for Class: MoosTensuraAddon (com.mooswqz.moostensuraaddon)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MoosTensuraAddon</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.block.BlockRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.client.ClientItemPropertyEvents;
+&nbsp;import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+&nbsp;import com.mooswqz.moostensuraaddon.item.ItemRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.network.NetworkRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
+&nbsp;import net.neoforged.api.distmarker.Dist;
+&nbsp;import net.neoforged.bus.api.IEventBus;
+&nbsp;import net.neoforged.fml.ModContainer;
+&nbsp;import net.neoforged.fml.common.Mod;
+&nbsp;import net.neoforged.fml.config.ModConfig;
+&nbsp;import net.neoforged.fml.loading.FMLEnvironment;
+&nbsp;
+&nbsp;@Mod(MoosTensuraAddon.MODID)
+&nbsp;public class MoosTensuraAddon {
+&nbsp;    public static final String MODID = &quot;moostensuraaddon&quot;;
+&nbsp;
+<b class="fc">&nbsp;    public MoosTensuraAddon(IEventBus modEventBus, ModContainer modContainer) {</b>
+<b class="fc">&nbsp;        SkillRegistry.SKILLS.register(modEventBus);</b>
+<b class="fc">&nbsp;        AttachmentRegistry.ATTACHMENT_TYPES.register(modEventBus);</b>
+<b class="fc">&nbsp;        BlockRegistry.BLOCKS.register(modEventBus);</b>
+<b class="fc">&nbsp;        ItemRegistry.ITEMS.register(modEventBus);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (FMLEnvironment.dist == Dist.CLIENT) {</b>
+<b class="fc">&nbsp;            ClientItemPropertyEvents.register(modEventBus);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        modEventBus.addListener(NetworkRegistry::registerPayloads);</b>
+&nbsp;
+<b class="fc">&nbsp;        modContainer.registerConfig(ModConfig.Type.SERVER, MoosTensuraConfig.SPEC);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,952 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionMigrationDebugCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionMigrationDebugCommand (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionMigrationDebugCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    2%
+  </span>
+  <span class="absValue">
+    (1/49)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10.1%
+  </span>
+  <span class="absValue">
+    (33/328)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionMigrationDebugCommand$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    2%
+  </span>
+  <span class="absValue">
+    (1/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (33/329)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+&nbsp;import com.mojang.brigadier.exceptions.CommandSyntaxException;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionDataFixtureFactory;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.RecognitionNativeEndowmentService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCommittedResult;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionDisplayNameSyncService;
+&nbsp;import com.mooswqz.moostensuraaddon.util.TensuraPlayerStateHelper;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.commands.Commands;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;/** Permission-level-four artificial save and retry fixtures for B2B2. */
+&nbsp;public final class RecognitionMigrationDebugCommand {
+&nbsp;
+&nbsp;    private static final int RETRY_FIXTURE_ATTEMPTS = 7;
+&nbsp;
+&nbsp;    private RecognitionMigrationDebugCommand() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createDebugNode() {
+<b class="fc">&nbsp;        return Commands.literal(&quot;migration&quot;)</b>
+<b class="fc">&nbsp;                .requires(</b>
+&nbsp;                        DebugModeService
+&nbsp;                                ::canUseDangerousDebugTools
+&nbsp;                )
+<b class="fc">&nbsp;                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                        context.getSource()</b>
+&nbsp;                ))
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;validate&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt; validate(</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+&nbsp;                                ))
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;legacy&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt; requestLegacyFixture(</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+&nbsp;                                ))
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;confirm&quot;)</b>
+<b class="fc">&nbsp;                                                .executes(context -&gt; installLegacyFixture(</b>
+<b class="nc">&nbsp;                                                        context.getSource()</b>
+&nbsp;                                                ))
+&nbsp;                                )
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;future&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt; requestFutureFixture(</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+&nbsp;                                ))
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;confirm&quot;)</b>
+<b class="fc">&nbsp;                                                .executes(context -&gt; installFutureFixture(</b>
+<b class="nc">&nbsp;                                                        context.getSource()</b>
+&nbsp;                                                ))
+&nbsp;                                )
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;status&quot;)</b>
+<b class="fc">&nbsp;                                                .executes(context -&gt; inspectFutureFixture(</b>
+<b class="nc">&nbsp;                                                        context.getSource()</b>
+&nbsp;                                                ))
+&nbsp;                                )
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;retry&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+&nbsp;                                ))
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;probe&quot;)</b>
+<b class="fc">&nbsp;                                                .executes(context -&gt; probeRetryIdempotence(</b>
+<b class="nc">&nbsp;                                                        context.getSource()</b>
+&nbsp;                                                ))
+&nbsp;                                )
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;due&quot;)</b>
+<b class="fc">&nbsp;                                                .executes(context -&gt; runDueRetry(</b>
+<b class="nc">&nbsp;                                                        context.getSource()</b>
+&nbsp;                                                ))
+&nbsp;                                )
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;hold&quot;)</b>
+<b class="fc">&nbsp;                                                .executes(context -&gt; holdRetryForReset(</b>
+<b class="nc">&nbsp;                                                        context.getSource()</b>
+&nbsp;                                                ))
+&nbsp;                                )
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int inspect(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+<b class="nc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+<b class="nc">&nbsp;        RecognitionCommittedResult committed =</b>
+<b class="nc">&nbsp;                data.getCommittedResult();</b>
+<b class="nc">&nbsp;        AddonIncarnationState.Snapshot lifecycle =</b>
+<b class="nc">&nbsp;                AddonIncarnationState.inspect(player);</b>
+<b class="nc">&nbsp;        long retryRemaining = Math.max(</b>
+&nbsp;                0L,
+<b class="nc">&nbsp;                lifecycle.nativeEndowmentNextAttemptEpochMillis()</b>
+<b class="nc">&nbsp;                        - System.currentTimeMillis()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        RecognitionDataFixtureFactory.FutureInspection future =</b>
+<b class="nc">&nbsp;                RecognitionDataFixtureFactory.inspectFutureFixture(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(source, &quot;Recognition Migration / Retry Fixture&quot;);</b>
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Data version&quot;,
+<b class="nc">&nbsp;                Integer.toString(data.getDataVersion())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Write-blocked by future version&quot;,
+<b class="nc">&nbsp;                yesNo(data.isWriteBlockedByFutureVersion())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Committed migration state&quot;,
+<b class="nc">&nbsp;                committed.migrationState().displayName()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Path / title&quot;,
+<b class="nc">&nbsp;                committed.pathSummary()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + display(committed.bestowedTitle())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Recognition incarnation&quot;,
+<b class="nc">&nbsp;                display(committed.incarnationId())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Payload fingerprint&quot;,
+<b class="nc">&nbsp;                future.actualFingerprint()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Life token / reset sequence&quot;,
+<b class="nc">&nbsp;                lifecycle.lifeToken()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + lifecycle.resetSequence()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Native retry attempts / remaining&quot;,
+<b class="nc">&nbsp;                lifecycle.nativeEndowmentAttempts()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + formatSeconds(retryRemaining)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Native marker&quot;,
+<b class="nc">&nbsp;                display(lifecycle.nativeEndowmentIncarnation())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Native named / EP&quot;,
+<b class="nc">&nbsp;                yesNo(</b>
+&nbsp;                        TensuraPlayerStateHelper
+<b class="nc">&nbsp;                                .isNamedOrEndowed(player)</b>
+&nbsp;                )
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + formatEp(readEp(player))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int validate(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+&nbsp;        RecognitionDataFixtureFactory.ValidationReport report =
+<b class="nc">&nbsp;                RecognitionDataFixtureFactory.validate();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(source, &quot;Recognition Migration Fixture Validation&quot;);</b>
+&nbsp;
+&nbsp;        for (RecognitionDataFixtureFactory.Check check :
+<b class="nc">&nbsp;                report.checks()) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                    (check.passed()</b>
+<b class="nc">&nbsp;                                            ? &quot;[PASS] &quot;</b>
+<b class="nc">&nbsp;                                            : &quot;[FAIL] &quot;)</b>
+<b class="nc">&nbsp;                                            + check.name()</b>
+&nbsp;                                            + &quot; — &quot;
+<b class="nc">&nbsp;                                            + check.detail()</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+<b class="nc">&nbsp;                                    check.passed()</b>
+<b class="nc">&nbsp;                                            ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                            : ChatFormatting.RED</b>
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Checks&quot;,
+<b class="nc">&nbsp;                report.passedChecks()</b>
+&nbsp;                        + &quot; passed / &quot;
+<b class="nc">&nbsp;                        + report.failedChecks()</b>
+&nbsp;                        + &quot; failed&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                report.passed()</b>
+<b class="nc">&nbsp;                                        ? &quot;Migration fixture validation PASS.&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;Migration fixture validation FAIL.&quot;</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                report.passed()</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.RED,</b>
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return report.passed() ? 1 : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int requestLegacyFixture(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+&nbsp;
+<b class="nc">&nbsp;        AdminConfirmationTracker.arm(</b>
+&nbsp;                source,
+&nbsp;                AdminConfirmationTracker.Action
+&nbsp;                        .INSTALL_LEGACY_MIGRATION_FIXTURE,
+<b class="nc">&nbsp;                player.getUUID()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendFixtureWarning(</b>
+&nbsp;                source,
+&nbsp;                &quot;LEGACY V1 + RETRY&quot;,
+&nbsp;                &quot;This replaces the addon&#39;s recognition attachment with an artificial committed v1 payload and a capped 60-second native-endowment retry.&quot;,
+&nbsp;                &quot;/moostensura debug migration legacy confirm&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int installLegacyFixture(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+<b class="nc">&nbsp;        AdminConfirmationTracker.Result confirmation =</b>
+<b class="nc">&nbsp;                AdminConfirmationTracker.consume(</b>
+&nbsp;                        source,
+&nbsp;                        AdminConfirmationTracker.Action
+&nbsp;                                .INSTALL_LEGACY_MIGRATION_FIXTURE,
+<b class="nc">&nbsp;                        player.getUUID()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!confirmation.confirmed()) {</b>
+<b class="nc">&nbsp;            return sendConfirmationFailure(</b>
+&nbsp;                    source,
+&nbsp;                    confirmation,
+&nbsp;                    &quot;/moostensura debug migration legacy&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (TensuraPlayerStateHelper.isNamedOrEndowed(player)) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;The legacy fixture requires an unnamed player in a disposable world. Clear native naming first.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        RecognitionData fixture =
+&nbsp;                RecognitionDataFixtureFactory
+<b class="nc">&nbsp;                        .createUnmigratedLegacyCommitted();</b>
+&nbsp;
+<b class="nc">&nbsp;        player.setData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA,
+&nbsp;                fixture
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        AddonIncarnationState.load(player)</b>
+<b class="nc">&nbsp;                .prepareNativeEndowmentRetryFixture(</b>
+&nbsp;                        RETRY_FIXTURE_ATTEMPTS,
+<b class="nc">&nbsp;                        System.currentTimeMillis()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Installed unmigrated recognition v1 and capped retry fixture.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GREEN,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Immediately use Save and Quit to Title, then reopen this world before the 60-second retry deadline.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;After reload: /moostensura debug migration and /moostensura debug migration retry probe&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int requestFutureFixture(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+&nbsp;
+<b class="nc">&nbsp;        AdminConfirmationTracker.arm(</b>
+&nbsp;                source,
+&nbsp;                AdminConfirmationTracker.Action
+&nbsp;                        .INSTALL_FUTURE_MIGRATION_FIXTURE,
+<b class="nc">&nbsp;                player.getUUID()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendFixtureWarning(</b>
+&nbsp;                source,
+&nbsp;                &quot;UNKNOWN FUTURE VERSION&quot;,
+&nbsp;                &quot;This replaces the addon&#39;s recognition attachment with a future schema/result/rules/reward payload containing exact sentinels.&quot;,
+&nbsp;                &quot;/moostensura debug migration future confirm&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int installFutureFixture(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+<b class="nc">&nbsp;        AdminConfirmationTracker.Result confirmation =</b>
+<b class="nc">&nbsp;                AdminConfirmationTracker.consume(</b>
+&nbsp;                        source,
+&nbsp;                        AdminConfirmationTracker.Action
+&nbsp;                                .INSTALL_FUTURE_MIGRATION_FIXTURE,
+<b class="nc">&nbsp;                        player.getUUID()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!confirmation.confirmed()) {</b>
+<b class="nc">&nbsp;            return sendConfirmationFailure(</b>
+&nbsp;                    source,
+&nbsp;                    confirmation,
+&nbsp;                    &quot;/moostensura debug migration future&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        player.setData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA,
+&nbsp;                RecognitionDataFixtureFactory
+<b class="nc">&nbsp;                        .createFutureVersionFixture()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionDisplayNameSyncService</b>
+<b class="nc">&nbsp;                .refreshAndBroadcast(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Installed the exact unknown-future recognition fixture.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GREEN,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Use /moostensura debug migration future status now and after a save/reload. Both fingerprints must match.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return inspectFutureFixture(source);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int inspectFutureFixture(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+<b class="nc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+<b class="nc">&nbsp;        RecognitionDataFixtureFactory.FutureInspection inspection =</b>
+&nbsp;                RecognitionDataFixtureFactory
+<b class="nc">&nbsp;                        .inspectFutureFixture(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(source, &quot;Unknown Future Recognition Fixture&quot;);</b>
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Expected fingerprint&quot;,
+<b class="nc">&nbsp;                inspection.expectedFingerprint()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Actual fingerprint&quot;,
+<b class="nc">&nbsp;                inspection.actualFingerprint()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Exact payload match&quot;,
+<b class="nc">&nbsp;                yesNo(inspection.exactMatch())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Write-blocked&quot;,
+<b class="nc">&nbsp;                yesNo(inspection.writeBlocked())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                (inspection.passed()</b>
+<b class="nc">&nbsp;                                        ? &quot;[PASS] &quot;</b>
+<b class="nc">&nbsp;                                        : &quot;[FAIL] &quot;)</b>
+<b class="nc">&nbsp;                                        + inspection.detail()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                inspection.passed()</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.RED,</b>
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return inspection.passed() ? 1 : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int probeRetryIdempotence(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+<b class="nc">&nbsp;        AddonIncarnationState.Snapshot before =</b>
+<b class="nc">&nbsp;                AddonIncarnationState.inspect(player);</b>
+<b class="nc">&nbsp;        double beforeEp = readEp(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int attempt = 0; attempt &lt; 3; attempt++) {</b>
+<b class="nc">&nbsp;            RecognitionNativeEndowmentService.synchronize(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AddonIncarnationState.Snapshot after =</b>
+<b class="nc">&nbsp;                AddonIncarnationState.inspect(player);</b>
+<b class="nc">&nbsp;        double afterEp = readEp(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean unchanged = before.nativeEndowmentAttempts()</b>
+<b class="nc">&nbsp;                == after.nativeEndowmentAttempts()</b>
+<b class="nc">&nbsp;                &amp;&amp; before.nativeEndowmentNextAttemptEpochMillis()</b>
+<b class="nc">&nbsp;                == after.nativeEndowmentNextAttemptEpochMillis()</b>
+<b class="nc">&nbsp;                &amp;&amp; before.nativeEndowmentIncarnation().equals(</b>
+<b class="nc">&nbsp;                after.nativeEndowmentIncarnation()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                &amp;&amp; Double.compare(beforeEp, afterEp) == 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(source, &quot;Native Endowment Retry Probe&quot;);</b>
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Attempts before / after&quot;,
+<b class="nc">&nbsp;                before.nativeEndowmentAttempts()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + after.nativeEndowmentAttempts()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Marker before / after&quot;,
+<b class="nc">&nbsp;                display(before.nativeEndowmentIncarnation())</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + display(after.nativeEndowmentIncarnation())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;EP delta across three synchronizations&quot;,
+<b class="nc">&nbsp;                formatSignedEp(afterEp - beforeEp)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                unchanged</b>
+<b class="nc">&nbsp;                                        ? &quot;[PASS] Repeated synchronization was idempotent and non-spamming.&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;[FAIL] Retry state or EP changed during the probe.&quot;</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                unchanged</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.RED,</b>
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return unchanged ? 1 : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int runDueRetry(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+<b class="nc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!data.isNamingCommitted()</b>
+<b class="nc">&nbsp;                || data.isWriteBlockedByFutureVersion()) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;A current committed recognition fixture is required.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AddonIncarnationState state =</b>
+<b class="nc">&nbsp;                AddonIncarnationState.load(player);</b>
+<b class="nc">&nbsp;        double beforeEp = readEp(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        state.makeNativeEndowmentRetryDueForFixture();</b>
+<b class="nc">&nbsp;        RecognitionNativeEndowmentService.synchronize(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        AddonIncarnationState.Snapshot after =</b>
+<b class="nc">&nbsp;                AddonIncarnationState.inspect(player);</b>
+<b class="nc">&nbsp;        double afterEp = readEp(player);</b>
+<b class="nc">&nbsp;        String recognitionIncarnation = data.getIncarnationId().isBlank()</b>
+<b class="nc">&nbsp;                ? after.lifeToken()</b>
+<b class="nc">&nbsp;                : data.getIncarnationId();</b>
+<b class="nc">&nbsp;        boolean completed = TensuraPlayerStateHelper</b>
+<b class="nc">&nbsp;                .isNamedOrEndowed(player)</b>
+<b class="nc">&nbsp;                &amp;&amp; !recognitionIncarnation.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; recognitionIncarnation.equals(</b>
+<b class="nc">&nbsp;                after.nativeEndowmentIncarnation()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                &amp;&amp; after.nativeEndowmentAttempts() == 0</b>
+<b class="nc">&nbsp;                &amp;&amp; after.nativeEndowmentNextAttemptEpochMillis() == 0L;</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(source, &quot;Forced-Due Native Endowment Retry&quot;);</b>
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Native marker&quot;,
+<b class="nc">&nbsp;                display(after.nativeEndowmentIncarnation())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Failed attempts / next deadline&quot;,
+<b class="nc">&nbsp;                after.nativeEndowmentAttempts()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + after.nativeEndowmentNextAttemptEpochMillis()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;EP delta&quot;,
+<b class="nc">&nbsp;                formatSignedEp(afterEp - beforeEp)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                completed</b>
+<b class="nc">&nbsp;                                        ? &quot;[PASS] Retry completed and established the exactly-once marker.&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;[FAIL] Retry did not reach the completed anchored state.&quot;</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                completed</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.RED,</b>
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return completed ? 1 : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int holdRetryForReset(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player = source.getPlayerOrException();</b>
+<b class="nc">&nbsp;        RecognitionData data = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!data.isNamingCommitted()</b>
+<b class="nc">&nbsp;                || data.isWriteBlockedByFutureVersion()) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;A current committed recognition record is required.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.RED)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AddonIncarnationState.load(player)</b>
+<b class="nc">&nbsp;                .prepareNativeEndowmentRetryFixture(</b>
+&nbsp;                        RETRY_FIXTURE_ATTEMPTS,
+<b class="nc">&nbsp;                        System.currentTimeMillis()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Installed a capped pending retry and removed the old exactly-once marker.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GREEN,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Use Tensura&#39;s Character Reset Scroll now. After reset, lifecycle attempts/deadline/marker and the old recognition must all be cleared.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return inspect(source);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendFixtureWarning(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String fixtureName,
+&nbsp;            String description,
+&nbsp;            String confirmationCommand
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                fixtureName + &quot; FIXTURE CONFIRMATION REQUIRED&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(description)</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Use only in a backed-up disposable test world.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.RED),</b>
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Run &quot;
+&nbsp;                                        + confirmationCommand
+&nbsp;                                        + &quot; within &quot;
+&nbsp;                                        + AdminConfirmationTracker
+&nbsp;                                        .CONFIRMATION_WINDOW_SECONDS
+&nbsp;                                        + &quot; seconds.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int sendConfirmationFailure(
+&nbsp;            CommandSourceStack source,
+&nbsp;            AdminConfirmationTracker.Result confirmation,
+&nbsp;            String requestCommand
+&nbsp;    ) {
+<b class="nc">&nbsp;        String explanation = switch (confirmation.status()) {</b>
+<b class="nc">&nbsp;            case EXPIRED -&gt; &quot;The fixture confirmation expired.&quot;;</b>
+&nbsp;            case DIFFERENT_ACTION -&gt;
+<b class="nc">&nbsp;                    &quot;A different destructive action was awaiting confirmation.&quot;;</b>
+&nbsp;            case DIFFERENT_TARGET -&gt;
+<b class="nc">&nbsp;                    &quot;The fixture confirmation belonged to another player.&quot;;</b>
+&nbsp;            case MISSING, CONFIRMED -&gt;
+<b class="nc">&nbsp;                    &quot;No matching fixture confirmation exists.&quot;;</b>
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        source.sendFailure(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                explanation
+&nbsp;                                        + &quot; Run &quot;
+&nbsp;                                        + requestCommand
+&nbsp;                                        + &quot; first.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.RED)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double readEp(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        IExistence existence = TensuraStorages.getExistenceFrom(player);</b>
+<b class="nc">&nbsp;        return existence == null</b>
+<b class="nc">&nbsp;                ? 0.0D</b>
+<b class="nc">&nbsp;                : Math.max(0.0D, existence.getEP());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String yesNo(
+&nbsp;            boolean value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value ? &quot;Yes&quot; : &quot;No&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String display(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null || value.isBlank()</b>
+<b class="nc">&nbsp;                ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                : value.trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatSeconds(
+&nbsp;            long millis
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.1f seconds&quot;,
+<b class="nc">&nbsp;                Math.max(0L, millis) / 1_000.0D</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatEp(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%,.0f EP&quot;,
+<b class="nc">&nbsp;                Math.max(0.0D, value)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatSignedEp(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%+,.0f EP&quot;,
+<b class="nc">&nbsp;                value</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendHeader(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String text
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(text)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendValue(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String label,
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent message =</b>
+<b class="nc">&nbsp;                Component.literal(label + &quot;: &quot;)</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY);</b>
+&nbsp;
+<b class="nc">&nbsp;        message.append(</b>
+<b class="nc">&nbsp;                Component.literal(value)</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.WHITE)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(() -&gt; message, false);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

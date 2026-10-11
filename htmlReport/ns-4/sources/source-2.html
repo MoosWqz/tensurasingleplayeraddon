@@ -1,0 +1,267 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ClientPayloadHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client</a>
+</div>
+
+<h1>Coverage Summary for Class: ClientPayloadHandler (com.mooswqz.moostensuraaddon.client)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClientPayloadHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (1/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (3/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.9%
+  </span>
+  <span class="absValue">
+    (7/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.GranterSkillSelectionScreen;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.RecognitionProgressScreen;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.SubordinateOverviewScreen;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.UltimateConfirmationScreen;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.UltimateMultiGrantScreen;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.UltimateSubordinateSkillSelectionScreen;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenGranterScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenRecognitionProgressScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenUltimateConfirmationScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenUltimateMultiGrantScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenUltimateSubordinateSkillScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.RemoveSubordinateOverviewEntryPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.SyncRecognitionDisplayNamePayload;
+&nbsp;import net.minecraft.client.Minecraft;
+&nbsp;import net.minecraft.client.player.AbstractClientPlayer;
+&nbsp;import net.neoforged.api.distmarker.Dist;
+&nbsp;import net.neoforged.api.distmarker.OnlyIn;
+&nbsp;
+&nbsp;@OnlyIn(Dist.CLIENT)
+&nbsp;public final class ClientPayloadHandler {
+&nbsp;
+&nbsp;    private ClientPayloadHandler() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void openGranterScreen() {
+<b class="nc">&nbsp;        openGranterScreen(</b>
+&nbsp;                OpenGranterScreenPayload.INSTANCE
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void openGranterScreen(
+&nbsp;            OpenGranterScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        Minecraft minecraft = Minecraft.getInstance();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (minecraft.player != null) {</b>
+<b class="nc">&nbsp;            minecraft.setScreen(</b>
+&nbsp;                    new GranterSkillSelectionScreen()
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void openUltimateMultiGrantScreen(
+&nbsp;            OpenUltimateMultiGrantScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        Minecraft minecraft = Minecraft.getInstance();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (minecraft.player != null) {</b>
+<b class="nc">&nbsp;            minecraft.setScreen(</b>
+&nbsp;                    new UltimateMultiGrantScreen(payload)
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void openUltimateSubordinateSkillScreen(
+&nbsp;            OpenUltimateSubordinateSkillScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        Minecraft minecraft = Minecraft.getInstance();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (minecraft.player != null) {</b>
+<b class="nc">&nbsp;            minecraft.setScreen(</b>
+&nbsp;                    new UltimateSubordinateSkillSelectionScreen(
+&nbsp;                            payload
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void openSubordinateOverviewScreen(
+&nbsp;            OpenSubordinateOverviewScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        Minecraft minecraft = Minecraft.getInstance();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (minecraft.player == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (minecraft.screen instanceof SubordinateOverviewScreen screen) {</b>
+<b class="nc">&nbsp;            screen.applyPayload(payload);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        minecraft.setScreen(</b>
+&nbsp;                new SubordinateOverviewScreen(payload)
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void removeSubordinateOverviewEntry(
+&nbsp;            RemoveSubordinateOverviewEntryPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        Minecraft minecraft = Minecraft.getInstance();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (payload == null</b>
+<b class="nc">&nbsp;                || !(minecraft.screen instanceof SubordinateOverviewScreen screen)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        screen.removeTarget(payload.targetUuid());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void openUltimateConfirmationScreen(
+&nbsp;            OpenUltimateConfirmationScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        Minecraft minecraft = Minecraft.getInstance();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (minecraft.player != null) {</b>
+<b class="nc">&nbsp;            minecraft.setScreen(</b>
+&nbsp;                    new UltimateConfirmationScreen(payload)
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void openRecognitionProgressScreen(
+&nbsp;            OpenRecognitionProgressScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        Minecraft minecraft = Minecraft.getInstance();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (minecraft.player != null) {</b>
+<b class="nc">&nbsp;            minecraft.setScreen(</b>
+&nbsp;                    new RecognitionProgressScreen(payload)
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void syncRecognitionDisplayName(
+&nbsp;            SyncRecognitionDisplayNamePayload payload
+&nbsp;    ) {
+<b class="fc">&nbsp;        ClientRecognitionDisplayNameCache.apply(payload);</b>
+&nbsp;
+<b class="fc">&nbsp;        Minecraft minecraft = Minecraft.getInstance();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (minecraft.level == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        for (AbstractClientPlayer player :
+<b class="pc">&nbsp;                minecraft.level.players()) {</b>
+<b class="pc">&nbsp;            if (!player.getUUID().equals(</b>
+<b class="fc">&nbsp;                    payload.playerUuid()</b>
+&nbsp;            )) {
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            player.refreshDisplayName();</b>
+&nbsp;            break;
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,2152 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionProgressScreen</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionProgressScreen (com.mooswqz.moostensuraaddon.client.screen)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionProgressScreen</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/215)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/666)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionProgressScreen$OverviewLayout</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionProgressScreen$PanelRect</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionProgressScreen$View</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/223)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/679)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.client.ClientRecognitionBenefitsCache;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenRecognitionProgressScreenPayload;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.client.gui.GuiGraphics;
+&nbsp;import net.minecraft.client.gui.components.Button;
+&nbsp;import net.minecraft.client.gui.screens.Screen;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;/**
+&nbsp; * Unified player-facing view of recognition guidance, paths and benefits.
+&nbsp; *
+&nbsp; * &lt;p&gt;The server remains authoritative for every displayed value. This screen
+&nbsp; * only presents the sanitized progress payload and the separately synchronized
+&nbsp; * recognition-benefit snapshot.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionProgressScreen extends Screen {
+&nbsp;
+&nbsp;    private static final int MARGIN = 12;
+&nbsp;    private static final int HEADER_BOTTOM = 47;
+&nbsp;    private static final int TAB_TOP = 49;
+&nbsp;    private static final int TAB_HEIGHT = 20;
+&nbsp;    private static final int CONTENT_TOP = 74;
+&nbsp;    private static final int FOOTER_HEIGHT = 30;
+&nbsp;    private static final int CELL_GAP = 3;
+&nbsp;    private static final int PANEL_GAP = 6;
+&nbsp;
+<b class="nc">&nbsp;    private static final String[] MATRIX_PATH_IDS = {</b>
+&nbsp;            &quot;lawful_good&quot;,
+&nbsp;            &quot;lawful_neutral&quot;,
+&nbsp;            &quot;lawful_evil&quot;,
+&nbsp;            &quot;neutral_good&quot;,
+&nbsp;            &quot;true_neutral&quot;,
+&nbsp;            &quot;neutral_evil&quot;,
+&nbsp;            &quot;chaotic_good&quot;,
+&nbsp;            &quot;chaotic_neutral&quot;,
+&nbsp;            &quot;chaotic_evil&quot;
+&nbsp;    };
+&nbsp;
+<b class="nc">&nbsp;    private static final String[] COLUMN_LABELS = {</b>
+&nbsp;            &quot;Good&quot;,
+&nbsp;            &quot;Neutral&quot;,
+&nbsp;            &quot;Evil&quot;
+&nbsp;    };
+&nbsp;
+<b class="nc">&nbsp;    private static final String[] ROW_LABELS = {</b>
+&nbsp;            &quot;L&quot;,
+&nbsp;            &quot;N&quot;,
+&nbsp;            &quot;C&quot;
+&nbsp;    };
+&nbsp;
+&nbsp;    private final OpenRecognitionProgressScreenPayload payload;
+&nbsp;
+&nbsp;    private View activeView;
+&nbsp;    private int overviewFirstRow;
+&nbsp;
+&nbsp;    private Button overviewTabButton;
+&nbsp;    private Button pathsTabButton;
+&nbsp;    private Button benefitsTabButton;
+&nbsp;    private Button previousPageButton;
+&nbsp;    private Button nextPageButton;
+&nbsp;    private Button closeButton;
+&nbsp;
+&nbsp;    public RecognitionProgressScreen(
+&nbsp;            OpenRecognitionProgressScreenPayload payload
+&nbsp;    ) {
+<b class="nc">&nbsp;        super(Component.translatable(</b>
+&nbsp;                &quot;screen.moostensuraaddon.recognition.title&quot;
+&nbsp;        ));
+&nbsp;
+<b class="nc">&nbsp;        this.payload = payload;</b>
+<b class="nc">&nbsp;        this.activeView = payload != null</b>
+<b class="nc">&nbsp;                &amp;&amp; payload.recognitionCommitted()</b>
+<b class="nc">&nbsp;                ? View.PATHS</b>
+<b class="nc">&nbsp;                : View.OVERVIEW;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void init() {
+<b class="nc">&nbsp;        int tabAreaWidth = Math.min(</b>
+&nbsp;                390,
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        210,
+&nbsp;                        this.width - MARGIN * 2
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int tabGap = 3;</b>
+<b class="nc">&nbsp;        int tabWidth = Math.max(</b>
+&nbsp;                64,
+&nbsp;                (tabAreaWidth - tabGap * 2) / 3
+&nbsp;        );
+<b class="nc">&nbsp;        int realTabWidth = tabWidth * 3 + tabGap * 2;</b>
+<b class="nc">&nbsp;        int tabLeft = this.width / 2 - realTabWidth / 2;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.overviewTabButton = Button.builder(</b>
+<b class="nc">&nbsp;                        Component.translatable(</b>
+&nbsp;                                &quot;screen.moostensuraaddon.recognition.tab.overview&quot;
+&nbsp;                        ),
+<b class="nc">&nbsp;                        button -&gt; setActiveView(View.OVERVIEW)</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .pos(tabLeft, TAB_TOP)</b>
+<b class="nc">&nbsp;                .size(tabWidth, TAB_HEIGHT)</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.pathsTabButton = Button.builder(</b>
+<b class="nc">&nbsp;                        Component.translatable(</b>
+&nbsp;                                &quot;screen.moostensuraaddon.recognition.tab.paths&quot;
+&nbsp;                        ),
+<b class="nc">&nbsp;                        button -&gt; setActiveView(View.PATHS)</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .pos(</b>
+&nbsp;                        tabLeft + tabWidth + tabGap,
+&nbsp;                        TAB_TOP
+&nbsp;                )
+<b class="nc">&nbsp;                .size(tabWidth, TAB_HEIGHT)</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.benefitsTabButton = Button.builder(</b>
+<b class="nc">&nbsp;                        Component.translatable(</b>
+&nbsp;                                &quot;screen.moostensuraaddon.recognition.tab.benefits&quot;
+&nbsp;                        ),
+<b class="nc">&nbsp;                        button -&gt; setActiveView(View.BENEFITS)</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .pos(</b>
+&nbsp;                        tabLeft + (tabWidth + tabGap) * 2,
+&nbsp;                        TAB_TOP
+&nbsp;                )
+<b class="nc">&nbsp;                .size(tabWidth, TAB_HEIGHT)</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        int footerY = Math.max(</b>
+&nbsp;                CONTENT_TOP,
+&nbsp;                this.height - 25
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        this.previousPageButton = Button.builder(</b>
+<b class="nc">&nbsp;                        Component.translatable(</b>
+&nbsp;                                &quot;screen.moostensuraaddon.recognition.previous&quot;
+&nbsp;                        ),
+<b class="nc">&nbsp;                        button -&gt; changeOverviewPage(-1)</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .pos(MARGIN, footerY)</b>
+<b class="nc">&nbsp;                .size(</b>
+<b class="nc">&nbsp;                        Math.min(92, Math.max(66, this.width / 5)),</b>
+&nbsp;                        20
+&nbsp;                )
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.nextPageButton = Button.builder(</b>
+<b class="nc">&nbsp;                        Component.translatable(</b>
+&nbsp;                                &quot;screen.moostensuraaddon.recognition.next&quot;
+&nbsp;                        ),
+<b class="nc">&nbsp;                        button -&gt; changeOverviewPage(1)</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .size(</b>
+<b class="nc">&nbsp;                        Math.min(92, Math.max(66, this.width / 5)),</b>
+&nbsp;                        20
+&nbsp;                )
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.nextPageButton.setX(</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        MARGIN,
+&nbsp;                        this.width
+&nbsp;                                - MARGIN
+<b class="nc">&nbsp;                                - this.nextPageButton.getWidth()</b>
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        this.nextPageButton.setY(footerY);</b>
+&nbsp;
+<b class="nc">&nbsp;        int closeWidth = Math.min(</b>
+&nbsp;                120,
+<b class="nc">&nbsp;                Math.max(80, this.width / 3)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        this.closeButton = Button.builder(</b>
+<b class="nc">&nbsp;                        Component.translatable(</b>
+&nbsp;                                &quot;screen.moostensuraaddon.recognition.close&quot;
+&nbsp;                        ),
+<b class="nc">&nbsp;                        button -&gt; onClose()</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .pos(</b>
+&nbsp;                        this.width / 2 - closeWidth / 2,
+&nbsp;                        footerY
+&nbsp;                )
+<b class="nc">&nbsp;                .size(closeWidth, 20)</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        addRenderableWidget(this.overviewTabButton);</b>
+<b class="nc">&nbsp;        addRenderableWidget(this.pathsTabButton);</b>
+<b class="nc">&nbsp;        addRenderableWidget(this.benefitsTabButton);</b>
+<b class="nc">&nbsp;        addRenderableWidget(this.previousPageButton);</b>
+<b class="nc">&nbsp;        addRenderableWidget(this.nextPageButton);</b>
+<b class="nc">&nbsp;        addRenderableWidget(this.closeButton);</b>
+&nbsp;
+<b class="nc">&nbsp;        clampOverviewPage();</b>
+<b class="nc">&nbsp;        updateWidgetStates();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void render(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+&nbsp;        /*
+&nbsp;         * Do not call Screen#renderBackground or Screen#render.
+&nbsp;         *
+&nbsp;         * The custom opaque background avoids Minecraft&#39;s menu blur path.
+&nbsp;         * Registered widgets are rendered explicitly after all custom panels
+&nbsp;         * so labels, progress bars and buttons remain equally sharp.
+&nbsp;         */
+<b class="nc">&nbsp;        guiGraphics.fill(</b>
+&nbsp;                0,
+&nbsp;                0,
+&nbsp;                this.width,
+&nbsp;                this.height,
+&nbsp;                0xFF0D0F14
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        renderHeader(guiGraphics);</b>
+&nbsp;
+<b class="nc">&nbsp;        PanelRect content = createContentPanel();</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (activeView) {</b>
+&nbsp;            case OVERVIEW -&gt;
+<b class="nc">&nbsp;                    renderOverview(guiGraphics, content);</b>
+&nbsp;            case PATHS -&gt;
+<b class="nc">&nbsp;                    renderPaths(guiGraphics, content);</b>
+&nbsp;            case BENEFITS -&gt;
+<b class="nc">&nbsp;                    renderBenefitsPanel(guiGraphics, content);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        renderWidget(</b>
+&nbsp;                this.overviewTabButton,
+&nbsp;                guiGraphics,
+&nbsp;                mouseX,
+&nbsp;                mouseY,
+&nbsp;                partialTick
+&nbsp;        );
+<b class="nc">&nbsp;        renderWidget(</b>
+&nbsp;                this.pathsTabButton,
+&nbsp;                guiGraphics,
+&nbsp;                mouseX,
+&nbsp;                mouseY,
+&nbsp;                partialTick
+&nbsp;        );
+<b class="nc">&nbsp;        renderWidget(</b>
+&nbsp;                this.benefitsTabButton,
+&nbsp;                guiGraphics,
+&nbsp;                mouseX,
+&nbsp;                mouseY,
+&nbsp;                partialTick
+&nbsp;        );
+<b class="nc">&nbsp;        renderWidget(</b>
+&nbsp;                this.previousPageButton,
+&nbsp;                guiGraphics,
+&nbsp;                mouseX,
+&nbsp;                mouseY,
+&nbsp;                partialTick
+&nbsp;        );
+<b class="nc">&nbsp;        renderWidget(</b>
+&nbsp;                this.nextPageButton,
+&nbsp;                guiGraphics,
+&nbsp;                mouseX,
+&nbsp;                mouseY,
+&nbsp;                partialTick
+&nbsp;        );
+<b class="nc">&nbsp;        renderWidget(</b>
+&nbsp;                this.closeButton,
+&nbsp;                guiGraphics,
+&nbsp;                mouseX,
+&nbsp;                mouseY,
+&nbsp;                partialTick
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Minecraft 1.21.x supplies horizontal and vertical wheel deltas.
+&nbsp;     * The page buttons remain available when a platform does not forward a
+&nbsp;     * wheel event to this method.
+&nbsp;     */
+&nbsp;    public boolean mouseScrolled(
+&nbsp;            double mouseX,
+&nbsp;            double mouseY,
+&nbsp;            double scrollX,
+&nbsp;            double scrollY
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (activeView != View.OVERVIEW</b>
+&nbsp;                || scrollY == 0.0D
+<b class="nc">&nbsp;                || !createContentPanel().contains(</b>
+&nbsp;                mouseX,
+&nbsp;                mouseY
+&nbsp;        )) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        changeOverviewPage(</b>
+<b class="nc">&nbsp;                scrollY &gt; 0.0D ? -1 : 1</b>
+&nbsp;        );
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setActiveView(
+&nbsp;            View view
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (view == null || activeView == view) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        activeView = view;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (activeView == View.OVERVIEW) {</b>
+<b class="nc">&nbsp;            clampOverviewPage();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        updateWidgetStates();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void changeOverviewPage(
+&nbsp;            int delta
+&nbsp;    ) {
+<b class="nc">&nbsp;        OverviewLayout layout = createOverviewLayout(</b>
+<b class="nc">&nbsp;                createContentPanel()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int maximumFirstRow = Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                layout.totalRows()</b>
+<b class="nc">&nbsp;                        - layout.visibleRows()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        overviewFirstRow = Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        maximumFirstRow,
+&nbsp;                        overviewFirstRow + delta
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        updateWidgetStates();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clampOverviewPage() {
+<b class="nc">&nbsp;        OverviewLayout layout = createOverviewLayout(</b>
+<b class="nc">&nbsp;                createContentPanel()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        overviewFirstRow = Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                Math.min(</b>
+<b class="nc">&nbsp;                        Math.max(</b>
+&nbsp;                                0,
+<b class="nc">&nbsp;                                layout.totalRows()</b>
+<b class="nc">&nbsp;                                        - layout.visibleRows()</b>
+&nbsp;                        ),
+&nbsp;                        overviewFirstRow
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateWidgetStates() {
+<b class="nc">&nbsp;        if (this.overviewTabButton != null) {</b>
+<b class="nc">&nbsp;            this.overviewTabButton.active =</b>
+&nbsp;                    activeView != View.OVERVIEW;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (this.pathsTabButton != null) {</b>
+<b class="nc">&nbsp;            this.pathsTabButton.active =</b>
+&nbsp;                    activeView != View.PATHS;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (this.benefitsTabButton != null) {</b>
+<b class="nc">&nbsp;            this.benefitsTabButton.active =</b>
+&nbsp;                    activeView != View.BENEFITS;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        OverviewLayout layout = createOverviewLayout(</b>
+<b class="nc">&nbsp;                createContentPanel()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean paginated = activeView == View.OVERVIEW</b>
+<b class="nc">&nbsp;                &amp;&amp; layout.totalRows() &gt; layout.visibleRows();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (this.previousPageButton != null) {</b>
+<b class="nc">&nbsp;            this.previousPageButton.visible = paginated;</b>
+<b class="nc">&nbsp;            this.previousPageButton.active =</b>
+&nbsp;                    overviewFirstRow &gt; 0;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (this.nextPageButton != null) {</b>
+<b class="nc">&nbsp;            this.nextPageButton.visible = paginated;</b>
+<b class="nc">&nbsp;            this.nextPageButton.active =</b>
+&nbsp;                    overviewFirstRow
+<b class="nc">&nbsp;                            + layout.visibleRows()</b>
+<b class="nc">&nbsp;                            &lt; layout.totalRows();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderHeader(
+&nbsp;            GuiGraphics guiGraphics
+&nbsp;    ) {
+<b class="nc">&nbsp;        drawCenteredClipped(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                this.title.copy().withStyle(</b>
+&nbsp;                        ChatFormatting.LIGHT_PURPLE,
+&nbsp;                        ChatFormatting.BOLD
+&nbsp;                ),
+&nbsp;                this.width / 2,
+&nbsp;                6,
+&nbsp;                this.width - MARGIN * 2,
+&nbsp;                0xFFFFFF
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        MutableComponent identity = Component.literal(</b>
+<b class="nc">&nbsp;                        safeText(payload == null</b>
+<b class="nc">&nbsp;                                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                : payload.identityLine())</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .withColor(</b>
+<b class="nc">&nbsp;                        payload == null</b>
+<b class="nc">&nbsp;                                ? 0xFFFFFF</b>
+<b class="nc">&nbsp;                                : payload.recognitionColor()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (payload != null</b>
+<b class="nc">&nbsp;                &amp;&amp; payload.recognitionBold()) {</b>
+<b class="nc">&nbsp;            identity.withStyle(ChatFormatting.BOLD);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        drawCenteredClipped(</b>
+&nbsp;                guiGraphics,
+&nbsp;                identity,
+&nbsp;                this.width / 2,
+&nbsp;                20,
+&nbsp;                this.width - MARGIN * 2,
+<b class="nc">&nbsp;                payload == null</b>
+<b class="nc">&nbsp;                        ? 0xFFFFFF</b>
+<b class="nc">&nbsp;                        : payload.recognitionColor()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        drawCenteredClipped(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                                safeText(</b>
+<b class="nc">&nbsp;                                        payload == null</b>
+<b class="nc">&nbsp;                                                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                                : payload.pathSummary()</b>
+&nbsp;                                )
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                this.width / 2,
+&nbsp;                34,
+&nbsp;                this.width - MARGIN * 2,
+&nbsp;                0xA0A0A0
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.fill(</b>
+&nbsp;                MARGIN,
+&nbsp;                HEADER_BOTTOM,
+<b class="nc">&nbsp;                Math.max(MARGIN, this.width - MARGIN),</b>
+&nbsp;                HEADER_BOTTOM + 1,
+&nbsp;                0xFF2B2633
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private PanelRect createContentPanel() {
+<b class="nc">&nbsp;        int bottom = Math.max(</b>
+&nbsp;                CONTENT_TOP + 1,
+&nbsp;                this.height - FOOTER_HEIGHT
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return new PanelRect(</b>
+&nbsp;                MARGIN,
+&nbsp;                CONTENT_TOP,
+<b class="nc">&nbsp;                Math.max(1, this.width - MARGIN * 2),</b>
+<b class="nc">&nbsp;                Math.max(1, bottom - CONTENT_TOP)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderOverview(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            PanelRect panel
+&nbsp;    ) {
+<b class="nc">&nbsp;        OverviewLayout layout =</b>
+<b class="nc">&nbsp;                createOverviewLayout(panel);</b>
+&nbsp;
+<b class="nc">&nbsp;        renderStatusPanel(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                layout.statusPanel()</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        List&lt;OpenRecognitionProgressScreenPayload.GuidanceEntry&gt;
+<b class="nc">&nbsp;                entries =</b>
+<b class="nc">&nbsp;                guidanceEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            drawBorderedPanel(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    layout.guidancePanel().left(),</b>
+<b class="nc">&nbsp;                    layout.guidancePanel().top(),</b>
+<b class="nc">&nbsp;                    layout.guidancePanel().right(),</b>
+<b class="nc">&nbsp;                    layout.guidancePanel().bottom(),</b>
+&nbsp;                    0xFF3A3148,
+&nbsp;                    0xD014141A,
+&nbsp;                    1
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            drawCenteredClipped(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    Component.translatable(</b>
+&nbsp;                            &quot;screen.moostensuraaddon.recognition.overview.empty&quot;
+&nbsp;                    ),
+<b class="nc">&nbsp;                    layout.guidancePanel().left()</b>
+<b class="nc">&nbsp;                            + layout.guidancePanel().width() / 2,</b>
+<b class="nc">&nbsp;                    layout.guidancePanel().top()</b>
+<b class="nc">&nbsp;                            + Math.max(</b>
+&nbsp;                            5,
+<b class="nc">&nbsp;                            layout.guidancePanel().height() / 2 - 4</b>
+&nbsp;                    ),
+<b class="nc">&nbsp;                    layout.guidancePanel().width() - 12,</b>
+&nbsp;                    0x9FA7B3
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int firstEntry =</b>
+<b class="nc">&nbsp;                overviewFirstRow * layout.columns();</b>
+&nbsp;
+<b class="nc">&nbsp;        int lastEntryExclusive = Math.min(</b>
+<b class="nc">&nbsp;                entries.size(),</b>
+&nbsp;                firstEntry
+<b class="nc">&nbsp;                        + layout.visibleRows()</b>
+<b class="nc">&nbsp;                        * layout.columns()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        for (int entryIndex = firstEntry;</b>
+<b class="nc">&nbsp;             entryIndex &lt; lastEntryExclusive;</b>
+<b class="nc">&nbsp;             entryIndex++) {</b>
+&nbsp;
+<b class="nc">&nbsp;            int localIndex = entryIndex - firstEntry;</b>
+<b class="nc">&nbsp;            int row = localIndex / layout.columns();</b>
+<b class="nc">&nbsp;            int column = localIndex % layout.columns();</b>
+&nbsp;
+<b class="nc">&nbsp;            int left = layout.guidancePanel().left()</b>
+&nbsp;                    + column
+&nbsp;                    * (
+<b class="nc">&nbsp;                    layout.cardWidth()</b>
+&nbsp;                            + PANEL_GAP
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            int top = layout.guidancePanel().top()</b>
+&nbsp;                    + row
+&nbsp;                    * (
+<b class="nc">&nbsp;                    layout.cardHeight()</b>
+&nbsp;                            + PANEL_GAP
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            renderGuidanceCard(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    entries.get(entryIndex),</b>
+&nbsp;                    new PanelRect(
+&nbsp;                            left,
+&nbsp;                            top,
+<b class="nc">&nbsp;                            layout.cardWidth(),</b>
+<b class="nc">&nbsp;                            layout.cardHeight()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (layout.totalRows()</b>
+<b class="nc">&nbsp;                &gt; layout.visibleRows()) {</b>
+<b class="nc">&nbsp;            int firstVisibleRow = Math.min(</b>
+<b class="nc">&nbsp;                    layout.totalRows(),</b>
+&nbsp;                    overviewFirstRow + 1
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            int lastVisibleRow = Math.min(</b>
+<b class="nc">&nbsp;                    layout.totalRows(),</b>
+&nbsp;                    overviewFirstRow
+<b class="nc">&nbsp;                            + layout.visibleRows()</b>
+&nbsp;            );
+&nbsp;
+&nbsp;            Component rowIndicator =
+<b class="nc">&nbsp;                    firstVisibleRow == lastVisibleRow</b>
+<b class="nc">&nbsp;                            ? Component.translatable(</b>
+&nbsp;                            &quot;screen.moostensuraaddon.recognition.page&quot;,
+<b class="nc">&nbsp;                            firstVisibleRow,</b>
+<b class="nc">&nbsp;                            layout.totalRows()</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                            : Component.translatable(</b>
+&nbsp;                            &quot;screen.moostensuraaddon.recognition.rows&quot;,
+<b class="nc">&nbsp;                            firstVisibleRow,</b>
+<b class="nc">&nbsp;                            lastVisibleRow,</b>
+<b class="nc">&nbsp;                            layout.totalRows()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            drawCenteredClipped(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    rowIndicator,
+<b class="nc">&nbsp;                    panel.left() + panel.width() / 2,</b>
+<b class="nc">&nbsp;                    panel.bottom() - 10,</b>
+<b class="nc">&nbsp;                    Math.max(1, panel.width() - 180),</b>
+&nbsp;                    0x747B86
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private OverviewLayout createOverviewLayout(
+&nbsp;            PanelRect panel
+&nbsp;    ) {
+<b class="nc">&nbsp;        int statusHeight = Math.min(</b>
+&nbsp;                72,
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        56,
+<b class="nc">&nbsp;                        panel.height() / 4</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        PanelRect statusPanel = new PanelRect(</b>
+<b class="nc">&nbsp;                panel.left(),</b>
+<b class="nc">&nbsp;                panel.top(),</b>
+<b class="nc">&nbsp;                panel.width(),</b>
+<b class="nc">&nbsp;                Math.min(</b>
+<b class="nc">&nbsp;                        panel.height(),</b>
+&nbsp;                        statusHeight
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int guidanceTop = Math.min(</b>
+<b class="nc">&nbsp;                panel.bottom(),</b>
+<b class="nc">&nbsp;                statusPanel.bottom() + PANEL_GAP</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int pageReserve = 14;</b>
+<b class="nc">&nbsp;        int guidanceHeight = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                panel.bottom()</b>
+&nbsp;                        - guidanceTop
+&nbsp;                        - pageReserve
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        PanelRect guidancePanel = new PanelRect(</b>
+<b class="nc">&nbsp;                panel.left(),</b>
+&nbsp;                guidanceTop,
+<b class="nc">&nbsp;                panel.width(),</b>
+&nbsp;                guidanceHeight
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int columns = panel.width() &gt;= 520</b>
+<b class="nc">&nbsp;                ? 2</b>
+<b class="nc">&nbsp;                : 1;</b>
+&nbsp;
+<b class="nc">&nbsp;        int cardWidth = Math.max(</b>
+&nbsp;                1,
+&nbsp;                (
+<b class="nc">&nbsp;                        guidancePanel.width()</b>
+&nbsp;                                - PANEL_GAP
+&nbsp;                                * (columns - 1)
+&nbsp;                ) / columns
+&nbsp;        );
+&nbsp;
+&nbsp;        int cardHeight;
+&nbsp;
+<b class="nc">&nbsp;        if (guidancePanel.height() &gt;= 260) {</b>
+<b class="nc">&nbsp;            cardHeight = 64;</b>
+<b class="nc">&nbsp;        } else if (guidancePanel.height() &gt;= 190) {</b>
+<b class="nc">&nbsp;            cardHeight = 57;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            cardHeight = 50;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int visibleRows = Math.max(</b>
+&nbsp;                1,
+&nbsp;                (
+<b class="nc">&nbsp;                        guidancePanel.height()</b>
+&nbsp;                                + PANEL_GAP
+&nbsp;                ) / (
+&nbsp;                        cardHeight
+&nbsp;                                + PANEL_GAP
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int totalRows = Math.max(</b>
+&nbsp;                1,
+&nbsp;                (
+<b class="nc">&nbsp;                        guidanceEntries().size()</b>
+&nbsp;                                + columns - 1
+&nbsp;                ) / columns
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return new OverviewLayout(</b>
+&nbsp;                statusPanel,
+&nbsp;                guidancePanel,
+&nbsp;                columns,
+&nbsp;                cardWidth,
+&nbsp;                cardHeight,
+&nbsp;                visibleRows,
+&nbsp;                totalRows
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderStatusPanel(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            PanelRect panel
+&nbsp;    ) {
+<b class="nc">&nbsp;        int accent = getStatusColor();</b>
+&nbsp;
+<b class="nc">&nbsp;        drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                panel.left(),</b>
+<b class="nc">&nbsp;                panel.top(),</b>
+<b class="nc">&nbsp;                panel.right(),</b>
+<b class="nc">&nbsp;                panel.bottom(),</b>
+<b class="nc">&nbsp;                opaque(accent),</b>
+&nbsp;                0xD014141A,
+&nbsp;                1
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int left = panel.left() + 7;</b>
+<b class="nc">&nbsp;        int width = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                panel.width() - 14</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int y = panel.top() + 5;</b>
+&nbsp;
+<b class="nc">&nbsp;        drawLineClipped(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.translatable(</b>
+&nbsp;                                &quot;screen.moostensuraaddon.recognition.overview&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                left,
+&nbsp;                y,
+&nbsp;                width,
+&nbsp;                0xD7B5FF
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        y += 12;</b>
+&nbsp;
+<b class="nc">&nbsp;        drawLineClipped(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                                safeText(</b>
+<b class="nc">&nbsp;                                        payload == null</b>
+<b class="nc">&nbsp;                                                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                                : payload.statusHeading()</b>
+&nbsp;                                )
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.BOLD),</b>
+&nbsp;                left,
+&nbsp;                y,
+&nbsp;                width,
+&nbsp;                accent
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        y += 11;</b>
+&nbsp;
+<b class="nc">&nbsp;        int levelY = panel.bottom()</b>
+<b class="nc">&nbsp;                - this.font.lineHeight - 4;</b>
+&nbsp;
+<b class="nc">&nbsp;        int detailHeight = Math.max(</b>
+&nbsp;                0,
+&nbsp;                levelY - y - 2
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        drawWrappedLines(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                        safeText(</b>
+<b class="nc">&nbsp;                                payload == null</b>
+<b class="nc">&nbsp;                                        ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                        : payload.statusDetail()</b>
+&nbsp;                        )
+&nbsp;                ),
+&nbsp;                left,
+&nbsp;                y,
+&nbsp;                width,
+&nbsp;                detailHeight,
+&nbsp;                0xC7C9CE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (levelY &gt;= panel.top() + 4) {</b>
+<b class="nc">&nbsp;            drawLineClipped(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    Component.literal(</b>
+<b class="nc">&nbsp;                            safeText(</b>
+<b class="nc">&nbsp;                                    payload == null</b>
+<b class="nc">&nbsp;                                            ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                            : payload.levelLine()</b>
+&nbsp;                            )
+&nbsp;                    ),
+&nbsp;                    left,
+&nbsp;                    levelY,
+&nbsp;                    width,
+&nbsp;                    0x8F96A1
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderGuidanceCard(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            OpenRecognitionProgressScreenPayload.GuidanceEntry entry,
+&nbsp;            PanelRect card
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (entry == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int color = entry.color();</b>
+&nbsp;
+<b class="nc">&nbsp;        drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                card.left(),</b>
+<b class="nc">&nbsp;                card.top(),</b>
+<b class="nc">&nbsp;                card.right(),</b>
+<b class="nc">&nbsp;                card.bottom(),</b>
+<b class="nc">&nbsp;                opaque(color),</b>
+&nbsp;                0xD014141A,
+&nbsp;                1
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int left = card.left() + 6;</b>
+<b class="nc">&nbsp;        int width = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                card.width() - 12</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int stageWidth = Math.min(</b>
+<b class="nc">&nbsp;                Math.max(42, card.width() / 3),</b>
+<b class="nc">&nbsp;                Math.max(42, width)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        drawLineClipped(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                                safeText(entry.displayName())</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withColor(color)</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.BOLD),</b>
+&nbsp;                left,
+<b class="nc">&nbsp;                card.top() + 4,</b>
+<b class="nc">&nbsp;                Math.max(1, width - stageWidth - 3),</b>
+&nbsp;                color
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        drawRightAlignedClipped(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                                safeText(entry.stageLabel())</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY),</b>
+<b class="nc">&nbsp;                card.right() - 6,</b>
+<b class="nc">&nbsp;                card.top() + 4,</b>
+&nbsp;                stageWidth,
+<b class="nc">&nbsp;                stageColor(entry.stageLabel())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int textTop = card.top() + 16;</b>
+<b class="nc">&nbsp;        int barTop = card.bottom() - 7;</b>
+<b class="nc">&nbsp;        int textHeight = Math.max(</b>
+&nbsp;                0,
+&nbsp;                barTop - textTop - 2
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        drawWrappedLines(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                        safeText(entry.guidanceText())</b>
+&nbsp;                ),
+&nbsp;                left,
+&nbsp;                textTop,
+&nbsp;                width,
+&nbsp;                textHeight,
+&nbsp;                0xB6BAC2
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.fill(</b>
+&nbsp;                left,
+&nbsp;                barTop,
+&nbsp;                left + width,
+&nbsp;                barTop + 3,
+&nbsp;                0xFF272727
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int filledWidth = (int) Math.round(</b>
+<b class="nc">&nbsp;                width * clampProgress(entry.progress())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (filledWidth &gt; 0) {</b>
+<b class="nc">&nbsp;            guiGraphics.fill(</b>
+&nbsp;                    left,
+&nbsp;                    barTop,
+<b class="nc">&nbsp;                    left + Math.min(width, filledWidth),</b>
+&nbsp;                    barTop + 3,
+<b class="nc">&nbsp;                    opaque(color)</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderPaths(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            PanelRect panel
+&nbsp;    ) {
+<b class="nc">&nbsp;        int statusHeight = Math.min(</b>
+&nbsp;                68,
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        52,
+<b class="nc">&nbsp;                        panel.height() / 4</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int matrixHeight = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                panel.height()</b>
+&nbsp;                        - statusHeight
+&nbsp;                        - PANEL_GAP
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        PanelRect matrixPanel = new PanelRect(</b>
+<b class="nc">&nbsp;                panel.left(),</b>
+<b class="nc">&nbsp;                panel.top(),</b>
+<b class="nc">&nbsp;                panel.width(),</b>
+&nbsp;                matrixHeight
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        PanelRect summaryPanel = new PanelRect(</b>
+<b class="nc">&nbsp;                panel.left(),</b>
+<b class="nc">&nbsp;                matrixPanel.bottom() + PANEL_GAP,</b>
+<b class="nc">&nbsp;                panel.width(),</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        1,
+<b class="nc">&nbsp;                        panel.bottom()</b>
+<b class="nc">&nbsp;                                - matrixPanel.bottom()</b>
+&nbsp;                                - PANEL_GAP
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        renderPathMatrix(</b>
+&nbsp;                guiGraphics,
+&nbsp;                matrixPanel
+&nbsp;        );
+<b class="nc">&nbsp;        renderPathSummary(</b>
+&nbsp;                guiGraphics,
+&nbsp;                summaryPanel
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderPathMatrix(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            PanelRect panel
+&nbsp;    ) {
+<b class="nc">&nbsp;        drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                panel.left(),</b>
+<b class="nc">&nbsp;                panel.top(),</b>
+<b class="nc">&nbsp;                panel.right(),</b>
+<b class="nc">&nbsp;                panel.bottom(),</b>
+&nbsp;                0xFF3A3148,
+&nbsp;                0xD014141A,
+&nbsp;                1
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int innerLeft = panel.left() + 14;</b>
+<b class="nc">&nbsp;        int innerRight = panel.right() - 5;</b>
+<b class="nc">&nbsp;        int labelsTop = panel.top() + 16;</b>
+<b class="nc">&nbsp;        int innerTop = labelsTop + 12;</b>
+<b class="nc">&nbsp;        int innerBottom = panel.bottom() - 5;</b>
+<b class="nc">&nbsp;        int matrixWidth = Math.max(</b>
+&nbsp;                3,
+&nbsp;                innerRight - innerLeft
+&nbsp;        );
+<b class="nc">&nbsp;        int cellWidth = Math.max(</b>
+&nbsp;                1,
+&nbsp;                (
+&nbsp;                        matrixWidth
+&nbsp;                                - CELL_GAP * 2
+&nbsp;                ) / 3
+&nbsp;        );
+<b class="nc">&nbsp;        int rowHeight = Math.max(</b>
+&nbsp;                19,
+&nbsp;                (
+<b class="nc">&nbsp;                        Math.max(</b>
+&nbsp;                                57,
+&nbsp;                                innerBottom - innerTop
+&nbsp;                        )
+&nbsp;                                - CELL_GAP * 2
+&nbsp;                ) / 3
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        drawLineClipped(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.translatable(</b>
+&nbsp;                                &quot;screen.moostensuraaddon.recognition.paths&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+<b class="nc">&nbsp;                panel.left() + 6,</b>
+<b class="nc">&nbsp;                panel.top() + 4,</b>
+<b class="nc">&nbsp;                Math.max(1, panel.width() - 12),</b>
+&nbsp;                0xD7B5FF
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        for (int column = 0;</b>
+<b class="nc">&nbsp;             column &lt; COLUMN_LABELS.length;</b>
+<b class="nc">&nbsp;             column++) {</b>
+&nbsp;
+<b class="nc">&nbsp;            int cellLeft = innerLeft</b>
+&nbsp;                    + column
+&nbsp;                    * (
+&nbsp;                    cellWidth
+&nbsp;                            + CELL_GAP
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            drawCenteredClipped(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                            COLUMN_LABELS[column]
+&nbsp;                    ),
+&nbsp;                    cellLeft + cellWidth / 2,
+&nbsp;                    labelsTop,
+&nbsp;                    cellWidth,
+&nbsp;                    0x9096A0
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0;</b>
+<b class="nc">&nbsp;             index &lt; MATRIX_PATH_IDS.length;</b>
+<b class="nc">&nbsp;             index++) {</b>
+&nbsp;
+<b class="nc">&nbsp;            int row = index / 3;</b>
+<b class="nc">&nbsp;            int column = index % 3;</b>
+<b class="nc">&nbsp;            int left = innerLeft</b>
+&nbsp;                    + column
+&nbsp;                    * (
+&nbsp;                    cellWidth
+&nbsp;                            + CELL_GAP
+&nbsp;            );
+<b class="nc">&nbsp;            int top = innerTop</b>
+&nbsp;                    + row
+&nbsp;                    * (
+&nbsp;                    rowHeight
+&nbsp;                            + CELL_GAP
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            if (column == 0) {</b>
+<b class="nc">&nbsp;                drawCenteredClipped(</b>
+&nbsp;                        guiGraphics,
+<b class="nc">&nbsp;                        Component.literal(</b>
+&nbsp;                                ROW_LABELS[row]
+&nbsp;                        ),
+<b class="nc">&nbsp;                        panel.left() + 7,</b>
+<b class="nc">&nbsp;                        top + Math.max(</b>
+&nbsp;                                4,
+&nbsp;                                rowHeight / 2 - 4
+&nbsp;                        ),
+&nbsp;                        10,
+&nbsp;                        0x707782
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+&nbsp;            OpenRecognitionProgressScreenPayload.PathEntry
+&nbsp;                    path =
+<b class="nc">&nbsp;                    payload == null</b>
+<b class="nc">&nbsp;                            ? null</b>
+<b class="nc">&nbsp;                            : payload.findPath(</b>
+&nbsp;                            MATRIX_PATH_IDS[index]
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (path == null) {</b>
+<b class="nc">&nbsp;                drawBorderedPanel(</b>
+&nbsp;                        guiGraphics,
+&nbsp;                        left,
+&nbsp;                        top,
+&nbsp;                        left + cellWidth,
+<b class="nc">&nbsp;                        Math.min(</b>
+<b class="nc">&nbsp;                                panel.bottom() - 3,</b>
+&nbsp;                                top + rowHeight
+&nbsp;                        ),
+&nbsp;                        0xFF333333,
+&nbsp;                        0xCC151515,
+&nbsp;                        1
+&nbsp;                );
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            renderPathCell(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    path,
+&nbsp;                    left,
+&nbsp;                    top,
+&nbsp;                    cellWidth,
+<b class="nc">&nbsp;                    Math.min(</b>
+&nbsp;                            rowHeight,
+<b class="nc">&nbsp;                            panel.bottom() - top - 3</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderPathCell(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            OpenRecognitionProgressScreenPayload.PathEntry path,
+&nbsp;            int left,
+&nbsp;            int top,
+&nbsp;            int width,
+&nbsp;            int height
+&nbsp;    ) {
+<b class="nc">&nbsp;        int safeHeight = Math.max(</b>
+&nbsp;                1,
+&nbsp;                height
+&nbsp;        );
+&nbsp;
+&nbsp;        int borderColor =
+<b class="nc">&nbsp;                path.primary()</b>
+<b class="nc">&nbsp;                        || path.secondary()</b>
+<b class="nc">&nbsp;                        ? opaque(path.color())</b>
+<b class="nc">&nbsp;                        : 0xFF353535;</b>
+&nbsp;
+&nbsp;        int borderThickness =
+<b class="nc">&nbsp;                path.primary()</b>
+<b class="nc">&nbsp;                        ? 2</b>
+<b class="nc">&nbsp;                        : 1;</b>
+&nbsp;
+<b class="nc">&nbsp;        drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+&nbsp;                left,
+&nbsp;                top,
+&nbsp;                left + width,
+&nbsp;                top + safeHeight,
+&nbsp;                borderColor,
+&nbsp;                0xD0161616,
+&nbsp;                borderThickness
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        MutableComponent displayName =</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                                safeText(path.displayName())</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withColor(path.color());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (path.primary()</b>
+&nbsp;                &amp;&amp; payload != null
+<b class="nc">&nbsp;                &amp;&amp; payload.pureRecognition()) {</b>
+<b class="nc">&nbsp;            displayName.withStyle(</b>
+&nbsp;                    ChatFormatting.BOLD
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        drawCenteredClipped(</b>
+&nbsp;                guiGraphics,
+&nbsp;                displayName,
+&nbsp;                left + width / 2,
+&nbsp;                top + 3,
+<b class="nc">&nbsp;                Math.max(1, width - 8),</b>
+<b class="nc">&nbsp;                path.color()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (safeHeight &gt;= 25) {</b>
+<b class="nc">&nbsp;            drawCenteredClipped(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    Component.literal(</b>
+<b class="nc">&nbsp;                            safeText(path.stageLabel())</b>
+&nbsp;                    ),
+&nbsp;                    left + width / 2,
+&nbsp;                    top + 14,
+<b class="nc">&nbsp;                    Math.max(1, width - 8),</b>
+<b class="nc">&nbsp;                    path.primary()</b>
+<b class="nc">&nbsp;                            || path.secondary()</b>
+<b class="nc">&nbsp;                            ? 0xD0D0D0</b>
+<b class="nc">&nbsp;                            : 0x858585</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (path.primary()</b>
+<b class="nc">&nbsp;                || path.secondary()) {</b>
+<b class="nc">&nbsp;            guiGraphics.drawString(</b>
+&nbsp;                    this.font,
+<b class="nc">&nbsp;                    path.primary()</b>
+<b class="nc">&nbsp;                            ? &quot;P&quot;</b>
+<b class="nc">&nbsp;                            : &quot;S&quot;,</b>
+&nbsp;                    left + width - 8,
+&nbsp;                    top + 3,
+<b class="nc">&nbsp;                    opaque(path.color()),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (safeHeight &gt;= 8) {</b>
+<b class="nc">&nbsp;            int barLeft = left + 4;</b>
+<b class="nc">&nbsp;            int barWidth = Math.max(</b>
+&nbsp;                    1,
+&nbsp;                    width - 8
+&nbsp;            );
+<b class="nc">&nbsp;            int barTop = top + safeHeight - 5;</b>
+&nbsp;
+<b class="nc">&nbsp;            guiGraphics.fill(</b>
+&nbsp;                    barLeft,
+&nbsp;                    barTop,
+&nbsp;                    barLeft + barWidth,
+&nbsp;                    barTop + 2,
+&nbsp;                    0xFF272727
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            int filledWidth = (int) Math.round(</b>
+&nbsp;                    barWidth
+<b class="nc">&nbsp;                            * clampProgress(path.progress())</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            if (filledWidth &gt; 0) {</b>
+<b class="nc">&nbsp;                guiGraphics.fill(</b>
+&nbsp;                        barLeft,
+&nbsp;                        barTop,
+&nbsp;                        barLeft
+<b class="nc">&nbsp;                                + Math.min(</b>
+&nbsp;                                barWidth,
+&nbsp;                                filledWidth
+&nbsp;                        ),
+&nbsp;                        barTop + 2,
+<b class="nc">&nbsp;                        opaque(path.color())</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderPathSummary(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            PanelRect panel
+&nbsp;    ) {
+<b class="nc">&nbsp;        int accent = getStatusColor();</b>
+&nbsp;
+<b class="nc">&nbsp;        drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                panel.left(),</b>
+<b class="nc">&nbsp;                panel.top(),</b>
+<b class="nc">&nbsp;                panel.right(),</b>
+<b class="nc">&nbsp;                panel.bottom(),</b>
+<b class="nc">&nbsp;                opaque(accent),</b>
+&nbsp;                0xD014141A,
+&nbsp;                1
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int left = panel.left() + 7;</b>
+<b class="nc">&nbsp;        int width = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                panel.width() - 14</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int y = panel.top() + 5;</b>
+&nbsp;
+<b class="nc">&nbsp;        drawLineClipped(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                                safeText(</b>
+<b class="nc">&nbsp;                                        payload == null</b>
+<b class="nc">&nbsp;                                                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                                : payload.statusHeading()</b>
+&nbsp;                                )
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.BOLD),</b>
+&nbsp;                left,
+&nbsp;                y,
+&nbsp;                width,
+&nbsp;                accent
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        y += 12;</b>
+&nbsp;
+<b class="nc">&nbsp;        int levelWidth = Math.min(</b>
+<b class="nc">&nbsp;                Math.max(90, width / 3),</b>
+&nbsp;                width
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        drawRightAlignedClipped(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                        safeText(</b>
+<b class="nc">&nbsp;                                payload == null</b>
+<b class="nc">&nbsp;                                        ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                        : payload.levelLine()</b>
+&nbsp;                        )
+&nbsp;                ),
+<b class="nc">&nbsp;                panel.right() - 7,</b>
+&nbsp;                y,
+&nbsp;                levelWidth,
+&nbsp;                0x8F96A1
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        drawWrappedLines(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                        safeText(</b>
+<b class="nc">&nbsp;                                payload == null</b>
+<b class="nc">&nbsp;                                        ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                        : payload.statusDetail()</b>
+&nbsp;                        )
+&nbsp;                ),
+&nbsp;                left,
+&nbsp;                y,
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        1,
+&nbsp;                        width - levelWidth - 6
+&nbsp;                ),
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        1,
+<b class="nc">&nbsp;                        panel.bottom() - y - 4</b>
+&nbsp;                ),
+&nbsp;                0xC7C9CE
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderBenefitsPanel(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            PanelRect panel
+&nbsp;    ) {
+&nbsp;        int accent = payload != null
+<b class="nc">&nbsp;                &amp;&amp; payload.recognitionCommitted()</b>
+<b class="nc">&nbsp;                ? payload.recognitionColor()</b>
+<b class="nc">&nbsp;                : getStatusColor();</b>
+&nbsp;
+<b class="nc">&nbsp;        drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                panel.left(),</b>
+<b class="nc">&nbsp;                panel.top(),</b>
+<b class="nc">&nbsp;                panel.right(),</b>
+<b class="nc">&nbsp;                panel.bottom(),</b>
+<b class="nc">&nbsp;                opaque(accent),</b>
+&nbsp;                0xD014141A,
+&nbsp;                1
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int textLeft = panel.left() + 8;</b>
+<b class="nc">&nbsp;        int maxWidth = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                panel.width() - 16</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int y = panel.top() + 6;</b>
+&nbsp;
+<b class="nc">&nbsp;        drawLineClipped(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Component.translatable(</b>
+&nbsp;                                &quot;screen.moostensuraaddon.recognition.benefits&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GOLD,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                textLeft,
+&nbsp;                y,
+&nbsp;                maxWidth,
+&nbsp;                0xFFD36A
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        y += 14;</b>
+&nbsp;
+&nbsp;        ClientRecognitionBenefitsCache.Snapshot benefits =
+<b class="nc">&nbsp;                ClientRecognitionBenefitsCache.current();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!benefits.active()) {</b>
+<b class="nc">&nbsp;            drawLineClipped(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    Component.translatable(</b>
+&nbsp;                            &quot;screen.moostensuraaddon.recognition.benefit_state.&quot;
+<b class="nc">&nbsp;                                    + benefits.stateId()</b>
+&nbsp;                    ),
+&nbsp;                    textLeft,
+&nbsp;                    y,
+&nbsp;                    maxWidth,
+<b class="nc">&nbsp;                    benefitsStateColor(</b>
+<b class="nc">&nbsp;                            benefits.stateId()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            y += 14;</b>
+&nbsp;
+<b class="nc">&nbsp;            drawWrappedLines(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    Component.literal(</b>
+<b class="nc">&nbsp;                            safeText(</b>
+<b class="nc">&nbsp;                                    payload == null</b>
+<b class="nc">&nbsp;                                            ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                            : payload.statusHeading()</b>
+&nbsp;                            )
+&nbsp;                    ),
+&nbsp;                    textLeft,
+&nbsp;                    y,
+&nbsp;                    maxWidth,
+<b class="nc">&nbsp;                    Math.max(</b>
+&nbsp;                            1,
+<b class="nc">&nbsp;                            panel.bottom() - y - 6</b>
+&nbsp;                    ),
+&nbsp;                    0xC7C9CE
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int lineStep = panel.height() &lt; 105</b>
+<b class="nc">&nbsp;                ? 11</b>
+<b class="nc">&nbsp;                : 14;</b>
+&nbsp;
+<b class="nc">&nbsp;        drawBenefitLine(</b>
+&nbsp;                guiGraphics,
+&nbsp;                textLeft,
+&nbsp;                y,
+&nbsp;                maxWidth,
+&nbsp;                &quot;screen.moostensuraaddon.recognition.native_endowment&quot;,
+<b class="nc">&nbsp;                Component.translatable(</b>
+<b class="nc">&nbsp;                        benefits.nativeEndowmentAnchored()</b>
+<b class="nc">&nbsp;                                ? &quot;screen.moostensuraaddon.recognition.anchored&quot;</b>
+<b class="nc">&nbsp;                                : &quot;screen.moostensuraaddon.recognition.pending&quot;</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                benefits.nativeEndowmentAnchored()</b>
+<b class="nc">&nbsp;                        ? 0xD7B5FF</b>
+<b class="nc">&nbsp;                        : 0xFFD36A</b>
+&nbsp;        );
+<b class="nc">&nbsp;        y += lineStep;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!hasLineSpace(panel, y)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        drawBenefitLine(</b>
+&nbsp;                guiGraphics,
+&nbsp;                textLeft,
+&nbsp;                y,
+&nbsp;                maxWidth,
+&nbsp;                &quot;screen.moostensuraaddon.recognition.permanent_strength&quot;,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                        formatPercent(</b>
+<b class="nc">&nbsp;                                benefits.totalStrength()</b>
+&nbsp;                        )
+&nbsp;                ),
+&nbsp;                0xFFD36A
+&nbsp;        );
+<b class="nc">&nbsp;        y += lineStep;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!hasLineSpace(panel, y)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        drawBenefitLine(</b>
+&nbsp;                guiGraphics,
+&nbsp;                textLeft,
+&nbsp;                y,
+&nbsp;                maxWidth,
+&nbsp;                &quot;screen.moostensuraaddon.recognition.health_damage&quot;,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                        formatPercent(</b>
+<b class="nc">&nbsp;                                benefits.maxHealthMultiplier()</b>
+&nbsp;                        )
+&nbsp;                                + &quot; / &quot;
+<b class="nc">&nbsp;                                + formatPercent(</b>
+<b class="nc">&nbsp;                                benefits.attackDamageMultiplier()</b>
+&nbsp;                        )
+&nbsp;                ),
+&nbsp;                0xFF8A8A
+&nbsp;        );
+<b class="nc">&nbsp;        y += lineStep;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!hasLineSpace(panel, y)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        drawBenefitLine(</b>
+&nbsp;                guiGraphics,
+&nbsp;                textLeft,
+&nbsp;                y,
+&nbsp;                maxWidth,
+&nbsp;                &quot;screen.moostensuraaddon.recognition.speed&quot;,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                        formatPercent(</b>
+<b class="nc">&nbsp;                                benefits.movementSpeedMultiplier()</b>
+&nbsp;                        )
+&nbsp;                                + &quot; / &quot;
+<b class="nc">&nbsp;                                + formatPercent(</b>
+<b class="nc">&nbsp;                                benefits.attackSpeedMultiplier()</b>
+&nbsp;                        )
+&nbsp;                ),
+&nbsp;                0x73DCE8
+&nbsp;        );
+<b class="nc">&nbsp;        y += lineStep;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!hasLineSpace(panel, y)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        drawBenefitLine(</b>
+&nbsp;                guiGraphics,
+&nbsp;                textLeft,
+&nbsp;                y,
+&nbsp;                maxWidth,
+&nbsp;                &quot;screen.moostensuraaddon.recognition.knockback&quot;,
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                        formatPercent(</b>
+<b class="nc">&nbsp;                                benefits.knockbackResistanceAddition()</b>
+&nbsp;                        )
+&nbsp;                ),
+&nbsp;                0x71E0B8
+&nbsp;        );
+<b class="nc">&nbsp;        y += lineStep;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (hasLineSpace(panel, y)) {</b>
+<b class="nc">&nbsp;            drawBenefitLine(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    textLeft,
+&nbsp;                    y,
+&nbsp;                    maxWidth,
+&nbsp;                    &quot;screen.moostensuraaddon.recognition.identity_strength&quot;,
+<b class="nc">&nbsp;                    Component.literal(</b>
+<b class="nc">&nbsp;                            formatDecimal(</b>
+<b class="nc">&nbsp;                                    benefits.frozenIdentityStrength()</b>
+&nbsp;                            )
+&nbsp;                                    + &quot; / &quot;
+<b class="nc">&nbsp;                                    + formatDecimal(</b>
+<b class="nc">&nbsp;                                    benefits.identityStrengthMaximum()</b>
+&nbsp;                            )
+&nbsp;                    ),
+&nbsp;                    0xC8A5FF
+&nbsp;            );
+<b class="nc">&nbsp;            y += lineStep;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!benefits.attributeStateMatches()</b>
+<b class="nc">&nbsp;                &amp;&amp; hasLineSpace(panel, y)) {</b>
+<b class="nc">&nbsp;            drawLineClipped(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    Component.translatable(</b>
+&nbsp;                            &quot;screen.moostensuraaddon.recognition.reconciling&quot;
+&nbsp;                    ),
+&nbsp;                    textLeft,
+&nbsp;                    y,
+&nbsp;                    maxWidth,
+&nbsp;                    0xFFD36A
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;
+&nbsp;            OpenRecognitionProgressScreenPayload.GuidanceEntry
+&nbsp;            &gt; guidanceEntries() {
+<b class="nc">&nbsp;        if (payload == null</b>
+<b class="nc">&nbsp;                || payload.guidanceEntries() == null) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return payload.guidanceEntries();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean hasLineSpace(
+&nbsp;            PanelRect panel,
+&nbsp;            int y
+&nbsp;    ) {
+<b class="nc">&nbsp;        return panel != null</b>
+<b class="nc">&nbsp;                &amp;&amp; y + this.font.lineHeight</b>
+<b class="nc">&nbsp;                &lt;= panel.bottom() - 3;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void drawBenefitLine(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int left,
+&nbsp;            int y,
+&nbsp;            int maxWidth,
+&nbsp;            String labelKey,
+&nbsp;            Component value,
+&nbsp;            int valueColor
+&nbsp;    ) {
+<b class="nc">&nbsp;        Component line =</b>
+<b class="nc">&nbsp;                Component.translatable(labelKey)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GRAY
+&nbsp;                        )
+<b class="nc">&nbsp;                        .append(</b>
+<b class="nc">&nbsp;                                Component.literal(&quot;: &quot;)</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .append(</b>
+<b class="nc">&nbsp;                                value.copy()</b>
+<b class="nc">&nbsp;                                        .withColor(</b>
+&nbsp;                                                valueColor
+&nbsp;                                        )
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        drawLineClipped(</b>
+&nbsp;                guiGraphics,
+&nbsp;                line,
+&nbsp;                left,
+&nbsp;                y,
+&nbsp;                maxWidth,
+&nbsp;                0xD7D9DE
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void drawWrappedLines(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            Component text,
+&nbsp;            int left,
+&nbsp;            int top,
+&nbsp;            int maxWidth,
+&nbsp;            int maxHeight,
+&nbsp;            int color
+&nbsp;    ) {
+<b class="nc">&nbsp;        int y = top;</b>
+<b class="nc">&nbsp;        int bottom = top</b>
+<b class="nc">&nbsp;                + Math.max(</b>
+&nbsp;                0,
+&nbsp;                maxHeight
+&nbsp;        );
+&nbsp;
+&nbsp;        for (var line :
+<b class="nc">&nbsp;                this.font.split(</b>
+<b class="nc">&nbsp;                        text == null</b>
+<b class="nc">&nbsp;                                ? Component.empty()</b>
+<b class="nc">&nbsp;                                : text,</b>
+<b class="nc">&nbsp;                        Math.max(1, maxWidth)</b>
+&nbsp;                )) {
+&nbsp;
+<b class="nc">&nbsp;            if (y + this.font.lineHeight &gt; bottom) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            guiGraphics.drawString(</b>
+&nbsp;                    this.font,
+&nbsp;                    line,
+&nbsp;                    left,
+&nbsp;                    y,
+<b class="nc">&nbsp;                    opaque(color),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            y += this.font.lineHeight + 1;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void drawCenteredClipped(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            Component text,
+&nbsp;            int centerX,
+&nbsp;            int y,
+&nbsp;            int maxWidth,
+&nbsp;            int color
+&nbsp;    ) {
+<b class="nc">&nbsp;        String clipped =</b>
+<b class="nc">&nbsp;                this.font.plainSubstrByWidth(</b>
+<b class="nc">&nbsp;                        text == null</b>
+<b class="nc">&nbsp;                                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                : text.getString(),</b>
+<b class="nc">&nbsp;                        Math.max(1, maxWidth)</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        int left = centerX</b>
+<b class="nc">&nbsp;                - this.font.width(clipped) / 2;</b>
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.drawString(</b>
+&nbsp;                this.font,
+&nbsp;                clipped,
+&nbsp;                left,
+&nbsp;                y,
+<b class="nc">&nbsp;                opaque(color),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void drawRightAlignedClipped(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            Component text,
+&nbsp;            int right,
+&nbsp;            int y,
+&nbsp;            int maxWidth,
+&nbsp;            int color
+&nbsp;    ) {
+<b class="nc">&nbsp;        String clipped =</b>
+<b class="nc">&nbsp;                this.font.plainSubstrByWidth(</b>
+<b class="nc">&nbsp;                        text == null</b>
+<b class="nc">&nbsp;                                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                : text.getString(),</b>
+<b class="nc">&nbsp;                        Math.max(1, maxWidth)</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.drawString(</b>
+&nbsp;                this.font,
+&nbsp;                clipped,
+<b class="nc">&nbsp;                right - this.font.width(clipped),</b>
+&nbsp;                y,
+<b class="nc">&nbsp;                opaque(color),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void drawLineClipped(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            Component text,
+&nbsp;            int left,
+&nbsp;            int y,
+&nbsp;            int maxWidth,
+&nbsp;            int color
+&nbsp;    ) {
+<b class="nc">&nbsp;        String clipped =</b>
+<b class="nc">&nbsp;                this.font.plainSubstrByWidth(</b>
+<b class="nc">&nbsp;                        text == null</b>
+<b class="nc">&nbsp;                                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                : text.getString(),</b>
+<b class="nc">&nbsp;                        Math.max(1, maxWidth)</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.drawString(</b>
+&nbsp;                this.font,
+&nbsp;                clipped,
+&nbsp;                left,
+&nbsp;                y,
+<b class="nc">&nbsp;                opaque(color),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderWidget(
+&nbsp;            Button button,
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (button == null || !button.visible) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        button.render(</b>
+&nbsp;                guiGraphics,
+&nbsp;                mouseX,
+&nbsp;                mouseY,
+&nbsp;                partialTick
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private int getStatusColor() {
+<b class="nc">&nbsp;        if (payload == null) {</b>
+<b class="nc">&nbsp;            return 0x9FA7B3;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (payload.revealPending()) {</b>
+<b class="nc">&nbsp;            return 0xD6A5FF;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (payload.recognitionCommitted()) {</b>
+<b class="nc">&nbsp;            return payload.recognitionColor();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (payload.eligibilityStatusId()) {</b>
+<b class="nc">&nbsp;            case &quot;ready&quot; -&gt; 0x71E0B8;</b>
+<b class="nc">&nbsp;            case &quot;not_enough_level&quot; -&gt; 0xFFD36A;</b>
+<b class="nc">&nbsp;            case &quot;already_named&quot; -&gt; 0xFF8A8A;</b>
+<b class="nc">&nbsp;            default -&gt; 0x9FA7B3;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int stageColor(
+&nbsp;            String stage
+&nbsp;    ) {
+<b class="nc">&nbsp;        return switch (safeText(stage)) {</b>
+<b class="nc">&nbsp;            case &quot;Defining&quot;, &quot;Dominant&quot; -&gt; 0xFFD36A;</b>
+<b class="nc">&nbsp;            case &quot;Strong&quot;, &quot;Established&quot; -&gt; 0x71E0B8;</b>
+<b class="nc">&nbsp;            case &quot;Developing&quot; -&gt; 0x73DCE8;</b>
+<b class="nc">&nbsp;            case &quot;Faint&quot; -&gt; 0xA98CFF;</b>
+<b class="nc">&nbsp;            default -&gt; 0x777E89;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int benefitsStateColor(
+&nbsp;            String stateId
+&nbsp;    ) {
+<b class="nc">&nbsp;        return switch (</b>
+<b class="nc">&nbsp;                stateId == null</b>
+<b class="nc">&nbsp;                        ? &quot;&quot;</b>
+<b class="nc">&nbsp;                        : stateId</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            case &quot;invalid&quot; -&gt; 0xFF8A8A;</b>
+<b class="nc">&nbsp;            case &quot;future_profile&quot; -&gt; 0x73DCE8;</b>
+<b class="nc">&nbsp;            case &quot;synchronizing&quot; -&gt; 0xFFD36A;</b>
+<b class="nc">&nbsp;            default -&gt; 0xA9AFB8;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatPercent(
+&nbsp;            double fraction
+&nbsp;    ) {
+<b class="nc">&nbsp;        double safe = Double.isFinite(fraction)</b>
+<b class="nc">&nbsp;                ? Math.max(</b>
+&nbsp;                0.0D,
+&nbsp;                fraction
+&nbsp;        )
+<b class="nc">&nbsp;                : 0.0D;</b>
+&nbsp;
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;+%.1f%%&quot;,
+<b class="nc">&nbsp;                safe * 100.0D</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatDecimal(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        double safe = Double.isFinite(value)</b>
+<b class="nc">&nbsp;                ? Math.max(</b>
+&nbsp;                0.0D,
+&nbsp;                value
+&nbsp;        )
+<b class="nc">&nbsp;                : 0.0D;</b>
+&nbsp;
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.2f&quot;,
+<b class="nc">&nbsp;                safe</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double clampProgress(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(value)) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.max(</b>
+&nbsp;                0.0D,
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        1.0D,
+&nbsp;                        value
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String safeText(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void drawBorderedPanel(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int left,
+&nbsp;            int top,
+&nbsp;            int right,
+&nbsp;            int bottom,
+&nbsp;            int borderColor,
+&nbsp;            int fillColor,
+&nbsp;            int borderThickness
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (right &lt;= left || bottom &lt;= top) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int safeThickness = Math.max(</b>
+&nbsp;                1,
+&nbsp;                borderThickness
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.fill(</b>
+&nbsp;                left,
+&nbsp;                top,
+&nbsp;                right,
+&nbsp;                bottom,
+&nbsp;                borderColor
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (right - left</b>
+&nbsp;                &lt;= safeThickness * 2
+&nbsp;                || bottom - top
+&nbsp;                &lt;= safeThickness * 2) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.fill(</b>
+&nbsp;                left + safeThickness,
+&nbsp;                top + safeThickness,
+&nbsp;                right - safeThickness,
+&nbsp;                bottom - safeThickness,
+&nbsp;                fillColor
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int opaque(
+&nbsp;            int rgb
+&nbsp;    ) {
+<b class="nc">&nbsp;        return 0xFF000000</b>
+&nbsp;                | rgb
+&nbsp;                &amp; 0xFFFFFF;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isPauseScreen() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private enum View {</b>
+<b class="nc">&nbsp;        OVERVIEW,</b>
+<b class="nc">&nbsp;        PATHS,</b>
+<b class="nc">&nbsp;        BENEFITS</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record OverviewLayout(</b>
+&nbsp;            PanelRect statusPanel,
+&nbsp;            PanelRect guidancePanel,
+&nbsp;            int columns,
+&nbsp;            int cardWidth,
+&nbsp;            int cardHeight,
+&nbsp;            int visibleRows,
+&nbsp;            int totalRows
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record PanelRect(</b>
+&nbsp;            int left,
+&nbsp;            int top,
+&nbsp;            int width,
+&nbsp;            int height
+&nbsp;    ) {
+&nbsp;
+&nbsp;        private int right() {
+<b class="nc">&nbsp;            return left</b>
+<b class="nc">&nbsp;                    + Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    width
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private int bottom() {
+<b class="nc">&nbsp;            return top</b>
+<b class="nc">&nbsp;                    + Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    height
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private boolean contains(
+&nbsp;                double x,
+&nbsp;                double y
+&nbsp;        ) {
+<b class="nc">&nbsp;            return x &gt;= left</b>
+<b class="nc">&nbsp;                    &amp;&amp; x &lt; right()</b>
+&nbsp;                    &amp;&amp; y &gt;= top
+<b class="nc">&nbsp;                    &amp;&amp; y &lt; bottom();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

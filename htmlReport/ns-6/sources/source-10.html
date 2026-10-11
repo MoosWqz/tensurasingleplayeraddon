@@ -1,0 +1,248 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SkillUiTheme</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen.skillui</a>
+</div>
+
+<h1>Coverage Summary for Class: SkillUiTheme (com.mooswqz.moostensuraaddon.client.screen.skillui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SkillUiTheme</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen.skillui;
+&nbsp;
+&nbsp;/**
+&nbsp; * Shared colour contract for skill-facing screens.
+&nbsp; */
+<b class="nc">&nbsp;public record SkillUiTheme(</b>
+&nbsp;        int backgroundColor,
+&nbsp;        int panelFillColor,
+&nbsp;        int panelBorderColor,
+&nbsp;        int accentColor,
+&nbsp;        int secondaryAccentColor,
+&nbsp;        int primaryTextColor,
+&nbsp;        int secondaryTextColor,
+&nbsp;        int mutedTextColor,
+&nbsp;        int disabledTextColor,
+&nbsp;        int rowFillColor,
+&nbsp;        int hoveredRowFillColor,
+&nbsp;        int selectedRowFillColor,
+&nbsp;        int categoryFillColor,
+&nbsp;        int scrollbarTrackColor,
+&nbsp;        int scrollbarThumbColor,
+&nbsp;        int successColor,
+&nbsp;        int warningColor,
+&nbsp;        int dangerColor
+&nbsp;) {
+&nbsp;
+<b class="nc">&nbsp;    public static final SkillUiTheme GRANTER = new SkillUiTheme(</b>
+&nbsp;            0xFF09100E,
+&nbsp;            0xF0121816,
+&nbsp;            0xFF355246,
+&nbsp;            0xFF75D6A8,
+&nbsp;            0xFFB8E7D1,
+&nbsp;            0xFFF4FFF9,
+&nbsp;            0xFFB8C8C0,
+&nbsp;            0xFF84948C,
+&nbsp;            0xFF66726C,
+&nbsp;            0xF0141C18,
+&nbsp;            0xF0202D27,
+&nbsp;            0xF02A4638,
+&nbsp;            0xF018241F,
+&nbsp;            0xFF25332D,
+&nbsp;            0xFF75D6A8,
+&nbsp;            0xFF7BE0B2,
+&nbsp;            0xFFFFD36A,
+&nbsp;            0xFFFF8A8A
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    public static final SkillUiTheme BENEVOLENT = new SkillUiTheme(</b>
+&nbsp;            0xFF100E08,
+&nbsp;            0xF018160F,
+&nbsp;            0xFF5B4A24,
+&nbsp;            0xFFFFD36A,
+&nbsp;            0xFFFFF0B5,
+&nbsp;            0xFFFFFDF4,
+&nbsp;            0xFFD8CCAA,
+&nbsp;            0xFFA59772,
+&nbsp;            0xFF71684F,
+&nbsp;            0xF01C1911,
+&nbsp;            0xF02B2516,
+&nbsp;            0xF0483A19,
+&nbsp;            0xF0252014,
+&nbsp;            0xFF3B321D,
+&nbsp;            0xFFFFD36A,
+&nbsp;            0xFF8DE0B5,
+&nbsp;            0xFFFFC85A,
+&nbsp;            0xFFFF8A8A
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    public static final SkillUiTheme GOVERNANCE = new SkillUiTheme(</b>
+&nbsp;            0xFF08050D,
+&nbsp;            0xF0110A19,
+&nbsp;            0xFF3C2452,
+&nbsp;            0xFF7436A6,
+&nbsp;            0xFFB88ADA,
+&nbsp;            0xFFFBF7FF,
+&nbsp;            0xFFC5B1D4,
+&nbsp;            0xFF8A7898,
+&nbsp;            0xFF655A6D,
+&nbsp;            0xF0140C1D,
+&nbsp;            0xF020122D,
+&nbsp;            0xF039164F,
+&nbsp;            0xF01A1024,
+&nbsp;            0xFF291A35,
+&nbsp;            0xFF7436A6,
+&nbsp;            0xFF78D9B0,
+&nbsp;            0xFFFFC85A,
+&nbsp;            0xFFFF7085
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    public static final SkillUiTheme SEIZE = new SkillUiTheme(</b>
+<b class="nc">&nbsp;            GOVERNANCE.backgroundColor(),</b>
+<b class="nc">&nbsp;            GOVERNANCE.panelFillColor(),</b>
+&nbsp;            0xFF66303A,
+&nbsp;            0xFFFF5D72,
+&nbsp;            0xFF7436A6,
+<b class="nc">&nbsp;            GOVERNANCE.primaryTextColor(),</b>
+<b class="nc">&nbsp;            GOVERNANCE.secondaryTextColor(),</b>
+<b class="nc">&nbsp;            GOVERNANCE.mutedTextColor(),</b>
+<b class="nc">&nbsp;            GOVERNANCE.disabledTextColor(),</b>
+<b class="nc">&nbsp;            GOVERNANCE.rowFillColor(),</b>
+&nbsp;            0xF0321B24,
+&nbsp;            0xF0532430,
+&nbsp;            0xF0291720,
+&nbsp;            0xFF3D252D,
+&nbsp;            0xFFFF5D72,
+<b class="nc">&nbsp;            GOVERNANCE.successColor(),</b>
+&nbsp;            0xFFFFC85A,
+&nbsp;            0xFFFF5D72
+&nbsp;    );
+&nbsp;
+&nbsp;    public SkillUiTheme withAccents(
+&nbsp;            int newAccentColor,
+&nbsp;            int newSecondaryAccentColor
+&nbsp;    ) {
+<b class="nc">&nbsp;        return new SkillUiTheme(</b>
+&nbsp;                backgroundColor,
+&nbsp;                panelFillColor,
+&nbsp;                panelBorderColor,
+<b class="nc">&nbsp;                opaque(newAccentColor),</b>
+<b class="nc">&nbsp;                opaque(newSecondaryAccentColor),</b>
+&nbsp;                primaryTextColor,
+&nbsp;                secondaryTextColor,
+&nbsp;                mutedTextColor,
+&nbsp;                disabledTextColor,
+&nbsp;                rowFillColor,
+&nbsp;                hoveredRowFillColor,
+&nbsp;                selectedRowFillColor,
+&nbsp;                categoryFillColor,
+&nbsp;                scrollbarTrackColor,
+<b class="nc">&nbsp;                opaque(newAccentColor),</b>
+&nbsp;                successColor,
+&nbsp;                warningColor,
+&nbsp;                dangerColor
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int opaque(
+&nbsp;            int color
+&nbsp;    ) {
+<b class="nc">&nbsp;        return 0xFF000000</b>
+&nbsp;                | color
+&nbsp;                &amp; 0x00FFFFFF;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

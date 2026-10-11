@@ -1,0 +1,748 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionTitlePoolReloadListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionTitlePoolReloadListener (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionTitlePoolReloadListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.3%
+  </span>
+  <span class="absValue">
+    (47/82)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.8%
+  </span>
+  <span class="absValue">
+    (139/164)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionTitlePoolReloadListener$ParsedTitleFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57%
+  </span>
+  <span class="absValue">
+    (49/86)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.3%
+  </span>
+  <span class="absValue">
+    (145/172)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import com.google.gson.GsonBuilder;
+&nbsp;import com.google.gson.JsonArray;
+&nbsp;import com.google.gson.JsonElement;
+&nbsp;import com.google.gson.JsonObject;
+&nbsp;import com.google.gson.JsonPrimitive;
+&nbsp;import com.mojang.logging.LogUtils;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.packs.resources.ResourceManager;
+&nbsp;import net.minecraft.server.packs.resources
+&nbsp;        .SimpleJsonResourceReloadListener;
+&nbsp;import net.minecraft.util.profiling.ProfilerFiller;
+&nbsp;import org.slf4j.Logger;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.EnumMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * Loads recognition titles from:
+&nbsp; *
+&nbsp; * data/&lt;namespace&gt;/recognition_titles/*.json
+&nbsp; *
+&nbsp; * Multiple files can contribute to the same recognition path. Files are
+&nbsp; * processed in deterministic resource-location order, and title order inside
+&nbsp; * each JSON array is preserved.
+&nbsp; *
+&nbsp; * Normal datapack priority applies when two packs provide the exact same
+&nbsp; * ResourceLocation. Therefore, overriding:
+&nbsp; *
+&nbsp; * data/moostensuraaddon/recognition_titles/lawful_good.json
+&nbsp; *
+&nbsp; * replaces the addon&#39;s default lawful-good definition.
+&nbsp; */
+&nbsp;public final class RecognitionTitlePoolReloadListener
+&nbsp;        extends SimpleJsonResourceReloadListener {
+&nbsp;
+&nbsp;    private static final Logger LOGGER =
+<b class="fc">&nbsp;            LogUtils.getLogger();</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * These fields must be initialized before INSTANCE.
+&nbsp;     *
+&nbsp;     * Java initializes static fields in source order. Creating INSTANCE before
+&nbsp;     * GSON or DIRECTORY would call the superclass constructor with null values.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final Gson GSON =</b>
+&nbsp;            new GsonBuilder()
+<b class="fc">&nbsp;                    .disableHtmlEscaping()</b>
+<b class="fc">&nbsp;                    .create();</b>
+&nbsp;
+&nbsp;    private static final String DIRECTORY =
+&nbsp;            &quot;recognition_titles&quot;;
+&nbsp;
+&nbsp;    private static final int MAX_SOURCE_FILES =
+&nbsp;            512;
+&nbsp;
+&nbsp;    public static final RecognitionTitlePoolReloadListener
+<b class="fc">&nbsp;            INSTANCE =</b>
+&nbsp;            new RecognitionTitlePoolReloadListener();
+&nbsp;
+&nbsp;    private RecognitionTitlePoolReloadListener() {
+<b class="fc">&nbsp;        super(</b>
+&nbsp;                GSON,
+&nbsp;                DIRECTORY
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void apply(
+&nbsp;            Map&lt;ResourceLocation, JsonElement&gt; resources,
+&nbsp;            ResourceManager resourceManager,
+&nbsp;            ProfilerFiller profiler
+&nbsp;    ) {
+&nbsp;        EnumMap&lt;
+&nbsp;                RecognitionPath,
+&nbsp;                LinkedHashSet&lt;String&gt;
+&nbsp;                &gt; standardTitles =
+<b class="fc">&nbsp;                createEmptyPoolSets();</b>
+&nbsp;
+&nbsp;        EnumMap&lt;
+&nbsp;                RecognitionPath,
+&nbsp;                LinkedHashSet&lt;String&gt;
+&nbsp;                &gt; pureTitles =
+<b class="fc">&nbsp;                createEmptyPoolSets();</b>
+&nbsp;
+&nbsp;        List&lt;Map.Entry&lt;ResourceLocation, JsonElement&gt;&gt;
+<b class="fc">&nbsp;                sortedResources =</b>
+<b class="fc">&nbsp;                resources.entrySet()</b>
+<b class="fc">&nbsp;                        .stream()</b>
+<b class="fc">&nbsp;                        .sorted(</b>
+<b class="fc">&nbsp;                                Comparator.comparing(</b>
+&nbsp;                                        entry -&gt;
+<b class="fc">&nbsp;                                                entry.getKey()</b>
+<b class="fc">&nbsp;                                                        .toString()</b>
+&nbsp;                                )
+&nbsp;                        )
+<b class="fc">&nbsp;                        .limit(</b>
+&nbsp;                                MAX_SOURCE_FILES
+&nbsp;                        )
+<b class="fc">&nbsp;                        .toList();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (resources.size()</b>
+&nbsp;                &gt; MAX_SOURCE_FILES) {
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.warn(</b>
+&nbsp;                    &quot;Found {} recognition title files, but only the first {} &quot;
+&nbsp;                            + &quot;will be processed.&quot;,
+<b class="nc">&nbsp;                    resources.size(),</b>
+<b class="nc">&nbsp;                    MAX_SOURCE_FILES</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        int acceptedFiles =</b>
+&nbsp;                0;
+&nbsp;
+&nbsp;        for (Map.Entry&lt;ResourceLocation, JsonElement&gt; entry :
+<b class="fc">&nbsp;                sortedResources) {</b>
+&nbsp;
+<b class="fc">&nbsp;            ParsedTitleFile parsed =</b>
+<b class="fc">&nbsp;                    parseTitleFile(</b>
+<b class="fc">&nbsp;                            entry.getKey(),</b>
+<b class="fc">&nbsp;                            entry.getValue()</b>
+&nbsp;                    );
+&nbsp;
+<b class="pc">&nbsp;            if (parsed == null) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            addTitles(</b>
+<b class="fc">&nbsp;                    standardTitles.get(</b>
+<b class="fc">&nbsp;                            parsed.path()</b>
+&nbsp;                    ),
+<b class="fc">&nbsp;                    parsed.standardTitles()</b>
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            addTitles(</b>
+<b class="fc">&nbsp;                    pureTitles.get(</b>
+<b class="fc">&nbsp;                            parsed.path()</b>
+&nbsp;                    ),
+<b class="fc">&nbsp;                    parsed.pureTitles()</b>
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            acceptedFiles++;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        int removedDuplicates =</b>
+<b class="fc">&nbsp;                removeGlobalDuplicates(</b>
+&nbsp;                        standardTitles,
+&nbsp;                        pureTitles
+&nbsp;                );
+&nbsp;
+&nbsp;        EnumMap&lt;RecognitionPath, List&lt;String&gt;&gt;
+<b class="fc">&nbsp;                finalStandardTitles =</b>
+<b class="fc">&nbsp;                freezePools(</b>
+&nbsp;                        standardTitles
+&nbsp;                );
+&nbsp;
+&nbsp;        EnumMap&lt;RecognitionPath, List&lt;String&gt;&gt;
+<b class="fc">&nbsp;                finalPureTitles =</b>
+<b class="fc">&nbsp;                freezePools(</b>
+&nbsp;                        pureTitles
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionTitlePoolManager.install(</b>
+&nbsp;                finalStandardTitles,
+&nbsp;                finalPureTitles,
+&nbsp;                acceptedFiles
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (removedDuplicates &gt; 0) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(</b>
+&nbsp;                    &quot;Removed {} duplicate recognition titles across the &quot;
+&nbsp;                            + &quot;loaded title pools.&quot;,
+<b class="nc">&nbsp;                    removedDuplicates</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        LOGGER.info(</b>
+&nbsp;                &quot;Loaded {} recognition title files: {} standard titles and &quot;
+&nbsp;                        + &quot;{} pure titles.&quot;,
+<b class="fc">&nbsp;                acceptedFiles,</b>
+<b class="fc">&nbsp;                RecognitionTitlePoolManager</b>
+<b class="fc">&nbsp;                        .getTotalStandardTitleCount(),</b>
+<b class="fc">&nbsp;                RecognitionTitlePoolManager</b>
+<b class="fc">&nbsp;                        .getTotalPureTitleCount()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ParsedTitleFile parseTitleFile(
+&nbsp;            ResourceLocation resourceId,
+&nbsp;            JsonElement rootElement
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (rootElement == null</b>
+<b class="pc">&nbsp;                || !rootElement.isJsonObject()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.warn(</b>
+&nbsp;                    &quot;Ignoring recognition title file {} because its root &quot;
+&nbsp;                            + &quot;element is not a JSON object.&quot;,
+&nbsp;                    resourceId
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        JsonObject root =</b>
+<b class="fc">&nbsp;                rootElement.getAsJsonObject();</b>
+&nbsp;
+<b class="fc">&nbsp;        String rawPathId =</b>
+<b class="fc">&nbsp;                readString(</b>
+&nbsp;                        root,
+&nbsp;                        &quot;path&quot;
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        RecognitionPath path =</b>
+<b class="fc">&nbsp;                RecognitionPath.byId(</b>
+&nbsp;                                rawPathId
+&nbsp;                        )
+<b class="fc">&nbsp;                        .orElse(null);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(</b>
+&nbsp;                    &quot;Ignoring recognition title file {} because &#39;{}&#39; is not &quot;
+&nbsp;                            + &quot;a valid recognition path.&quot;,
+&nbsp;                    resourceId,
+&nbsp;                    rawPathId
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        List&lt;String&gt; standardTitles =</b>
+<b class="fc">&nbsp;                readTitleArray(</b>
+&nbsp;                        resourceId,
+&nbsp;                        root,
+&nbsp;                        &quot;standard&quot;
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        List&lt;String&gt; pureTitles =</b>
+<b class="fc">&nbsp;                readTitleArray(</b>
+&nbsp;                        resourceId,
+&nbsp;                        root,
+&nbsp;                        &quot;pure&quot;
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (standardTitles.isEmpty()</b>
+<b class="nc">&nbsp;                &amp;&amp; pureTitles.isEmpty()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.warn(</b>
+&nbsp;                    &quot;Ignoring recognition title file {} because it contains &quot;
+&nbsp;                            + &quot;no valid standard or pure titles.&quot;,
+&nbsp;                    resourceId
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return new ParsedTitleFile(</b>
+&nbsp;                path,
+&nbsp;                standardTitles,
+&nbsp;                pureTitles
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String readString(
+&nbsp;            JsonObject root,
+&nbsp;            String key
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (root == null</b>
+&nbsp;                || key == null
+<b class="pc">&nbsp;                || !root.has(key)) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        JsonElement element =</b>
+<b class="fc">&nbsp;                root.get(key);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (element == null</b>
+<b class="pc">&nbsp;                || !element.isJsonPrimitive()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        JsonPrimitive primitive =</b>
+<b class="fc">&nbsp;                element.getAsJsonPrimitive();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!primitive.isString()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return primitive.getAsString()</b>
+<b class="fc">&nbsp;                .trim()</b>
+<b class="fc">&nbsp;                .toLowerCase(</b>
+&nbsp;                        Locale.ROOT
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; readTitleArray(
+&nbsp;            ResourceLocation resourceId,
+&nbsp;            JsonObject root,
+&nbsp;            String key
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (root == null</b>
+&nbsp;                || key == null
+<b class="pc">&nbsp;                || !root.has(key)) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        JsonElement element =</b>
+<b class="fc">&nbsp;                root.get(key);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (element == null</b>
+<b class="pc">&nbsp;                || !element.isJsonArray()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.warn(</b>
+&nbsp;                    &quot;Recognition title file {} has a &#39;{}&#39; field that is not &quot;
+&nbsp;                            + &quot;a JSON array. That field will be ignored.&quot;,
+&nbsp;                    resourceId,
+&nbsp;                    key
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        JsonArray array =</b>
+<b class="fc">&nbsp;                element.getAsJsonArray();</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;String&gt; titles =</b>
+&nbsp;                new ArrayList&lt;&gt;(
+<b class="fc">&nbsp;                        Math.min(</b>
+<b class="fc">&nbsp;                                array.size(),</b>
+&nbsp;                                RecognitionTitlePoolManager
+&nbsp;                                        .MAX_TITLES_PER_POOL
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+&nbsp;        for (JsonElement titleElement :
+<b class="fc">&nbsp;                array) {</b>
+&nbsp;
+<b class="pc">&nbsp;            if (titles.size()</b>
+&nbsp;                    &gt;= RecognitionTitlePoolManager
+&nbsp;                    .MAX_TITLES_PER_POOL) {
+&nbsp;
+<b class="nc">&nbsp;                LOGGER.warn(</b>
+&nbsp;                        &quot;Recognition title file {} contains more than {} &quot;
+&nbsp;                                + &quot;entries in &#39;{}&#39;. Remaining entries were &quot;
+&nbsp;                                + &quot;ignored.&quot;,
+&nbsp;                        resourceId,
+<b class="nc">&nbsp;                        RecognitionTitlePoolManager</b>
+&nbsp;                                .MAX_TITLES_PER_POOL,
+&nbsp;                        key
+&nbsp;                );
+&nbsp;
+&nbsp;                break;
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (titleElement == null</b>
+<b class="pc">&nbsp;                    || !titleElement.isJsonPrimitive()) {</b>
+&nbsp;
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            JsonPrimitive primitive =</b>
+<b class="fc">&nbsp;                    titleElement.getAsJsonPrimitive();</b>
+&nbsp;
+<b class="pc">&nbsp;            if (!primitive.isString()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            String safeTitle =</b>
+&nbsp;                    RecognitionDisplayNameService
+<b class="fc">&nbsp;                            .sanitizeTitle(</b>
+<b class="fc">&nbsp;                                    primitive.getAsString()</b>
+&nbsp;                            );
+&nbsp;
+<b class="pc">&nbsp;            if (safeTitle.isBlank()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            titles.add(</b>
+&nbsp;                    safeTitle
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return List.copyOf(</b>
+&nbsp;                titles
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static EnumMap&lt;
+&nbsp;            RecognitionPath,
+&nbsp;            LinkedHashSet&lt;String&gt;
+&nbsp;            &gt; createEmptyPoolSets() {
+&nbsp;
+&nbsp;        EnumMap&lt;
+&nbsp;                RecognitionPath,
+&nbsp;                LinkedHashSet&lt;String&gt;
+<b class="fc">&nbsp;                &gt; result =</b>
+&nbsp;                new EnumMap&lt;&gt;(
+&nbsp;                        RecognitionPath.class
+&nbsp;                );
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="fc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="fc">&nbsp;            result.put(</b>
+&nbsp;                    path,
+&nbsp;                    new LinkedHashSet&lt;&gt;()
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addTitles(
+&nbsp;            LinkedHashSet&lt;String&gt; target,
+&nbsp;            List&lt;String&gt; additions
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (target == null</b>
+&nbsp;                || additions == null
+<b class="pc">&nbsp;                || additions.isEmpty()) {</b>
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        for (String title : additions) {</b>
+<b class="pc">&nbsp;            if (target.size()</b>
+&nbsp;                    &gt;= RecognitionTitlePoolManager
+&nbsp;                    .MAX_TITLES_PER_POOL) {
+&nbsp;
+&nbsp;                break;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            String safeTitle =</b>
+&nbsp;                    RecognitionDisplayNameService
+<b class="fc">&nbsp;                            .sanitizeTitle(</b>
+&nbsp;                                    title
+&nbsp;                            );
+&nbsp;
+<b class="pc">&nbsp;            if (!safeTitle.isBlank()) {</b>
+<b class="fc">&nbsp;                target.add(</b>
+&nbsp;                        safeTitle
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Prevents one title from appearing in multiple path or purity pools.
+&nbsp;     *
+&nbsp;     * The first occurrence in the deterministic path and resource order is
+&nbsp;     * kept. Later case-insensitive duplicates are discarded.
+&nbsp;     */
+&nbsp;    private static int removeGlobalDuplicates(
+&nbsp;            EnumMap&lt;
+&nbsp;                    RecognitionPath,
+&nbsp;                    LinkedHashSet&lt;String&gt;
+&nbsp;                    &gt; standardTitles,
+&nbsp;            EnumMap&lt;
+&nbsp;                    RecognitionPath,
+&nbsp;                    LinkedHashSet&lt;String&gt;
+&nbsp;                    &gt; pureTitles
+&nbsp;    ) {
+<b class="fc">&nbsp;        Set&lt;String&gt; globallySeen =</b>
+&nbsp;                new HashSet&lt;&gt;();
+&nbsp;
+<b class="fc">&nbsp;        int removed =</b>
+&nbsp;                0;
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="fc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="fc">&nbsp;            removed += removeDuplicates(</b>
+<b class="fc">&nbsp;                    standardTitles.get(path),</b>
+&nbsp;                    globallySeen
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            removed += removeDuplicates(</b>
+<b class="fc">&nbsp;                    pureTitles.get(path),</b>
+&nbsp;                    globallySeen
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return removed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int removeDuplicates(
+&nbsp;            LinkedHashSet&lt;String&gt; titles,
+&nbsp;            Set&lt;String&gt; globallySeen
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (titles == null || titles.isEmpty()) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        int removed =</b>
+&nbsp;                0;
+&nbsp;
+<b class="fc">&nbsp;        Iterator&lt;String&gt; iterator =</b>
+<b class="fc">&nbsp;                titles.iterator();</b>
+&nbsp;
+<b class="fc">&nbsp;        while (iterator.hasNext()) {</b>
+<b class="fc">&nbsp;            String title =</b>
+<b class="fc">&nbsp;                    iterator.next();</b>
+&nbsp;
+<b class="fc">&nbsp;            String normalized =</b>
+<b class="fc">&nbsp;                    title.toLowerCase(</b>
+&nbsp;                            Locale.ROOT
+&nbsp;                    );
+&nbsp;
+<b class="pc">&nbsp;            if (!globallySeen.add(</b>
+&nbsp;                    normalized
+&nbsp;            )) {
+<b class="nc">&nbsp;                iterator.remove();</b>
+<b class="nc">&nbsp;                removed++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return removed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static EnumMap&lt;RecognitionPath, List&lt;String&gt;&gt;
+&nbsp;    freezePools(
+&nbsp;            EnumMap&lt;
+&nbsp;                    RecognitionPath,
+&nbsp;                    LinkedHashSet&lt;String&gt;
+&nbsp;                    &gt; source
+&nbsp;    ) {
+<b class="fc">&nbsp;        EnumMap&lt;RecognitionPath, List&lt;String&gt;&gt; result =</b>
+&nbsp;                new EnumMap&lt;&gt;(
+&nbsp;                        RecognitionPath.class
+&nbsp;                );
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="fc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="fc">&nbsp;            LinkedHashSet&lt;String&gt; titles =</b>
+<b class="fc">&nbsp;                    source.get(path);</b>
+&nbsp;
+<b class="pc">&nbsp;            if (titles == null || titles.isEmpty()) {</b>
+<b class="nc">&nbsp;                result.put(</b>
+&nbsp;                        path,
+<b class="nc">&nbsp;                        List.of()</b>
+&nbsp;                );
+&nbsp;            } else {
+<b class="fc">&nbsp;                result.put(</b>
+&nbsp;                        path,
+<b class="fc">&nbsp;                        List.copyOf(</b>
+&nbsp;                                titles
+&nbsp;                        )
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private record ParsedTitleFile(</b>
+&nbsp;            RecognitionPath path,
+&nbsp;            List&lt;String&gt; standardTitles,
+&nbsp;            List&lt;String&gt; pureTitles
+&nbsp;    ) {
+&nbsp;
+<b class="fc">&nbsp;        private ParsedTitleFile {</b>
+&nbsp;            standardTitles =
+<b class="pc">&nbsp;                    standardTitles == null</b>
+<b class="nc">&nbsp;                            ? List.of()</b>
+<b class="fc">&nbsp;                            : List.copyOf(</b>
+&nbsp;                            standardTitles
+&nbsp;                    );
+&nbsp;
+&nbsp;            pureTitles =
+<b class="pc">&nbsp;                    pureTitles == null</b>
+<b class="nc">&nbsp;                            ? List.of()</b>
+<b class="fc">&nbsp;                            : List.copyOf(</b>
+&nbsp;                            pureTitles
+&nbsp;                    );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

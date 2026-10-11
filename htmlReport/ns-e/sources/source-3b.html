@@ -1,0 +1,432 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionSubordinateCombatTracker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionSubordinateCombatTracker (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionSubordinateCombatTracker</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.5%
+  </span>
+  <span class="absValue">
+    (6/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.6%
+  </span>
+  <span class="absValue">
+    (7/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    17.3%
+  </span>
+  <span class="absValue">
+    (14/81)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionSubordinateCombatTracker$ParticipationRecord</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionSubordinateCombatTracker$RuntimeSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (6/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14%
+  </span>
+  <span class="absValue">
+    (7/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.1%
+  </span>
+  <span class="absValue">
+    (14/87)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import net.minecraft.resources.ResourceKey;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.damagesource.DamageSource;
+&nbsp;import net.minecraft.world.entity.Entity;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;import net.minecraft.world.level.Level;
+&nbsp;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;public final class RecognitionSubordinateCombatTracker {
+&nbsp;
+&nbsp;    private static final long PARTICIPATION_WINDOW_TICKS =
+&nbsp;            20L * 120L;
+&nbsp;
+&nbsp;    private static final int MAX_ACTIVE_MAJOR_ENEMIES = 4096;
+&nbsp;
+&nbsp;    private static final RecognitionRuntimeCapTable&lt;UUID, ParticipationRecord&gt;
+<b class="fc">&nbsp;            ACTIVE_MAJOR_ENEMIES = new RecognitionRuntimeCapTable&lt;&gt;(</b>
+&nbsp;            MAX_ACTIVE_MAJOR_ENEMIES,
+&nbsp;            ParticipationRecord::firstObservedGameTime
+&nbsp;    );
+&nbsp;
+&nbsp;    private RecognitionSubordinateCombatTracker() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static synchronized void recordIncomingDamage(
+&nbsp;            LivingEntity victim,
+&nbsp;            DamageSource source
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (victim == null</b>
+&nbsp;                || source == null
+<b class="pc">&nbsp;                || victim.level().isClientSide()</b>
+<b class="pc">&nbsp;                || !victim.getType().is(</b>
+&nbsp;                RecognitionEntityTags.MAJOR_ENEMIES
+&nbsp;        )) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ServerPlayer owner = resolveSubordinateOwner(source);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (owner == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long gameTime = victim.level().getGameTime();</b>
+&nbsp;
+<b class="nc">&nbsp;        ParticipationRecord existing =</b>
+<b class="nc">&nbsp;                ACTIVE_MAJOR_ENEMIES.get(victim.getUUID());</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;UUID&gt; participatingOwners = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (existing != null</b>
+<b class="nc">&nbsp;                &amp;&amp; existing.dimension().equals(</b>
+<b class="nc">&nbsp;                victim.level().dimension()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                &amp;&amp; gameTime &lt;= existing.expirationGameTime()) {</b>
+<b class="nc">&nbsp;            participatingOwners.addAll(</b>
+<b class="nc">&nbsp;                    existing.participatingOwners()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        participatingOwners.add(owner.getUUID());</b>
+&nbsp;
+<b class="nc">&nbsp;        ACTIVE_MAJOR_ENEMIES.put(</b>
+<b class="nc">&nbsp;                victim.getUUID(),</b>
+&nbsp;                new ParticipationRecord(
+<b class="nc">&nbsp;                        victim.level().dimension(),</b>
+<b class="nc">&nbsp;                        Set.copyOf(participatingOwners),</b>
+<b class="nc">&nbsp;                        existing == null</b>
+<b class="nc">&nbsp;                                ? gameTime</b>
+<b class="nc">&nbsp;                                : existing.firstObservedGameTime(),</b>
+&nbsp;                        gameTime + PARTICIPATION_WINDOW_TICKS
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static synchronized Set&lt;UUID&gt; consumeParticipants(
+&nbsp;            LivingEntity victim
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (victim == null) {</b>
+<b class="nc">&nbsp;            return Set.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        ParticipationRecord record =</b>
+<b class="fc">&nbsp;                ACTIVE_MAJOR_ENEMIES.remove(</b>
+<b class="fc">&nbsp;                        victim.getUUID()</b>
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (record == null) {</b>
+<b class="fc">&nbsp;            return Set.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!record.dimension().equals(</b>
+<b class="nc">&nbsp;                victim.level().dimension()</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            return Set.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (victim.level().getGameTime()</b>
+<b class="nc">&nbsp;                &gt; record.expirationGameTime()) {</b>
+<b class="nc">&nbsp;            return Set.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return record.participatingOwners();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static synchronized void forget(
+&nbsp;            LivingEntity entity
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (entity == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        ACTIVE_MAJOR_ENEMIES.remove(entity.getUUID());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static synchronized void cleanup(
+&nbsp;            long currentGameTime
+&nbsp;    ) {
+<b class="fc">&nbsp;        ACTIVE_MAJOR_ENEMIES.removeIf(</b>
+<b class="nc">&nbsp;                entry -&gt; currentGameTime</b>
+<b class="nc">&nbsp;                        &gt; entry.getValue()</b>
+<b class="nc">&nbsp;                        .expirationGameTime()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static synchronized void forgetOwner(
+&nbsp;            UUID ownerUuid
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (ownerUuid == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (var entry : ACTIVE_MAJOR_ENEMIES.snapshotEntries()) {</b>
+<b class="nc">&nbsp;            ParticipationRecord record = entry.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!record.participatingOwners().contains(ownerUuid)) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Set&lt;UUID&gt; remainingOwners = new HashSet&lt;&gt;(</b>
+<b class="nc">&nbsp;                    record.participatingOwners()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            remainingOwners.remove(ownerUuid);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (remainingOwners.isEmpty()) {</b>
+<b class="nc">&nbsp;                ACTIVE_MAJOR_ENEMIES.remove(entry.getKey());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                ACTIVE_MAJOR_ENEMIES.put(</b>
+<b class="nc">&nbsp;                        entry.getKey(),</b>
+&nbsp;                        new ParticipationRecord(
+<b class="nc">&nbsp;                                record.dimension(),</b>
+&nbsp;                                remainingOwners,
+<b class="nc">&nbsp;                                record.firstObservedGameTime(),</b>
+<b class="nc">&nbsp;                                record.expirationGameTime()</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static synchronized void clearAll() {
+<b class="fc">&nbsp;        ACTIVE_MAJOR_ENEMIES.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static synchronized RuntimeSnapshot inspect(
+&nbsp;            UUID selectedOwner
+&nbsp;    ) {
+<b class="nc">&nbsp;        int selectedOwnerRecords = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selectedOwner != null) {</b>
+&nbsp;            for (var entry :
+<b class="nc">&nbsp;                    ACTIVE_MAJOR_ENEMIES.snapshotEntries()) {</b>
+<b class="nc">&nbsp;                if (entry.getValue()</b>
+<b class="nc">&nbsp;                        .participatingOwners()</b>
+<b class="nc">&nbsp;                        .contains(selectedOwner)) {</b>
+<b class="nc">&nbsp;                    selectedOwnerRecords++;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new RuntimeSnapshot(</b>
+<b class="nc">&nbsp;                ACTIVE_MAJOR_ENEMIES.size(),</b>
+&nbsp;                selectedOwnerRecords,
+&nbsp;                MAX_ACTIVE_MAJOR_ENEMIES
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Installs one synthetic participant used only by the reset fixture. */
+&nbsp;    public static synchronized void installResetFixture(
+&nbsp;            ServerPlayer owner
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (owner == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long gameTime = owner.level().getGameTime();</b>
+&nbsp;
+<b class="nc">&nbsp;        ACTIVE_MAJOR_ENEMIES.put(</b>
+<b class="nc">&nbsp;                UUID.randomUUID(),</b>
+&nbsp;                new ParticipationRecord(
+<b class="nc">&nbsp;                        owner.level().dimension(),</b>
+<b class="nc">&nbsp;                        Set.of(owner.getUUID()),</b>
+&nbsp;                        gameTime,
+&nbsp;                        gameTime + PARTICIPATION_WINDOW_TICKS
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ServerPlayer resolveSubordinateOwner(
+&nbsp;            DamageSource source
+&nbsp;    ) {
+<b class="nc">&nbsp;        Entity causingEntity = source.getEntity();</b>
+<b class="nc">&nbsp;        Entity directEntity = source.getDirectEntity();</b>
+&nbsp;
+<b class="nc">&nbsp;        ServerPlayer owner =</b>
+<b class="nc">&nbsp;                RecognitionSubordinateSupport.findOnlineOwner(</b>
+&nbsp;                        causingEntity
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (owner != null) {</b>
+<b class="nc">&nbsp;            return owner;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return RecognitionSubordinateSupport.findOnlineOwner(</b>
+&nbsp;                directEntity
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record ParticipationRecord(</b>
+&nbsp;            ResourceKey&lt;Level&gt; dimension,
+&nbsp;            Set&lt;UUID&gt; participatingOwners,
+&nbsp;            long firstObservedGameTime,
+&nbsp;            long expirationGameTime
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        private ParticipationRecord {</b>
+&nbsp;            participatingOwners =
+<b class="nc">&nbsp;                    participatingOwners == null</b>
+<b class="nc">&nbsp;                            ? Set.of()</b>
+<b class="nc">&nbsp;                            : Set.copyOf(participatingOwners);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record RuntimeSnapshot(</b>
+&nbsp;            int activeMajorEnemies,
+&nbsp;            int selectedOwnerRecords,
+&nbsp;            int maximumActiveMajorEnemies
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,376 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionStatKeys</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionStatKeys (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">RecognitionStatKeys</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;public final class RecognitionStatKeys {
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Integer counters
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String HIGHEST_EXPERIENCE_LEVEL =
+&nbsp;            &quot;highest_experience_level&quot;;
+&nbsp;
+&nbsp;    public static final String MASTERED_SKILLS =
+&nbsp;            &quot;mastered_skills&quot;;
+&nbsp;
+&nbsp;    public static final String MASTERED_SKILL_CATEGORIES =
+&nbsp;            &quot;mastered_skill_categories&quot;;
+&nbsp;
+&nbsp;    public static final String RAID_VICTORIES =
+&nbsp;            &quot;raid_victories&quot;;
+&nbsp;
+&nbsp;    public static final String VILLAGERS_CURED =
+&nbsp;            &quot;villagers_cured&quot;;
+&nbsp;
+&nbsp;    public static final String CIVILIANS_DEFENDED =
+&nbsp;            &quot;civilians_defended&quot;;
+&nbsp;
+&nbsp;    public static final String CIVILIAN_KILLS =
+&nbsp;            &quot;civilian_kills&quot;;
+&nbsp;
+&nbsp;    public static final String PASSIVE_BABY_KILLS =
+&nbsp;            &quot;passive_baby_kills&quot;;
+&nbsp;
+&nbsp;    public static final String OWNED_COMPANION_KILLS =
+&nbsp;            &quot;owned_companion_kills&quot;;
+&nbsp;
+&nbsp;    public static final String OWNED_SUBORDINATE_KILLS =
+&nbsp;            &quot;owned_subordinate_kills&quot;;
+&nbsp;
+&nbsp;    public static final String CURRENT_SUBORDINATES =
+&nbsp;            &quot;current_subordinates&quot;;
+&nbsp;
+&nbsp;    public static final String HIGHEST_SUBORDINATES =
+&nbsp;            &quot;highest_subordinates&quot;;
+&nbsp;
+&nbsp;    public static final String SUBORDINATE_ASSISTED_MAJOR_VICTORIES =
+&nbsp;            &quot;subordinate_assisted_major_victories&quot;;
+&nbsp;
+&nbsp;    public static final String MASS_GRANTS_PERFORMED =
+&nbsp;            &quot;mass_grants_performed&quot;;
+&nbsp;
+&nbsp;    public static final String GLOBAL_TAKE_BACKS_PERFORMED =
+&nbsp;            &quot;global_take_backs_performed&quot;;
+&nbsp;
+&nbsp;    public static final String SKILLS_SEIZED =
+&nbsp;            &quot;skills_seized&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Versioned contradiction-history counters
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String IDENTITY_HISTORY_VERSION =
+&nbsp;            &quot;identity_history_version&quot;;
+&nbsp;
+&nbsp;    public static final String MORAL_REVERSAL_COUNT =
+&nbsp;            &quot;moral_reversal_count&quot;;
+&nbsp;
+&nbsp;    public static final String TEMPERAMENT_REVERSAL_COUNT =
+&nbsp;            &quot;temperament_reversal_count&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Persisted authority-counter baselines for event-delta integration.
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String HISTORY_OBSERVED_UNIQUE_SUBORDINATES_EMPOWERED =
+&nbsp;            &quot;history_observed_unique_subordinates_empowered&quot;;
+&nbsp;
+&nbsp;    public static final String HISTORY_OBSERVED_MASS_GRANTS_PERFORMED =
+&nbsp;            &quot;history_observed_mass_grants_performed&quot;;
+&nbsp;
+&nbsp;    public static final String HISTORY_OBSERVED_GLOBAL_TAKE_BACKS_PERFORMED =
+&nbsp;            &quot;history_observed_global_take_backs_performed&quot;;
+&nbsp;
+&nbsp;    public static final String HISTORY_OBSERVED_SKILLS_SEIZED =
+&nbsp;            &quot;history_observed_skills_seized&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Frozen recognition-result versions
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String RECOGNITION_RESULT_VERSION =
+&nbsp;            &quot;recognition_result_version&quot;;
+&nbsp;
+&nbsp;    public static final String RECOGNITION_RULES_VERSION =
+&nbsp;            &quot;recognition_rules_version&quot;;
+&nbsp;
+&nbsp;    public static final String REWARD_PROFILE_VERSION =
+&nbsp;            &quot;reward_profile_version&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Decimal measurements
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String CURRENT_EP =
+&nbsp;            &quot;current_ep&quot;;
+&nbsp;
+&nbsp;    public static final String HIGHEST_EP =
+&nbsp;            &quot;highest_ep&quot;;
+&nbsp;
+&nbsp;    public static final String PRIMARY_SCORE_AT_COMMIT =
+&nbsp;            &quot;primary_score_at_commit&quot;;
+&nbsp;
+&nbsp;    public static final String SECONDARY_SCORE_AT_COMMIT =
+&nbsp;            &quot;secondary_score_at_commit&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Frozen recognition-strength reward profile 2
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String IDENTITY_STRENGTH_AT_COMMIT =
+&nbsp;            &quot;identity_strength_at_commit&quot;;
+&nbsp;
+&nbsp;    public static final String IDENTITY_STRENGTH_MAXIMUM_AT_COMMIT =
+&nbsp;            &quot;identity_strength_maximum_at_commit&quot;;
+&nbsp;
+&nbsp;    public static final String RECOGNITION_STRENGTH_REWARD =
+&nbsp;            &quot;recognition_strength_reward&quot;;
+&nbsp;
+&nbsp;    public static final String ENDOWMENT_MAXIMUM_EXTRA_EP_AT_COMMIT =
+&nbsp;            &quot;endowment_maximum_extra_ep_at_commit&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Lazy contradiction-history momentum and historical peaks
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String GOOD_MOMENTUM =
+&nbsp;            &quot;good_momentum&quot;;
+&nbsp;
+&nbsp;    public static final String EVIL_MOMENTUM =
+&nbsp;            &quot;evil_momentum&quot;;
+&nbsp;
+&nbsp;    public static final String ORDER_MOMENTUM =
+&nbsp;            &quot;order_momentum&quot;;
+&nbsp;
+&nbsp;    public static final String FREEDOM_MOMENTUM =
+&nbsp;            &quot;freedom_momentum&quot;;
+&nbsp;
+&nbsp;    public static final String HIGHEST_GOOD_COMMITMENT =
+&nbsp;            &quot;highest_good_commitment&quot;;
+&nbsp;
+&nbsp;    public static final String HIGHEST_EVIL_COMMITMENT =
+&nbsp;            &quot;highest_evil_commitment&quot;;
+&nbsp;
+&nbsp;    public static final String HIGHEST_ORDER_COMMITMENT =
+&nbsp;            &quot;highest_order_commitment&quot;;
+&nbsp;
+&nbsp;    public static final String HIGHEST_FREEDOM_COMMITMENT =
+&nbsp;            &quot;highest_freedom_commitment&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Boolean flags
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String TRUE_HERO =
+&nbsp;            &quot;true_hero&quot;;
+&nbsp;
+&nbsp;    public static final String TRUE_DEMON_LORD =
+&nbsp;            &quot;true_demon_lord&quot;;
+&nbsp;
+&nbsp;    public static final String NAMING_COMMITTED =
+&nbsp;            &quot;naming_committed&quot;;
+&nbsp;
+&nbsp;    public static final String PURE_RECOGNITION =
+&nbsp;            &quot;pure_recognition&quot;;
+&nbsp;
+&nbsp;    public static final String REVEAL_PENDING =
+&nbsp;            &quot;reveal_pending&quot;;
+&nbsp;
+&nbsp;    public static final String IDENTITY_HISTORY_AUTHORITY_BASELINE_INITIALIZED =
+&nbsp;            &quot;identity_history_authority_baseline_initialized&quot;;
+&nbsp;
+&nbsp;    public static final String RECOGNITION_REWARD_INITIALIZED =
+&nbsp;            &quot;recognition_reward_initialized&quot;;
+&nbsp;
+&nbsp;    public static final String ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED =
+&nbsp;            &quot;endowment_reward_snapshot_initialized&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * String values
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String INCARNATION_ID =
+&nbsp;            &quot;incarnation_id&quot;;
+&nbsp;
+&nbsp;    public static final String PRIMARY_PATH =
+&nbsp;            &quot;primary_path&quot;;
+&nbsp;
+&nbsp;    public static final String SECONDARY_PATH =
+&nbsp;            &quot;secondary_path&quot;;
+&nbsp;
+&nbsp;    public static final String BESTOWED_TITLE =
+&nbsp;            &quot;bestowed_title&quot;;
+&nbsp;
+&nbsp;    public static final String FROZEN_DISPLAY_NAME =
+&nbsp;            &quot;frozen_display_name&quot;;
+&nbsp;
+&nbsp;    public static final String CONTRADICTION_MODIFIER =
+&nbsp;            &quot;contradiction_modifier&quot;;
+&nbsp;
+&nbsp;    public static final String BALANCE_SOURCE_AT_COMMIT =
+&nbsp;            &quot;balance_source_at_commit&quot;;
+&nbsp;
+&nbsp;    public static final String INDEPENDENCE_DEFINITION_FINGERPRINT =
+&nbsp;            &quot;independence_definition_fingerprint&quot;;
+&nbsp;
+&nbsp;    public static final String IDENTITY_HISTORY_MODIFIER =
+&nbsp;            &quot;identity_history_modifier&quot;;
+&nbsp;
+&nbsp;    public static final String IDENTITY_HISTORY_MIGRATION_SOURCE =
+&nbsp;            &quot;identity_history_migration_source&quot;;
+&nbsp;
+&nbsp;    public static final String RECOGNITION_REWARD_MIGRATION_SOURCE =
+&nbsp;            &quot;recognition_reward_migration_source&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Long values are encoded as decimal strings so values such as epoch
+&nbsp;     * milliseconds and revisions never pass through lossy floating point.
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String BALANCE_REVISION_AT_COMMIT =
+&nbsp;            &quot;balance_revision_at_commit&quot;;
+&nbsp;
+&nbsp;    public static final String COMMIT_TIMESTAMP_EPOCH_MILLIS =
+&nbsp;            &quot;commit_timestamp_epoch_millis&quot;;
+&nbsp;
+&nbsp;    public static final String RECOGNITION_MIGRATION_SOURCE =
+&nbsp;            &quot;recognition_migration_source&quot;;
+&nbsp;
+&nbsp;    public static final String LAST_GOOD_DEED_GAME_TIME =
+&nbsp;            &quot;last_good_deed_game_time&quot;;
+&nbsp;
+&nbsp;    public static final String LAST_EVIL_DEED_GAME_TIME =
+&nbsp;            &quot;last_evil_deed_game_time&quot;;
+&nbsp;
+&nbsp;    public static final String LAST_ORDER_DEED_GAME_TIME =
+&nbsp;            &quot;last_order_deed_game_time&quot;;
+&nbsp;
+&nbsp;    public static final String LAST_FREEDOM_DEED_GAME_TIME =
+&nbsp;            &quot;last_freedom_deed_game_time&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Incremental lazy-decay anchors.
+&nbsp;     *
+&nbsp;     * These remain separate from the last-deed timestamps so repeatedly
+&nbsp;     * evaluating decay cannot subtract the same elapsed time more than once.
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String GOOD_DECAY_ANCHOR_GAME_TIME =
+&nbsp;            &quot;good_decay_anchor_game_time&quot;;
+&nbsp;
+&nbsp;    public static final String EVIL_DECAY_ANCHOR_GAME_TIME =
+&nbsp;            &quot;evil_decay_anchor_game_time&quot;;
+&nbsp;
+&nbsp;    public static final String ORDER_DECAY_ANCHOR_GAME_TIME =
+&nbsp;            &quot;order_decay_anchor_game_time&quot;;
+&nbsp;
+&nbsp;    public static final String FREEDOM_DECAY_ANCHOR_GAME_TIME =
+&nbsp;            &quot;freedom_decay_anchor_game_time&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Last clearly established direction on each contradiction axis.
+&nbsp;     *
+&nbsp;     * Values are semantic strings rather than enum ordinals.
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String MORAL_ESTABLISHED_DIRECTION =
+&nbsp;            &quot;moral_established_direction&quot;;
+&nbsp;
+&nbsp;    public static final String TEMPERAMENT_ESTABLISHED_DIRECTION =
+&nbsp;            &quot;temperament_established_direction&quot;;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Unique registry ID / UUID collections
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final String MALEVOLENT_BOSS_TYPES_DEFEATED =
+&nbsp;            &quot;malevolent_boss_types_defeated&quot;;
+&nbsp;
+&nbsp;    public static final String BENEVOLENT_BOSS_TYPES_KILLED =
+&nbsp;            &quot;benevolent_boss_types_killed&quot;;
+&nbsp;
+&nbsp;    public static final String MAJOR_ENEMY_TYPES_DEFEATED =
+&nbsp;            &quot;major_enemy_types_defeated&quot;;
+&nbsp;
+&nbsp;    public static final String SOLO_MAJOR_ENEMY_TYPES_DEFEATED =
+&nbsp;            &quot;solo_major_enemy_types_defeated&quot;;
+&nbsp;
+&nbsp;    public static final String DISCOVERY_MILESTONES =
+&nbsp;            &quot;discovery_milestones&quot;;
+&nbsp;
+&nbsp;    public static final String INDEPENDENCE_MILESTONES =
+&nbsp;            &quot;independence_milestones&quot;;
+&nbsp;
+&nbsp;    public static final String UNIQUE_SUBORDINATES_EMPOWERED =
+&nbsp;            &quot;unique_subordinates_empowered&quot;;
+&nbsp;
+&nbsp;    private RecognitionStatKeys() {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,318 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionRewardNoticeService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionRewardNoticeService (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionRewardNoticeService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (3/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.9%
+  </span>
+  <span class="absValue">
+    (11/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    31.6%
+  </span>
+  <span class="absValue">
+    (24/76)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.lifecycle.AddonIncarnationState;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.nbt.CompoundTag;
+&nbsp;import net.minecraft.network.chat.ClickEvent;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.HoverEvent;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.entity.player.Player;
+&nbsp;
+&nbsp;/**
+&nbsp; * Shows one concise benefits link after a recognized incarnation stabilizes.
+&nbsp; */
+&nbsp;public final class RecognitionRewardNoticeService {
+&nbsp;
+&nbsp;    private static final String ROOT_KEY =
+&nbsp;            &quot;moostensuraaddon_recognition_notice&quot;;
+&nbsp;    private static final String SHOWN_IDENTITY_KEY =
+&nbsp;            &quot;shown_identity&quot;;
+&nbsp;    private static final int CHECK_INTERVAL_TICKS = 40;
+&nbsp;
+&nbsp;    private RecognitionRewardNoticeService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void tick(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null</b>
+<b class="pc">&nbsp;                || player.level().isClientSide()</b>
+&nbsp;                || player.tickCount % CHECK_INTERVAL_TICKS != 0) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        tryShow(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean tryShow(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null</b>
+<b class="pc">&nbsp;                || player.level().isClientSide()</b>
+<b class="pc">&nbsp;                || AddonIncarnationState.isResetGuardActive(player)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionData recognition = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (!recognition.isNamingCommitted()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        AddonIncarnationState.Snapshot lifecycle =</b>
+<b class="fc">&nbsp;                AddonIncarnationState.inspect(player);</b>
+<b class="fc">&nbsp;        String identity = RecognitionRewardNoticePolicy.createIdentity(</b>
+<b class="fc">&nbsp;                recognition.getIncarnationId(),</b>
+<b class="fc">&nbsp;                lifecycle.lifeToken(),</b>
+<b class="fc">&nbsp;                recognition.getRewardProfileVersion()</b>
+&nbsp;        );
+<b class="fc">&nbsp;        String shownIdentity = getShownIdentity(player);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!identity.isBlank()</b>
+<b class="pc">&nbsp;                &amp;&amp; identity.equals(shownIdentity)) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionStrengthRewardSnapshot reward =</b>
+<b class="nc">&nbsp;                RecognitionStrengthRewardService.inspect(player);</b>
+<b class="nc">&nbsp;        String recognitionIncarnation = recognition.getIncarnationId()</b>
+<b class="nc">&nbsp;                .isBlank()</b>
+<b class="nc">&nbsp;                ? lifecycle.lifeToken()</b>
+<b class="nc">&nbsp;                : recognition.getIncarnationId();</b>
+<b class="nc">&nbsp;        boolean nativeMarkerMatches = !recognitionIncarnation.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; recognitionIncarnation.equals(</b>
+<b class="nc">&nbsp;                lifecycle.nativeEndowmentIncarnation()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!RecognitionRewardNoticePolicy.shouldShow(</b>
+<b class="nc">&nbsp;                reward.recognitionCommitted(),</b>
+<b class="nc">&nbsp;                reward.committedResultValid(),</b>
+<b class="nc">&nbsp;                reward.rewardMetadataInitialized(),</b>
+<b class="nc">&nbsp;                reward.futureProfilePreserved(),</b>
+<b class="nc">&nbsp;                lifecycle.resetGuardActive(),</b>
+&nbsp;                nativeMarkerMatches,
+&nbsp;                identity,
+&nbsp;                shownIdentity
+&nbsp;        )) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendNotice(player);</b>
+<b class="nc">&nbsp;        setShownIdentity(player, identity);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void copyPersistentState(
+&nbsp;            Player original,
+&nbsp;            Player clone
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (original == null || clone == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CompoundTag originalRoot = original.getPersistentData();</b>
+<b class="nc">&nbsp;        CompoundTag originalPersisted = originalRoot.getCompound(</b>
+&nbsp;                Player.PERSISTED_NBT_TAG
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!originalPersisted.contains(ROOT_KEY)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CompoundTag cloneRoot = clone.getPersistentData();</b>
+<b class="nc">&nbsp;        CompoundTag clonePersisted = cloneRoot.getCompound(</b>
+&nbsp;                Player.PERSISTED_NBT_TAG
+&nbsp;        );
+<b class="nc">&nbsp;        clonePersisted.put(</b>
+&nbsp;                ROOT_KEY,
+<b class="nc">&nbsp;                originalPersisted.getCompound(ROOT_KEY).copy()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        cloneRoot.put(</b>
+&nbsp;                Player.PERSISTED_NBT_TAG,
+&nbsp;                clonePersisted
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendNotice(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        String command = &quot;/moostensura paths&quot;;</b>
+<b class="nc">&nbsp;        MutableComponent link = Component.translatable(</b>
+&nbsp;                        &quot;message.moostensuraaddon.recognition_notice.link&quot;
+&nbsp;                )
+<b class="nc">&nbsp;                .withStyle(style -&gt; style</b>
+<b class="nc">&nbsp;                        .withColor(ChatFormatting.AQUA)</b>
+<b class="nc">&nbsp;                        .withUnderlined(true)</b>
+<b class="nc">&nbsp;                        .withClickEvent(</b>
+&nbsp;                                new ClickEvent(
+&nbsp;                                        ClickEvent.Action.RUN_COMMAND,
+&nbsp;                                        command
+&nbsp;                                )
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withHoverEvent(</b>
+&nbsp;                                new HoverEvent(
+&nbsp;                                        HoverEvent.Action.SHOW_TEXT,
+<b class="nc">&nbsp;                                        Component.translatable(</b>
+&nbsp;                                                &quot;message.moostensuraaddon.recognition_notice.hover&quot;
+&nbsp;                                        )
+&nbsp;                                )
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                Component.translatable(</b>
+&nbsp;                                &quot;message.moostensuraaddon.recognition_notice.text&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.LIGHT_PURPLE)</b>
+<b class="nc">&nbsp;                        .append(Component.literal(&quot; &quot;))</b>
+<b class="nc">&nbsp;                        .append(link)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getShownIdentity(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="fc">&nbsp;        CompoundTag persisted = player.getPersistentData()</b>
+<b class="fc">&nbsp;                .getCompound(Player.PERSISTED_NBT_TAG);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!persisted.contains(ROOT_KEY)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return persisted.getCompound(ROOT_KEY)</b>
+<b class="fc">&nbsp;                .getString(SHOWN_IDENTITY_KEY)</b>
+<b class="fc">&nbsp;                .trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void setShownIdentity(
+&nbsp;            ServerPlayer player,
+&nbsp;            String identity
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null</b>
+&nbsp;                || identity == null
+<b class="nc">&nbsp;                || identity.isBlank()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CompoundTag root = player.getPersistentData();</b>
+<b class="nc">&nbsp;        CompoundTag persisted = root.getCompound(</b>
+&nbsp;                Player.PERSISTED_NBT_TAG
+&nbsp;        );
+<b class="nc">&nbsp;        CompoundTag notice = persisted.getCompound(ROOT_KEY);</b>
+<b class="nc">&nbsp;        notice.putString(SHOWN_IDENTITY_KEY, identity.trim());</b>
+<b class="nc">&nbsp;        persisted.put(ROOT_KEY, notice);</b>
+<b class="nc">&nbsp;        root.put(Player.PERSISTED_NBT_TAG, persisted);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,179 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionRewardNoticePolicy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionRewardNoticePolicy (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionRewardNoticePolicy</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15%
+  </span>
+  <span class="absValue">
+    (3/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.2%
+  </span>
+  <span class="absValue">
+    (6/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;/**
+&nbsp; * Pure lifecycle rules for the one-time recognition-benefit notice.
+&nbsp; */
+&nbsp;public final class RecognitionRewardNoticePolicy {
+&nbsp;
+&nbsp;    public static final int CURRENT_NOTICE_REVISION = 1;
+&nbsp;
+&nbsp;    private RecognitionRewardNoticePolicy() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String createIdentity(
+&nbsp;            String recognitionIncarnationId,
+&nbsp;            String lifecycleToken,
+&nbsp;            int rewardProfileVersion
+&nbsp;    ) {
+<b class="fc">&nbsp;        String incarnation = clean(recognitionIncarnationId);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (incarnation.isBlank()) {</b>
+<b class="nc">&nbsp;            incarnation = clean(lifecycleToken);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (incarnation.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return incarnation</b>
+&nbsp;                + &quot;|profile=&quot;
+<b class="fc">&nbsp;                + Math.max(0, rewardProfileVersion)</b>
+&nbsp;                + &quot;|notice=&quot;
+&nbsp;                + CURRENT_NOTICE_REVISION;
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean shouldShow(
+&nbsp;            boolean recognitionCommitted,
+&nbsp;            boolean committedResultValid,
+&nbsp;            boolean rewardMetadataInitialized,
+&nbsp;            boolean futureProfilePreserved,
+&nbsp;            boolean resetGuardActive,
+&nbsp;            boolean nativeEndowmentMarkerMatches,
+&nbsp;            String currentIdentity,
+&nbsp;            String shownIdentity
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!recognitionCommitted</b>
+&nbsp;                || !committedResultValid
+&nbsp;                || !rewardMetadataInitialized
+&nbsp;                || futureProfilePreserved
+&nbsp;                || resetGuardActive
+&nbsp;                || !nativeEndowmentMarkerMatches) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String current = clean(currentIdentity);</b>
+&nbsp;
+<b class="nc">&nbsp;        return !current.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; !current.equals(clean(shownIdentity));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String clean(String value) {
+<b class="pc">&nbsp;        return value == null ? &quot;&quot; : value.trim();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

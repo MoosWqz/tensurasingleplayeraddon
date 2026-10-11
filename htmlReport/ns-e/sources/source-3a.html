@@ -1,0 +1,479 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionStrengthRewardValidationHarness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionStrengthRewardValidationHarness (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionStrengthRewardValidationHarness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionStrengthRewardValidationHarness$Check</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionStrengthRewardValidationHarness$Report</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/134)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/** Deterministic, player-free validation of strength reward profile 2. */
+&nbsp;public final class RecognitionStrengthRewardValidationHarness {
+&nbsp;
+&nbsp;    private static final double EPSILON = 0.000_001D;
+&nbsp;
+&nbsp;    private RecognitionStrengthRewardValidationHarness() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Report validate() {
+<b class="nc">&nbsp;        List&lt;Check&gt; checks = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionStrengthRewardFormula.Reward minimum =</b>
+<b class="nc">&nbsp;                RecognitionStrengthRewardFormula.calculateDefault(</b>
+&nbsp;                        0.0D,
+&nbsp;                        false
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionStrengthRewardFormula.Reward midpoint =</b>
+<b class="nc">&nbsp;                RecognitionStrengthRewardFormula.calculateDefault(</b>
+&nbsp;                        20.0D,
+&nbsp;                        false
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionStrengthRewardFormula.Reward maximum =</b>
+<b class="nc">&nbsp;                RecognitionStrengthRewardFormula.calculateDefault(</b>
+&nbsp;                        40.0D,
+&nbsp;                        false
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionStrengthRewardFormula.Reward pureMaximum =</b>
+<b class="nc">&nbsp;                RecognitionStrengthRewardFormula.calculateDefault(</b>
+&nbsp;                        40.0D,
+&nbsp;                        true
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Reward profile version is 2&quot;,</b>
+&nbsp;                RecognitionStrengthRewardFormula.PROFILE_VERSION == 2,
+<b class="nc">&nbsp;                Integer.toString(RecognitionStrengthRewardFormula.PROFILE_VERSION));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Reward profile has a stable semantic ID&quot;,</b>
+<b class="nc">&nbsp;                &quot;recognition_strength_v2&quot;.equals(RecognitionStrengthRewardFormula.PROFILE_ID),</b>
+&nbsp;                RecognitionStrengthRewardFormula.PROFILE_ID);
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Recognition always grants meaningful base strength&quot;,</b>
+<b class="nc">&nbsp;                approximately(minimum.totalStrength(), 0.10D),</b>
+<b class="nc">&nbsp;                format(minimum.totalStrength()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Identity strength scales the reward monotonically&quot;,</b>
+<b class="nc">&nbsp;                minimum.totalStrength() &lt; midpoint.totalStrength()</b>
+<b class="nc">&nbsp;                        &amp;&amp; midpoint.totalStrength() &lt; maximum.totalStrength(),</b>
+<b class="nc">&nbsp;                format(minimum.totalStrength()) + &quot; &lt; &quot;</b>
+<b class="nc">&nbsp;                        + format(midpoint.totalStrength()) + &quot; &lt; &quot;</b>
+<b class="nc">&nbsp;                        + format(maximum.totalStrength()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Maximum non-Pure reward is 20%&quot;,</b>
+<b class="nc">&nbsp;                approximately(maximum.totalStrength(), 0.20D),</b>
+<b class="nc">&nbsp;                formatPercent(maximum.totalStrength()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Pure recognition receives the intended 2.5% bonus&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        pureMaximum.totalStrength() - maximum.totalStrength(),</b>
+&nbsp;                        RecognitionStrengthRewardFormula.PURE_RECOGNITION_BONUS
+&nbsp;                ),
+<b class="nc">&nbsp;                formatPercent(pureMaximum.totalStrength() - maximum.totalStrength()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Maximum Pure reward is capped at 22.5%&quot;,</b>
+<b class="nc">&nbsp;                approximately(pureMaximum.totalStrength(), 0.225D),</b>
+<b class="nc">&nbsp;                formatPercent(pureMaximum.totalStrength()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Negative identity strength is safely clamped&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        RecognitionStrengthRewardFormula.calculateDefault(-100.0D, false)</b>
+<b class="nc">&nbsp;                                .totalStrength(),</b>
+<b class="nc">&nbsp;                        minimum.totalStrength()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                format(RecognitionStrengthRewardFormula.calculateDefault(-100.0D, false).totalStrength()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Excess identity strength is safely capped&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        RecognitionStrengthRewardFormula.calculateDefault(10_000.0D, false)</b>
+<b class="nc">&nbsp;                                .totalStrength(),</b>
+<b class="nc">&nbsp;                        maximum.totalStrength()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                format(RecognitionStrengthRewardFormula.calculateDefault(10_000.0D, false).totalStrength()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Invalid identity maximum falls back safely&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        RecognitionStrengthRewardFormula.calculate(40.0D, Double.NaN, false)</b>
+<b class="nc">&nbsp;                                .totalStrength(),</b>
+<b class="nc">&nbsp;                        maximum.totalStrength()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                format(RecognitionStrengthRewardFormula.calculate(40.0D, Double.NaN, false).totalStrength()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Health and attack damage receive the full strength reward&quot;,</b>
+<b class="nc">&nbsp;                approximately(pureMaximum.maxHealthMultiplier(), pureMaximum.totalStrength())</b>
+<b class="nc">&nbsp;                        &amp;&amp; approximately(pureMaximum.attackDamageMultiplier(), pureMaximum.totalStrength()),</b>
+<b class="nc">&nbsp;                formatPercent(pureMaximum.maxHealthMultiplier()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Movement and attack speed receive half strength&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        pureMaximum.movementSpeedMultiplier(),</b>
+<b class="nc">&nbsp;                        pureMaximum.totalStrength() * 0.5D</b>
+<b class="nc">&nbsp;                ) &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        pureMaximum.attackSpeedMultiplier(),</b>
+<b class="nc">&nbsp;                        pureMaximum.totalStrength() * 0.5D</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                formatPercent(pureMaximum.movementSpeedMultiplier()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Knockback resistance receives one-quarter strength&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        pureMaximum.knockbackResistanceAddition(),</b>
+<b class="nc">&nbsp;                        pureMaximum.totalStrength() * 0.25D</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                formatPercent(pureMaximum.knockbackResistanceAddition()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Reward formula is alignment-neutral&quot;,</b>
+&nbsp;                RecognitionStrengthRewardFormula.class
+<b class="nc">&nbsp;                        .getDeclaredMethods().length &gt; 0,</b>
+&nbsp;                &quot;The formula accepts identity strength and Pure status only; no path or alignment parameter exists.&quot;);
+&nbsp;
+&nbsp;        RecognitionEndowmentEffortRewardFormula.Reward
+<b class="nc">&nbsp;                minimumEndowment =</b>
+&nbsp;                RecognitionEndowmentEffortRewardFormula
+<b class="nc">&nbsp;                        .calculateDefault(0.0D);</b>
+&nbsp;
+&nbsp;        RecognitionEndowmentEffortRewardFormula.Reward
+<b class="nc">&nbsp;                midpointEndowment =</b>
+&nbsp;                RecognitionEndowmentEffortRewardFormula
+<b class="nc">&nbsp;                        .calculateDefault(20.0D);</b>
+&nbsp;
+&nbsp;        RecognitionEndowmentEffortRewardFormula.Reward
+<b class="nc">&nbsp;                maximumEndowment =</b>
+&nbsp;                RecognitionEndowmentEffortRewardFormula
+<b class="nc">&nbsp;                        .calculateDefault(40.0D);</b>
+&nbsp;
+&nbsp;        RecognitionEndowmentEffortRewardFormula.Reward
+<b class="nc">&nbsp;                configuredEndowment =</b>
+<b class="nc">&nbsp;                RecognitionEndowmentEffortRewardFormula.calculate(</b>
+&nbsp;                        40.0D,
+&nbsp;                        40.0D,
+&nbsp;                        250_000.0D
+&nbsp;                );
+&nbsp;
+&nbsp;        RecognitionEndowmentEffortRewardFormula.Reward
+<b class="nc">&nbsp;                disabledEndowment =</b>
+<b class="nc">&nbsp;                RecognitionEndowmentEffortRewardFormula.calculate(</b>
+&nbsp;                        40.0D,
+&nbsp;                        40.0D,
+&nbsp;                        0.0D
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Zero Identity Strength adds no endowment capacity&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        minimumEndowment.extraEpAllowance(),</b>
+&nbsp;                        0.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                format(minimumEndowment.extraEpAllowance()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Half Identity Strength adds 500,000 EP capacity&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        midpointEndowment.extraEpAllowance(),</b>
+&nbsp;                        500_000.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                format(midpointEndowment.extraEpAllowance()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Maximum effort adds at most 1,000,000 EP capacity&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        maximumEndowment.extraEpAllowance(),</b>
+&nbsp;                        RecognitionEndowmentEffortRewardFormula
+&nbsp;                                .MAXIMUM_EXTRA_EP
+&nbsp;                ),
+<b class="nc">&nbsp;                format(maximumEndowment.extraEpAllowance()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Effort capacity is split evenly between magicules and aura&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        maximumEndowment.energyIncreasePerPool(),</b>
+&nbsp;                        500_000.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                format(maximumEndowment.energyIncreasePerPool()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Configured endowment maximum controls the reward ceiling&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        configuredEndowment.extraEpAllowance(),</b>
+&nbsp;                        250_000.0D
+<b class="nc">&nbsp;                ) &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        configuredEndowment.energyIncreasePerPool(),</b>
+&nbsp;                        125_000.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                format(configuredEndowment.extraEpAllowance()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;A zero configured maximum disables extra capacity&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+<b class="nc">&nbsp;                        disabledEndowment.extraEpAllowance(),</b>
+&nbsp;                        0.0D
+<b class="nc">&nbsp;                ) &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        disabledEndowment.energyIncreasePerPool(),</b>
+&nbsp;                        0.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                format(disabledEndowment.extraEpAllowance()));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Legacy saves retain the original endowment maximum&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+&nbsp;                        RecognitionEndowmentEffortRewardFormula
+<b class="nc">&nbsp;                                .resolveFrozenMaximumExtraEp(</b>
+&nbsp;                                        false,
+&nbsp;                                        0.0D
+&nbsp;                                ),
+&nbsp;                        RecognitionEndowmentEffortRewardFormula
+&nbsp;                                .DEFAULT_MAXIMUM_EXTRA_EP
+&nbsp;                ),
+<b class="nc">&nbsp;                format(</b>
+&nbsp;                        RecognitionEndowmentEffortRewardFormula
+<b class="nc">&nbsp;                                .resolveFrozenMaximumExtraEp(</b>
+&nbsp;                                        false,
+&nbsp;                                        0.0D
+&nbsp;                                )
+&nbsp;                ));
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;An explicitly frozen zero maximum remains disabled&quot;,</b>
+<b class="nc">&nbsp;                approximately(</b>
+&nbsp;                        RecognitionEndowmentEffortRewardFormula
+<b class="nc">&nbsp;                                .resolveFrozenMaximumExtraEp(</b>
+&nbsp;                                        true,
+&nbsp;                                        0.0D
+&nbsp;                                ),
+&nbsp;                        0.0D
+&nbsp;                ),
+<b class="nc">&nbsp;                format(</b>
+&nbsp;                        RecognitionEndowmentEffortRewardFormula
+<b class="nc">&nbsp;                                .resolveFrozenMaximumExtraEp(</b>
+&nbsp;                                        true,
+&nbsp;                                        0.0D
+&nbsp;                                )
+&nbsp;                ));
+&nbsp;
+<b class="nc">&nbsp;        add(checks, &quot;Endowment effort formula is alignment-neutral&quot;,</b>
+&nbsp;                RecognitionEndowmentEffortRewardFormula.class
+<b class="nc">&nbsp;                        .getDeclaredMethods().length &gt; 0,</b>
+&nbsp;                &quot;The formula accepts only the frozen Identity Strength snapshot.&quot;);
+&nbsp;
+<b class="nc">&nbsp;        return new Report(List.copyOf(checks));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void add(
+&nbsp;            List&lt;Check&gt; checks,
+&nbsp;            String name,
+&nbsp;            boolean passed,
+&nbsp;            String detail
+&nbsp;    ) {
+<b class="nc">&nbsp;        checks.add(new Check(name, passed, detail));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean approximately(double first, double second) {
+<b class="nc">&nbsp;        return Math.abs(first - second) &lt;= EPSILON;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String format(double value) {
+<b class="nc">&nbsp;        return String.format(java.util.Locale.ROOT, &quot;%.4f&quot;, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatPercent(double value) {
+<b class="nc">&nbsp;        return String.format(java.util.Locale.ROOT, &quot;%.2f%%&quot;, value * 100.0D);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Check(String name, boolean passed, String detail) {</b>
+<b class="nc">&nbsp;        public Check {</b>
+<b class="nc">&nbsp;            name = name == null ? &quot;&quot; : name.trim();</b>
+<b class="nc">&nbsp;            detail = detail == null ? &quot;&quot; : detail.trim();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Report(List&lt;Check&gt; checks) {</b>
+<b class="nc">&nbsp;        public Report {</b>
+<b class="nc">&nbsp;            checks = checks == null ? List.of() : List.copyOf(checks);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public long passedChecks() {
+<b class="nc">&nbsp;            return checks.stream().filter(Check::passed).count();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public long failedChecks() {
+<b class="nc">&nbsp;            return checks.size() - passedChecks();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean passed() {
+<b class="nc">&nbsp;            return failedChecks() == 0L;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

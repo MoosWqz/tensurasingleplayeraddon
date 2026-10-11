@@ -1,0 +1,385 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AddonLifecycleValidationHarness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.lifecycle</a>
+</div>
+
+<h1>Coverage Summary for Class: AddonLifecycleValidationHarness (com.mooswqz.moostensuraaddon.lifecycle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AddonLifecycleValidationHarness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.lifecycle;
+&nbsp;
+&nbsp;/**
+&nbsp; * Standalone validation for lifecycle and acquisition transition rules.
+&nbsp; */
+&nbsp;public final class AddonLifecycleValidationHarness {
+&nbsp;
+&nbsp;    private static int passed;
+&nbsp;    private static int failed;
+&nbsp;
+&nbsp;    private AddonLifecycleValidationHarness() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void main(String[] arguments) {
+<b class="nc">&nbsp;        validateGuards();</b>
+<b class="nc">&nbsp;        validateDuplicateSuppression();</b>
+<b class="nc">&nbsp;        validateEndowmentPolicy();</b>
+<b class="nc">&nbsp;        validateAcquisitionPolicy();</b>
+&nbsp;
+<b class="nc">&nbsp;        System.out.println(</b>
+&nbsp;                &quot;Lifecycle validation: &quot;
+&nbsp;                        + passed
+&nbsp;                        + &quot; passed, &quot;
+&nbsp;                        + failed
+&nbsp;                        + &quot; failed&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (failed &gt; 0) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(</b>
+&nbsp;                    &quot;Lifecycle validation failed.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateGuards() {
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;guard active before deadline&quot;,
+<b class="nc">&nbsp;                AddonLifecyclePolicy.isGuardActive(2_000L, 1_999L)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;guard inactive at deadline&quot;,
+<b class="nc">&nbsp;                !AddonLifecyclePolicy.isGuardActive(2_000L, 2_000L)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;negative time sanitized&quot;,
+<b class="nc">&nbsp;                !AddonLifecyclePolicy.isGuardActive(0L, -1L)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateDuplicateSuppression() {
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;same reset reason suppressed inside window&quot;,
+<b class="nc">&nbsp;                AddonLifecyclePolicy.shouldSuppressDuplicateReset(</b>
+&nbsp;                        &quot;character_reset&quot;,
+&nbsp;                        1_000L,
+&nbsp;                        &quot;character_reset&quot;,
+&nbsp;                        2_000L
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;same reason accepted outside window&quot;,
+<b class="nc">&nbsp;                !AddonLifecyclePolicy.shouldSuppressDuplicateReset(</b>
+&nbsp;                        &quot;character_reset&quot;,
+&nbsp;                        1_000L,
+&nbsp;                        &quot;character_reset&quot;,
+&nbsp;                        3_000L
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;different reset reason accepted&quot;,
+<b class="nc">&nbsp;                !AddonLifecyclePolicy.shouldSuppressDuplicateReset(</b>
+&nbsp;                        &quot;admin_command&quot;,
+&nbsp;                        1_000L,
+&nbsp;                        &quot;character_reset&quot;,
+&nbsp;                        1_100L
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateEndowmentPolicy() {
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;eligible committed result attempts endowment&quot;,
+<b class="nc">&nbsp;                AddonLifecyclePolicy.shouldAttemptNativeEndowment(</b>
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        0L,
+&nbsp;                        5_000L
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;guard suppresses endowment&quot;,
+<b class="nc">&nbsp;                !AddonLifecyclePolicy.shouldAttemptNativeEndowment(</b>
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        true,
+&nbsp;                        0L,
+&nbsp;                        5_000L
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;native name suppresses endowment&quot;,
+<b class="nc">&nbsp;                !AddonLifecyclePolicy.shouldAttemptNativeEndowment(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        0L,
+&nbsp;                        5_000L
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;matching marker suppresses endowment&quot;,
+<b class="nc">&nbsp;                !AddonLifecyclePolicy.shouldAttemptNativeEndowment(</b>
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        0L,
+&nbsp;                        5_000L
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;retry deadline enforced&quot;,
+<b class="nc">&nbsp;                !AddonLifecyclePolicy.shouldAttemptNativeEndowment(</b>
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        6_000L,
+&nbsp;                        5_000L
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;first retry is one second&quot;,
+<b class="nc">&nbsp;                AddonLifecyclePolicy.nextEndowmentAttemptEpochMillis(</b>
+&nbsp;                        10_000L,
+&nbsp;                        1
+&nbsp;                ) == 11_000L
+&nbsp;        );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;retry delay is capped&quot;,
+<b class="nc">&nbsp;                AddonLifecyclePolicy.nextEndowmentAttemptEpochMillis(</b>
+&nbsp;                        10_000L,
+&nbsp;                        20
+&nbsp;                ) == 70_000L
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateAcquisitionPolicy() {
+<b class="nc">&nbsp;        GranterAcquisitionPolicy.Observation freshBaseline =</b>
+<b class="nc">&nbsp;                GranterAcquisitionPolicy.evaluate(</b>
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false
+&nbsp;                );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;fresh baseline initializes without award&quot;,
+<b class="nc">&nbsp;                freshBaseline.initialized()</b>
+<b class="nc">&nbsp;                        &amp;&amp; !freshBaseline.shouldAwardAdvancement()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        GranterAcquisitionPolicy.Observation oldSaveBaseline =</b>
+<b class="nc">&nbsp;                GranterAcquisitionPolicy.evaluate(</b>
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false
+&nbsp;                );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;old owned authority does not false-trigger&quot;,
+<b class="nc">&nbsp;                oldSaveBaseline.lastOwnedAuthority()</b>
+<b class="nc">&nbsp;                        &amp;&amp; !oldSaveBaseline.shouldAwardAdvancement()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        GranterAcquisitionPolicy.Observation transition =</b>
+<b class="nc">&nbsp;                GranterAcquisitionPolicy.evaluate(</b>
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false
+&nbsp;                );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;false-to-true transition awards&quot;,
+<b class="nc">&nbsp;                transition.acquisitionConfirmedThisLife()</b>
+<b class="nc">&nbsp;                        &amp;&amp; transition.shouldAwardAdvancement()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        GranterAcquisitionPolicy.Observation relog =</b>
+<b class="nc">&nbsp;                GranterAcquisitionPolicy.evaluate(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false
+&nbsp;                );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;relog does not duplicate completed advancement&quot;,
+<b class="nc">&nbsp;                !relog.shouldAwardAdvancement()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        GranterAcquisitionPolicy.Observation repair =</b>
+<b class="nc">&nbsp;                GranterAcquisitionPolicy.evaluate(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        false
+&nbsp;                );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;confirmed acquisition repairs missing advancement&quot;,
+<b class="nc">&nbsp;                repair.shouldAwardAdvancement()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        GranterAcquisitionPolicy.Observation evidenceRepair =</b>
+<b class="nc">&nbsp;                GranterAcquisitionPolicy.evaluate(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        true
+&nbsp;                );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;authority-use evidence confirms acquisition&quot;,
+<b class="nc">&nbsp;                evidenceRepair.acquisitionConfirmedThisLife()</b>
+<b class="nc">&nbsp;                        &amp;&amp; evidenceRepair.shouldAwardAdvancement()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        GranterAcquisitionPolicy.Observation removal =</b>
+<b class="nc">&nbsp;                GranterAcquisitionPolicy.evaluate(</b>
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        true,
+&nbsp;                        false,
+&nbsp;                        true,
+&nbsp;                        false
+&nbsp;                );
+<b class="nc">&nbsp;        expect(</b>
+&nbsp;                &quot;temporary removal retains life confirmation&quot;,
+<b class="nc">&nbsp;                removal.acquisitionConfirmedThisLife()</b>
+<b class="nc">&nbsp;                        &amp;&amp; !removal.lastOwnedAuthority()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void expect(
+&nbsp;            String name,
+&nbsp;            boolean condition
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (condition) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        failed++;</b>
+<b class="nc">&nbsp;        System.err.println(&quot;FAILED: &quot; + name);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

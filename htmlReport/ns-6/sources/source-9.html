@@ -1,0 +1,508 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SkillUiFrameworkValidationHarness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen.skillui</a>
+</div>
+
+<h1>Coverage Summary for Class: SkillUiFrameworkValidationHarness (com.mooswqz.moostensuraaddon.client.screen.skillui)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SkillUiFrameworkValidationHarness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/165)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SkillUiFrameworkValidationHarness$ValidationResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/167)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen.skillui;
+&nbsp;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Deterministic checks for the shared skill UI data and interaction model.
+&nbsp; */
+&nbsp;public final class SkillUiFrameworkValidationHarness {
+&nbsp;
+&nbsp;    private SkillUiFrameworkValidationHarness() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ValidationResult validate() {
+<b class="nc">&nbsp;        List&lt;String&gt; issues = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        int passed = 0;</b>
+<b class="nc">&nbsp;        int total = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (SkillUiCategory.fromRaw(&quot;Unique Skill&quot;)</b>
+&nbsp;                == SkillUiCategory.UNIQUE) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Unique category alias did not resolve.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (SkillUiCategory.fromRaw(&quot;ultimate&quot;)</b>
+&nbsp;                == SkillUiCategory.UNIQUE) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Ultimate category alias did not resolve as Unique.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (SkillUiCategory.fromRaw(&quot;Resistance&quot;)</b>
+&nbsp;                == SkillUiCategory.RESISTANCE) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Resistance category alias did not resolve.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (SkillUiCategory.fromRaw(&quot;unknown&quot;)</b>
+&nbsp;                == SkillUiCategory.OTHER) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Unknown category did not fall back to Other.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;SkillUiEntry&gt; entries = sampleEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiFilterState filterState =</b>
+&nbsp;                new SkillUiFilterState();
+<b class="nc">&nbsp;        SkillUiListModel listModel =</b>
+&nbsp;                new SkillUiListModel(filterState);
+<b class="nc">&nbsp;        listModel.setViewportHeight(50);</b>
+<b class="nc">&nbsp;        listModel.setEntries(entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (listModel.filteredEntries().size() == 4) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Initial list did not contain every sample skill.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (listModel.rows().stream()</b>
+<b class="nc">&nbsp;                .filter(SkillUiListModel.Row::categoryHeader)</b>
+<b class="nc">&nbsp;                .count() == 4L) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Category headers were not created deterministically.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        filterState.setQuery(&quot;fire&quot;);</b>
+<b class="nc">&nbsp;        listModel.rebuild();</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (listModel.filteredEntries().size() == 1</b>
+<b class="nc">&nbsp;                &amp;&amp; &quot;example:fire&quot;.equals(</b>
+<b class="nc">&nbsp;                listModel.filteredEntries()</b>
+<b class="nc">&nbsp;                        .getFirst()</b>
+<b class="nc">&nbsp;                        .skillId()</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Search filtering did not match display name and ID.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        filterState.setQuery(&quot;&quot;);</b>
+<b class="nc">&nbsp;        filterState.setCategoryVisible(</b>
+&nbsp;                SkillUiCategory.BASIC,
+&nbsp;                false
+&nbsp;        );
+<b class="nc">&nbsp;        listModel.rebuild();</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (listModel.filteredEntries().stream()</b>
+<b class="nc">&nbsp;                .noneMatch(entry -&gt; entry.category()</b>
+&nbsp;                        == SkillUiCategory.BASIC)) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Category visibility filter did not exclude Basic skills.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        filterState.showAllCategories();</b>
+<b class="nc">&nbsp;        filterState.setShowUnavailable(false);</b>
+<b class="nc">&nbsp;        listModel.rebuild();</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (listModel.filteredEntries().stream()</b>
+<b class="nc">&nbsp;                .noneMatch(entry -&gt; !entry.selectable())) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Unavailable-skill filter did not hide disabled entries.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        filterState.setShowUnavailable(true);</b>
+<b class="nc">&nbsp;        listModel.rebuild();</b>
+<b class="nc">&nbsp;        listModel.setScrollOffset(10_000.0D);</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (listModel.scrollOffset()</b>
+<b class="nc">&nbsp;                == listModel.maximumScroll()) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Scroll offset was not clamped to its maximum.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        listModel.setScrollOffset(-25.0D);</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (listModel.scrollOffset() == 0.0D) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Negative scroll offset was not clamped to zero.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (listModel.focusFirst().isPresent()</b>
+<b class="nc">&nbsp;                &amp;&amp; listModel.focusedEntry().isPresent()) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Keyboard focus could not select the first skill row.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiSelectionModel singleSelection =</b>
+&nbsp;                new SkillUiSelectionModel(
+&nbsp;                        SkillUiSelectionMode.SINGLE
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        singleSelection.toggle(entries.get(0));</b>
+<b class="nc">&nbsp;        singleSelection.toggle(entries.get(1));</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (singleSelection.selectedCount() == 1</b>
+<b class="nc">&nbsp;                &amp;&amp; singleSelection.isSelected(</b>
+<b class="nc">&nbsp;                entries.get(1).skillId()</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Single selection retained more than one skill.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiSelectionModel multiSelection =</b>
+&nbsp;                new SkillUiSelectionModel(
+&nbsp;                        SkillUiSelectionMode.MULTI,
+&nbsp;                        2
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        multiSelection.toggle(entries.get(0));</b>
+<b class="nc">&nbsp;        multiSelection.toggle(entries.get(1));</b>
+<b class="nc">&nbsp;        SkillUiSelectionModel.ToggleResult limitResult =</b>
+<b class="nc">&nbsp;                multiSelection.toggle(entries.get(2));</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (multiSelection.selectedCount() == 2</b>
+&nbsp;                &amp;&amp; limitResult
+&nbsp;                == SkillUiSelectionModel.ToggleResult.LIMIT_REACHED) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Multi-selection ceiling was not enforced.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiSelectionModel disabledSelection =</b>
+&nbsp;                new SkillUiSelectionModel(
+&nbsp;                        SkillUiSelectionMode.MULTI
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (disabledSelection.toggle(entries.get(3))</b>
+&nbsp;                == SkillUiSelectionModel.ToggleResult.NOT_SELECTABLE
+<b class="nc">&nbsp;                &amp;&amp; disabledSelection.selectedCount() == 0) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Disabled skill could be selected.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiSelectionModel readOnlySelection =</b>
+&nbsp;                new SkillUiSelectionModel(
+&nbsp;                        SkillUiSelectionMode.READ_ONLY
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (readOnlySelection.toggle(entries.get(0))</b>
+&nbsp;                == SkillUiSelectionModel.ToggleResult.READ_ONLY) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Read-only selection accepted a toggle.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiLayout wideLayout =</b>
+<b class="nc">&nbsp;                SkillUiLayout.calculate(</b>
+&nbsp;                        960,
+&nbsp;                        540,
+&nbsp;                        true
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (!wideLayout.compact()</b>
+<b class="nc">&nbsp;                &amp;&amp; wideLayout.detailsVisible()</b>
+<b class="nc">&nbsp;                &amp;&amp; wideLayout.list().right()</b>
+<b class="nc">&nbsp;                &lt;= wideLayout.details().left()) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Wide layout did not create separate list and details columns.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiLayout narrowLayout =</b>
+<b class="nc">&nbsp;                SkillUiLayout.calculate(</b>
+&nbsp;                        360,
+&nbsp;                        300,
+&nbsp;                        true
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (narrowLayout.compact()</b>
+<b class="nc">&nbsp;                &amp;&amp; narrowLayout.detailsVisible()</b>
+<b class="nc">&nbsp;                &amp;&amp; narrowLayout.list().bottom()</b>
+<b class="nc">&nbsp;                &lt;= narrowLayout.details().top()) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Compact layout did not stack list and details panels.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiLayout tinyLayout =</b>
+<b class="nc">&nbsp;                SkillUiLayout.calculate(</b>
+&nbsp;                        180,
+&nbsp;                        120,
+&nbsp;                        true
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (tinyLayout.panel().width() &gt; 0</b>
+<b class="nc">&nbsp;                &amp;&amp; tinyLayout.panel().height() &gt; 0</b>
+<b class="nc">&nbsp;                &amp;&amp; tinyLayout.list().width() &gt; 0</b>
+<b class="nc">&nbsp;                &amp;&amp; tinyLayout.list().height() &gt; 0) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Tiny layout produced a non-positive required area.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (SkillUiTheme.BENEVOLENT.accentColor()</b>
+<b class="nc">&nbsp;                != SkillUiTheme.GOVERNANCE.accentColor()</b>
+<b class="nc">&nbsp;                &amp;&amp; SkillUiTheme.GRANTER.backgroundColor()</b>
+<b class="nc">&nbsp;                == SkillUiTheme.BENEVOLENT.backgroundColor()) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Theme variants did not preserve structure while changing accents.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (entries.getFirst().detailLines().getClass()</b>
+<b class="nc">&nbsp;                .getName().contains(&quot;Immutable&quot;)</b>
+<b class="nc">&nbsp;                || isUnmodifiable(entries.getFirst().detailLines())) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Skill detail lines were not defensively copied.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new ValidationResult(</b>
+&nbsp;                passed,
+&nbsp;                total - passed,
+&nbsp;                total,
+<b class="nc">&nbsp;                List.copyOf(issues)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;SkillUiEntry&gt; sampleEntries() {
+<b class="nc">&nbsp;        return List.of(</b>
+&nbsp;                new SkillUiEntry(
+&nbsp;                        &quot;example:unique&quot;,
+<b class="nc">&nbsp;                        Component.literal(&quot;Authority&quot;),</b>
+&nbsp;                        SkillUiCategory.UNIQUE,
+&nbsp;                        true,
+&nbsp;                        true,
+<b class="nc">&nbsp;                        Component.empty(),</b>
+<b class="nc">&nbsp;                        Component.empty(),</b>
+<b class="nc">&nbsp;                        List.of(</b>
+<b class="nc">&nbsp;                                Component.literal(&quot;Unique example&quot;)</b>
+&nbsp;                        ),
+&nbsp;                        0
+&nbsp;                ),
+<b class="nc">&nbsp;                SkillUiEntry.simple(</b>
+&nbsp;                        &quot;example:extra&quot;,
+&nbsp;                        &quot;Awareness&quot;,
+&nbsp;                        SkillUiCategory.EXTRA,
+&nbsp;                        true
+&nbsp;                ),
+<b class="nc">&nbsp;                SkillUiEntry.simple(</b>
+&nbsp;                        &quot;example:fire&quot;,
+&nbsp;                        &quot;Fire Manipulation&quot;,
+&nbsp;                        SkillUiCategory.BASIC,
+&nbsp;                        true
+&nbsp;                ),
+&nbsp;                new SkillUiEntry(
+&nbsp;                        &quot;example:resistance&quot;,
+<b class="nc">&nbsp;                        Component.literal(&quot;Heat Resistance&quot;),</b>
+&nbsp;                        SkillUiCategory.RESISTANCE,
+&nbsp;                        false,
+&nbsp;                        false,
+<b class="nc">&nbsp;                        Component.literal(&quot;Not mastered&quot;),</b>
+<b class="nc">&nbsp;                        Component.empty(),</b>
+<b class="nc">&nbsp;                        List.of(),</b>
+&nbsp;                        0
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isUnmodifiable(
+&nbsp;            List&lt;Component&gt; lines
+&nbsp;    ) {
+&nbsp;        try {
+<b class="nc">&nbsp;            lines.add(</b>
+<b class="nc">&nbsp;                    Component.literal(&quot;mutation&quot;)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        } catch (UnsupportedOperationException expected) {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record ValidationResult(</b>
+&nbsp;            int passed,
+&nbsp;            int failed,
+&nbsp;            int total,
+&nbsp;            List&lt;String&gt; issues
+&nbsp;    ) {
+&nbsp;
+&nbsp;        public boolean successful() {
+<b class="nc">&nbsp;            return failed == 0;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

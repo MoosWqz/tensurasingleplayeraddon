@@ -1,0 +1,569 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionTechnicalHardeningValidationHarness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionTechnicalHardeningValidationHarness (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionTechnicalHardeningValidationHarness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/98)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionTechnicalHardeningValidationHarness$Check</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionTechnicalHardeningValidationHarness$Entry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionTechnicalHardeningValidationHarness$Report</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/110)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.atomic.AtomicInteger;
+&nbsp;
+&nbsp;/**
+&nbsp; * Deterministic debug-only validation for the recognition runtime hardening rules.
+&nbsp; */
+&nbsp;public final class RecognitionTechnicalHardeningValidationHarness {
+&nbsp;
+&nbsp;    private RecognitionTechnicalHardeningValidationHarness() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Report validate() {
+<b class="nc">&nbsp;        List&lt;Check&gt; checks = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        validateRuntimeCapTable(checks);</b>
+<b class="nc">&nbsp;        validateCleanupEpochs(checks);</b>
+<b class="nc">&nbsp;        validateProductionLimits(checks);</b>
+<b class="nc">&nbsp;        validateLiveRuntimeBounds(checks);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new Report(List.copyOf(checks));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateRuntimeCapTable(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        boolean rejectedInvalidCap = false;</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            new RecognitionRuntimeCapTable&lt;String, Entry&gt;(</b>
+&nbsp;                    0,
+&nbsp;                    Entry::age
+&nbsp;            );
+&nbsp;        } catch (IllegalArgumentException expected) {
+<b class="nc">&nbsp;            rejectedInvalidCap = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Invalid runtime cap rejected&quot;,
+&nbsp;                rejectedInvalidCap,
+&nbsp;                &quot;A runtime table cannot be created with a zero-sized ceiling.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionRuntimeCapTable&lt;String, Entry&gt; table =</b>
+&nbsp;                new RecognitionRuntimeCapTable&lt;&gt;(
+&nbsp;                        3,
+&nbsp;                        Entry::age
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        AtomicInteger factoryCalls = new AtomicInteger();</b>
+&nbsp;
+<b class="nc">&nbsp;        Entry first = table.getOrCreate(</b>
+&nbsp;                &quot;first&quot;,
+&nbsp;                () -&gt; {
+<b class="nc">&nbsp;                    factoryCalls.incrementAndGet();</b>
+<b class="nc">&nbsp;                    return new Entry(10L, &quot;first&quot;);</b>
+&nbsp;                }
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Entry repeated = table.getOrCreate(</b>
+&nbsp;                &quot;first&quot;,
+&nbsp;                () -&gt; {
+<b class="nc">&nbsp;                    factoryCalls.incrementAndGet();</b>
+<b class="nc">&nbsp;                    return new Entry(99L, &quot;unexpected&quot;);</b>
+&nbsp;                }
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Atomic get-or-create&quot;,
+<b class="nc">&nbsp;                first == repeated &amp;&amp; factoryCalls.get() == 1,</b>
+&nbsp;                &quot;An existing runtime value is reused and its factory is not called twice.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        table.put(&quot;second&quot;, new Entry(20L, &quot;second&quot;));</b>
+<b class="nc">&nbsp;        table.put(&quot;third&quot;, new Entry(30L, &quot;third&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Runtime table reaches its cap&quot;,
+<b class="nc">&nbsp;                table.size() == 3,</b>
+&nbsp;                &quot;The test table contains exactly three bounded entries.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        table.put(&quot;fourth&quot;, new Entry(40L, &quot;fourth&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Oldest runtime entry evicted&quot;,
+<b class="nc">&nbsp;                table.get(&quot;first&quot;) == null,</b>
+&nbsp;                &quot;Inserting beyond the ceiling evicts the entry with the lowest age value.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Newest runtime entry retained&quot;,
+<b class="nc">&nbsp;                table.get(&quot;fourth&quot;) != null</b>
+<b class="nc">&nbsp;                        &amp;&amp; table.size() == 3,</b>
+&nbsp;                &quot;The new entry is retained without allowing the table to exceed its cap.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        table.put(&quot;second&quot;, new Entry(50L, &quot;second-updated&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Existing-key update does not evict&quot;,
+<b class="nc">&nbsp;                table.size() == 3</b>
+<b class="nc">&nbsp;                        &amp;&amp; &quot;second-updated&quot;.equals(</b>
+<b class="nc">&nbsp;                        table.get(&quot;second&quot;).label()</b>
+&nbsp;                ),
+&nbsp;                &quot;Replacing an existing value preserves the table size.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Entry removed = table.remove(&quot;third&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Explicit runtime removal&quot;,
+&nbsp;                removed != null
+<b class="nc">&nbsp;                        &amp;&amp; table.get(&quot;third&quot;) == null</b>
+<b class="nc">&nbsp;                        &amp;&amp; table.size() == 2,</b>
+&nbsp;                &quot;A known entry is removed exactly once.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int removedByPredicate = table.removeIf(</b>
+<b class="nc">&nbsp;                entry -&gt; entry.getValue().age() &gt;= 40L</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Predicate cleanup count&quot;,
+&nbsp;                removedByPredicate == 2
+<b class="nc">&nbsp;                        &amp;&amp; table.size() == 0,</b>
+&nbsp;                &quot;Predicate cleanup reports the exact number of removed entries.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        table.put(&quot;tie-a&quot;, new Entry(5L, &quot;tie-a&quot;));</b>
+<b class="nc">&nbsp;        table.put(&quot;tie-b&quot;, new Entry(5L, &quot;tie-b&quot;));</b>
+<b class="nc">&nbsp;        table.put(&quot;tie-c&quot;, new Entry(6L, &quot;tie-c&quot;));</b>
+<b class="nc">&nbsp;        table.put(&quot;tie-d&quot;, new Entry(7L, &quot;tie-d&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Deterministic tie eviction&quot;,
+<b class="nc">&nbsp;                table.get(&quot;tie-a&quot;) == null</b>
+<b class="nc">&nbsp;                        &amp;&amp; table.get(&quot;tie-b&quot;) != null,</b>
+&nbsp;                &quot;Equal-age entries are resolved by stable insertion order.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Map.Entry&lt;String, Entry&gt;&gt; snapshot =</b>
+<b class="nc">&nbsp;                table.snapshotEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean snapshotImmutable = false;</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            snapshot.add(</b>
+<b class="nc">&nbsp;                    Map.entry(</b>
+&nbsp;                            &quot;illegal&quot;,
+&nbsp;                            new Entry(0L, &quot;illegal&quot;)
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        } catch (UnsupportedOperationException expected) {
+<b class="nc">&nbsp;            snapshotImmutable = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Runtime snapshot immutable&quot;,
+&nbsp;                snapshotImmutable,
+&nbsp;                &quot;Debug snapshots cannot mutate the live runtime table.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        table.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Runtime table clear&quot;,
+<b class="nc">&nbsp;                table.size() == 0,</b>
+&nbsp;                &quot;Lifecycle cleanup can empty a runtime table completely.&quot;
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateCleanupEpochs(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+&nbsp;        long interval =
+<b class="nc">&nbsp;                CivilianDefenseTracker.cleanupIntervalTicks();</b>
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Cleanup interval blocks early rerun&quot;,
+<b class="nc">&nbsp;                !CivilianDefenseTracker.shouldRunCleanup(</b>
+&nbsp;                        1_000L,
+&nbsp;                        1_000L + interval - 1L
+&nbsp;                ),
+&nbsp;                &quot;Repeated player syncs inside the cleanup interval remain cheap.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Cleanup interval permits boundary&quot;,
+<b class="nc">&nbsp;                CivilianDefenseTracker.shouldRunCleanup(</b>
+&nbsp;                        1_000L,
+&nbsp;                        1_000L + interval
+&nbsp;                ),
+&nbsp;                &quot;Cleanup runs when the complete interval has elapsed.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Lower clock opens a new cleanup epoch&quot;,
+<b class="nc">&nbsp;                CivilianDefenseTracker.shouldRunCleanup(</b>
+&nbsp;                        50_000L,
+&nbsp;                        100L
+&nbsp;                ),
+&nbsp;                &quot;A newly started world cannot be blocked by the previous server&#39;s higher clock.&quot;
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateProductionLimits(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Civilian tracker ceiling&quot;,
+<b class="nc">&nbsp;                CivilianDefenseTracker.maximumActiveAggressors()</b>
+&nbsp;                        == 4096,
+&nbsp;                &quot;The civilian encounter tracker remains bounded at 4096 records.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Civilian cleanup cadence&quot;,
+<b class="nc">&nbsp;                CivilianDefenseTracker.cleanupIntervalTicks()</b>
+&nbsp;                        == 200L,
+&nbsp;                &quot;Civilian encounter cleanup remains limited to once per ten seconds.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Paths request-state ceiling&quot;,
+&nbsp;                RecognitionProgressScreenService
+<b class="nc">&nbsp;                        .maximumTrackedRequestStates()</b>
+&nbsp;                        == 1024,
+&nbsp;                &quot;The server cannot retain an unlimited number of stale Paths request states.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Global fresh-build ceiling&quot;,
+&nbsp;                RecognitionProgressScreenService
+<b class="nc">&nbsp;                        .maximumFreshBuildsPerWindow()</b>
+&nbsp;                        == 16,
+&nbsp;                &quot;The existing one-second global Paths build budget remains 16.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Tracker ceiling exceeds UI ceiling&quot;,
+<b class="nc">&nbsp;                CivilianDefenseTracker.maximumActiveAggressors()</b>
+&nbsp;                        &gt; RecognitionProgressScreenService
+<b class="nc">&nbsp;                        .maximumTrackedRequestStates(),</b>
+&nbsp;                &quot;The higher-volume encounter tracker has the intentionally larger bound.&quot;
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void validateLiveRuntimeBounds(
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+&nbsp;        RecognitionProgressScreenService.RuntimeSnapshot ui =
+&nbsp;                RecognitionProgressScreenService
+<b class="nc">&nbsp;                        .inspectRuntimeState();</b>
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Live Paths state within ceiling&quot;,
+<b class="nc">&nbsp;                ui.trackedPlayerStates() &gt;= 0</b>
+<b class="nc">&nbsp;                        &amp;&amp; ui.trackedPlayerStates()</b>
+<b class="nc">&nbsp;                        &lt;= ui.maximumTrackedPlayerStates(),</b>
+&nbsp;                &quot;Current tracked player states: &quot;
+<b class="nc">&nbsp;                        + ui.trackedPlayerStates()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + ui.maximumTrackedPlayerStates()</b>
+&nbsp;                        + &quot;.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Live fresh-build budget within ceiling&quot;,
+<b class="nc">&nbsp;                ui.freshBuildsInCurrentWindow() &gt;= 0</b>
+<b class="nc">&nbsp;                        &amp;&amp; ui.freshBuildsInCurrentWindow()</b>
+<b class="nc">&nbsp;                        &lt;= ui.maximumFreshBuildsPerWindow(),</b>
+&nbsp;                &quot;Current fresh builds: &quot;
+<b class="nc">&nbsp;                        + ui.freshBuildsInCurrentWindow()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + ui.maximumFreshBuildsPerWindow()</b>
+&nbsp;                        + &quot;.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Live Paths clocks non-negative&quot;,
+<b class="nc">&nbsp;                ui.buildWindowStartedNanos() &gt;= 0L</b>
+<b class="nc">&nbsp;                        &amp;&amp; ui.nextCleanupNanos() &gt;= 0L,</b>
+&nbsp;                &quot;Runtime nanosecond markers remain valid.&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        add(</b>
+&nbsp;                checks,
+&nbsp;                &quot;Tracked server-state count non-negative&quot;,
+<b class="nc">&nbsp;                CivilianDefenseTracker.serverStateCount() &gt;= 0,</b>
+&nbsp;                &quot;Current civilian tracker server states: &quot;
+<b class="nc">&nbsp;                        + CivilianDefenseTracker.serverStateCount()</b>
+&nbsp;                        + &quot;.&quot;
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void add(
+&nbsp;            List&lt;Check&gt; checks,
+&nbsp;            String name,
+&nbsp;            boolean passed,
+&nbsp;            String detail
+&nbsp;    ) {
+<b class="nc">&nbsp;        checks.add(</b>
+&nbsp;                new Check(
+&nbsp;                        name,
+&nbsp;                        passed,
+&nbsp;                        detail
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record Entry(</b>
+&nbsp;            long age,
+&nbsp;            String label
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Check(</b>
+&nbsp;            String name,
+&nbsp;            boolean passed,
+&nbsp;            String detail
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Report(</b>
+&nbsp;            List&lt;Check&gt; checks
+&nbsp;    ) {
+<b class="nc">&nbsp;        public Report {</b>
+<b class="nc">&nbsp;            checks = checks == null</b>
+<b class="nc">&nbsp;                    ? List.of()</b>
+<b class="nc">&nbsp;                    : List.copyOf(checks);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean passed() {
+<b class="nc">&nbsp;            return failedChecks() == 0;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public int passedChecks() {
+<b class="nc">&nbsp;            return (int) checks.stream()</b>
+<b class="nc">&nbsp;                    .filter(Check::passed)</b>
+<b class="nc">&nbsp;                    .count();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public int failedChecks() {
+<b class="nc">&nbsp;            return checks.size() - passedChecks();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

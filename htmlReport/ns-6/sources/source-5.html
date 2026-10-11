@@ -1,0 +1,302 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SkillUiButton</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen.skillui</a>
+</div>
+
+<h1>Coverage Summary for Class: SkillUiButton (com.mooswqz.moostensuraaddon.client.screen.skillui)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SkillUiButton</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SkillUiButton$Tone</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen.skillui;
+&nbsp;
+&nbsp;import net.minecraft.client.Minecraft;
+&nbsp;import net.minecraft.client.gui.GuiGraphics;
+&nbsp;import net.minecraft.client.gui.components.AbstractButton;
+&nbsp;import net.minecraft.client.gui.narration.NarrationElementOutput;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;
+&nbsp;/**
+&nbsp; * Small shared button matching the crisp bordered skill-screen style.
+&nbsp; */
+&nbsp;public final class SkillUiButton extends AbstractButton {
+&nbsp;
+&nbsp;    private final SkillUiTheme theme;
+&nbsp;    private final Runnable action;
+&nbsp;    private final Tone tone;
+&nbsp;
+&nbsp;    private boolean highlighted;
+&nbsp;
+&nbsp;    public SkillUiButton(
+&nbsp;            int x,
+&nbsp;            int y,
+&nbsp;            int width,
+&nbsp;            int height,
+&nbsp;            Component message,
+&nbsp;            SkillUiTheme theme,
+&nbsp;            Tone tone,
+&nbsp;            Runnable action
+&nbsp;    ) {
+<b class="nc">&nbsp;        super(</b>
+&nbsp;                x,
+&nbsp;                y,
+<b class="nc">&nbsp;                Math.max(1, width),</b>
+<b class="nc">&nbsp;                Math.max(1, height),</b>
+<b class="nc">&nbsp;                message == null</b>
+<b class="nc">&nbsp;                        ? Component.empty()</b>
+<b class="nc">&nbsp;                        : message</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        this.theme = theme == null</b>
+<b class="nc">&nbsp;                ? SkillUiTheme.GRANTER</b>
+<b class="nc">&nbsp;                : theme;</b>
+<b class="nc">&nbsp;        this.tone = tone == null</b>
+<b class="nc">&nbsp;                ? Tone.NORMAL</b>
+<b class="nc">&nbsp;                : tone;</b>
+<b class="nc">&nbsp;        this.action = action == null</b>
+<b class="nc">&nbsp;                ? () -&gt; {</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;                : action;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHighlighted(
+&nbsp;            boolean highlighted
+&nbsp;    ) {
+<b class="nc">&nbsp;        this.highlighted = highlighted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean highlighted() {
+<b class="nc">&nbsp;        return highlighted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onPress() {
+<b class="nc">&nbsp;        if (active) {</b>
+<b class="nc">&nbsp;            action.run();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void renderWidget(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+<b class="nc">&nbsp;        boolean hoveredOrFocused = isHoveredOrFocused();</b>
+&nbsp;
+&nbsp;        int borderColor;
+&nbsp;        int fillColor;
+&nbsp;        int textColor;
+&nbsp;
+<b class="nc">&nbsp;        if (!active) {</b>
+<b class="nc">&nbsp;            borderColor = theme.panelBorderColor();</b>
+<b class="nc">&nbsp;            fillColor = theme.rowFillColor();</b>
+<b class="nc">&nbsp;            textColor = theme.disabledTextColor();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            borderColor = switch (tone) {</b>
+<b class="nc">&nbsp;                case PRIMARY -&gt; theme.accentColor();</b>
+<b class="nc">&nbsp;                case DANGER -&gt; theme.dangerColor();</b>
+<b class="nc">&nbsp;                case NORMAL -&gt; highlighted</b>
+<b class="nc">&nbsp;                        ? theme.accentColor()</b>
+<b class="nc">&nbsp;                        : hoveredOrFocused</b>
+<b class="nc">&nbsp;                          ? theme.secondaryAccentColor()</b>
+<b class="nc">&nbsp;                          : theme.panelBorderColor();</b>
+&nbsp;            };
+&nbsp;
+&nbsp;            fillColor = highlighted
+<b class="nc">&nbsp;                    || tone == Tone.PRIMARY</b>
+<b class="nc">&nbsp;                    ? theme.selectedRowFillColor()</b>
+<b class="nc">&nbsp;                    : hoveredOrFocused</b>
+<b class="nc">&nbsp;                      ? theme.hoveredRowFillColor()</b>
+<b class="nc">&nbsp;                      : theme.rowFillColor();</b>
+&nbsp;
+<b class="nc">&nbsp;            textColor = switch (tone) {</b>
+<b class="nc">&nbsp;                case PRIMARY -&gt; theme.primaryTextColor();</b>
+<b class="nc">&nbsp;                case DANGER -&gt; theme.dangerColor();</b>
+<b class="nc">&nbsp;                case NORMAL -&gt; highlighted</b>
+<b class="nc">&nbsp;                        ? theme.accentColor()</b>
+<b class="nc">&nbsp;                        : theme.primaryTextColor();</b>
+&nbsp;            };
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+&nbsp;                new SkillUiLayout.Rect(
+<b class="nc">&nbsp;                        getX(),</b>
+<b class="nc">&nbsp;                        getY(),</b>
+<b class="nc">&nbsp;                        getWidth(),</b>
+<b class="nc">&nbsp;                        getHeight()</b>
+&nbsp;                ),
+&nbsp;                borderColor,
+&nbsp;                fillColor,
+<b class="nc">&nbsp;                hoveredOrFocused &amp;&amp; active</b>
+<b class="nc">&nbsp;                        ? 2</b>
+<b class="nc">&nbsp;                        : 1</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawCenteredText(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                Minecraft.getInstance().font,</b>
+<b class="nc">&nbsp;                getMessage(),</b>
+<b class="nc">&nbsp;                getX() + getWidth() / 2,</b>
+<b class="nc">&nbsp;                getY() + getHeight() / 2 - 4,</b>
+&nbsp;                textColor
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void updateWidgetNarration(
+&nbsp;            NarrationElementOutput narrationElementOutput
+&nbsp;    ) {
+<b class="nc">&nbsp;        defaultButtonNarrationText(</b>
+&nbsp;                narrationElementOutput
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum Tone {</b>
+<b class="nc">&nbsp;        NORMAL,</b>
+<b class="nc">&nbsp;        PRIMARY,</b>
+<b class="nc">&nbsp;        DANGER</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

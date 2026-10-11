@@ -1,0 +1,176 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AttachmentRegistry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.attachment</a>
+</div>
+
+<h1>Coverage Summary for Class: AttachmentRegistry (com.mooswqz.moostensuraaddon.attachment)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AttachmentRegistry</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (27/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.attachment;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import net.neoforged.neoforge.attachment.AttachmentType;
+&nbsp;import net.neoforged.neoforge.registries.DeferredRegister;
+&nbsp;import net.neoforged.neoforge.registries.NeoForgeRegistries;
+&nbsp;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;public final class AttachmentRegistry {
+&nbsp;
+&nbsp;    public static final DeferredRegister&lt;AttachmentType&lt;?&gt;&gt;
+<b class="fc">&nbsp;            ATTACHMENT_TYPES = DeferredRegister.create(</b>
+&nbsp;            NeoForgeRegistries.Keys.ATTACHMENT_TYPES,
+&nbsp;            MoosTensuraAddon.MODID
+&nbsp;    );
+&nbsp;
+&nbsp;    public static final Supplier&lt;AttachmentType&lt;GrantedSkillData&gt;&gt;
+<b class="fc">&nbsp;            GRANTED_SKILL_DATA = ATTACHMENT_TYPES.register(</b>
+&nbsp;            &quot;granted_skill_data&quot;,
+<b class="fc">&nbsp;            () -&gt; AttachmentType</b>
+<b class="fc">&nbsp;                    .builder(GrantedSkillData::new)</b>
+<b class="fc">&nbsp;                    .serialize(GrantedSkillData.CODEC)</b>
+<b class="fc">&nbsp;                    .build()</b>
+&nbsp;    );
+&nbsp;
+&nbsp;    public static final Supplier&lt;AttachmentType&lt;GranterProgressData&gt;&gt;
+<b class="fc">&nbsp;            GRANTER_PROGRESS_DATA = ATTACHMENT_TYPES.register(</b>
+&nbsp;            &quot;granter_progress_data&quot;,
+<b class="fc">&nbsp;            () -&gt; AttachmentType</b>
+<b class="fc">&nbsp;                    .builder(GranterProgressData::new)</b>
+<b class="fc">&nbsp;                    .serialize(GranterProgressData.CODEC)</b>
+<b class="fc">&nbsp;                    .build()</b>
+&nbsp;    );
+&nbsp;
+&nbsp;    public static final Supplier&lt;AttachmentType&lt;BorrowedSkillData&gt;&gt;
+<b class="fc">&nbsp;            BORROWED_SKILL_DATA = ATTACHMENT_TYPES.register(</b>
+&nbsp;            &quot;borrowed_skill_data&quot;,
+<b class="fc">&nbsp;            () -&gt; AttachmentType</b>
+<b class="fc">&nbsp;                    .builder(BorrowedSkillData::new)</b>
+<b class="fc">&nbsp;                    .serialize(BorrowedSkillData.CODEC)</b>
+<b class="fc">&nbsp;                    .build()</b>
+&nbsp;    );
+&nbsp;
+&nbsp;    public static final Supplier&lt;AttachmentType&lt;RecognitionData&gt;&gt;
+<b class="fc">&nbsp;            RECOGNITION_DATA = ATTACHMENT_TYPES.register(</b>
+&nbsp;            &quot;recognition_data&quot;,
+<b class="fc">&nbsp;            () -&gt; AttachmentType</b>
+<b class="fc">&nbsp;                    .builder(RecognitionData::new)</b>
+<b class="fc">&nbsp;                    .serialize(RecognitionData.CODEC)</b>
+<b class="fc">&nbsp;                    .copyOnDeath()</b>
+<b class="fc">&nbsp;                    .build()</b>
+&nbsp;    );
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Stored on zombie villagers while they are converting.
+&nbsp;     *
+&nbsp;     * It should not copy on death because a dead zombie villager did not
+&nbsp;     * complete its cure.
+&nbsp;     */
+&nbsp;    public static final Supplier&lt;AttachmentType&lt;CureAttributionData&gt;&gt;
+<b class="fc">&nbsp;            CURE_ATTRIBUTION_DATA = ATTACHMENT_TYPES.register(</b>
+&nbsp;            &quot;cure_attribution_data&quot;,
+<b class="fc">&nbsp;            () -&gt; AttachmentType</b>
+<b class="fc">&nbsp;                    .builder(CureAttributionData::new)</b>
+<b class="fc">&nbsp;                    .serialize(CureAttributionData.CODEC)</b>
+<b class="fc">&nbsp;                    .build()</b>
+&nbsp;    );
+&nbsp;
+&nbsp;    private AttachmentRegistry() {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

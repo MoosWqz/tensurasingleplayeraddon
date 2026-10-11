@@ -1,0 +1,932 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GranterSkillSelectionScreen</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen</a>
+</div>
+
+<h1>Coverage Summary for Class: GranterSkillSelectionScreen (com.mooswqz.moostensuraaddon.client.screen)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GranterSkillSelectionScreen</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/92)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/309)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GranterSkillSelectionScreen$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/92)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/311)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.GranterSkillUiEntryFactory;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillDetailsPanel;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillListWidget;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiButton;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiCategory;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiEntry;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiFilterState;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiLayout;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiListModel;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiRenderHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionMode;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiSelectionModel;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiTheme;
+&nbsp;import com.mooswqz.moostensuraaddon.client.screen.skillui.SkillUiText;
+&nbsp;import com.mooswqz.moostensuraaddon.network.SelectSkillPayload;
+&nbsp;import net.minecraft.client.Minecraft;
+&nbsp;import net.minecraft.client.gui.GuiGraphics;
+&nbsp;import net.minecraft.client.gui.components.EditBox;
+&nbsp;import net.minecraft.client.gui.components.Tooltip;
+&nbsp;import net.minecraft.client.gui.screens.Screen;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.neoforged.neoforge.network.PacketDistributor;
+&nbsp;import org.lwjgl.glfw.GLFW;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.EnumMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * Searchable, category-aware Granter skill selector.
+&nbsp; */
+&nbsp;public class GranterSkillSelectionScreen extends Screen {
+&nbsp;
+<b class="nc">&nbsp;    private static final SkillUiTheme THEME =</b>
+&nbsp;            SkillUiTheme.GRANTER;
+&nbsp;    private static final int FILTER_GAP = 4;
+&nbsp;    private static final int FOOTER_BUTTON_GAP = 5;
+&nbsp;
+<b class="nc">&nbsp;    private final SkillUiFilterState filterState =</b>
+&nbsp;            new SkillUiFilterState();
+<b class="nc">&nbsp;    private final SkillUiSelectionModel selectionModel =</b>
+&nbsp;            new SkillUiSelectionModel(
+&nbsp;                    SkillUiSelectionMode.SINGLE
+&nbsp;            );
+<b class="nc">&nbsp;    private final EnumMap&lt;</b>
+&nbsp;            SkillUiCategory,
+&nbsp;            SkillUiButton
+&nbsp;            &gt; categoryButtons = new EnumMap&lt;&gt;(
+&nbsp;            SkillUiCategory.class
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    private List&lt;SkillUiEntry&gt; entries = List.of();</b>
+&nbsp;    private SkillUiLayout layout;
+&nbsp;    private SkillUiListModel listModel;
+&nbsp;    private SkillListWidget listWidget;
+&nbsp;    private EditBox searchBox;
+&nbsp;    private SkillUiButton cancelButton;
+&nbsp;    private SkillUiButton confirmButton;
+&nbsp;    private int footerButtonsLeft;
+&nbsp;
+&nbsp;    private SkillUiEntry focusedEntry;
+<b class="nc">&nbsp;    private String retainedQuery = &quot;&quot;;</b>
+<b class="nc">&nbsp;    private String currentSkillId = &quot;&quot;;</b>
+<b class="nc">&nbsp;    private Component authorityName =</b>
+<b class="nc">&nbsp;            SkillUiText.component(&quot;authority.granter&quot;);</b>
+&nbsp;    private boolean evolvedAuthority;
+&nbsp;    private boolean initialSelectionApplied;
+&nbsp;
+<b class="nc">&nbsp;    private Component statusMessage = Component.empty();</b>
+<b class="nc">&nbsp;    private int statusColor = THEME.mutedTextColor();</b>
+&nbsp;
+&nbsp;    public GranterSkillSelectionScreen() {
+<b class="nc">&nbsp;        super(</b>
+<b class="nc">&nbsp;                SkillUiText.component(</b>
+&nbsp;                        &quot;legacy_active.title&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void open() {
+<b class="nc">&nbsp;        Minecraft.getInstance().setScreen(</b>
+&nbsp;                new GranterSkillSelectionScreen()
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void init() {
+<b class="nc">&nbsp;        List&lt;String&gt; previousSelection =</b>
+&nbsp;                new ArrayList&lt;&gt;(
+<b class="nc">&nbsp;                        selectionModel.selectedSkillIds()</b>
+&nbsp;                );
+&nbsp;
+&nbsp;        GranterSkillUiEntryFactory.BuildResult result =
+<b class="nc">&nbsp;                GranterSkillUiEntryFactory.build(</b>
+<b class="nc">&nbsp;                        minecraft == null</b>
+<b class="nc">&nbsp;                                ? null</b>
+<b class="nc">&nbsp;                                : minecraft.player</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        entries = result.entries();</b>
+<b class="nc">&nbsp;        evolvedAuthority = result.evolvedAuthority();</b>
+<b class="nc">&nbsp;        authorityName = result.authorityName();</b>
+<b class="nc">&nbsp;        currentSkillId = result.currentSelection()</b>
+<b class="nc">&nbsp;                .orElse(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!initialSelectionApplied) {</b>
+<b class="nc">&nbsp;            selectionModel.replaceSelection(</b>
+<b class="nc">&nbsp;                    result.currentSelection()</b>
+<b class="nc">&nbsp;                            .map(skillId -&gt; List.of(skillId))</b>
+<b class="nc">&nbsp;                            .orElseGet(List::of),</b>
+&nbsp;                    entries
+&nbsp;            );
+<b class="nc">&nbsp;            initialSelectionApplied = true;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            selectionModel.replaceSelection(</b>
+&nbsp;                    previousSelection,
+&nbsp;                    entries
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        filterState.setQuery(retainedQuery);</b>
+<b class="nc">&nbsp;        layout = SkillUiLayout.calculate(</b>
+&nbsp;                width,
+&nbsp;                height,
+&nbsp;                true
+&nbsp;        );
+<b class="nc">&nbsp;        listModel = new SkillUiListModel(</b>
+&nbsp;                filterState
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        listWidget = new SkillListWidget(</b>
+<b class="nc">&nbsp;                layout.list().left(),</b>
+<b class="nc">&nbsp;                layout.list().top(),</b>
+<b class="nc">&nbsp;                layout.list().width(),</b>
+<b class="nc">&nbsp;                layout.list().height(),</b>
+&nbsp;                font,
+&nbsp;                THEME,
+&nbsp;                listModel,
+&nbsp;                selectionModel
+&nbsp;        );
+<b class="nc">&nbsp;        listWidget.setEntries(entries);</b>
+<b class="nc">&nbsp;        listWidget.setFocusListener(entry -&gt; {</b>
+<b class="nc">&nbsp;            focusedEntry = entry;</b>
+<b class="nc">&nbsp;            clearStatus();</b>
+&nbsp;        });
+<b class="nc">&nbsp;        listWidget.setSelectionListener(</b>
+&nbsp;                this::onSelectionChanged
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        selectionModel.selectedSkillIds()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .findFirst()</b>
+<b class="nc">&nbsp;                .filter(listModel::focusEntry)</b>
+<b class="nc">&nbsp;                .flatMap(this::findEntry)</b>
+<b class="nc">&nbsp;                .ifPresent(entry -&gt; focusedEntry = entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (focusedEntry == null) {</b>
+<b class="nc">&nbsp;            listModel.focusFirst()</b>
+<b class="nc">&nbsp;                    .ifPresent(entry -&gt;</b>
+<b class="nc">&nbsp;                            focusedEntry = entry</b>
+&nbsp;                    );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        addRenderableWidget(listWidget);</b>
+<b class="nc">&nbsp;        createFilterControls();</b>
+<b class="nc">&nbsp;        createFooterControls();</b>
+<b class="nc">&nbsp;        updateControls();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createFilterControls() {
+<b class="nc">&nbsp;        categoryButtons.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiLayout.Rect filters = layout.filters();</b>
+<b class="nc">&nbsp;        int buttonHeight = Math.min(</b>
+&nbsp;                20,
+<b class="nc">&nbsp;                Math.max(16, filters.height())</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int controlY = filters.top()</b>
+<b class="nc">&nbsp;                + Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                (filters.height() - buttonHeight) / 2</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int categoryCount = SkillUiCategory.values().length;</b>
+<b class="nc">&nbsp;        int desiredSearchWidth = Math.max(</b>
+&nbsp;                60,
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        210,
+<b class="nc">&nbsp;                        filters.width() * 31 / 100</b>
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        int minimumCategoryWidth = filters.width() &lt; 390</b>
+<b class="nc">&nbsp;                ? 18</b>
+<b class="nc">&nbsp;                : 42;</b>
+<b class="nc">&nbsp;        int maximumSearchWidth = filters.width()</b>
+&nbsp;                - FILTER_GAP
+&nbsp;                - categoryCount * minimumCategoryWidth
+&nbsp;                - (categoryCount - 1) * FILTER_GAP;
+<b class="nc">&nbsp;        int searchWidth = Math.max(</b>
+&nbsp;                50,
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        desiredSearchWidth,
+&nbsp;                        maximumSearchWidth
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        searchBox = new EditBox(</b>
+&nbsp;                font,
+<b class="nc">&nbsp;                filters.left(),</b>
+&nbsp;                controlY,
+&nbsp;                searchWidth,
+&nbsp;                buttonHeight,
+<b class="nc">&nbsp;                SkillUiText.component(&quot;common.search_skills&quot;)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        searchBox.setMaxLength(80);</b>
+<b class="nc">&nbsp;        searchBox.setHint(</b>
+<b class="nc">&nbsp;                SkillUiText.component(&quot;common.search_skills_hint&quot;)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        searchBox.setValue(retainedQuery);</b>
+<b class="nc">&nbsp;        searchBox.setResponder(</b>
+&nbsp;                this::onSearchChanged
+&nbsp;        );
+<b class="nc">&nbsp;        addRenderableWidget(searchBox);</b>
+&nbsp;
+<b class="nc">&nbsp;        int categoriesLeft = filters.left()</b>
+&nbsp;                + searchWidth
+&nbsp;                + FILTER_GAP;
+<b class="nc">&nbsp;        int categoriesWidth = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                filters.right() - categoriesLeft</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int totalGaps = FILTER_GAP</b>
+&nbsp;                * (categoryCount - 1);
+<b class="nc">&nbsp;        int categoryButtonWidth = Math.max(</b>
+&nbsp;                1,
+&nbsp;                (categoriesWidth - totalGaps)
+&nbsp;                        / categoryCount
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int buttonX = categoriesLeft;</b>
+&nbsp;
+&nbsp;        for (SkillUiCategory category :
+<b class="nc">&nbsp;                SkillUiCategory.values()) {</b>
+<b class="nc">&nbsp;            int availableRight = filters.right()</b>
+&nbsp;                    - buttonX;
+<b class="nc">&nbsp;            int widthForButton = category == SkillUiCategory.OTHER</b>
+<b class="nc">&nbsp;                    ? Math.max(1, availableRight)</b>
+<b class="nc">&nbsp;                    : categoryButtonWidth;</b>
+&nbsp;
+<b class="nc">&nbsp;            SkillUiButton button = new SkillUiButton(</b>
+&nbsp;                    buttonX,
+&nbsp;                    controlY,
+&nbsp;                    widthForButton,
+&nbsp;                    buttonHeight,
+<b class="nc">&nbsp;                    categoryButtonLabel(</b>
+&nbsp;                            category,
+&nbsp;                            widthForButton
+&nbsp;                    ),
+&nbsp;                    THEME,
+&nbsp;                    SkillUiButton.Tone.NORMAL,
+<b class="nc">&nbsp;                    () -&gt; toggleCategory(category)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            button.setHighlighted(</b>
+<b class="nc">&nbsp;                    filterState.isCategoryVisible(category)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            button.setTooltip(</b>
+<b class="nc">&nbsp;                    Tooltip.create(</b>
+<b class="nc">&nbsp;                            category.displayName()</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            categoryButtons.put(</b>
+&nbsp;                    category,
+&nbsp;                    button
+&nbsp;            );
+<b class="nc">&nbsp;            addRenderableWidget(button);</b>
+&nbsp;
+<b class="nc">&nbsp;            buttonX += widthForButton</b>
+&nbsp;                    + FILTER_GAP;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createFooterControls() {
+<b class="nc">&nbsp;        SkillUiLayout.Rect footer = layout.footer();</b>
+<b class="nc">&nbsp;        int buttonHeight = Math.min(</b>
+&nbsp;                20,
+<b class="nc">&nbsp;                Math.max(16, footer.height() - 4)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int buttonY = footer.top()</b>
+<b class="nc">&nbsp;                + Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                (footer.height() - buttonHeight) / 2</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int buttonWidth = Math.max(</b>
+&nbsp;                1,
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        116,
+<b class="nc">&nbsp;                        Math.max(</b>
+&nbsp;                                1,
+<b class="nc">&nbsp;                                (footer.width()</b>
+&nbsp;                                        - FOOTER_BUTTON_GAP)
+&nbsp;                                        / 2
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int confirmX = footer.right()</b>
+&nbsp;                - buttonWidth;
+<b class="nc">&nbsp;        int cancelX = confirmX</b>
+&nbsp;                - FOOTER_BUTTON_GAP
+&nbsp;                - buttonWidth;
+<b class="nc">&nbsp;        footerButtonsLeft = cancelX;</b>
+&nbsp;
+<b class="nc">&nbsp;        cancelButton = new SkillUiButton(</b>
+&nbsp;                cancelX,
+&nbsp;                buttonY,
+&nbsp;                buttonWidth,
+&nbsp;                buttonHeight,
+<b class="nc">&nbsp;                SkillUiText.component(&quot;common.cancel&quot;),</b>
+&nbsp;                THEME,
+&nbsp;                SkillUiButton.Tone.NORMAL,
+&nbsp;                this::onClose
+&nbsp;        );
+<b class="nc">&nbsp;        addRenderableWidget(cancelButton);</b>
+&nbsp;
+<b class="nc">&nbsp;        confirmButton = new SkillUiButton(</b>
+&nbsp;                confirmX,
+&nbsp;                buttonY,
+&nbsp;                buttonWidth,
+&nbsp;                buttonHeight,
+<b class="nc">&nbsp;                SkillUiText.component(&quot;legacy_active.set_active&quot;),</b>
+&nbsp;                THEME,
+&nbsp;                SkillUiButton.Tone.PRIMARY,
+&nbsp;                this::confirmSelection
+&nbsp;        );
+<b class="nc">&nbsp;        addRenderableWidget(confirmButton);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onSearchChanged(
+&nbsp;            String query
+&nbsp;    ) {
+<b class="nc">&nbsp;        retainedQuery = query == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : query;</b>
+<b class="nc">&nbsp;        filterState.setQuery(retainedQuery);</b>
+<b class="nc">&nbsp;        rebuildVisibleEntries();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void toggleCategory(
+&nbsp;            SkillUiCategory category
+&nbsp;    ) {
+<b class="nc">&nbsp;        filterState.toggleCategory(category);</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiButton button = categoryButtons.get(</b>
+&nbsp;                category
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (button != null) {</b>
+<b class="nc">&nbsp;            button.setHighlighted(</b>
+<b class="nc">&nbsp;                    filterState.isCategoryVisible(category)</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        rebuildVisibleEntries();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void rebuildVisibleEntries() {
+<b class="nc">&nbsp;        if (listWidget == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String previouslyFocused = focusedEntry == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : focusedEntry.skillId();</b>
+&nbsp;
+<b class="nc">&nbsp;        listWidget.rebuildFilter();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;SkillUiEntry&gt; nextFocus = Optional.empty();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!previouslyFocused.isBlank()</b>
+<b class="nc">&nbsp;                &amp;&amp; listModel.focusEntry(previouslyFocused)) {</b>
+<b class="nc">&nbsp;            nextFocus = findEntry(previouslyFocused);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (nextFocus.isEmpty()) {</b>
+<b class="nc">&nbsp;            nextFocus = listModel.focusedEntry();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        focusedEntry = nextFocus.orElse(null);</b>
+<b class="nc">&nbsp;        clearStatus();</b>
+<b class="nc">&nbsp;        updateControls();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onSelectionChanged(
+&nbsp;            SkillUiEntry entry,
+&nbsp;            SkillUiSelectionModel.ToggleResult result
+&nbsp;    ) {
+<b class="nc">&nbsp;        focusedEntry = entry;</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (result) {</b>
+<b class="nc">&nbsp;            case SELECTED -&gt; setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(&quot;legacy_active.ready&quot;),</b>
+<b class="nc">&nbsp;                    THEME.successColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            case DESELECTED -&gt; setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(&quot;status.selection_cleared&quot;),</b>
+<b class="nc">&nbsp;                    THEME.mutedTextColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            case NOT_SELECTABLE -&gt; setStatus(</b>
+<b class="nc">&nbsp;                    entry.hasDisabledReason()</b>
+<b class="nc">&nbsp;                            ? entry.disabledReason()</b>
+<b class="nc">&nbsp;                            : SkillUiText.component(</b>
+&nbsp;                            &quot;error.skill_not_selectable&quot;
+&nbsp;                    ),
+<b class="nc">&nbsp;                    THEME.warningColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            case LIMIT_REACHED -&gt; setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(</b>
+&nbsp;                            &quot;error.single_selection_only&quot;
+&nbsp;                    ),
+<b class="nc">&nbsp;                    THEME.warningColor()</b>
+&nbsp;            );
+&nbsp;            case READ_ONLY,
+<b class="nc">&nbsp;                 NO_ENTRY -&gt; clearStatus();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        updateControls();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateControls() {
+<b class="nc">&nbsp;        if (confirmButton != null) {</b>
+<b class="nc">&nbsp;            confirmButton.active =</b>
+<b class="nc">&nbsp;                    selectionModel.selectedCount() == 1;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void confirmSelection() {
+<b class="nc">&nbsp;        Optional&lt;String&gt; selected = selectionModel</b>
+<b class="nc">&nbsp;                .selectedSkillIds()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .findFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selected.isEmpty()) {</b>
+<b class="nc">&nbsp;            setStatus(</b>
+<b class="nc">&nbsp;                    SkillUiText.component(</b>
+&nbsp;                            &quot;error.select_skill_first&quot;
+&nbsp;                    ),
+<b class="nc">&nbsp;                    THEME.warningColor()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            updateControls();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        PacketDistributor.sendToServer(</b>
+&nbsp;                new SelectSkillPayload(
+<b class="nc">&nbsp;                        selected.get()</b>
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        onClose();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;SkillUiEntry&gt; findEntry(
+&nbsp;            String skillId
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (skillId == null</b>
+<b class="nc">&nbsp;                || skillId.isBlank()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return entries.stream()</b>
+<b class="nc">&nbsp;                .filter(entry -&gt; skillId.equals(</b>
+<b class="nc">&nbsp;                        entry.skillId()</b>
+&nbsp;                ))
+<b class="nc">&nbsp;                .findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Component categoryButtonLabel(
+&nbsp;            SkillUiCategory category,
+&nbsp;            int buttonWidth
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (buttonWidth &gt;= 58) {</b>
+<b class="nc">&nbsp;            return switch (category) {</b>
+<b class="nc">&nbsp;                case UNIQUE -&gt; SkillUiText.component(&quot;category.unique_short&quot;);</b>
+<b class="nc">&nbsp;                case EXTRA -&gt; SkillUiText.component(&quot;category.extra_short&quot;);</b>
+<b class="nc">&nbsp;                case BASIC -&gt; SkillUiText.component(&quot;category.basic_short&quot;);</b>
+<b class="nc">&nbsp;                case RESISTANCE -&gt; SkillUiText.component(&quot;category.resistance_short&quot;);</b>
+<b class="nc">&nbsp;                case OTHER -&gt; SkillUiText.component(&quot;category.other_short&quot;);</b>
+&nbsp;            };
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (category) {</b>
+<b class="nc">&nbsp;            case UNIQUE -&gt; SkillUiText.component(&quot;category.unique_compact&quot;);</b>
+<b class="nc">&nbsp;            case EXTRA -&gt; SkillUiText.component(&quot;category.extra_compact&quot;);</b>
+<b class="nc">&nbsp;            case BASIC -&gt; SkillUiText.component(&quot;category.basic_compact&quot;);</b>
+<b class="nc">&nbsp;            case RESISTANCE -&gt; SkillUiText.component(&quot;category.resistance_compact&quot;);</b>
+<b class="nc">&nbsp;            case OTHER -&gt; SkillUiText.component(&quot;category.other_compact&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setStatus(
+&nbsp;            Component message,
+&nbsp;            int color
+&nbsp;    ) {
+<b class="nc">&nbsp;        statusMessage = message == null</b>
+<b class="nc">&nbsp;                ? Component.empty()</b>
+<b class="nc">&nbsp;                : message;</b>
+<b class="nc">&nbsp;        statusColor = color;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearStatus() {
+<b class="nc">&nbsp;        statusMessage = Component.empty();</b>
+<b class="nc">&nbsp;        statusColor = THEME.mutedTextColor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void render(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiRenderHelper.fillBackground(</b>
+&nbsp;                guiGraphics,
+&nbsp;                width,
+&nbsp;                height,
+&nbsp;                THEME
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                layout.panel(),</b>
+<b class="nc">&nbsp;                THEME.accentColor(),</b>
+<b class="nc">&nbsp;                THEME.panelFillColor(),</b>
+&nbsp;                2
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        renderHeader(guiGraphics);</b>
+<b class="nc">&nbsp;        renderFooterStatus(guiGraphics);</b>
+&nbsp;
+<b class="nc">&nbsp;        renderWidgetsWithoutParentBlur(</b>
+&nbsp;                guiGraphics,
+&nbsp;                mouseX,
+&nbsp;                mouseY,
+&nbsp;                partialTick
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiEntry detailsEntry = listWidget == null</b>
+<b class="nc">&nbsp;                ? focusedEntry</b>
+<b class="nc">&nbsp;                : listWidget.hoveredEntry()</b>
+<b class="nc">&nbsp;                .orElse(focusedEntry);</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillDetailsPanel.render(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                layout.details(),</b>
+&nbsp;                THEME,
+&nbsp;                detailsEntry,
+&nbsp;                selectionModel
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderWidgetsWithoutParentBlur(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (searchBox != null) {</b>
+<b class="nc">&nbsp;            searchBox.render(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    mouseX,
+&nbsp;                    mouseY,
+&nbsp;                    partialTick
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (SkillUiButton button : categoryButtons.values()) {</b>
+<b class="nc">&nbsp;            if (button != null) {</b>
+<b class="nc">&nbsp;                button.render(</b>
+&nbsp;                        guiGraphics,
+&nbsp;                        mouseX,
+&nbsp;                        mouseY,
+&nbsp;                        partialTick
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (listWidget != null) {</b>
+<b class="nc">&nbsp;            listWidget.render(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    mouseX,
+&nbsp;                    mouseY,
+&nbsp;                    partialTick
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (cancelButton != null) {</b>
+<b class="nc">&nbsp;            cancelButton.render(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    mouseX,
+&nbsp;                    mouseY,
+&nbsp;                    partialTick
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (confirmButton != null) {</b>
+<b class="nc">&nbsp;            confirmButton.render(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    mouseX,
+&nbsp;                    mouseY,
+&nbsp;                    partialTick
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderHeader(
+&nbsp;            GuiGraphics guiGraphics
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiLayout.Rect header = layout.header();</b>
+<b class="nc">&nbsp;        int textLeft = header.left() + 2;</b>
+<b class="nc">&nbsp;        int badgeLeft = SkillUiRenderHelper.drawModeBadge(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                SkillUiText.component(&quot;legacy_active.badge&quot;),</b>
+<b class="nc">&nbsp;                header.right() - 2,</b>
+<b class="nc">&nbsp;                header.top() + 1,</b>
+&nbsp;                THEME
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+&nbsp;                title,
+&nbsp;                textLeft,
+<b class="nc">&nbsp;                header.top() + 2,</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        1,
+&nbsp;                        badgeLeft - textLeft - 6
+&nbsp;                ),
+<b class="nc">&nbsp;                THEME.primaryTextColor()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                SkillUiText.component(</b>
+&nbsp;                        &quot;legacy_active.subtitle&quot;
+&nbsp;                ),
+&nbsp;                textLeft,
+<b class="nc">&nbsp;                header.top() + 15,</b>
+<b class="nc">&nbsp;                Math.max(1, header.width() - 4),</b>
+<b class="nc">&nbsp;                THEME.secondaryTextColor()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int visibleCount = listModel == null</b>
+<b class="nc">&nbsp;                ? 0</b>
+<b class="nc">&nbsp;                : listModel.filteredEntries().size();</b>
+<b class="nc">&nbsp;        String stateLine = SkillUiText.string(</b>
+<b class="nc">&nbsp;                evolvedAuthority</b>
+<b class="nc">&nbsp;                        ? &quot;legacy_active.state_bypass&quot;</b>
+<b class="nc">&nbsp;                        : &quot;legacy_active.state_mastered&quot;,</b>
+&nbsp;                authorityName,
+<b class="nc">&nbsp;                visibleCount,</b>
+<b class="nc">&nbsp;                entries.size()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!currentSkillId.isBlank()) {</b>
+<b class="nc">&nbsp;            String currentName = findEntry(currentSkillId)</b>
+<b class="nc">&nbsp;                    .map((SkillUiEntry entry) -&gt; entry</b>
+<b class="nc">&nbsp;                            .displayName()</b>
+<b class="nc">&nbsp;                            .getString())</b>
+<b class="nc">&nbsp;                    .orElse(currentSkillId);</b>
+<b class="nc">&nbsp;            stateLine = SkillUiText.string(</b>
+&nbsp;                    &quot;legacy_active.state_current&quot;,
+&nbsp;                    stateLine,
+&nbsp;                    currentName
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                Component.literal(stateLine),</b>
+&nbsp;                textLeft,
+<b class="nc">&nbsp;                header.top() + 28,</b>
+<b class="nc">&nbsp;                Math.max(1, header.width() - 4),</b>
+<b class="nc">&nbsp;                THEME.mutedTextColor()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawDivider(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                header.left(),</b>
+<b class="nc">&nbsp;                header.right(),</b>
+<b class="nc">&nbsp;                header.bottom() - 1,</b>
+<b class="nc">&nbsp;                THEME.panelBorderColor()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderFooterStatus(
+&nbsp;            GuiGraphics guiGraphics
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiLayout.Rect footer = layout.footer();</b>
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawDivider(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                footer.left(),</b>
+<b class="nc">&nbsp;                footer.right(),</b>
+<b class="nc">&nbsp;                footer.top(),</b>
+<b class="nc">&nbsp;                THEME.panelBorderColor()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Component footerText = statusMessage;</b>
+<b class="nc">&nbsp;        int footerColor = statusColor;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (footerText.getString().isBlank()) {</b>
+<b class="nc">&nbsp;            footerText = selectionModel</b>
+<b class="nc">&nbsp;                    .selectedSkillIds()</b>
+<b class="nc">&nbsp;                    .stream()</b>
+<b class="nc">&nbsp;                    .findFirst()</b>
+<b class="nc">&nbsp;                    .flatMap(this::findEntry)</b>
+<b class="nc">&nbsp;                    .map(entry -&gt; SkillUiText.component(</b>
+&nbsp;                            &quot;legacy_active.footer_selected&quot;,
+<b class="nc">&nbsp;                            entry.displayName()</b>
+&nbsp;                    ))
+<b class="nc">&nbsp;                    .orElseGet(() -&gt; SkillUiText.component(</b>
+&nbsp;                            &quot;legacy_active.footer_empty&quot;
+&nbsp;                    ));
+<b class="nc">&nbsp;            footerColor = selectionModel.selectedCount() == 1</b>
+<b class="nc">&nbsp;                    ? THEME.accentColor()</b>
+<b class="nc">&nbsp;                    : THEME.mutedTextColor();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int maximumWidth = Math.max(</b>
+&nbsp;                1,
+&nbsp;                footerButtonsLeft
+<b class="nc">&nbsp;                        - footer.left()</b>
+&nbsp;                        - 6
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+&nbsp;                footerText,
+<b class="nc">&nbsp;                footer.left() + 2,</b>
+<b class="nc">&nbsp;                footer.centerY() - 4,</b>
+&nbsp;                maximumWidth,
+&nbsp;                footerColor
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean keyPressed(
+&nbsp;            int keyCode,
+&nbsp;            int scanCode,
+&nbsp;            int modifiers
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (super.keyPressed(</b>
+&nbsp;                keyCode,
+&nbsp;                scanCode,
+&nbsp;                modifiers
+&nbsp;        )) {
+<b class="nc">&nbsp;            updateControls();</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if ((keyCode == GLFW.GLFW_KEY_ENTER</b>
+&nbsp;                || keyCode == GLFW.GLFW_KEY_KP_ENTER)
+&nbsp;                &amp;&amp; confirmButton != null
+&nbsp;                &amp;&amp; confirmButton.active) {
+<b class="nc">&nbsp;            confirmSelection();</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isPauseScreen() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

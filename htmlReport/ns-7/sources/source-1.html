@@ -1,0 +1,420 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AdminConfirmationTracker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: AdminConfirmationTracker (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AdminConfirmationTracker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AdminConfirmationTracker$Action</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AdminConfirmationTracker$PendingConfirmation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AdminConfirmationTracker$Result</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AdminConfirmationTracker$Status</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.ConcurrentMap;
+&nbsp;
+&nbsp;public final class AdminConfirmationTracker {
+&nbsp;
+&nbsp;    public static final int CONFIRMATION_WINDOW_SECONDS =
+&nbsp;            30;
+&nbsp;
+&nbsp;    private static final long CONFIRMATION_WINDOW_NANOS =
+&nbsp;            CONFIRMATION_WINDOW_SECONDS
+&nbsp;                    * 1_000_000_000L;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Only one destructive or privileged confirmation may be pending for a
+&nbsp;     * command source at a time.
+&nbsp;     *
+&nbsp;     * Requesting another action replaces the previous pending confirmation.
+&nbsp;     */
+&nbsp;    private static final ConcurrentMap&lt;String, PendingConfirmation&gt;
+<b class="nc">&nbsp;            PENDING_CONFIRMATIONS =</b>
+&nbsp;            new ConcurrentHashMap&lt;&gt;();
+&nbsp;
+&nbsp;    private AdminConfirmationTracker() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void arm(
+&nbsp;            CommandSourceStack source,
+&nbsp;            Action action
+&nbsp;    ) {
+<b class="nc">&nbsp;        arm(</b>
+&nbsp;                source,
+&nbsp;                action,
+&nbsp;                null
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void arm(
+&nbsp;            CommandSourceStack source,
+&nbsp;            Action action,
+&nbsp;            UUID targetUuid
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (source == null || action == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        long expiresAtNanos =
+<b class="nc">&nbsp;                System.nanoTime()</b>
+&nbsp;                        + CONFIRMATION_WINDOW_NANOS;
+&nbsp;
+<b class="nc">&nbsp;        PENDING_CONFIRMATIONS.put(</b>
+<b class="nc">&nbsp;                getSourceKey(source),</b>
+&nbsp;                new PendingConfirmation(
+&nbsp;                        action,
+&nbsp;                        targetUuid,
+&nbsp;                        expiresAtNanos
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Result consume(
+&nbsp;            CommandSourceStack source,
+&nbsp;            Action expectedAction
+&nbsp;    ) {
+<b class="nc">&nbsp;        return consume(</b>
+&nbsp;                source,
+&nbsp;                expectedAction,
+&nbsp;                null
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Consumes one pending confirmation.
+&nbsp;     *
+&nbsp;     * Confirmations are deliberately one-use. A mismatched action or target
+&nbsp;     * also consumes the pending entry, forcing the administrator to issue the
+&nbsp;     * warning-stage command again.
+&nbsp;     */
+&nbsp;    public static Result consume(
+&nbsp;            CommandSourceStack source,
+&nbsp;            Action expectedAction,
+&nbsp;            UUID expectedTargetUuid
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (source == null || expectedAction == null) {</b>
+<b class="nc">&nbsp;            return new Result(</b>
+&nbsp;                    Status.MISSING
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        PendingConfirmation pending =</b>
+<b class="nc">&nbsp;                PENDING_CONFIRMATIONS.remove(</b>
+<b class="nc">&nbsp;                        getSourceKey(source)</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (pending == null) {</b>
+<b class="nc">&nbsp;            return new Result(</b>
+&nbsp;                    Status.MISSING
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (System.nanoTime()</b>
+<b class="nc">&nbsp;                &gt; pending.expiresAtNanos()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return new Result(</b>
+&nbsp;                    Status.EXPIRED
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (pending.action()</b>
+&nbsp;                != expectedAction) {
+&nbsp;
+<b class="nc">&nbsp;            return new Result(</b>
+&nbsp;                    Status.DIFFERENT_ACTION
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!Objects.equals(</b>
+<b class="nc">&nbsp;                pending.targetUuid(),</b>
+&nbsp;                expectedTargetUuid
+&nbsp;        )) {
+<b class="nc">&nbsp;            return new Result(</b>
+&nbsp;                    Status.DIFFERENT_TARGET
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new Result(</b>
+&nbsp;                Status.CONFIRMED
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clear(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (source == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        PENDING_CONFIRMATIONS.remove(</b>
+<b class="nc">&nbsp;                getSourceKey(source)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getSourceKey(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (source.getEntity() != null) {</b>
+<b class="nc">&nbsp;            return &quot;entity:&quot;</b>
+<b class="nc">&nbsp;                    + source.getEntity()</b>
+<b class="nc">&nbsp;                    .getUUID();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * The dedicated-server console and integrated-server console use one
+&nbsp;         * shared confirmation slot.
+&nbsp;         */
+<b class="nc">&nbsp;        return &quot;server_console&quot;;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum Action {</b>
+<b class="nc">&nbsp;        UNNAME,</b>
+<b class="nc">&nbsp;        RESET_CONFIG,</b>
+<b class="nc">&nbsp;        RESET_PLAYER_DATA,</b>
+<b class="nc">&nbsp;        ENABLE_DEBUG_MODE,</b>
+<b class="nc">&nbsp;        INSTALL_LEGACY_MIGRATION_FIXTURE,</b>
+<b class="nc">&nbsp;        INSTALL_FUTURE_MIGRATION_FIXTURE,</b>
+<b class="nc">&nbsp;        INSTALL_ATTRIBUTION_RESET_FIXTURE</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum Status {</b>
+<b class="nc">&nbsp;        CONFIRMED,</b>
+<b class="nc">&nbsp;        MISSING,</b>
+<b class="nc">&nbsp;        EXPIRED,</b>
+<b class="nc">&nbsp;        DIFFERENT_ACTION,</b>
+<b class="nc">&nbsp;        DIFFERENT_TARGET</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Result(</b>
+&nbsp;            Status status
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public Result {</b>
+&nbsp;            status =
+<b class="nc">&nbsp;                    status == null</b>
+<b class="nc">&nbsp;                            ? Status.MISSING</b>
+<b class="nc">&nbsp;                            : status;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean confirmed() {
+<b class="nc">&nbsp;            return status</b>
+&nbsp;                    == Status.CONFIRMED;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record PendingConfirmation(</b>
+&nbsp;            Action action,
+&nbsp;            UUID targetUuid,
+&nbsp;            long expiresAtNanos
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

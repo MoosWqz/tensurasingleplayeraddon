@@ -1,0 +1,685 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionNamingService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionNamingService (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionNamingService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/197)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public final class RecognitionNamingService {
+&nbsp;
+&nbsp;    public static final int REQUIRED_EXPERIENCE_LEVEL =
+&nbsp;            50;
+&nbsp;
+&nbsp;    private RecognitionNamingService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs a complete live evaluation.
+&nbsp;     *
+&nbsp;     * This method synchronizes the player state first, making it suitable for
+&nbsp;     * altar interactions and the recognition progress screen.
+&nbsp;     */
+&nbsp;    public static RecognitionNamingEligibility evaluate(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;A player is required for naming evaluation.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data =</b>
+<b class="nc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        TensuraRecognitionStateHelper.synchronize(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionAuthorityProgress.synchronize(</b>
+&nbsp;                player,
+&nbsp;                data
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvaluation evaluation =</b>
+<b class="nc">&nbsp;                RecognitionPathEvaluator.evaluate(</b>
+&nbsp;                        data
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return evaluate(</b>
+&nbsp;                player,
+&nbsp;                data,
+&nbsp;                evaluation
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reuses an evaluation that has already been calculated.
+&nbsp;     *
+&nbsp;     * This is primarily used by diagnostics and the recognition screen so the
+&nbsp;     * complete recognition graph does not need to be calculated twice.
+&nbsp;     */
+&nbsp;    public static RecognitionNamingEligibility evaluate(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionEvaluation evaluation
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;A player is required for naming evaluation.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        RecognitionData safeData =
+<b class="nc">&nbsp;                data == null</b>
+<b class="nc">&nbsp;                        ? new RecognitionData()</b>
+<b class="nc">&nbsp;                        : data;</b>
+&nbsp;
+&nbsp;        RecognitionEvaluation safeEvaluation =
+<b class="nc">&nbsp;                evaluation == null</b>
+<b class="nc">&nbsp;                        ? RecognitionPathEvaluator.evaluate(</b>
+&nbsp;                        safeData
+&nbsp;                )
+<b class="nc">&nbsp;                        : evaluation;</b>
+&nbsp;
+<b class="nc">&nbsp;        String nativeName =</b>
+<b class="nc">&nbsp;                getNativeName(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        boolean nativeNamed =</b>
+<b class="nc">&nbsp;                !nativeName.isBlank();</b>
+&nbsp;
+<b class="nc">&nbsp;        synchronizeCommittedResultMetadata(</b>
+&nbsp;                player,
+&nbsp;                safeData,
+&nbsp;                nativeName
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean recognitionCommitted =</b>
+<b class="nc">&nbsp;                safeData.isNamingCommitted();</b>
+&nbsp;
+<b class="nc">&nbsp;        int recognizedLevel =</b>
+<b class="nc">&nbsp;                getRecognizedExperienceLevel(</b>
+&nbsp;                        player,
+&nbsp;                        safeData
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionNamingCandidate candidate =</b>
+<b class="nc">&nbsp;                safeEvaluation.getSelection()</b>
+<b class="nc">&nbsp;                        .map(selection -&gt;</b>
+<b class="nc">&nbsp;                                createCandidate(</b>
+&nbsp;                                        player,
+&nbsp;                                        selection
+&nbsp;                                )
+&nbsp;                        )
+<b class="nc">&nbsp;                        .orElse(null);</b>
+&nbsp;
+&nbsp;        RecognitionNamingEligibility.Status status;
+&nbsp;
+<b class="nc">&nbsp;        if (recognitionCommitted) {</b>
+<b class="nc">&nbsp;            status =</b>
+&nbsp;                    RecognitionNamingEligibility.Status
+&nbsp;                            .ALREADY_COMMITTED;
+<b class="nc">&nbsp;        } else if (recognizedLevel</b>
+&nbsp;                &lt; REQUIRED_EXPERIENCE_LEVEL) {
+<b class="nc">&nbsp;            status =</b>
+&nbsp;                    RecognitionNamingEligibility.Status
+&nbsp;                            .NOT_ENOUGH_LEVEL;
+<b class="nc">&nbsp;        } else if (candidate == null) {</b>
+<b class="nc">&nbsp;            status =</b>
+&nbsp;                    RecognitionNamingEligibility.Status
+&nbsp;                            .NO_RECOGNITION_SELECTION;
+&nbsp;        } else {
+<b class="nc">&nbsp;            status =</b>
+&nbsp;                    RecognitionNamingEligibility.Status.READY;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionNamingEligibility(</b>
+&nbsp;                status,
+&nbsp;                recognizedLevel,
+&nbsp;                REQUIRED_EXPERIENCE_LEVEL,
+&nbsp;                nativeNamed,
+&nbsp;                nativeName,
+&nbsp;                recognitionCommitted,
+&nbsp;                safeEvaluation,
+&nbsp;                candidate
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Preferred commitment route for altar runtimes that already hold the
+&nbsp;     * eligibility snapshot fixed at ritual start.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;The compatibility {@code RecognitionData.commitNaming(selection,
+&nbsp;     * title)} route remains valid, but this method can also freeze the exact
+&nbsp;     * display name and incarnation ID in the same transaction.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static boolean commitRecognition(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionNamingEligibility eligibility
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null</b>
+&nbsp;                || eligibility == null
+<b class="nc">&nbsp;                || eligibility.status()</b>
+&nbsp;                != RecognitionNamingEligibility.Status.READY
+<b class="nc">&nbsp;                || eligibility.candidate() == null) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data =</b>
+<b class="nc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (data.isNamingCommitted()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionNamingCandidate candidate =</b>
+<b class="nc">&nbsp;                eligibility.candidate();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPathSelection selection =</b>
+&nbsp;                new RecognitionPathSelection(
+<b class="nc">&nbsp;                        candidate.primaryPath(),</b>
+<b class="nc">&nbsp;                        candidate.hasSecondaryPath()</b>
+<b class="nc">&nbsp;                                ? candidate.secondaryPath()</b>
+<b class="nc">&nbsp;                                : null,</b>
+<b class="nc">&nbsp;                        candidate.pure(),</b>
+<b class="nc">&nbsp;                        candidate.primaryScore(),</b>
+<b class="nc">&nbsp;                        candidate.secondaryScore()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvaluation evaluation =</b>
+<b class="nc">&nbsp;                eligibility.evaluation();</b>
+&nbsp;
+<b class="nc">&nbsp;        String accountName =</b>
+<b class="nc">&nbsp;                player.getGameProfile()</b>
+<b class="nc">&nbsp;                        .getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        String frozenDisplayName =</b>
+<b class="nc">&nbsp;                candidate.formatDisplayName(</b>
+&nbsp;                        accountName
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        String incarnationId =</b>
+<b class="nc">&nbsp;                resolveCommitIncarnationId(</b>
+&nbsp;                        player,
+&nbsp;                        data
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCommitRecord record =</b>
+&nbsp;                RecognitionCommitRecord
+<b class="nc">&nbsp;                        .fromSelection(</b>
+&nbsp;                                selection,
+<b class="nc">&nbsp;                                candidate.bestowedTitle(),</b>
+&nbsp;                                frozenDisplayName,
+<b class="nc">&nbsp;                                evaluation.getBalance()</b>
+<b class="nc">&nbsp;                                        .sourceId(),</b>
+<b class="nc">&nbsp;                                evaluation.getBalanceRevision(),</b>
+<b class="nc">&nbsp;                                System.currentTimeMillis(),</b>
+&nbsp;                                incarnationId
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        boolean committed = data.commitNaming(</b>
+&nbsp;                record
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!committed) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionStrengthRewardService.initializeNewCommit(</b>
+&nbsp;                data,
+<b class="nc">&nbsp;                evaluation.getDimensions()</b>
+<b class="nc">&nbsp;                        .identityStrength(),</b>
+<b class="nc">&nbsp;                evaluation.getBalance()</b>
+<b class="nc">&nbsp;                        .identityStrength()</b>
+<b class="nc">&nbsp;                        .maximum(),</b>
+<b class="nc">&nbsp;                candidate.pure()</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Attribute reconciliation is deliberately recoverable. The identity
+&nbsp;         * commitment stays frozen even if another mod temporarily prevents an
+&nbsp;         * attribute from being available; the existing 40-tick synchronizer
+&nbsp;         * repairs the reward later without allowing a reroll.
+&nbsp;         */
+<b class="nc">&nbsp;        RecognitionStrengthRewardService.reconcile(</b>
+&nbsp;                player
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Completes only metadata that could not exist in the version-1 save
+&nbsp;     * format. Existing frozen values are never replaced.
+&nbsp;     */
+&nbsp;    private static void synchronizeCommittedResultMetadata(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData data,
+&nbsp;            String nativeName
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null</b>
+&nbsp;                || data == null
+<b class="nc">&nbsp;                || !data.isNamingCommitted()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String frozenDisplayName =</b>
+<b class="nc">&nbsp;                data.getFrozenDisplayName();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (frozenDisplayName.isBlank()) {</b>
+<b class="nc">&nbsp;            if (nativeName != null</b>
+<b class="nc">&nbsp;                    &amp;&amp; !nativeName.isBlank()) {</b>
+<b class="nc">&nbsp;                frozenDisplayName =</b>
+<b class="nc">&nbsp;                        nativeName.trim();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                String accountName =</b>
+<b class="nc">&nbsp;                        player.getGameProfile()</b>
+<b class="nc">&nbsp;                                .getName();</b>
+&nbsp;
+<b class="nc">&nbsp;                String bestowedTitle =</b>
+<b class="nc">&nbsp;                        data.getBestowedTitle();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (bestowedTitle.isBlank()) {</b>
+<b class="nc">&nbsp;                    frozenDisplayName =</b>
+&nbsp;                            accountName;
+&nbsp;                } else {
+<b class="nc">&nbsp;                    frozenDisplayName =</b>
+&nbsp;                            accountName
+&nbsp;                                    + &quot; &quot;
+&nbsp;                                    + bestowedTitle;
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String incarnationId =</b>
+<b class="nc">&nbsp;                data.getIncarnationId();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (incarnationId.isBlank()) {</b>
+<b class="nc">&nbsp;            incarnationId =</b>
+<b class="nc">&nbsp;                    createLegacyIncarnationId(</b>
+&nbsp;                            player
+&nbsp;                    );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        data.completeCommittedPlayerMetadata(</b>
+&nbsp;                frozenDisplayName,
+&nbsp;                incarnationId
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String resolveCommitIncarnationId(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        String existing =</b>
+<b class="nc">&nbsp;                data.getIncarnationId();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!existing.isBlank()) {</b>
+<b class="nc">&nbsp;            return existing;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;incarnation-v1-&quot;</b>
+<b class="nc">&nbsp;                + player.getUUID()</b>
+&nbsp;                + &quot;-&quot;
+<b class="nc">&nbsp;                + Long.toUnsignedString(</b>
+<b class="nc">&nbsp;                System.currentTimeMillis(),</b>
+&nbsp;                36
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String createLegacyIncarnationId(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        return &quot;legacy-v1-&quot;</b>
+<b class="nc">&nbsp;                + player.getUUID();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the highest experience level legitimately reached during this
+&nbsp;     * incarnation.
+&nbsp;     *
+&nbsp;     * The current level is synchronized immediately before the stored maximum
+&nbsp;     * is read. Reaching the requirement and interacting with the altar
+&nbsp;     * therefore does not depend on a periodic recognition synchronization
+&nbsp;     * tick.
+&nbsp;     *
+&nbsp;     * Losing levels through death, enchanting, anvils or another progression
+&nbsp;     * system does not erase an already-earned recognition milestone.
+&nbsp;     */
+&nbsp;    private static int getRecognizedExperienceLevel(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null || data == null) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int currentLevel =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        0,
+&nbsp;                        player.experienceLevel
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        data.setCounterMaximum(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_EXPERIENCE_LEVEL,
+&nbsp;                currentLevel
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return Math.max(</b>
+&nbsp;                currentLevel,
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .HIGHEST_EXPERIENCE_LEVEL
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionNamingCandidate createCandidate(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionPathSelection selection
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="nc">&nbsp;                selection.primaryPath();</b>
+&nbsp;
+&nbsp;        RecognitionPath secondaryPath =
+<b class="nc">&nbsp;                selection.pure()</b>
+<b class="nc">&nbsp;                        ? null</b>
+<b class="nc">&nbsp;                        : selection.secondaryPath();</b>
+&nbsp;
+<b class="nc">&nbsp;        String title =</b>
+<b class="nc">&nbsp;                selectDeterministicTitle(</b>
+&nbsp;                        player,
+&nbsp;                        primaryPath,
+&nbsp;                        secondaryPath,
+<b class="nc">&nbsp;                        selection.pure()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionNamingCandidate(</b>
+&nbsp;                primaryPath,
+&nbsp;                secondaryPath,
+<b class="nc">&nbsp;                selection.pure(),</b>
+<b class="nc">&nbsp;                selection.primaryScore(),</b>
+<b class="nc">&nbsp;                selection.pure()</b>
+<b class="nc">&nbsp;                        ? 0.0D</b>
+<b class="nc">&nbsp;                        : selection.secondaryScore(),</b>
+&nbsp;                title
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Selects a stable title from the currently loaded server datapack pool.
+&nbsp;     *
+&nbsp;     * The title result remains deterministic for the same player, world,
+&nbsp;     * primary path, secondary path and pure/combined state as long as the
+&nbsp;     * loaded title list retains the same ordering.
+&nbsp;     *
+&nbsp;     * Once the naming ritual commits a title, that title is stored in the
+&nbsp;     * player&#39;s RecognitionData and is no longer affected by datapack reloads.
+&nbsp;     */
+&nbsp;    private static String selectDeterministicTitle(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionPath primaryPath,
+&nbsp;            RecognitionPath secondaryPath,
+&nbsp;            boolean pure
+&nbsp;    ) {
+<b class="nc">&nbsp;        List&lt;String&gt; titles =</b>
+<b class="nc">&nbsp;                RecognitionTitlePoolManager.getTitles(</b>
+&nbsp;                        primaryPath,
+&nbsp;                        pure
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (titles.isEmpty()) {</b>
+<b class="nc">&nbsp;            return RecognitionTitlePoolManager</b>
+<b class="nc">&nbsp;                    .getFallbackTitle(</b>
+&nbsp;                            primaryPath,
+&nbsp;                            pure
+&nbsp;                    );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long hash =</b>
+&nbsp;                0xcbf29ce484222325L;
+&nbsp;
+<b class="nc">&nbsp;        hash = mix(</b>
+&nbsp;                hash,
+<b class="nc">&nbsp;                player.getUUID()</b>
+<b class="nc">&nbsp;                        .getMostSignificantBits()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        hash = mix(</b>
+&nbsp;                hash,
+<b class="nc">&nbsp;                player.getUUID()</b>
+<b class="nc">&nbsp;                        .getLeastSignificantBits()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        hash = mix(</b>
+&nbsp;                hash,
+<b class="nc">&nbsp;                player.serverLevel()</b>
+<b class="nc">&nbsp;                        .getSeed()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        hash = mixString(</b>
+&nbsp;                hash,
+<b class="nc">&nbsp;                primaryPath == null</b>
+<b class="nc">&nbsp;                        ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                        : primaryPath.getId()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        hash = mixString(</b>
+&nbsp;                hash,
+<b class="nc">&nbsp;                secondaryPath == null</b>
+<b class="nc">&nbsp;                        ? &quot;none&quot;</b>
+<b class="nc">&nbsp;                        : secondaryPath.getId()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        hash = mixString(</b>
+&nbsp;                hash,
+<b class="nc">&nbsp;                pure</b>
+<b class="nc">&nbsp;                        ? &quot;pure&quot;</b>
+<b class="nc">&nbsp;                        : &quot;combined&quot;</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int index =</b>
+<b class="nc">&nbsp;                Math.floorMod(</b>
+&nbsp;                        hash,
+<b class="nc">&nbsp;                        titles.size()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return titles.get(index);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getNativeName(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        IExistence existence =</b>
+<b class="nc">&nbsp;                TensuraStorages.getExistenceFrom(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (existence == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String name =</b>
+<b class="nc">&nbsp;                existence.getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        return name == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : name.trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static long mix(
+&nbsp;            long hash,
+&nbsp;            long value
+&nbsp;    ) {
+<b class="nc">&nbsp;        long result =</b>
+&nbsp;                hash;
+&nbsp;
+<b class="nc">&nbsp;        for (int shift = 0;</b>
+<b class="nc">&nbsp;             shift &lt; Long.SIZE;</b>
+<b class="nc">&nbsp;             shift += Byte.SIZE) {</b>
+&nbsp;
+<b class="nc">&nbsp;            result ^=</b>
+&nbsp;                    (value &gt;&gt;&gt; shift)
+&nbsp;                            &amp; 0xffL;
+&nbsp;
+<b class="nc">&nbsp;            result *=</b>
+&nbsp;                    0x100000001b3L;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static long mixString(
+&nbsp;            long hash,
+&nbsp;            String value
+&nbsp;    ) {
+&nbsp;        String safeValue =
+<b class="nc">&nbsp;                value == null</b>
+<b class="nc">&nbsp;                        ? &quot;&quot;</b>
+<b class="nc">&nbsp;                        : value;</b>
+&nbsp;
+<b class="nc">&nbsp;        long result =</b>
+&nbsp;                hash;
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0;</b>
+<b class="nc">&nbsp;             index &lt; safeValue.length();</b>
+<b class="nc">&nbsp;             index++) {</b>
+&nbsp;
+<b class="nc">&nbsp;            result ^=</b>
+<b class="nc">&nbsp;                    safeValue.charAt(</b>
+&nbsp;                            index
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            result *=</b>
+&nbsp;                    0x100000001b3L;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

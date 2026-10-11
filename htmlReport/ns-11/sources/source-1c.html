@@ -1,0 +1,343 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UltimateMultiGrantValidationHarness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: UltimateMultiGrantValidationHarness (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UltimateMultiGrantValidationHarness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/76)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UltimateMultiGrantValidationHarness$ValidationResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public final class UltimateMultiGrantValidationHarness {
+&nbsp;
+&nbsp;    private UltimateMultiGrantValidationHarness() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ValidationResult validate() {
+<b class="nc">&nbsp;        List&lt;String&gt; issues = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        int passed = 0;</b>
+<b class="nc">&nbsp;        int total = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+&nbsp;        UltimateMultiGrantPolicy.RequestAnalysis empty =
+<b class="nc">&nbsp;                UltimateMultiGrantPolicy.analyseRequest(</b>
+<b class="nc">&nbsp;                        List.of()</b>
+&nbsp;                );
+<b class="nc">&nbsp;        if (empty.uniqueSkillIds().isEmpty()</b>
+<b class="nc">&nbsp;                &amp;&amp; empty.submittedCount() == 0</b>
+<b class="nc">&nbsp;                &amp;&amp; !empty.overLimit()) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Empty request was not handled safely.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        UltimateMultiGrantPolicy.RequestAnalysis ordered =</b>
+<b class="nc">&nbsp;                UltimateMultiGrantPolicy.analyseRequest(</b>
+<b class="nc">&nbsp;                        List.of(</b>
+&nbsp;                                &quot;mod:first&quot;,
+&nbsp;                                &quot;mod:second&quot;,
+&nbsp;                                &quot;mod:third&quot;
+&nbsp;                        )
+&nbsp;                );
+<b class="nc">&nbsp;        if (ordered.uniqueSkillIds().equals(</b>
+<b class="nc">&nbsp;                List.of(</b>
+&nbsp;                        &quot;mod:first&quot;,
+&nbsp;                        &quot;mod:second&quot;,
+&nbsp;                        &quot;mod:third&quot;
+&nbsp;                )
+&nbsp;        )) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Request order was not preserved.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        UltimateMultiGrantPolicy.RequestAnalysis duplicate =</b>
+<b class="nc">&nbsp;                UltimateMultiGrantPolicy.analyseRequest(</b>
+<b class="nc">&nbsp;                        List.of(</b>
+&nbsp;                                &quot;mod:first&quot;,
+&nbsp;                                &quot;mod:first&quot;,
+&nbsp;                                &quot;mod:second&quot;
+&nbsp;                        )
+&nbsp;                );
+<b class="nc">&nbsp;        if (duplicate.uniqueSkillIds().equals(</b>
+<b class="nc">&nbsp;                List.of(</b>
+&nbsp;                        &quot;mod:first&quot;,
+&nbsp;                        &quot;mod:second&quot;
+&nbsp;                )
+&nbsp;        )
+<b class="nc">&nbsp;                &amp;&amp; duplicate.rejectedCount() == 1) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Duplicate skill IDs were not collapsed once.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        UltimateMultiGrantPolicy.RequestAnalysis whitespace =</b>
+<b class="nc">&nbsp;                UltimateMultiGrantPolicy.analyseRequest(</b>
+<b class="nc">&nbsp;                        List.of(</b>
+&nbsp;                                &quot;  mod:first  &quot;,
+&nbsp;                                &quot; &quot;,
+&nbsp;                                &quot;mod:second&quot;
+&nbsp;                        )
+&nbsp;                );
+<b class="nc">&nbsp;        if (whitespace.uniqueSkillIds().equals(</b>
+<b class="nc">&nbsp;                List.of(</b>
+&nbsp;                        &quot;mod:first&quot;,
+&nbsp;                        &quot;mod:second&quot;
+&nbsp;                )
+&nbsp;        )
+<b class="nc">&nbsp;                &amp;&amp; whitespace.rejectedCount() == 1) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Whitespace IDs were not normalised safely.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; exactLimit = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0;</b>
+<b class="nc">&nbsp;             index &lt; UltimateMultiGrantPolicy.MAX_SELECTED_SKILLS;</b>
+<b class="nc">&nbsp;             index++) {</b>
+<b class="nc">&nbsp;            exactLimit.add(&quot;mod:skill_&quot; + index);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        UltimateMultiGrantPolicy.RequestAnalysis atLimit =</b>
+<b class="nc">&nbsp;                UltimateMultiGrantPolicy.analyseRequest(</b>
+&nbsp;                        exactLimit
+&nbsp;                );
+<b class="nc">&nbsp;        if (!atLimit.overLimit()</b>
+<b class="nc">&nbsp;                &amp;&amp; atLimit.uniqueSkillIds().size()</b>
+&nbsp;                == UltimateMultiGrantPolicy.MAX_SELECTED_SKILLS) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;The exact 32-skill limit was rejected.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; aboveLimit = new ArrayList&lt;&gt;(</b>
+&nbsp;                exactLimit
+&nbsp;        );
+<b class="nc">&nbsp;        aboveLimit.add(&quot;mod:skill_over_limit&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (UltimateMultiGrantPolicy</b>
+<b class="nc">&nbsp;                .analyseRequest(aboveLimit)</b>
+<b class="nc">&nbsp;                .overLimit()) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;A 33-skill request was not marked oversized.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        double charge = UltimateMultiGrantPolicy.calculateCharge(</b>
+<b class="nc">&nbsp;                List.of(</b>
+<b class="nc">&nbsp;                        100.0D,</b>
+<b class="nc">&nbsp;                        250.0D,</b>
+<b class="nc">&nbsp;                        0.0D,</b>
+<b class="nc">&nbsp;                        -50.0D,</b>
+<b class="nc">&nbsp;                        Double.NaN</b>
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        if (Math.abs(charge - 350.0D) &lt; 1.0E-9D) {</b>
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Successful-cost charging was not sanitised.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+<b class="nc">&nbsp;        if (UltimateMultiGrantPolicy.calculateCharge(null)</b>
+&nbsp;                == 0.0D) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            issues.add(&quot;Null cost input was not safe.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        total++;</b>
+&nbsp;        if (UltimateMultiGrantPolicy.MAX_SELECTED_SKILLS
+&nbsp;                == com.mooswqz.moostensuraaddon.network
+&nbsp;                .ExecuteUltimateMultiGrantPayload
+&nbsp;                .MAX_SELECTED_SKILLS) {
+<b class="nc">&nbsp;            passed++;</b>
+&nbsp;        } else {
+&nbsp;            issues.add(&quot;Network and server selection ceilings diverged.&quot;);
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new ValidationResult(</b>
+&nbsp;                passed,
+&nbsp;                total,
+<b class="nc">&nbsp;                List.copyOf(issues)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record ValidationResult(</b>
+&nbsp;            int passed,
+&nbsp;            int total,
+&nbsp;            List&lt;String&gt; issues
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public ValidationResult {</b>
+<b class="nc">&nbsp;            issues = issues == null</b>
+<b class="nc">&nbsp;                    ? List.of()</b>
+<b class="nc">&nbsp;                    : List.copyOf(issues);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean successful() {
+<b class="nc">&nbsp;            return passed == total</b>
+<b class="nc">&nbsp;                    &amp;&amp; issues.isEmpty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

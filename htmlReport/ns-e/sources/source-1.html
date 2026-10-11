@@ -1,0 +1,770 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CivilianDefenseTracker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: CivilianDefenseTracker (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CivilianDefenseTracker</td>
+<td class="coverageStat">
+  <span class="percent">
+    37%
+  </span>
+  <span class="absValue">
+    (10/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (18/108)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.8%
+  </span>
+  <span class="absValue">
+    (38/167)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CivilianDefenseTracker$AggressionRecord</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CivilianDefenseTracker$EntityKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CivilianDefenseTracker$RuntimeSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CivilianDefenseTracker$TrackerState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    29.4%
+  </span>
+  <span class="absValue">
+    (10/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (18/108)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.7%
+  </span>
+  <span class="absValue">
+    (38/175)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import net.minecraft.resources.ResourceKey;
+&nbsp;import net.minecraft.server.MinecraftServer;
+&nbsp;import net.minecraft.server.level.ServerLevel;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.damagesource.DamageSource;
+&nbsp;import net.minecraft.world.entity.Entity;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;import net.minecraft.world.entity.npc.AbstractVillager;
+&nbsp;import net.minecraft.world.entity.player.Player;
+&nbsp;import net.minecraft.world.level.Level;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.WeakHashMap;
+&nbsp;
+&nbsp;public final class CivilianDefenseTracker {
+&nbsp;
+&nbsp;    private static final long TARGET_ONLY_WINDOW_TICKS =
+&nbsp;            20L * 20L;
+&nbsp;
+&nbsp;    private static final long DAMAGE_CONFIRMED_WINDOW_TICKS =
+&nbsp;            20L * 45L;
+&nbsp;
+&nbsp;    private static final long CLEANUP_INTERVAL_TICKS =
+&nbsp;            20L * 10L;
+&nbsp;
+&nbsp;    private static final int MAX_ACTIVE_AGGRESSORS = 4096;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Runtime encounter state is isolated by MinecraftServer instance.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This fixes two lifecycle problems from the original tracker:&lt;/p&gt;
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;a cleanup timestamp from one dimension could suppress cleanup
+&nbsp;     *     for records created in another dimension;&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;a stopped integrated server could leave a high game-time value
+&nbsp;     *     behind for the next world loaded in the same JVM.&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Weak keys are an additional safety net. ServerStoppedEvent also
+&nbsp;     * removes the state explicitly.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    private static final Map&lt;MinecraftServer, TrackerState&gt;
+<b class="fc">&nbsp;            SERVER_STATES = new WeakHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private CivilianDefenseTracker() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isCivilian(LivingEntity entity) {
+<b class="pc">&nbsp;        if (entity == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * This catches vanilla villagers, wandering traders and modded
+&nbsp;         * entities that inherit Minecraft&#39;s normal villager foundation.
+&nbsp;         */
+<b class="pc">&nbsp;        if (entity instanceof AbstractVillager) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return entity.getType().is(</b>
+&nbsp;                RecognitionEntityTags.CIVILIANS
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isHostileToCivilians(
+&nbsp;            LivingEntity entity
+&nbsp;    ) {
+<b class="nc">&nbsp;        return entity != null</b>
+<b class="nc">&nbsp;                &amp;&amp; entity.getType().is(</b>
+&nbsp;                RecognitionEntityTags.HOSTILE_TO_CIVILIANS
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void recordTargetChange(
+&nbsp;            LivingEntity aggressor,
+&nbsp;            LivingEntity newTarget
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (aggressor == null</b>
+<b class="nc">&nbsp;                || !(aggressor.level()</b>
+<b class="nc">&nbsp;                instanceof ServerLevel serverLevel)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MinecraftServer server = serverLevel.getServer();</b>
+<b class="nc">&nbsp;        TrackerState state = stateFor(server);</b>
+<b class="nc">&nbsp;        EntityKey aggressorKey = keyOf(aggressor);</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Player behaviour is evaluated by direct deed tracking.
+&nbsp;         * This encounter tracker is for hostile NPCs and creatures.
+&nbsp;         */
+<b class="nc">&nbsp;        if (aggressor instanceof Player) {</b>
+<b class="nc">&nbsp;            removeAggressorEverywhere(</b>
+&nbsp;                    state,
+<b class="nc">&nbsp;                    aggressor.getUUID()</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * The datapack decides which entity types are eligible civilian
+&nbsp;         * threats. Real target/damage evidence is still required below, so
+&nbsp;         * this does not introduce proximity-only morality.
+&nbsp;         */
+<b class="nc">&nbsp;        if (!isHostileToCivilians(aggressor)) {</b>
+<b class="nc">&nbsp;            removeAggressorEverywhere(</b>
+&nbsp;                    state,
+<b class="nc">&nbsp;                    aggressor.getUUID()</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!isCivilian(newTarget)</b>
+<b class="nc">&nbsp;                || !(newTarget.level()</b>
+<b class="nc">&nbsp;                instanceof ServerLevel targetLevel)</b>
+<b class="nc">&nbsp;                || targetLevel.getServer() != server</b>
+<b class="nc">&nbsp;                || !targetLevel.dimension().equals(</b>
+<b class="nc">&nbsp;                serverLevel.dimension()</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            removeAggressorEverywhere(</b>
+&nbsp;                    state,
+<b class="nc">&nbsp;                    aggressor.getUUID()</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long gameTime = getServerGameTime(</b>
+&nbsp;                server,
+&nbsp;                serverLevel
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        state.activeAggressors().put(</b>
+&nbsp;                aggressorKey,
+&nbsp;                new AggressionRecord(
+<b class="nc">&nbsp;                        keyOf(newTarget),</b>
+&nbsp;                        gameTime,
+&nbsp;                        gameTime + TARGET_ONLY_WINDOW_TICKS,
+&nbsp;                        false
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void recordCivilianDamage(
+&nbsp;            LivingEntity civilian,
+&nbsp;            DamageSource source
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (civilian == null</b>
+&nbsp;                || source == null
+<b class="pc">&nbsp;                || !(civilian.level()</b>
+<b class="fc">&nbsp;                instanceof ServerLevel serverLevel)</b>
+<b class="pc">&nbsp;                || !isCivilian(civilian)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        LivingEntity aggressor = resolveAggressor(source);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (aggressor == null</b>
+&nbsp;                || aggressor == civilian
+&nbsp;                || aggressor instanceof Player
+<b class="nc">&nbsp;                || !(aggressor.level()</b>
+<b class="nc">&nbsp;                instanceof ServerLevel aggressorLevel)</b>
+<b class="nc">&nbsp;                || aggressorLevel.getServer()</b>
+<b class="nc">&nbsp;                != serverLevel.getServer()</b>
+<b class="nc">&nbsp;                || !aggressorLevel.dimension().equals(</b>
+<b class="nc">&nbsp;                serverLevel.dimension()</b>
+&nbsp;        )) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MinecraftServer server = serverLevel.getServer();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!isHostileToCivilians(aggressor)) {</b>
+<b class="nc">&nbsp;            TrackerState state = existingState(server);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (state != null) {</b>
+<b class="nc">&nbsp;                removeAggressorEverywhere(</b>
+&nbsp;                        state,
+<b class="nc">&nbsp;                        aggressor.getUUID()</b>
+&nbsp;                );
+&nbsp;            }
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long gameTime = getServerGameTime(</b>
+&nbsp;                server,
+&nbsp;                serverLevel
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        stateFor(server).activeAggressors().put(</b>
+<b class="nc">&nbsp;                keyOf(aggressor),</b>
+&nbsp;                new AggressionRecord(
+<b class="nc">&nbsp;                        keyOf(civilian),</b>
+&nbsp;                        gameTime,
+&nbsp;                        gameTime + DAMAGE_CONFIRMED_WINDOW_TICKS,
+&nbsp;                        true
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true exactly once when a player defeats a recently observed
+&nbsp;     * aggressor while the protected civilian is still alive.
+&nbsp;     */
+&nbsp;    public static boolean consumeDefense(
+&nbsp;            LivingEntity defeatedAggressor,
+&nbsp;            ServerPlayer responsiblePlayer
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (defeatedAggressor == null</b>
+&nbsp;                || responsiblePlayer == null
+<b class="nc">&nbsp;                || !(defeatedAggressor.level()</b>
+<b class="nc">&nbsp;                instanceof ServerLevel serverLevel)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MinecraftServer server = serverLevel.getServer();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (responsiblePlayer.getServer() != server) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        TrackerState state = existingState(server);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (state == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AggressionRecord record = state</b>
+<b class="nc">&nbsp;                .activeAggressors()</b>
+<b class="nc">&nbsp;                .remove(keyOf(defeatedAggressor));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (record == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long gameTime = getServerGameTime(</b>
+&nbsp;                server,
+&nbsp;                serverLevel
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (gameTime &gt; record.expirationGameTime()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!record.civilianKey().dimension().equals(</b>
+<b class="nc">&nbsp;                serverLevel.dimension()</b>
+&nbsp;        )) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Entity civilianEntity = serverLevel.getEntity(</b>
+<b class="nc">&nbsp;                record.civilianKey().entityUuid()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return civilianEntity instanceof LivingEntity civilian</b>
+<b class="nc">&nbsp;                &amp;&amp; civilian.isAlive()</b>
+<b class="nc">&nbsp;                &amp;&amp; isCivilian(civilian);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void forget(LivingEntity entity) {
+<b class="pc">&nbsp;        if (entity == null</b>
+<b class="pc">&nbsp;                || !(entity.level()</b>
+<b class="fc">&nbsp;                instanceof ServerLevel serverLevel)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        TrackerState state = existingState(</b>
+<b class="fc">&nbsp;                serverLevel.getServer()</b>
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (state == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        EntityKey entityKey = keyOf(entity);</b>
+&nbsp;
+<b class="nc">&nbsp;        state.activeAggressors().remove(entityKey);</b>
+<b class="nc">&nbsp;        state.activeAggressors().removeIf(</b>
+<b class="nc">&nbsp;                entry -&gt; entry.getValue()</b>
+<b class="nc">&nbsp;                        .civilianKey()</b>
+<b class="nc">&nbsp;                        .equals(entityKey)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs bounded cleanup using the overworld game time for the server.
+&nbsp;     * The call is cheap and may be made by several players; only one cleanup
+&nbsp;     * per server can pass the interval gate.
+&nbsp;     */
+&nbsp;    public static void cleanup(MinecraftServer server) {
+<b class="pc">&nbsp;        if (server == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        ServerLevel overworld = server.overworld();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (overworld == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        cleanup(</b>
+&nbsp;                server,
+<b class="fc">&nbsp;                overworld.getGameTime()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    static void cleanup(
+&nbsp;            MinecraftServer server,
+&nbsp;            long currentGameTime
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (server == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        TrackerState state = existingState(server);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (state == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        synchronized (state) {</b>
+<b class="nc">&nbsp;            long lastCleanup = state.lastCleanupGameTime();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!shouldRunCleanup(</b>
+&nbsp;                    lastCleanup,
+&nbsp;                    currentGameTime
+&nbsp;            )) {
+<b class="nc">&nbsp;                return;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            /*
+&nbsp;             * A lower clock means a world/server lifecycle changed. Treat it
+&nbsp;             * as a new cleanup epoch instead of waiting for the old clock to
+&nbsp;             * be reached again.
+&nbsp;             */
+<b class="nc">&nbsp;            state.setLastCleanupGameTime(currentGameTime);</b>
+&nbsp;
+<b class="nc">&nbsp;            state.activeAggressors().removeIf(</b>
+<b class="nc">&nbsp;                    entry -&gt; currentGameTime</b>
+<b class="nc">&nbsp;                            &gt; entry.getValue()</b>
+<b class="nc">&nbsp;                            .expirationGameTime()</b>
+&nbsp;            );
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clearServer(MinecraftServer server) {
+<b class="pc">&nbsp;        if (server == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        synchronized (SERVER_STATES) {</b>
+<b class="fc">&nbsp;            SERVER_STATES.remove(server);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void clearAll() {
+<b class="fc">&nbsp;        synchronized (SERVER_STATES) {</b>
+<b class="fc">&nbsp;            SERVER_STATES.clear();</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Installs one synthetic encounter used only by the reset fixture. */
+&nbsp;    public static void installResetFixture(
+&nbsp;            MinecraftServer server
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (server == null || server.overworld() == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long gameTime = server.overworld().getGameTime();</b>
+<b class="nc">&nbsp;        ResourceKey&lt;Level&gt; dimension =</b>
+<b class="nc">&nbsp;                server.overworld().dimension();</b>
+&nbsp;
+<b class="nc">&nbsp;        stateFor(server).activeAggressors().put(</b>
+&nbsp;                new EntityKey(
+&nbsp;                        dimension,
+<b class="nc">&nbsp;                        UUID.randomUUID()</b>
+&nbsp;                ),
+&nbsp;                new AggressionRecord(
+&nbsp;                        new EntityKey(
+&nbsp;                                dimension,
+<b class="nc">&nbsp;                                UUID.randomUUID()</b>
+&nbsp;                        ),
+&nbsp;                        gameTime,
+&nbsp;                        gameTime + DAMAGE_CONFIRMED_WINDOW_TICKS,
+&nbsp;                        true
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RuntimeSnapshot inspect(
+&nbsp;            MinecraftServer server
+&nbsp;    ) {
+<b class="nc">&nbsp;        TrackerState state = existingState(server);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (state == null) {</b>
+<b class="nc">&nbsp;            return new RuntimeSnapshot(</b>
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    0L,
+&nbsp;                    MAX_ACTIVE_AGGRESSORS,
+<b class="nc">&nbsp;                    serverStateCount()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int damageConfirmed = 0;</b>
+&nbsp;
+&nbsp;        for (Map.Entry&lt;EntityKey, AggressionRecord&gt; entry :
+<b class="nc">&nbsp;                state.activeAggressors().snapshotEntries()) {</b>
+<b class="nc">&nbsp;            if (entry.getValue().damageConfirmed()) {</b>
+<b class="nc">&nbsp;                damageConfirmed++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new RuntimeSnapshot(</b>
+<b class="nc">&nbsp;                state.activeAggressors().size(),</b>
+&nbsp;                damageConfirmed,
+<b class="nc">&nbsp;                state.lastCleanupGameTime(),</b>
+&nbsp;                MAX_ACTIVE_AGGRESSORS,
+<b class="nc">&nbsp;                serverStateCount()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    static boolean shouldRunCleanup(
+&nbsp;            long lastCleanupGameTime,
+&nbsp;            long currentGameTime
+&nbsp;    ) {
+<b class="nc">&nbsp;        return currentGameTime &lt; lastCleanupGameTime</b>
+&nbsp;                || currentGameTime &gt;= lastCleanupGameTime
+&nbsp;                + CLEANUP_INTERVAL_TICKS;
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int maximumActiveAggressors() {
+<b class="nc">&nbsp;        return MAX_ACTIVE_AGGRESSORS;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static long cleanupIntervalTicks() {
+<b class="nc">&nbsp;        return CLEANUP_INTERVAL_TICKS;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int serverStateCount() {
+<b class="nc">&nbsp;        synchronized (SERVER_STATES) {</b>
+<b class="nc">&nbsp;            return SERVER_STATES.size();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static TrackerState stateFor(
+&nbsp;            MinecraftServer server
+&nbsp;    ) {
+<b class="nc">&nbsp;        synchronized (SERVER_STATES) {</b>
+<b class="nc">&nbsp;            return SERVER_STATES.computeIfAbsent(</b>
+&nbsp;                    server,
+<b class="nc">&nbsp;                    ignored -&gt; new TrackerState()</b>
+&nbsp;            );
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static TrackerState existingState(
+&nbsp;            MinecraftServer server
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (server == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        synchronized (SERVER_STATES) {</b>
+<b class="fc">&nbsp;            return SERVER_STATES.get(server);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void removeAggressorEverywhere(
+&nbsp;            TrackerState state,
+&nbsp;            UUID aggressorUuid
+&nbsp;    ) {
+<b class="nc">&nbsp;        state.activeAggressors().removeIf(</b>
+<b class="nc">&nbsp;                entry -&gt; entry.getKey()</b>
+<b class="nc">&nbsp;                        .entityUuid()</b>
+<b class="nc">&nbsp;                        .equals(aggressorUuid)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static EntityKey keyOf(LivingEntity entity) {
+<b class="nc">&nbsp;        return new EntityKey(</b>
+<b class="nc">&nbsp;                entity.level().dimension(),</b>
+<b class="nc">&nbsp;                entity.getUUID()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static long getServerGameTime(
+&nbsp;            MinecraftServer server,
+&nbsp;            ServerLevel fallbackLevel
+&nbsp;    ) {
+<b class="nc">&nbsp;        ServerLevel overworld = server.overworld();</b>
+&nbsp;
+<b class="nc">&nbsp;        return overworld == null</b>
+<b class="nc">&nbsp;                ? fallbackLevel.getGameTime()</b>
+<b class="nc">&nbsp;                : overworld.getGameTime();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static LivingEntity resolveAggressor(
+&nbsp;            DamageSource source
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (source.getEntity() instanceof LivingEntity livingEntity) {</b>
+<b class="nc">&nbsp;            return livingEntity;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (source.getDirectEntity()</b>
+<b class="fc">&nbsp;                instanceof LivingEntity livingEntity) {</b>
+<b class="nc">&nbsp;            return livingEntity;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final class TrackerState {</b>
+&nbsp;
+<b class="nc">&nbsp;        private final RecognitionRuntimeCapTable&lt;EntityKey, AggressionRecord&gt;</b>
+&nbsp;                activeAggressors = new RecognitionRuntimeCapTable&lt;&gt;(
+&nbsp;                MAX_ACTIVE_AGGRESSORS,
+&nbsp;                AggressionRecord::firstObservedGameTime
+&nbsp;        );
+&nbsp;
+&nbsp;        private volatile long lastCleanupGameTime;
+&nbsp;
+&nbsp;        private RecognitionRuntimeCapTable&lt;EntityKey, AggressionRecord&gt;
+&nbsp;        activeAggressors() {
+<b class="nc">&nbsp;            return activeAggressors;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private long lastCleanupGameTime() {
+<b class="nc">&nbsp;            return lastCleanupGameTime;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void setLastCleanupGameTime(long value) {
+<b class="nc">&nbsp;            lastCleanupGameTime = Math.max(0L, value);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record EntityKey(</b>
+&nbsp;            ResourceKey&lt;Level&gt; dimension,
+&nbsp;            UUID entityUuid
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record AggressionRecord(</b>
+&nbsp;            EntityKey civilianKey,
+&nbsp;            long firstObservedGameTime,
+&nbsp;            long expirationGameTime,
+&nbsp;            boolean damageConfirmed
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record RuntimeSnapshot(</b>
+&nbsp;            int activeAggressors,
+&nbsp;            int damageConfirmedAggressors,
+&nbsp;            long lastCleanupGameTime,
+&nbsp;            int maximumActiveAggressors,
+&nbsp;            int trackedServerStates
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

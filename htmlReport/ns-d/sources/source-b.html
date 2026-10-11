@@ -1,0 +1,403 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OpenUltimateSubordinateSkillScreenPayload</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.network</a>
+</div>
+
+<h1>Coverage Summary for Class: OpenUltimateSubordinateSkillScreenPayload (com.mooswqz.moostensuraaddon.network)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OpenUltimateSubordinateSkillScreenPayload</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.7%
+  </span>
+  <span class="absValue">
+    (3/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OpenUltimateSubordinateSkillScreenPayload$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.1%
+  </span>
+  <span class="absValue">
+    (1/32)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OpenUltimateSubordinateSkillScreenPayload$SkillEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    13.3%
+  </span>
+  <span class="absValue">
+    (2/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5%
+  </span>
+  <span class="absValue">
+    (4/80)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.network;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import net.minecraft.network.RegistryFriendlyByteBuf;
+&nbsp;import net.minecraft.network.codec.StreamCodec;
+&nbsp;import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+<b class="nc">&nbsp;public record OpenUltimateSubordinateSkillScreenPayload(</b>
+&nbsp;        boolean seize,
+&nbsp;        String targetUuid,
+&nbsp;        String targetName,
+&nbsp;        double availableMagicules,
+&nbsp;        double costPerSkill,
+&nbsp;        double seizeDeathChancePerSkill,
+&nbsp;        double seizeDeathChanceMax,
+&nbsp;        List&lt;SkillEntry&gt; skills
+&nbsp;) implements CustomPacketPayload {
+&nbsp;
+&nbsp;    public static final int MAX_SKILLS = 256;
+&nbsp;    private static final int MAX_ID_LENGTH = 256;
+&nbsp;    private static final int MAX_NAME_LENGTH = 160;
+&nbsp;    private static final int MAX_CATEGORY_LENGTH = 48;
+&nbsp;
+<b class="fc">&nbsp;    public static final CustomPacketPayload.Type&lt;OpenUltimateSubordinateSkillScreenPayload&gt; TYPE =</b>
+&nbsp;            new CustomPacketPayload.Type&lt;&gt;(
+<b class="fc">&nbsp;                    ResourceLocation.fromNamespaceAndPath(</b>
+&nbsp;                            MoosTensuraAddon.MODID,
+&nbsp;                            &quot;open_ultimate_subordinate_skill_screen&quot;
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+&nbsp;    public static final StreamCodec&lt;
+&nbsp;            RegistryFriendlyByteBuf,
+&nbsp;            OpenUltimateSubordinateSkillScreenPayload
+<b class="fc">&nbsp;            &gt; STREAM_CODEC = new StreamCodec&lt;&gt;() {</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public OpenUltimateSubordinateSkillScreenPayload decode(
+&nbsp;                RegistryFriendlyByteBuf buffer
+&nbsp;        ) {
+<b class="nc">&nbsp;            boolean seize = buffer.readBoolean();</b>
+<b class="nc">&nbsp;            String targetUuid = buffer.readUtf(MAX_ID_LENGTH);</b>
+<b class="nc">&nbsp;            String targetName = buffer.readUtf(MAX_NAME_LENGTH);</b>
+<b class="nc">&nbsp;            double availableMagicules = buffer.readDouble();</b>
+<b class="nc">&nbsp;            double costPerSkill = buffer.readDouble();</b>
+<b class="nc">&nbsp;            double seizeDeathChancePerSkill = buffer.readDouble();</b>
+<b class="nc">&nbsp;            double seizeDeathChanceMax = buffer.readDouble();</b>
+<b class="nc">&nbsp;            int encodedCount = Math.max(0, buffer.readVarInt());</b>
+<b class="nc">&nbsp;            int retainedCount = Math.min(</b>
+&nbsp;                    encodedCount,
+&nbsp;                    MAX_SKILLS
+&nbsp;            );
+<b class="nc">&nbsp;            List&lt;SkillEntry&gt; skills = new ArrayList&lt;&gt;(</b>
+&nbsp;                    retainedCount
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            for (int index = 0;</b>
+<b class="nc">&nbsp;                 index &lt; encodedCount;</b>
+<b class="nc">&nbsp;                 index++) {</b>
+<b class="nc">&nbsp;                SkillEntry entry = SkillEntry.decode(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (index &lt; retainedCount) {</b>
+<b class="nc">&nbsp;                    skills.add(entry);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return new OpenUltimateSubordinateSkillScreenPayload(</b>
+&nbsp;                    seize,
+&nbsp;                    targetUuid,
+&nbsp;                    targetName,
+&nbsp;                    availableMagicules,
+&nbsp;                    costPerSkill,
+&nbsp;                    seizeDeathChancePerSkill,
+&nbsp;                    seizeDeathChanceMax,
+&nbsp;                    skills
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void encode(
+&nbsp;                RegistryFriendlyByteBuf buffer,
+&nbsp;                OpenUltimateSubordinateSkillScreenPayload payload
+&nbsp;        ) {
+<b class="nc">&nbsp;            buffer.writeBoolean(payload.seize());</b>
+<b class="nc">&nbsp;            buffer.writeUtf(payload.targetUuid(), MAX_ID_LENGTH);</b>
+<b class="nc">&nbsp;            buffer.writeUtf(payload.targetName(), MAX_NAME_LENGTH);</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.availableMagicules());</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.costPerSkill());</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.seizeDeathChancePerSkill());</b>
+<b class="nc">&nbsp;            buffer.writeDouble(payload.seizeDeathChanceMax());</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;SkillEntry&gt; safeSkills = payload.skills()</b>
+<b class="nc">&nbsp;                    .stream()</b>
+<b class="nc">&nbsp;                    .limit(MAX_SKILLS)</b>
+<b class="nc">&nbsp;                    .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;            buffer.writeVarInt(safeSkills.size());</b>
+&nbsp;
+<b class="nc">&nbsp;            for (SkillEntry entry : safeSkills) {</b>
+<b class="nc">&nbsp;                entry.encode(buffer);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+<b class="nc">&nbsp;    public OpenUltimateSubordinateSkillScreenPayload {</b>
+<b class="nc">&nbsp;        targetUuid = clean(targetUuid);</b>
+<b class="nc">&nbsp;        targetName = clean(targetName);</b>
+<b class="nc">&nbsp;        availableMagicules = sanitizeNonNegative(availableMagicules);</b>
+<b class="nc">&nbsp;        costPerSkill = sanitizeNonNegative(costPerSkill);</b>
+<b class="nc">&nbsp;        seizeDeathChancePerSkill = clampChance(</b>
+&nbsp;                seizeDeathChancePerSkill
+&nbsp;        );
+<b class="nc">&nbsp;        seizeDeathChanceMax = clampChance(</b>
+&nbsp;                seizeDeathChanceMax
+&nbsp;        );
+<b class="nc">&nbsp;        skills = skills == null</b>
+<b class="nc">&nbsp;                ? List.of()</b>
+<b class="nc">&nbsp;                : List.copyOf(</b>
+<b class="nc">&nbsp;                skills.stream()</b>
+<b class="nc">&nbsp;                        .filter(entry -&gt; entry != null)</b>
+<b class="nc">&nbsp;                        .limit(MAX_SKILLS)</b>
+<b class="nc">&nbsp;                        .toList()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public OpenUltimateSubordinateSkillScreenPayload(
+&nbsp;            boolean seize,
+&nbsp;            String targetUuid,
+&nbsp;            String targetName,
+&nbsp;            double costPerSkill,
+&nbsp;            double seizeDeathChancePerSkill,
+&nbsp;            double seizeDeathChanceMax,
+&nbsp;            List&lt;SkillEntry&gt; skills
+&nbsp;    ) {
+<b class="nc">&nbsp;        this(</b>
+&nbsp;                seize,
+&nbsp;                targetUuid,
+&nbsp;                targetName,
+&nbsp;                0.0D,
+&nbsp;                costPerSkill,
+&nbsp;                seizeDeathChancePerSkill,
+&nbsp;                seizeDeathChanceMax,
+&nbsp;                skills
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public CustomPacketPayload.Type&lt;? extends CustomPacketPayload&gt; type() {
+<b class="nc">&nbsp;        return TYPE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String clean(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="nc">&nbsp;                : value.trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeNonNegative(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return !Double.isFinite(value)</b>
+<b class="nc">&nbsp;                || value &lt; 0.0D</b>
+<b class="nc">&nbsp;                ? 0.0D</b>
+<b class="nc">&nbsp;                : value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double clampChance(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(value)) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.max(</b>
+&nbsp;                0.0D,
+<b class="nc">&nbsp;                Math.min(1.0D, value)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record SkillEntry(</b>
+&nbsp;            String skillId,
+&nbsp;            String displayName,
+&nbsp;            String category,
+&nbsp;            boolean mastered,
+&nbsp;            double borrowPermanentChance
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public SkillEntry {</b>
+<b class="nc">&nbsp;            skillId = clean(skillId);</b>
+<b class="nc">&nbsp;            displayName = clean(displayName);</b>
+<b class="nc">&nbsp;            category = clean(category);</b>
+<b class="nc">&nbsp;            borrowPermanentChance = clampChance(</b>
+&nbsp;                    borrowPermanentChance
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private static SkillEntry decode(
+&nbsp;                RegistryFriendlyByteBuf buffer
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new SkillEntry(</b>
+<b class="nc">&nbsp;                    buffer.readUtf(MAX_ID_LENGTH),</b>
+<b class="nc">&nbsp;                    buffer.readUtf(MAX_NAME_LENGTH),</b>
+<b class="nc">&nbsp;                    buffer.readUtf(MAX_CATEGORY_LENGTH),</b>
+<b class="nc">&nbsp;                    buffer.readBoolean(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private void encode(
+&nbsp;                RegistryFriendlyByteBuf buffer
+&nbsp;        ) {
+<b class="nc">&nbsp;            buffer.writeUtf(skillId, MAX_ID_LENGTH);</b>
+<b class="nc">&nbsp;            buffer.writeUtf(displayName, MAX_NAME_LENGTH);</b>
+<b class="nc">&nbsp;            buffer.writeUtf(category, MAX_CATEGORY_LENGTH);</b>
+<b class="nc">&nbsp;            buffer.writeBoolean(mastered);</b>
+<b class="nc">&nbsp;            buffer.writeDouble(borrowPermanentChance);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

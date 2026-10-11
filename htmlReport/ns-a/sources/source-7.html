@@ -1,0 +1,302 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GranterProgressionEvents</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.event</a>
+</div>
+
+<h1>Coverage Summary for Class: GranterProgressionEvents (com.mooswqz.moostensuraaddon.event)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GranterProgressionEvents</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    39.3%
+  </span>
+  <span class="absValue">
+    (22/56)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.7%
+  </span>
+  <span class="absValue">
+    (42/62)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.event;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
+&nbsp;import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+&nbsp;import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.util.ActionbarHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.util.GranterActions;
+&nbsp;import io.github.manasmods.manascore.skill.api.SkillAPI;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import io.github.manasmods.tensura.util.SubordinateHelper;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;import net.neoforged.bus.api.SubscribeEvent;
+&nbsp;import net.neoforged.fml.common.EventBusSubscriber;
+&nbsp;import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;@EventBusSubscriber(modid = MoosTensuraAddon.MODID)
+<b class="nc">&nbsp;public class GranterProgressionEvents {</b>
+&nbsp;    private static final int CHECK_INTERVAL_TICKS = 100;
+&nbsp;    private static final long NAMING_HINT_COOLDOWN_TICKS = 20L * 30L;
+&nbsp;
+<b class="fc">&nbsp;    private static final Map&lt;UUID, Long&gt; NAMING_HINT_COOLDOWNS = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onPlayerTick(PlayerTickEvent.Post event) {
+<b class="fc">&nbsp;        if (!(event.getEntity() instanceof ServerPlayer player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (player.level().isClientSide()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (player.tickCount % CHECK_INTERVAL_TICKS != 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        tryAwakenGranter(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void tryAwakenGranter(ServerPlayer player) {
+<b class="pc">&nbsp;        if (!MoosTensuraConfig.GRANTER_AWAKENING_ENABLED.get()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Reincarnation-friendly rule:
+&nbsp;         * - If the player currently has Granter, do nothing.
+&nbsp;         * - If the player currently has an evolved Granter Ultimate Skill, do nothing.
+&nbsp;         * - If reincarnation removes both Granter and the evolved Ultimate Skill, the player can awaken Granter again.
+&nbsp;         */
+<b class="pc">&nbsp;        if (hasGranter(player) || hasAnyEvolvedGranterSkill(player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        GranterProgressData progress = player.getData(AttachmentRegistry.GRANTER_PROGRESS_DATA);</b>
+<b class="fc">&nbsp;        IExistence existence = TensuraStorages.getExistenceFrom(player);</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;LivingEntity&gt; nearbySubordinates = getNearbySubordinates(player);</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean hasGreatSage = GranterActions.hasGreatSage(player);</b>
+<b class="pc">&nbsp;        boolean hasEnoughMasteredSkills = getMasteredSkillCount(player) &gt;= MoosTensuraConfig.GRANTER_AWAKENING_REQUIRED_MASTERED_SKILLS.get();</b>
+<b class="pc">&nbsp;        boolean hasEnoughSubordinates = nearbySubordinates.size() &gt;= MoosTensuraConfig.GRANTER_AWAKENING_REQUIRED_SUBORDINATES.get()</b>
+<b class="pc">&nbsp;                || progress.getRecognizedSubordinateCount() &gt;= MoosTensuraConfig.GRANTER_AWAKENING_REQUIRED_SUBORDINATES.get();</b>
+<b class="pc">&nbsp;        boolean hasEnoughEp = getEp(existence) &gt;= MoosTensuraConfig.GRANTER_AWAKENING_REQUIRED_EP.get();</b>
+<b class="fc">&nbsp;        boolean named = isNamed(existence);</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Mystery-friendly hint:
+&nbsp;         * If the player has everything else but is missing the named/endowed condition,
+&nbsp;         * give a vague actionbar hint instead of a full debug checklist.
+&nbsp;         */
+<b class="pc">&nbsp;        if (!named &amp;&amp; hasGreatSage &amp;&amp; hasEnoughMasteredSkills &amp;&amp; hasEnoughSubordinates &amp;&amp; hasEnoughEp) {</b>
+<b class="nc">&nbsp;            sendNamingHint(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!named) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!hasGreatSage) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (!hasEnoughMasteredSkills) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!hasEnoughSubordinates) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!hasEnoughEp) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean learned = GranterActions.giveGranter(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!learned) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (LivingEntity subordinate : nearbySubordinates) {</b>
+<b class="nc">&nbsp;            progress.recognizeSubordinate(subordinate.getUUID());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        progress.setAwakenedGranterNaturally(true);</b>
+<b class="nc">&nbsp;        player.setData(AttachmentRegistry.GRANTER_PROGRESS_DATA, progress);</b>
+&nbsp;
+<b class="nc">&nbsp;        player.sendSystemMessage(Component.translatable(&quot;moostensuraaddon.granter.awakened_naturally&quot;)</b>
+<b class="nc">&nbsp;                .withStyle(ChatFormatting.LIGHT_PURPLE));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendNamingHint(ServerPlayer player) {
+<b class="nc">&nbsp;        long currentGameTime = player.level().getGameTime();</b>
+<b class="nc">&nbsp;        long nextAllowedTime = NAMING_HINT_COOLDOWNS.getOrDefault(player.getUUID(), 0L);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (currentGameTime &lt; nextAllowedTime) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        NAMING_HINT_COOLDOWNS.put(player.getUUID(), currentGameTime + NAMING_HINT_COOLDOWN_TICKS);</b>
+&nbsp;
+<b class="nc">&nbsp;        ActionbarHelper.send(player, Component.translatable(&quot;moostensuraaddon.granter.hint.needs_name&quot;)</b>
+<b class="nc">&nbsp;                .withStyle(ChatFormatting.DARK_AQUA));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasGranter(ServerPlayer player) {
+<b class="fc">&nbsp;        return SkillAPI.getSkillsFrom(player)</b>
+<b class="fc">&nbsp;                .getSkill(SkillRegistry.GRANTER.get().getRegistryName())</b>
+<b class="fc">&nbsp;                .isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasAnyEvolvedGranterSkill(ServerPlayer player) {
+<b class="fc">&nbsp;        return SkillAPI.getSkillsFrom(player)</b>
+<b class="fc">&nbsp;                .getSkill(SkillRegistry.BENEVOLENT_EMPOWERMENT.get().getRegistryName())</b>
+<b class="pc">&nbsp;                .isPresent()</b>
+<b class="fc">&nbsp;                || SkillAPI.getSkillsFrom(player)</b>
+<b class="fc">&nbsp;                .getSkill(SkillRegistry.ABSOLUTE_GOVERNANCE.get().getRegistryName())</b>
+<b class="fc">&nbsp;                .isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isNamed(IExistence existence) {
+<b class="pc">&nbsp;        if (existence == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String name = existence.getName();</b>
+<b class="pc">&nbsp;        return name != null &amp;&amp; !name.isBlank();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double getEp(IExistence existence) {
+<b class="pc">&nbsp;        if (existence == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return existence.getEP();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int getMasteredSkillCount(ServerPlayer player) {
+<b class="fc">&nbsp;        return (int) SkillAPI.getSkillsFrom(player)</b>
+<b class="fc">&nbsp;                .getLearnedSkills()</b>
+<b class="fc">&nbsp;                .stream()</b>
+<b class="fc">&nbsp;                .filter(instance -&gt; instance.isMastered(player))</b>
+<b class="fc">&nbsp;                .count();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;LivingEntity&gt; getNearbySubordinates(ServerPlayer player) {
+<b class="fc">&nbsp;        return player.level().getEntitiesOfClass(</b>
+&nbsp;                LivingEntity.class,
+<b class="fc">&nbsp;                player.getBoundingBox().inflate(MoosTensuraConfig.GRANTER_AWAKENING_SCAN_RADIUS.get()),</b>
+<b class="fc">&nbsp;                entity -&gt; entity != player &amp;&amp; SubordinateHelper.isSubordinate(player, entity)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

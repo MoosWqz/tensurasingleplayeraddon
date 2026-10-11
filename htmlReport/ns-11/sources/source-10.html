@@ -1,0 +1,452 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SkillCategoryHelper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: SkillCategoryHelper (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SkillCategoryHelper</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (8/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.3%
+  </span>
+  <span class="absValue">
+    (11/97)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.3%
+  </span>
+  <span class="absValue">
+    (23/108)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SkillCategoryHelper$SkillCategory</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SkillCategoryHelper$SkillDisplayEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    42.3%
+  </span>
+  <span class="absValue">
+    (11/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (11/99)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25.6%
+  </span>
+  <span class="absValue">
+    (31/121)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import io.github.manasmods.manascore.skill.api.ManasSkill;
+&nbsp;import io.github.manasmods.manascore.skill.api.ManasSkillInstance;
+&nbsp;import io.github.manasmods.manascore.skill.impl.SkillRegistry;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.tags.TagKey;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;public final class SkillCategoryHelper {
+<b class="fc">&nbsp;    private static final TagKey&lt;ManasSkill&gt; UNIQUE_SKILLS = createTensuraSkillTag(&quot;unique_skills&quot;);</b>
+<b class="fc">&nbsp;    private static final TagKey&lt;ManasSkill&gt; EXTRA_SKILLS = createTensuraSkillTag(&quot;extra_skills&quot;);</b>
+<b class="fc">&nbsp;    private static final TagKey&lt;ManasSkill&gt; RESISTANCE_SKILLS = createTensuraSkillTag(&quot;resistance_skills&quot;);</b>
+&nbsp;
+&nbsp;    private SkillCategoryHelper() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SkillCategory getCategory(ManasSkillInstance instance) {
+<b class="nc">&nbsp;        if (instance == null) {</b>
+<b class="nc">&nbsp;            return SkillCategory.OTHER;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return getCategory(instance, instance.getSkillId(), instance.getDisplayName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SkillCategory getCategory(ManasSkillInstance instance, ResourceLocation skillId, Component displayName) {
+&nbsp;        /*
+&nbsp;         * Prefer real Tensura/ManasCore tags. This is the important fix.
+&nbsp;         * IDs such as &quot;tensura:magic_sense&quot; do not contain &quot;extra&quot;, so text
+&nbsp;         * matching alone cannot sort the list correctly.
+&nbsp;         */
+<b class="pc">&nbsp;        if (isInTag(instance, UNIQUE_SKILLS)) {</b>
+<b class="fc">&nbsp;            return SkillCategory.UNIQUE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isInTag(instance, EXTRA_SKILLS)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.EXTRA;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isCommonSkillClass(instance)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.BASIC;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isInTag(instance, RESISTANCE_SKILLS)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.RESISTANCE;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Fallback for custom/modded skills or if the client does not have
+&nbsp;         * tag data available for some reason.
+&nbsp;         */
+<b class="nc">&nbsp;        SkillCategory classCategory = getCategoryFromSkillClass(instance);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (classCategory != SkillCategory.OTHER) {</b>
+<b class="nc">&nbsp;            return classCategory;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return getCategory(skillId, displayName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SkillCategory getCategory(ResourceLocation skillId, Component displayName) {
+<b class="nc">&nbsp;        String idText = skillId == null ? &quot;&quot; : skillId.toString().toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;        String pathText = skillId == null ? &quot;&quot; : skillId.getPath().toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;        String nameText = displayName == null ? &quot;&quot; : displayName.getString().toLowerCase(Locale.ROOT);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isUnique(idText, pathText, nameText)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.UNIQUE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isExtra(idText, pathText, nameText)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.EXTRA;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isBasic(idText, pathText, nameText)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.BASIC;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isResistance(idText, pathText, nameText)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.RESISTANCE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return SkillCategory.OTHER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isIntrinsic(ManasSkillInstance instance) {
+<b class="nc">&nbsp;        if (instance == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return isIntrinsic(instance, instance.getSkillId(), instance.getDisplayName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isIntrinsic(ManasSkillInstance instance, ResourceLocation skillId, Component displayName) {
+<b class="pc">&nbsp;        if (isIntrinsicSkillClass(instance)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return isIntrinsic(skillId, displayName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isIntrinsic(ResourceLocation skillId, Component displayName) {
+<b class="pc">&nbsp;        String idText = skillId == null ? &quot;&quot; : skillId.toString().toLowerCase(Locale.ROOT);</b>
+<b class="pc">&nbsp;        String pathText = skillId == null ? &quot;&quot; : skillId.getPath().toLowerCase(Locale.ROOT);</b>
+<b class="pc">&nbsp;        String nameText = displayName == null ? &quot;&quot; : displayName.getString().toLowerCase(Locale.ROOT);</b>
+&nbsp;
+<b class="pc">&nbsp;        return idText.contains(&quot;intrinsic&quot;)</b>
+<b class="pc">&nbsp;                || pathText.contains(&quot;intrinsic&quot;)</b>
+<b class="fc">&nbsp;                || nameText.contains(&quot;intrinsic&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Component getMasteryPrefix(boolean mastered) {
+<b class="nc">&nbsp;        if (!mastered) {</b>
+<b class="nc">&nbsp;            return Component.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Component.literal(&quot;♛ &quot;)</b>
+<b class="nc">&nbsp;                .withStyle(ChatFormatting.GOLD);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Component getCategoryHeader(SkillCategory category) {
+<b class="nc">&nbsp;        if (category == null) {</b>
+<b class="nc">&nbsp;            return Component.literal(&quot;Other&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.GRAY, ChatFormatting.BOLD);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (category) {</b>
+<b class="nc">&nbsp;            case UNIQUE -&gt; Component.literal(&quot;Unique&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.BOLD);</b>
+<b class="nc">&nbsp;            case EXTRA -&gt; Component.literal(&quot;Extra&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD);</b>
+<b class="nc">&nbsp;            case BASIC -&gt; Component.literal(&quot;Basic&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD);</b>
+<b class="nc">&nbsp;            case RESISTANCE -&gt; Component.literal(&quot;Resistances&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD);</b>
+<b class="nc">&nbsp;            case OTHER -&gt; Component.literal(&quot;Other&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.GRAY, ChatFormatting.BOLD);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Comparator&lt;SkillDisplayEntry&gt; skillDisplaySorter() {
+<b class="nc">&nbsp;        return Comparator</b>
+<b class="nc">&nbsp;                .comparingInt((SkillDisplayEntry entry) -&gt; entry.category().sortOrder())</b>
+<b class="nc">&nbsp;                .thenComparing(entry -&gt; entry.displayName().getString(), String.CASE_INSENSITIVE_ORDER)</b>
+<b class="nc">&nbsp;                .thenComparing(entry -&gt; entry.skillId() == null ? &quot;&quot; : entry.skillId().toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static TagKey&lt;ManasSkill&gt; createTensuraSkillTag(String path) {
+<b class="fc">&nbsp;        return TagKey.create(</b>
+&nbsp;                SkillRegistry.KEY,
+<b class="fc">&nbsp;                ResourceLocation.fromNamespaceAndPath(&quot;tensura&quot;, path)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isInTag(ManasSkillInstance instance, TagKey&lt;ManasSkill&gt; tagKey) {
+<b class="pc">&nbsp;        if (instance == null || tagKey == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            return instance.is(tagKey);</b>
+&nbsp;        } catch (RuntimeException ignored) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static SkillCategory getCategoryFromSkillClass(ManasSkillInstance instance) {
+<b class="nc">&nbsp;        String className = getSkillClassName(instance);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (className.isBlank()) {</b>
+<b class="nc">&nbsp;            return SkillCategory.OTHER;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (className.contains(&quot;.skill.unique.&quot;)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.UNIQUE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (className.contains(&quot;.skill.extra.&quot;)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.EXTRA;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (className.contains(&quot;.skill.common.&quot;)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.BASIC;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (className.contains(&quot;.skill.resistance.&quot;)) {</b>
+<b class="nc">&nbsp;            return SkillCategory.RESISTANCE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return SkillCategory.OTHER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isCommonSkillClass(ManasSkillInstance instance) {
+<b class="nc">&nbsp;        return getSkillClassName(instance).contains(&quot;.skill.common.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isIntrinsicSkillClass(ManasSkillInstance instance) {
+<b class="fc">&nbsp;        return getSkillClassName(instance).contains(&quot;.skill.intrinsic.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getSkillClassName(ManasSkillInstance instance) {
+<b class="pc">&nbsp;        if (instance == null || instance.getSkill() == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return instance.getSkill()</b>
+<b class="fc">&nbsp;                .getClass()</b>
+<b class="fc">&nbsp;                .getName()</b>
+<b class="fc">&nbsp;                .toLowerCase(Locale.ROOT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isUnique(String idText, String pathText, String nameText) {
+<b class="nc">&nbsp;        return idText.contains(&quot;unique&quot;)</b>
+<b class="nc">&nbsp;                || pathText.contains(&quot;unique&quot;)</b>
+<b class="nc">&nbsp;                || nameText.contains(&quot;unique&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isExtra(String idText, String pathText, String nameText) {
+<b class="nc">&nbsp;        return idText.contains(&quot;extra&quot;)</b>
+<b class="nc">&nbsp;                || pathText.contains(&quot;extra&quot;)</b>
+<b class="nc">&nbsp;                || nameText.contains(&quot;extra&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isBasic(String idText, String pathText, String nameText) {
+<b class="nc">&nbsp;        return idText.contains(&quot;basic&quot;)</b>
+<b class="nc">&nbsp;                || idText.contains(&quot;common&quot;)</b>
+<b class="nc">&nbsp;                || pathText.contains(&quot;basic&quot;)</b>
+<b class="nc">&nbsp;                || pathText.contains(&quot;common&quot;)</b>
+<b class="nc">&nbsp;                || nameText.contains(&quot;basic&quot;)</b>
+<b class="nc">&nbsp;                || nameText.contains(&quot;common&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isResistance(String idText, String pathText, String nameText) {
+<b class="nc">&nbsp;        return idText.contains(&quot;resistance&quot;)</b>
+<b class="nc">&nbsp;                || idText.contains(&quot;resist&quot;)</b>
+<b class="nc">&nbsp;                || pathText.contains(&quot;resistance&quot;)</b>
+<b class="nc">&nbsp;                || pathText.contains(&quot;resist&quot;)</b>
+<b class="nc">&nbsp;                || nameText.contains(&quot;resistance&quot;)</b>
+<b class="nc">&nbsp;                || nameText.contains(&quot;resist&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum SkillCategory {</b>
+<b class="fc">&nbsp;        UNIQUE(0),</b>
+<b class="fc">&nbsp;        EXTRA(1),</b>
+<b class="fc">&nbsp;        BASIC(2),</b>
+<b class="fc">&nbsp;        RESISTANCE(3),</b>
+<b class="fc">&nbsp;        OTHER(4);</b>
+&nbsp;
+&nbsp;        private final int sortOrder;
+&nbsp;
+<b class="fc">&nbsp;        SkillCategory(int sortOrder) {</b>
+<b class="fc">&nbsp;            this.sortOrder = sortOrder;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public int sortOrder() {
+<b class="nc">&nbsp;            return sortOrder;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record SkillDisplayEntry(</b>
+&nbsp;            ResourceLocation skillId,
+&nbsp;            Component displayName,
+&nbsp;            SkillCategory category,
+&nbsp;            boolean mastered
+&nbsp;    ) {
+&nbsp;        public Component getFormattedDisplayName() {
+<b class="nc">&nbsp;            return Component.empty()</b>
+<b class="nc">&nbsp;                    .append(getMasteryPrefix(mastered))</b>
+<b class="nc">&nbsp;                    .append(displayName == null ? Component.literal(&quot;Unknown Skill&quot;) : displayName.copy());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

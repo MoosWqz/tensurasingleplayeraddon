@@ -1,0 +1,347 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SageWhisperEvents</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.event</a>
+</div>
+
+<h1>Coverage Summary for Class: SageWhisperEvents (com.mooswqz.moostensuraaddon.event)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SageWhisperEvents</td>
+<td class="coverageStat">
+  <span class="percent">
+    26.7%
+  </span>
+  <span class="absValue">
+    (4/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.3%
+  </span>
+  <span class="absValue">
+    (9/59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.4%
+  </span>
+  <span class="absValue">
+    (11/82)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SageWhisperEvents$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (4/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.3%
+  </span>
+  <span class="absValue">
+    (9/59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.3%
+  </span>
+  <span class="absValue">
+    (11/83)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.event;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+&nbsp;import com.mooswqz.moostensuraaddon.ritual.GreatSageRitualManager;
+&nbsp;import com.mooswqz.moostensuraaddon.util.ActionbarHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.util.GreatSageAwakeningHelper;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.neoforged.bus.api.SubscribeEvent;
+&nbsp;import net.neoforged.fml.common.EventBusSubscriber;
+&nbsp;import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+&nbsp;import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;@EventBusSubscriber(modid = MoosTensuraAddon.MODID)
+<b class="nc">&nbsp;public class SageWhisperEvents {</b>
+&nbsp;    private static final int CHECK_STEP_TICKS = 20;
+<b class="fc">&nbsp;    private static final Map&lt;UUID, Integer&gt; WHISPER_COOLDOWNS = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onPlayerTick(PlayerTickEvent.Post event) {
+<b class="fc">&nbsp;        if (!(event.getEntity() instanceof ServerPlayer player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (player.level().isClientSide()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (player.tickCount % CHECK_STEP_TICKS != 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        tickWhispers(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+<b class="pc">&nbsp;        if (event.getEntity() instanceof ServerPlayer player) {</b>
+<b class="fc">&nbsp;            WHISPER_COOLDOWNS.remove(player.getUUID());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void tickWhispers(ServerPlayer player) {
+<b class="pc">&nbsp;        if (!MoosTensuraConfig.SAGE_WHISPERS_ENABLED.get()) {</b>
+<b class="nc">&nbsp;            WHISPER_COOLDOWNS.remove(player.getUUID());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (GreatSageRitualManager.isRitualActive(player)) {</b>
+<b class="nc">&nbsp;            resetCooldown(player);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (GreatSageAwakeningHelper.hasGreatSage(player)) {</b>
+<b class="fc">&nbsp;            WHISPER_COOLDOWNS.remove(player.getUUID());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (GreatSageAwakeningHelper.findSage(player).isEmpty()) {</b>
+<b class="nc">&nbsp;            WHISPER_COOLDOWNS.remove(player.getUUID());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        UUID playerId = player.getUUID();</b>
+<b class="nc">&nbsp;        int cooldown = WHISPER_COOLDOWNS.getOrDefault(playerId, initialCooldown());</b>
+&nbsp;
+<b class="nc">&nbsp;        cooldown -= CHECK_STEP_TICKS;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (cooldown &gt; 0) {</b>
+<b class="nc">&nbsp;            WHISPER_COOLDOWNS.put(playerId, cooldown);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        resetCooldown(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        double chance = MoosTensuraConfig.SAGE_WHISPER_CHANCE.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (chance &lt;= 0.0D) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (chance &lt; 1.0D &amp;&amp; player.getRandom().nextDouble() &gt; chance) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        GreatSageAwakeningHelper.RequirementCheck check = GreatSageAwakeningHelper.checkAltarRequirements(player);</b>
+<b class="nc">&nbsp;        Component whisper = getWhisperFor(player, check);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (whisper != null) {</b>
+<b class="nc">&nbsp;            ActionbarHelper.send(player, whisper.copy().withStyle(ChatFormatting.AQUA));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Component getWhisperFor(ServerPlayer player, GreatSageAwakeningHelper.RequirementCheck check) {
+<b class="nc">&nbsp;        if (check == null) {</b>
+<b class="nc">&nbsp;            return randomGenericWhisper(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (check.successful()) {</b>
+<b class="nc">&nbsp;            return randomReadyWhisper(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (check.failureReason()) {</b>
+<b class="nc">&nbsp;            case NOT_ENOUGH_EP -&gt; randomEpWhisper(player);</b>
+<b class="nc">&nbsp;            case NOT_ENOUGH_XP -&gt; randomExperienceWhisper(player);</b>
+<b class="nc">&nbsp;            case NOT_ENOUGH_MAGICULES -&gt; randomMagiculeWhisper(player);</b>
+<b class="nc">&nbsp;            case NOT_ENOUGH_MASTERED_SKILLS -&gt; randomMasteryWhisper(player);</b>
+<b class="nc">&nbsp;            case NOT_NAMED -&gt; randomSoulAnchorWhisper(player);</b>
+<b class="nc">&nbsp;            case DISABLED -&gt; null;</b>
+<b class="nc">&nbsp;            case ALREADY_HAS_GREAT_SAGE -&gt; null;</b>
+<b class="nc">&nbsp;            case NO_SAGE -&gt; null;</b>
+<b class="nc">&nbsp;            case NO_EXISTENCE -&gt; randomGenericWhisper(player);</b>
+<b class="nc">&nbsp;            case LEARN_FAILED -&gt; randomGenericWhisper(player);</b>
+<b class="nc">&nbsp;            case NONE -&gt; randomGenericWhisper(player);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Component randomGenericWhisper(ServerPlayer player) {
+<b class="nc">&nbsp;        return switch (player.getRandom().nextInt(4)) {</b>
+<b class="nc">&nbsp;            case 0 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.generic_0&quot;);</b>
+<b class="nc">&nbsp;            case 1 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.generic_1&quot;);</b>
+<b class="nc">&nbsp;            case 2 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.generic_2&quot;);</b>
+<b class="nc">&nbsp;            default -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.generic_3&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Component randomReadyWhisper(ServerPlayer player) {
+<b class="nc">&nbsp;        return switch (player.getRandom().nextInt(4)) {</b>
+<b class="nc">&nbsp;            case 0 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.ready_0&quot;);</b>
+<b class="nc">&nbsp;            case 1 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.ready_1&quot;);</b>
+<b class="nc">&nbsp;            case 2 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.ready_2&quot;);</b>
+<b class="nc">&nbsp;            default -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.ready_3&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Component randomEpWhisper(ServerPlayer player) {
+<b class="nc">&nbsp;        return switch (player.getRandom().nextInt(3)) {</b>
+<b class="nc">&nbsp;            case 0 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.ep_0&quot;);</b>
+<b class="nc">&nbsp;            case 1 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.ep_1&quot;);</b>
+<b class="nc">&nbsp;            default -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.ep_2&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Component randomExperienceWhisper(ServerPlayer player) {
+<b class="nc">&nbsp;        return switch (player.getRandom().nextInt(3)) {</b>
+<b class="nc">&nbsp;            case 0 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.experience_0&quot;);</b>
+<b class="nc">&nbsp;            case 1 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.experience_1&quot;);</b>
+<b class="nc">&nbsp;            default -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.experience_2&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Component randomMagiculeWhisper(ServerPlayer player) {
+<b class="nc">&nbsp;        return switch (player.getRandom().nextInt(3)) {</b>
+<b class="nc">&nbsp;            case 0 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.magicules_0&quot;);</b>
+<b class="nc">&nbsp;            case 1 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.magicules_1&quot;);</b>
+<b class="nc">&nbsp;            default -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.magicules_2&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Component randomMasteryWhisper(ServerPlayer player) {
+<b class="nc">&nbsp;        return switch (player.getRandom().nextInt(3)) {</b>
+<b class="nc">&nbsp;            case 0 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.mastery_0&quot;);</b>
+<b class="nc">&nbsp;            case 1 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.mastery_1&quot;);</b>
+<b class="nc">&nbsp;            default -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.mastery_2&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Component randomSoulAnchorWhisper(ServerPlayer player) {
+<b class="nc">&nbsp;        return switch (player.getRandom().nextInt(3)) {</b>
+<b class="nc">&nbsp;            case 0 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.soul_anchor_0&quot;);</b>
+<b class="nc">&nbsp;            case 1 -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.soul_anchor_1&quot;);</b>
+<b class="nc">&nbsp;            default -&gt; Component.translatable(&quot;moostensuraaddon.sage_whisper.soul_anchor_2&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int initialCooldown() {
+<b class="nc">&nbsp;        return Math.max(20, MoosTensuraConfig.SAGE_WHISPER_INITIAL_DELAY_TICKS.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void resetCooldown(ServerPlayer player) {
+<b class="nc">&nbsp;        int min = Math.max(20, MoosTensuraConfig.SAGE_WHISPER_MIN_INTERVAL_TICKS.get());</b>
+<b class="nc">&nbsp;        int randomExtra = Math.max(0, MoosTensuraConfig.SAGE_WHISPER_RANDOM_INTERVAL_TICKS.get());</b>
+<b class="nc">&nbsp;        int cooldown = min;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (randomExtra &gt; 0) {</b>
+<b class="nc">&nbsp;            cooldown += player.getRandom().nextInt(randomExtra + 1);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        WHISPER_COOLDOWNS.put(player.getUUID(), cooldown);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

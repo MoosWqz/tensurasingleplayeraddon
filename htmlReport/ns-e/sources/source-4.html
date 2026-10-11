@@ -1,0 +1,280 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionAuthorityProgress</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionAuthorityProgress (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionAuthorityProgress</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.7%
+  </span>
+  <span class="absValue">
+    (2/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    19.4%
+  </span>
+  <span class="absValue">
+    (6/31)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;public final class RecognitionAuthorityProgress {
+&nbsp;
+&nbsp;    private RecognitionAuthorityProgress() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void synchronize(ServerPlayer player) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData recognitionData = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        synchronize(player, recognitionData);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void synchronize(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData recognitionData
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null || recognitionData == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        GranterProgressData granterProgress = player.getData(</b>
+&nbsp;                AttachmentRegistry.GRANTER_PROGRESS_DATA
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        int currentSubordinates = Math.max(</b>
+&nbsp;                0,
+<b class="fc">&nbsp;                granterProgress.getRecognizedSubordinateCount()</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        recognitionData.setCounter(</b>
+&nbsp;                RecognitionStatKeys.CURRENT_SUBORDINATES,
+&nbsp;                currentSubordinates
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        recognitionData.setCounterMaximum(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_SUBORDINATES,
+&nbsp;                currentSubordinates
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void recordEmpoweredSubordinate(
+&nbsp;            ServerPlayer player,
+&nbsp;            LivingEntity subordinate
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null || subordinate == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData recognitionData = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        recognitionData.addUniqueValue(</b>
+&nbsp;                RecognitionStatKeys.UNIQUE_SUBORDINATES_EMPOWERED,
+<b class="nc">&nbsp;                subordinate.getUUID().toString()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        synchronize(player, recognitionData);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void recordMassGrant(
+&nbsp;            ServerPlayer player,
+&nbsp;            int successfulTargets
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null || successfulTargets &lt;= 1) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData recognitionData = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        recognitionData.incrementCounter(</b>
+&nbsp;                RecognitionStatKeys.MASS_GRANTS_PERFORMED
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void recordGlobalTakeBack(
+&nbsp;            ServerPlayer player,
+&nbsp;            int successfulTargets,
+&nbsp;            boolean benevolent
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null</b>
+&nbsp;                || successfulTargets &lt;= 0
+&nbsp;                || benevolent) {
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Benevolent Empowerment performs a ranged reclamation.
+&nbsp;         * Absolute Governance represents the global-authority route tracked
+&nbsp;         * by this specific recognition counter.
+&nbsp;         */
+<b class="nc">&nbsp;        RecognitionData recognitionData = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        recognitionData.incrementCounter(</b>
+&nbsp;                RecognitionStatKeys.GLOBAL_TAKE_BACKS_PERFORMED
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void recordSkillsSeized(
+&nbsp;            ServerPlayer player,
+&nbsp;            int successfulSkills
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null || successfulSkills &lt;= 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData recognitionData = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int current = recognitionData.getCounter(</b>
+&nbsp;                RecognitionStatKeys.SKILLS_SEIZED
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        recognitionData.setCounter(</b>
+&nbsp;                RecognitionStatKeys.SKILLS_SEIZED,
+&nbsp;                current + successfulSkills
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void removeDeadSubordinate(
+&nbsp;            ServerPlayer owner,
+&nbsp;            UUID subordinateUuid
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (owner == null || subordinateUuid == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        GranterProgressData granterProgress = owner.getData(</b>
+&nbsp;                AttachmentRegistry.GRANTER_PROGRESS_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean removed = granterProgress</b>
+<b class="nc">&nbsp;                .forgetRecognizedSubordinate(subordinateUuid);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (removed) {</b>
+<b class="nc">&nbsp;            owner.setData(</b>
+&nbsp;                    AttachmentRegistry.GRANTER_PROGRESS_DATA,
+&nbsp;                    granterProgress
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        synchronize(owner);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

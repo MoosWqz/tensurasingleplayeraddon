@@ -1,0 +1,1094 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TensuraRecognitionStateHelper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: TensuraRecognitionStateHelper (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TensuraRecognitionStateHelper</td>
+<td class="coverageStat">
+  <span class="percent">
+    96%
+  </span>
+  <span class="absValue">
+    (24/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.3%
+  </span>
+  <span class="absValue">
+    (119/188)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.1%
+  </span>
+  <span class="absValue">
+    (216/263)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TensuraRecognitionStateHelper$AwakeningSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TensuraRecognitionStateHelper$InspectionTarget</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TensuraRecognitionStateHelper$ProbeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30%
+  </span>
+  <span class="absValue">
+    (3/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (10/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TensuraRecognitionStateHelper$SkillSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TensuraRecognitionStateHelper$Snapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (10/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    86.1%
+  </span>
+  <span class="absValue">
+    (31/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.3%
+  </span>
+  <span class="absValue">
+    (125/204)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80.2%
+  </span>
+  <span class="absValue">
+    (239/298)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.util.SkillCategoryHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.util.SkillCategoryHelper.SkillCategory;
+&nbsp;import io.github.manasmods.manascore.skill.api.ManasSkillInstance;
+&nbsp;import io.github.manasmods.manascore.skill.api.SkillAPI;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.ConcurrentMap;
+&nbsp;
+&nbsp;public final class TensuraRecognitionStateHelper {
+&nbsp;
+<b class="fc">&nbsp;    private static final Set&lt;String&gt; TRUE_HERO_BOOLEAN_METHODS = Set.of(</b>
+&nbsp;            &quot;istruehero&quot;,
+&nbsp;            &quot;hastruehero&quot;,
+&nbsp;            &quot;isawakenedhero&quot;,
+&nbsp;            &quot;hasawakenedhero&quot;,
+&nbsp;            &quot;isheroawakened&quot;
+&nbsp;    );
+&nbsp;
+<b class="fc">&nbsp;    private static final Set&lt;String&gt; TRUE_DEMON_LORD_BOOLEAN_METHODS = Set.of(</b>
+&nbsp;            &quot;istruedemonlord&quot;,
+&nbsp;            &quot;hastruedemonlord&quot;,
+&nbsp;            &quot;isawakeneddemonlord&quot;,
+&nbsp;            &quot;hasawakeneddemonlord&quot;,
+&nbsp;            &quot;isdemonlordawakened&quot;,
+&nbsp;            &quot;isharvestfestivalcomplete&quot;,
+&nbsp;            &quot;hascompletedharvestfestival&quot;
+&nbsp;    );
+&nbsp;
+<b class="fc">&nbsp;    private static final Set&lt;String&gt; DESCRIPTOR_METHOD_NAMES = Set.of(</b>
+&nbsp;            &quot;getrace&quot;,
+&nbsp;            &quot;race&quot;,
+&nbsp;            &quot;getraceid&quot;,
+&nbsp;            &quot;getracename&quot;,
+&nbsp;            &quot;getregistryname&quot;,
+&nbsp;            &quot;getid&quot;,
+&nbsp;            &quot;getkey&quot;,
+&nbsp;            &quot;location&quot;,
+&nbsp;            &quot;getlocation&quot;,
+&nbsp;            &quot;getevolution&quot;,
+&nbsp;            &quot;getevolutionid&quot;,
+&nbsp;            &quot;getevolutionstage&quot;,
+&nbsp;            &quot;getawakening&quot;,
+&nbsp;            &quot;getawakeningstate&quot;,
+&nbsp;            &quot;getawakeningtype&quot;,
+&nbsp;            &quot;getstatus&quot;,
+&nbsp;            &quot;getstate&quot;,
+&nbsp;            &quot;getstage&quot;,
+&nbsp;            &quot;gettitle&quot;,
+&nbsp;            &quot;gettype&quot;,
+&nbsp;            &quot;getspecies&quot;
+&nbsp;    );
+&nbsp;
+&nbsp;    private static final ConcurrentMap&lt;Class&lt;?&gt;, List&lt;Method&gt;&gt;
+<b class="fc">&nbsp;            INSPECTION_METHOD_CACHE = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private static volatile List&lt;Method&gt; storageGetterCache;
+&nbsp;
+&nbsp;    private TensuraRecognitionStateHelper() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads the current Tensura state and copies the relevant values into
+&nbsp;     * the persistent recognition attachment.
+&nbsp;     *
+&nbsp;     * TH and TDL flags are intentionally one-way for the current incarnation.
+&nbsp;     * Once detected, ordinary state changes cannot remove the modifier.
+&nbsp;     */
+&nbsp;    public static Snapshot synchronize(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null || data == null) {</b>
+<b class="nc">&nbsp;            return Snapshot.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        IExistence existence = TensuraStorages.getExistenceFrom(player);</b>
+&nbsp;
+<b class="pc">&nbsp;        double currentEp = existence == null</b>
+<b class="nc">&nbsp;                ? 0.0D</b>
+<b class="fc">&nbsp;                : sanitizeMeasurement(existence.getEP());</b>
+&nbsp;
+<b class="fc">&nbsp;        data.setMeasurement(</b>
+&nbsp;                RecognitionStatKeys.CURRENT_EP,
+&nbsp;                currentEp
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        data.setMeasurementMaximum(</b>
+&nbsp;                RecognitionStatKeys.HIGHEST_EP,
+&nbsp;                currentEp
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        SkillSnapshot skillSnapshot = readSkillSnapshot(player);</b>
+&nbsp;
+<b class="fc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.MASTERED_SKILLS,
+<b class="fc">&nbsp;                skillSnapshot.masteredSkills()</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys.MASTERED_SKILL_CATEGORIES,
+<b class="fc">&nbsp;                skillSnapshot.masteredCategories()</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        AwakeningSnapshot awakeningSnapshot =</b>
+<b class="fc">&nbsp;                inspectAwakeningState(player, existence);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (awakeningSnapshot.trueHero()) {</b>
+<b class="nc">&nbsp;            data.setFlag(</b>
+&nbsp;                    RecognitionStatKeys.TRUE_HERO,
+&nbsp;                    true
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (awakeningSnapshot.trueDemonLord()) {</b>
+<b class="nc">&nbsp;            data.setFlag(</b>
+&nbsp;                    RecognitionStatKeys.TRUE_DEMON_LORD,
+&nbsp;                    true
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return new Snapshot(</b>
+&nbsp;                currentEp,
+<b class="fc">&nbsp;                skillSnapshot.masteredSkills(),</b>
+<b class="fc">&nbsp;                skillSnapshot.masteredCategories(),</b>
+<b class="fc">&nbsp;                awakeningSnapshot.trueHero(),</b>
+<b class="fc">&nbsp;                awakeningSnapshot.trueDemonLord(),</b>
+<b class="fc">&nbsp;                awakeningSnapshot.trueHeroSource(),</b>
+<b class="fc">&nbsp;                awakeningSnapshot.trueDemonLordSource(),</b>
+<b class="fc">&nbsp;                awakeningSnapshot.evidence()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs the same state inspection without requiring a RecognitionData
+&nbsp;     * object. Used by the admin probe.
+&nbsp;     */
+&nbsp;    public static Snapshot inspect(ServerPlayer player) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return Snapshot.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        IExistence existence = TensuraStorages.getExistenceFrom(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        double currentEp = existence == null</b>
+<b class="nc">&nbsp;                ? 0.0D</b>
+<b class="nc">&nbsp;                : sanitizeMeasurement(existence.getEP());</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillSnapshot skillSnapshot = readSkillSnapshot(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        AwakeningSnapshot awakeningSnapshot =</b>
+<b class="nc">&nbsp;                inspectAwakeningState(player, existence);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new Snapshot(</b>
+&nbsp;                currentEp,
+<b class="nc">&nbsp;                skillSnapshot.masteredSkills(),</b>
+<b class="nc">&nbsp;                skillSnapshot.masteredCategories(),</b>
+<b class="nc">&nbsp;                awakeningSnapshot.trueHero(),</b>
+<b class="nc">&nbsp;                awakeningSnapshot.trueDemonLord(),</b>
+<b class="nc">&nbsp;                awakeningSnapshot.trueHeroSource(),</b>
+<b class="nc">&nbsp;                awakeningSnapshot.trueDemonLordSource(),</b>
+<b class="nc">&nbsp;                awakeningSnapshot.evidence()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static SkillSnapshot readSkillSnapshot(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="fc">&nbsp;        Set&lt;String&gt; masteredSkillIds = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        EnumSet&lt;SkillCategory&gt; categories =</b>
+<b class="fc">&nbsp;                EnumSet.noneOf(SkillCategory.class);</b>
+&nbsp;
+&nbsp;        try {
+&nbsp;            for (ManasSkillInstance instance :
+<b class="fc">&nbsp;                    SkillAPI.getSkillsFrom(player).getLearnedSkills()) {</b>
+&nbsp;
+<b class="pc">&nbsp;                if (instance == null) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+&nbsp;                boolean mastered;
+&nbsp;
+&nbsp;                try {
+<b class="fc">&nbsp;                    mastered = instance.isMastered(player);</b>
+&nbsp;                } catch (RuntimeException ignored) {
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                if (!mastered) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                ResourceLocation skillId = instance.getSkillId();</b>
+&nbsp;
+<b class="pc">&nbsp;                if (SkillCategoryHelper.isIntrinsic(</b>
+&nbsp;                        instance,
+&nbsp;                        skillId,
+<b class="fc">&nbsp;                        instance.getDisplayName()</b>
+&nbsp;                )) {
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+&nbsp;                String stableSkillKey;
+&nbsp;
+<b class="pc">&nbsp;                if (skillId != null) {</b>
+<b class="fc">&nbsp;                    stableSkillKey = skillId.toString();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    stableSkillKey = instance.getDisplayName()</b>
+<b class="nc">&nbsp;                            .getString()</b>
+<b class="nc">&nbsp;                            .trim()</b>
+<b class="nc">&nbsp;                            .toLowerCase(Locale.ROOT);</b>
+&nbsp;                }
+&nbsp;
+<b class="pc">&nbsp;                if (stableSkillKey.isBlank()) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                masteredSkillIds.add(stableSkillKey);</b>
+&nbsp;
+<b class="fc">&nbsp;                SkillCategory category =</b>
+<b class="fc">&nbsp;                        SkillCategoryHelper.getCategory(</b>
+&nbsp;                                instance,
+&nbsp;                                skillId,
+<b class="fc">&nbsp;                                instance.getDisplayName()</b>
+&nbsp;                        );
+&nbsp;
+<b class="pc">&nbsp;                if (category != null</b>
+&nbsp;                        &amp;&amp; category != SkillCategory.OTHER) {
+<b class="fc">&nbsp;                    categories.add(category);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (RuntimeException ignored) {
+<b class="nc">&nbsp;            return new SkillSnapshot(0, 0);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return new SkillSnapshot(</b>
+<b class="fc">&nbsp;                masteredSkillIds.size(),</b>
+<b class="fc">&nbsp;                categories.size()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static AwakeningSnapshot inspectAwakeningState(
+&nbsp;            ServerPlayer player,
+&nbsp;            IExistence existence
+&nbsp;    ) {
+<b class="fc">&nbsp;        List&lt;InspectionTarget&gt; targets =</b>
+<b class="fc">&nbsp;                collectInspectionTargets(player, existence);</b>
+&nbsp;
+<b class="fc">&nbsp;        ProbeBuilder probe = new ProbeBuilder();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (InspectionTarget target : targets) {</b>
+<b class="fc">&nbsp;            inspectTarget(target, probe);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return probe.build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;InspectionTarget&gt; collectInspectionTargets(
+&nbsp;            ServerPlayer player,
+&nbsp;            IExistence existence
+&nbsp;    ) {
+<b class="fc">&nbsp;        List&lt;InspectionTarget&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        Set&lt;Object&gt; seenObjects =</b>
+<b class="fc">&nbsp;                java.util.Collections.newSetFromMap(</b>
+&nbsp;                        new java.util.IdentityHashMap&lt;&gt;()
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        addTarget(</b>
+&nbsp;                result,
+&nbsp;                seenObjects,
+&nbsp;                &quot;player&quot;,
+&nbsp;                player
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        addTarget(</b>
+&nbsp;                result,
+&nbsp;                seenObjects,
+&nbsp;                &quot;existence&quot;,
+&nbsp;                existence
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        for (Method method : getStorageGetterMethods()) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                Object value = method.invoke(null, player);</b>
+<b class="fc">&nbsp;                value = unwrapOptional(value);</b>
+&nbsp;
+<b class="fc">&nbsp;                addTarget(</b>
+&nbsp;                        result,
+&nbsp;                        seenObjects,
+<b class="fc">&nbsp;                        &quot;TensuraStorages.&quot; + method.getName(),</b>
+&nbsp;                        value
+&nbsp;                );
+&nbsp;            } catch (ReflectiveOperationException
+&nbsp;                     | RuntimeException ignored) {
+&nbsp;                // Optional compatibility probe. Failure is safe.
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addTarget(
+&nbsp;            List&lt;InspectionTarget&gt; targets,
+&nbsp;            Set&lt;Object&gt; seenObjects,
+&nbsp;            String label,
+&nbsp;            Object value
+&nbsp;    ) {
+<b class="fc">&nbsp;        Object unwrapped = unwrapOptional(value);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (unwrapped == null || seenObjects.contains(unwrapped)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        seenObjects.add(unwrapped);</b>
+<b class="fc">&nbsp;        targets.add(new InspectionTarget(label, unwrapped));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;Method&gt; getStorageGetterMethods() {
+<b class="fc">&nbsp;        List&lt;Method&gt; cached = storageGetterCache;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (cached != null) {</b>
+<b class="fc">&nbsp;            return cached;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        List&lt;Method&gt; discovered = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (Method method : TensuraStorages.class.getMethods()) {</b>
+<b class="fc">&nbsp;            if (!Modifier.isStatic(method.getModifiers())) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (method.getParameterCount() != 1) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (method.getReturnType() == Void.TYPE) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            Class&lt;?&gt; parameterType =</b>
+<b class="fc">&nbsp;                    method.getParameterTypes()[0];</b>
+&nbsp;
+<b class="fc">&nbsp;            if (!parameterType.isAssignableFrom(</b>
+&nbsp;                    ServerPlayer.class
+&nbsp;            )) {
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            String normalizedName =</b>
+<b class="fc">&nbsp;                    normalizeMethodName(method.getName());</b>
+&nbsp;
+<b class="fc">&nbsp;            if (!isRelevantStorageGetter(normalizedName)) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            discovered.add(method);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        storageGetterCache = List.copyOf(discovered);</b>
+<b class="fc">&nbsp;        return storageGetterCache;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isRelevantStorageGetter(
+&nbsp;            String normalizedName
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (!(normalizedName.startsWith(&quot;get&quot;)</b>
+<b class="nc">&nbsp;                || normalizedName.startsWith(&quot;find&quot;)</b>
+<b class="nc">&nbsp;                || normalizedName.startsWith(&quot;read&quot;))) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        return normalizedName.contains(&quot;race&quot;)</b>
+<b class="fc">&nbsp;                || normalizedName.contains(&quot;existence&quot;)</b>
+<b class="pc">&nbsp;                || normalizedName.contains(&quot;evolution&quot;)</b>
+<b class="pc">&nbsp;                || normalizedName.contains(&quot;awakening&quot;)</b>
+<b class="pc">&nbsp;                || normalizedName.contains(&quot;hero&quot;)</b>
+<b class="pc">&nbsp;                || normalizedName.contains(&quot;demon&quot;)</b>
+<b class="fc">&nbsp;                || normalizedName.contains(&quot;harvest&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void inspectTarget(
+&nbsp;            InspectionTarget target,
+&nbsp;            ProbeBuilder probe
+&nbsp;    ) {
+<b class="fc">&nbsp;        Object value = target.value();</b>
+&nbsp;
+<b class="fc">&nbsp;        inspectDescriptor(</b>
+<b class="fc">&nbsp;                target.label() + &quot;.class&quot;,</b>
+<b class="fc">&nbsp;                value.getClass().getName(),</b>
+&nbsp;                probe
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        for (Method method : getInspectionMethods(</b>
+<b class="fc">&nbsp;                value.getClass()</b>
+&nbsp;        )) {
+<b class="fc">&nbsp;            String normalizedName =</b>
+<b class="fc">&nbsp;                    normalizeMethodName(method.getName());</b>
+&nbsp;
+<b class="fc">&nbsp;            if (method.getReturnType() == Boolean.TYPE</b>
+<b class="pc">&nbsp;                    || method.getReturnType() == Boolean.class) {</b>
+<b class="fc">&nbsp;                inspectBooleanMethod(</b>
+&nbsp;                        target,
+&nbsp;                        method,
+&nbsp;                        normalizedName,
+&nbsp;                        probe
+&nbsp;                );
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            if (!isDescriptorMethod(normalizedName)) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+&nbsp;            try {
+<b class="fc">&nbsp;                Object result = method.invoke(value);</b>
+<b class="fc">&nbsp;                result = unwrapOptional(result);</b>
+&nbsp;
+<b class="pc">&nbsp;                if (result == null) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                String descriptor =</b>
+<b class="fc">&nbsp;                        convertDescriptorToString(result);</b>
+&nbsp;
+<b class="fc">&nbsp;                inspectDescriptor(</b>
+<b class="fc">&nbsp;                        target.label()</b>
+&nbsp;                                + &quot;.&quot;
+<b class="fc">&nbsp;                                + method.getName(),</b>
+&nbsp;                        descriptor,
+&nbsp;                        probe
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;                inspectDescriptor(</b>
+<b class="fc">&nbsp;                        target.label()</b>
+&nbsp;                                + &quot;.&quot;
+<b class="fc">&nbsp;                                + method.getName()</b>
+&nbsp;                                + &quot;.class&quot;,
+<b class="fc">&nbsp;                        result.getClass().getName(),</b>
+&nbsp;                        probe
+&nbsp;                );
+&nbsp;            } catch (ReflectiveOperationException
+&nbsp;                     | RuntimeException ignored) {
+&nbsp;                // Probe only. Unsupported methods are ignored safely.
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void inspectBooleanMethod(
+&nbsp;            InspectionTarget target,
+&nbsp;            Method method,
+&nbsp;            String normalizedName,
+&nbsp;            ProbeBuilder probe
+&nbsp;    ) {
+<b class="fc">&nbsp;        boolean heroCandidate =</b>
+<b class="fc">&nbsp;                TRUE_HERO_BOOLEAN_METHODS.contains(normalizedName)</b>
+<b class="fc">&nbsp;                        || isGenericTrueHeroBoolean(normalizedName);</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean demonLordCandidate =</b>
+<b class="fc">&nbsp;                TRUE_DEMON_LORD_BOOLEAN_METHODS.contains(normalizedName)</b>
+<b class="fc">&nbsp;                        || isGenericTrueDemonLordBoolean(normalizedName);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!heroCandidate &amp;&amp; !demonLordCandidate) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            Object result = method.invoke(target.value());</b>
+&nbsp;
+<b class="pc">&nbsp;            if (!(result instanceof Boolean booleanResult)) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            String evidence =</b>
+<b class="fc">&nbsp;                    target.label()</b>
+&nbsp;                            + &quot;.&quot;
+<b class="fc">&nbsp;                            + method.getName()</b>
+&nbsp;                            + &quot;=&quot;
+&nbsp;                            + booleanResult;
+&nbsp;
+<b class="fc">&nbsp;            probe.addEvidence(evidence);</b>
+&nbsp;
+<b class="pc">&nbsp;            if (!booleanResult) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (heroCandidate) {</b>
+<b class="nc">&nbsp;                probe.detectTrueHero(evidence);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (demonLordCandidate) {</b>
+<b class="nc">&nbsp;                probe.detectTrueDemonLord(evidence);</b>
+&nbsp;            }
+&nbsp;        } catch (ReflectiveOperationException
+&nbsp;                 | RuntimeException ignored) {
+&nbsp;            // Probe only.
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void inspectDescriptor(
+&nbsp;            String source,
+&nbsp;            String descriptor,
+&nbsp;            ProbeBuilder probe
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (descriptor == null || descriptor.isBlank()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        boolean trueHero = containsTrueHeroMarker(descriptor);</b>
+<b class="fc">&nbsp;        boolean trueDemonLord =</b>
+<b class="fc">&nbsp;                containsTrueDemonLordMarker(descriptor);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!trueHero &amp;&amp; !trueDemonLord) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String evidence = source + &quot;=&quot; + descriptor;</b>
+<b class="nc">&nbsp;        probe.addEvidence(evidence);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (trueHero) {</b>
+<b class="nc">&nbsp;            probe.detectTrueHero(evidence);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (trueDemonLord) {</b>
+<b class="nc">&nbsp;            probe.detectTrueDemonLord(evidence);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;Method&gt; getInspectionMethods(
+&nbsp;            Class&lt;?&gt; targetClass
+&nbsp;    ) {
+<b class="fc">&nbsp;        return INSPECTION_METHOD_CACHE.computeIfAbsent(</b>
+&nbsp;                targetClass,
+&nbsp;                ignored -&gt; {
+<b class="fc">&nbsp;                    List&lt;Method&gt; methods = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;                    for (Method method : targetClass.getMethods()) {</b>
+<b class="fc">&nbsp;                        if (Modifier.isStatic(</b>
+<b class="fc">&nbsp;                                method.getModifiers()</b>
+&nbsp;                        )) {
+&nbsp;                            continue;
+&nbsp;                        }
+&nbsp;
+<b class="fc">&nbsp;                        if (method.getParameterCount() != 0) {</b>
+&nbsp;                            continue;
+&nbsp;                        }
+&nbsp;
+<b class="fc">&nbsp;                        String normalizedName =</b>
+<b class="fc">&nbsp;                                normalizeMethodName(</b>
+<b class="fc">&nbsp;                                        method.getName()</b>
+&nbsp;                                );
+&nbsp;
+<b class="fc">&nbsp;                        boolean relevantBoolean =</b>
+<b class="fc">&nbsp;                                method.getReturnType()</b>
+&nbsp;                                        == Boolean.TYPE
+<b class="pc">&nbsp;                                        || method.getReturnType()</b>
+&nbsp;                                        == Boolean.class;
+&nbsp;
+<b class="fc">&nbsp;                        if (relevantBoolean</b>
+<b class="fc">&nbsp;                                &amp;&amp; (TRUE_HERO_BOOLEAN_METHODS.contains(</b>
+&nbsp;                                normalizedName
+&nbsp;                        )
+<b class="fc">&nbsp;                                || TRUE_DEMON_LORD_BOOLEAN_METHODS.contains(</b>
+&nbsp;                                normalizedName
+&nbsp;                        )
+<b class="pc">&nbsp;                                || isGenericTrueHeroBoolean(</b>
+&nbsp;                                normalizedName
+&nbsp;                        )
+<b class="pc">&nbsp;                                || isGenericTrueDemonLordBoolean(</b>
+&nbsp;                                normalizedName
+&nbsp;                        ))) {
+<b class="fc">&nbsp;                            methods.add(method);</b>
+&nbsp;                            continue;
+&nbsp;                        }
+&nbsp;
+<b class="fc">&nbsp;                        if (isDescriptorMethod(normalizedName)) {</b>
+<b class="fc">&nbsp;                            methods.add(method);</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;
+<b class="fc">&nbsp;                    return List.copyOf(methods);</b>
+&nbsp;                }
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isDescriptorMethod(
+&nbsp;            String normalizedName
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (DESCRIPTOR_METHOD_NAMES.contains(normalizedName)) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        return normalizedName.contains(&quot;race&quot;)</b>
+<b class="pc">&nbsp;                || normalizedName.contains(&quot;awakening&quot;)</b>
+<b class="fc">&nbsp;                || normalizedName.contains(&quot;evolution&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isGenericTrueHeroBoolean(
+&nbsp;            String normalizedName
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (!(normalizedName.startsWith(&quot;is&quot;)</b>
+<b class="fc">&nbsp;                || normalizedName.startsWith(&quot;has&quot;))) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        return normalizedName.contains(&quot;truehero&quot;)</b>
+<b class="pc">&nbsp;                || normalizedName.contains(&quot;awakenedhero&quot;)</b>
+<b class="fc">&nbsp;                || (normalizedName.contains(&quot;hero&quot;)</b>
+<b class="fc">&nbsp;                &amp;&amp; normalizedName.contains(&quot;awaken&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isGenericTrueDemonLordBoolean(
+&nbsp;            String normalizedName
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (!(normalizedName.startsWith(&quot;is&quot;)</b>
+<b class="fc">&nbsp;                || normalizedName.startsWith(&quot;has&quot;))) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        return normalizedName.contains(&quot;truedemonlord&quot;)</b>
+<b class="pc">&nbsp;                || normalizedName.contains(&quot;awakeneddemonlord&quot;)</b>
+<b class="fc">&nbsp;                || (normalizedName.contains(&quot;demonlord&quot;)</b>
+<b class="pc">&nbsp;                &amp;&amp; normalizedName.contains(&quot;awaken&quot;))</b>
+<b class="fc">&nbsp;                || normalizedName.contains(&quot;harvestfestivalcomplete&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean containsTrueHeroMarker(
+&nbsp;            String rawValue
+&nbsp;    ) {
+<b class="fc">&nbsp;        String normalized = normalizeDescriptor(rawValue);</b>
+<b class="fc">&nbsp;        String compact = compactDescriptor(rawValue);</b>
+&nbsp;
+<b class="pc">&nbsp;        return normalized.contains(&quot;true hero&quot;)</b>
+<b class="pc">&nbsp;                || normalized.contains(&quot;awakened hero&quot;)</b>
+<b class="pc">&nbsp;                || compact.contains(&quot;truehero&quot;)</b>
+<b class="fc">&nbsp;                || compact.contains(&quot;awakenedhero&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean containsTrueDemonLordMarker(
+&nbsp;            String rawValue
+&nbsp;    ) {
+<b class="fc">&nbsp;        String normalized = normalizeDescriptor(rawValue);</b>
+<b class="fc">&nbsp;        String compact = compactDescriptor(rawValue);</b>
+&nbsp;
+<b class="pc">&nbsp;        return normalized.contains(&quot;true demon lord&quot;)</b>
+<b class="pc">&nbsp;                || normalized.contains(&quot;awakened demon lord&quot;)</b>
+<b class="pc">&nbsp;                || compact.contains(&quot;truedemonlord&quot;)</b>
+<b class="fc">&nbsp;                || compact.contains(&quot;awakeneddemonlord&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String convertDescriptorToString(
+&nbsp;            Object value
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (value instanceof Component component) {</b>
+<b class="nc">&nbsp;            return component.getString();</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (value instanceof ResourceLocation resourceLocation) {</b>
+<b class="nc">&nbsp;            return resourceLocation.toString();</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (value instanceof Enum&lt;?&gt; enumValue) {</b>
+<b class="nc">&nbsp;            return enumValue.name();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return String.valueOf(value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Object unwrapOptional(Object value) {
+<b class="fc">&nbsp;        Object current = value;</b>
+&nbsp;
+<b class="pc">&nbsp;        while (current instanceof Optional&lt;?&gt; optional) {</b>
+<b class="nc">&nbsp;            current = optional.orElse(null);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return current;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String normalizeMethodName(String value) {
+<b class="pc">&nbsp;        if (value == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return value.replaceAll(&quot;[^A-Za-z0-9]&quot;, &quot;&quot;)</b>
+<b class="fc">&nbsp;                .toLowerCase(Locale.ROOT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String normalizeDescriptor(String value) {
+<b class="pc">&nbsp;        if (value == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return value</b>
+<b class="fc">&nbsp;                .replace(&#39;_&#39;, &#39; &#39;)</b>
+<b class="fc">&nbsp;                .replace(&#39;-&#39;, &#39; &#39;)</b>
+<b class="fc">&nbsp;                .replace(&#39;:&#39;, &#39; &#39;)</b>
+<b class="fc">&nbsp;                .replace(&#39;/&#39;, &#39; &#39;)</b>
+<b class="fc">&nbsp;                .replace(&#39;.&#39;, &#39; &#39;)</b>
+<b class="fc">&nbsp;                .toLowerCase(Locale.ROOT)</b>
+<b class="fc">&nbsp;                .replaceAll(&quot;\\s+&quot;, &quot; &quot;)</b>
+<b class="fc">&nbsp;                .trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String compactDescriptor(String value) {
+<b class="pc">&nbsp;        if (value == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return value.replaceAll(&quot;[^A-Za-z0-9]&quot;, &quot;&quot;)</b>
+<b class="fc">&nbsp;                .toLowerCase(Locale.ROOT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeMeasurement(double value) {
+<b class="pc">&nbsp;        if (!Double.isFinite(value) || value &lt; 0.0D) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private record SkillSnapshot(</b>
+&nbsp;            int masteredSkills,
+&nbsp;            int masteredCategories
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private record InspectionTarget(</b>
+&nbsp;            String label,
+&nbsp;            Object value
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final class ProbeBuilder {</b>
+&nbsp;
+&nbsp;        private boolean trueHero;
+&nbsp;        private boolean trueDemonLord;
+&nbsp;
+<b class="fc">&nbsp;        private String trueHeroSource = &quot;&quot;;</b>
+<b class="fc">&nbsp;        private String trueDemonLordSource = &quot;&quot;;</b>
+&nbsp;
+<b class="fc">&nbsp;        private final LinkedHashSet&lt;String&gt; evidence =</b>
+&nbsp;                new LinkedHashSet&lt;&gt;();
+&nbsp;
+&nbsp;        private void detectTrueHero(String source) {
+<b class="nc">&nbsp;            trueHero = true;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (trueHeroSource.isBlank()) {</b>
+<b class="nc">&nbsp;                trueHeroSource = source;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private void detectTrueDemonLord(String source) {
+<b class="nc">&nbsp;            trueDemonLord = true;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (trueDemonLordSource.isBlank()) {</b>
+<b class="nc">&nbsp;                trueDemonLordSource = source;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private void addEvidence(String value) {
+<b class="pc">&nbsp;            if (value == null</b>
+<b class="pc">&nbsp;                    || value.isBlank()</b>
+<b class="pc">&nbsp;                    || evidence.size() &gt;= 24) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            evidence.add(value);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private AwakeningSnapshot build() {
+<b class="fc">&nbsp;            return new AwakeningSnapshot(</b>
+&nbsp;                    trueHero,
+&nbsp;                    trueDemonLord,
+&nbsp;                    trueHeroSource,
+&nbsp;                    trueDemonLordSource,
+<b class="fc">&nbsp;                    List.copyOf(evidence)</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private record AwakeningSnapshot(</b>
+&nbsp;            boolean trueHero,
+&nbsp;            boolean trueDemonLord,
+&nbsp;            String trueHeroSource,
+&nbsp;            String trueDemonLordSource,
+&nbsp;            List&lt;String&gt; evidence
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Snapshot(</b>
+&nbsp;            double currentEp,
+&nbsp;            int masteredSkills,
+&nbsp;            int masteredCategories,
+&nbsp;            boolean detectedTrueHero,
+&nbsp;            boolean detectedTrueDemonLord,
+&nbsp;            String trueHeroSource,
+&nbsp;            String trueDemonLordSource,
+&nbsp;            List&lt;String&gt; evidence
+&nbsp;    ) {
+&nbsp;
+<b class="fc">&nbsp;        public Snapshot {</b>
+<b class="fc">&nbsp;            currentEp = sanitizeMeasurement(currentEp);</b>
+<b class="fc">&nbsp;            masteredSkills = Math.max(0, masteredSkills);</b>
+<b class="fc">&nbsp;            masteredCategories = Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    masteredCategories
+&nbsp;            );
+&nbsp;
+<b class="pc">&nbsp;            trueHeroSource = trueHeroSource == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="fc">&nbsp;                    : trueHeroSource;</b>
+&nbsp;
+&nbsp;            trueDemonLordSource =
+<b class="pc">&nbsp;                    trueDemonLordSource == null</b>
+<b class="nc">&nbsp;                            ? &quot;&quot;</b>
+<b class="fc">&nbsp;                            : trueDemonLordSource;</b>
+&nbsp;
+<b class="pc">&nbsp;            evidence = evidence == null</b>
+<b class="nc">&nbsp;                    ? List.of()</b>
+<b class="fc">&nbsp;                    : List.copyOf(evidence);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static Snapshot empty() {
+<b class="nc">&nbsp;            return new Snapshot(</b>
+&nbsp;                    0.0D,
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    &quot;&quot;,
+<b class="nc">&nbsp;                    List.of()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,817 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionFreedomDebugCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionFreedomDebugCommand (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionFreedomDebugCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.5%
+  </span>
+  <span class="absValue">
+    (1/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.7%
+  </span>
+  <span class="absValue">
+    (10/267)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionFreedomProgressSnapshot;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionFreedomValidationHarness;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionIndependenceMilestoneManager;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.commands.Commands;
+&nbsp;import net.minecraft.commands.arguments.EntityArgument;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * Debug-only, read-only diagnostics for recognition Freedom progression.
+&nbsp; */
+&nbsp;public final class RecognitionFreedomDebugCommand {
+&nbsp;
+&nbsp;    private static final int MAX_MILESTONES_SHOWN =
+&nbsp;            40;
+&nbsp;
+&nbsp;    private static final int MAX_INACTIVE_IDS_SHOWN =
+&nbsp;            20;
+&nbsp;
+&nbsp;    private RecognitionFreedomDebugCommand() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * /moostensura debug freedom
+&nbsp;     * /moostensura debug freedom &amp;lt;player&amp;gt;
+&nbsp;     * /moostensura debug freedom validate
+&nbsp;     */
+&nbsp;    public static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createDebugNode() {
+<b class="fc">&nbsp;        return Commands.literal(&quot;freedom&quot;)</b>
+<b class="fc">&nbsp;                .requires(</b>
+&nbsp;                        DebugModeService::canUseDebugTools
+&nbsp;                )
+<b class="fc">&nbsp;                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                        context.getSource(),</b>
+<b class="nc">&nbsp;                        context.getSource()</b>
+<b class="nc">&nbsp;                                .getPlayerOrException()</b>
+&nbsp;                ))
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;validate&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt; validate(</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+&nbsp;                                ))
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.argument(</b>
+&nbsp;                                        &quot;player&quot;,
+<b class="fc">&nbsp;                                        EntityArgument.player()</b>
+&nbsp;                                )
+<b class="fc">&nbsp;                                .executes(context -&gt; inspect(</b>
+<b class="nc">&nbsp;                                        context.getSource(),</b>
+<b class="nc">&nbsp;                                        EntityArgument.getPlayer(</b>
+&nbsp;                                                context,
+&nbsp;                                                &quot;player&quot;
+&nbsp;                                        )
+&nbsp;                                ))
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int inspect(
+&nbsp;            CommandSourceStack source,
+&nbsp;            ServerPlayer target
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionData data =</b>
+<b class="nc">&nbsp;                target.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionFreedomProgressSnapshot snapshot =</b>
+<b class="nc">&nbsp;                RecognitionFreedomProgressSnapshot.inspect(data);</b>
+&nbsp;
+&nbsp;        RecognitionIndependenceMilestoneManager.State milestoneState =
+<b class="nc">&nbsp;                RecognitionIndependenceMilestoneManager.getState();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Freedom Progress: &quot;
+<b class="nc">&nbsp;                        + target.getGameProfile().getName(),</b>
+&nbsp;                ChatFormatting.LIGHT_PURPLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Read-only inspection. No advancements were synchronized and no recognition data was modified.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Production score&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Total Freedom&quot;,
+<b class="nc">&nbsp;                format(snapshot.totalFreedomScore())</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + format(snapshot.totalFreedomMaximum()),</b>
+&nbsp;                ChatFormatting.AQUA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Solo major victories&quot;,
+<b class="nc">&nbsp;                snapshot.soloMajorVictoryCount()</b>
+&nbsp;                        + &quot; unique type(s) -&gt; &quot;
+<b class="nc">&nbsp;                        + format(snapshot.soloMajorVictoryScore())</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + format(snapshot.soloMajorVictoryMaximum()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Discovery milestones&quot;,
+<b class="nc">&nbsp;                snapshot.discoveryMilestoneCount()</b>
+&nbsp;                        + &quot; unique milestone(s) -&gt; &quot;
+<b class="nc">&nbsp;                        + format(snapshot.discoveryMilestoneScore())</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + format(snapshot.discoveryMilestoneMaximum()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Self-reliance milestones&quot;,
+<b class="nc">&nbsp;                snapshot.activeIndependenceMilestoneCount()</b>
+&nbsp;                        + &quot; active / &quot;
+<b class="nc">&nbsp;                        + snapshot.storedIndependenceMilestoneCount()</b>
+&nbsp;                        + &quot; stored -&gt; &quot;
+<b class="nc">&nbsp;                        + format(snapshot.activeIndependenceScore())</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + format(snapshot.activeIndependenceMaximum()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Definition state&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Balance source&quot;,
+<b class="nc">&nbsp;                snapshot.balanceSource(),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Balance revision&quot;,
+<b class="nc">&nbsp;                Long.toString(snapshot.balanceRevision()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Milestone revision&quot;,
+<b class="nc">&nbsp;                Long.toString(snapshot.milestoneRevision()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Definition files&quot;,
+<b class="nc">&nbsp;                Integer.toString(snapshot.milestoneSourceFileCount()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Configured milestones&quot;,
+<b class="nc">&nbsp;                Integer.toString(snapshot.configuredMilestoneCount()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Definition fingerprint&quot;,
+<b class="nc">&nbsp;                shortFingerprint(snapshot.milestoneFingerprint()),</b>
+&nbsp;                ChatFormatting.DARK_AQUA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Player fingerprint&quot;,
+<b class="nc">&nbsp;                shortFingerprint(snapshot.storedMilestoneFingerprint()),</b>
+<b class="nc">&nbsp;                snapshot.milestoneFingerprintCurrent()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Backfill state&quot;,
+<b class="nc">&nbsp;                snapshot.milestoneFingerprintCurrent()</b>
+<b class="nc">&nbsp;                        ? &quot;current&quot;</b>
+<b class="nc">&nbsp;                        : &quot;pending configured-ID check on the next synchronization route&quot;,</b>
+<b class="nc">&nbsp;                snapshot.milestoneFingerprintCurrent()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Configured self-reliance milestones&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;String&gt; earnedIds =</b>
+&nbsp;                new HashSet&lt;&gt;(
+<b class="nc">&nbsp;                        snapshot.activeMilestoneIds()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RecognitionIndependenceMilestoneManager.Milestone&gt; milestones =</b>
+<b class="nc">&nbsp;                milestoneState.milestones();</b>
+&nbsp;
+<b class="nc">&nbsp;        int shown = Math.min(</b>
+&nbsp;                MAX_MILESTONES_SHOWN,
+<b class="nc">&nbsp;                milestones.size()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; shown; index++) {</b>
+<b class="nc">&nbsp;            RecognitionIndependenceMilestoneManager.Milestone milestone =</b>
+<b class="nc">&nbsp;                    milestones.get(index);</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean earned =</b>
+<b class="nc">&nbsp;                    earnedIds.contains(</b>
+<b class="nc">&nbsp;                            milestone.id().toString()</b>
+&nbsp;                    );
+&nbsp;
+&nbsp;            MutableComponent line =
+<b class="nc">&nbsp;                    Component.literal(</b>
+<b class="nc">&nbsp;                                    earned</b>
+<b class="nc">&nbsp;                                            ? &quot;[earned] &quot;</b>
+<b class="nc">&nbsp;                                            : &quot;[missing] &quot;</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+<b class="nc">&nbsp;                                    earned</b>
+<b class="nc">&nbsp;                                            ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                            : ChatFormatting.GRAY</b>
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;            line.append(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+<b class="nc">&nbsp;                                    milestone.id().toString()</b>
+&nbsp;                                            + &quot; — &quot;
+<b class="nc">&nbsp;                                            + format(milestone.points())</b>
+&nbsp;                                            + &quot; points — advancement &quot;
+<b class="nc">&nbsp;                                            + milestone.advancementId()</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.WHITE)</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; line,</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (milestones.size() &gt; shown) {</b>
+<b class="nc">&nbsp;            int hidden = milestones.size() - shown;</b>
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;... &quot;
+&nbsp;                                            + hidden
+&nbsp;                                            + &quot; additional configured milestone(s) omitted.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (milestones.isEmpty()) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;No self-reliance milestones are currently configured.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!snapshot.inactiveMilestoneIds().isEmpty()) {</b>
+<b class="nc">&nbsp;            sendHeader(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Inactive historical milestone IDs&quot;,
+&nbsp;                    ChatFormatting.GOLD
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            int inactiveShown = Math.min(</b>
+&nbsp;                    MAX_INACTIVE_IDS_SHOWN,
+<b class="nc">&nbsp;                    snapshot.inactiveMilestoneIds().size()</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            for (int index = 0; index &lt; inactiveShown; index++) {</b>
+<b class="nc">&nbsp;                String id = snapshot.inactiveMilestoneIds().get(index);</b>
+&nbsp;
+<b class="nc">&nbsp;                source.sendSuccess(</b>
+<b class="nc">&nbsp;                        () -&gt; Component.literal(&quot;- &quot; + id)</b>
+<b class="nc">&nbsp;                                .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                        false
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (snapshot.inactiveMilestoneIds().size()</b>
+&nbsp;                    &gt; inactiveShown) {
+<b class="nc">&nbsp;                int hidden = snapshot.inactiveMilestoneIds().size()</b>
+&nbsp;                        - inactiveShown;
+&nbsp;
+<b class="nc">&nbsp;                source.sendSuccess(</b>
+<b class="nc">&nbsp;                        () -&gt; Component.literal(</b>
+&nbsp;                                        &quot;... &quot;
+&nbsp;                                                + hidden
+&nbsp;                                                + &quot; additional inactive ID(s) omitted.&quot;
+&nbsp;                                )
+<b class="nc">&nbsp;                                .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                        false
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Inactive IDs remain historical but contribute no score while their definitions are absent.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int validate(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+&nbsp;        RecognitionFreedomValidationHarness.Report report =
+<b class="nc">&nbsp;                RecognitionFreedomValidationHarness.validate();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Freedom Progression Validation&quot;,
+&nbsp;                ChatFormatting.LIGHT_PURPLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Overall result&quot;,
+<b class="nc">&nbsp;                report.passed()</b>
+<b class="nc">&nbsp;                        ? &quot;PASS&quot;</b>
+<b class="nc">&nbsp;                        : &quot;REVIEW REQUIRED&quot;,</b>
+<b class="nc">&nbsp;                report.passed()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.RED</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Balance&quot;,
+<b class="nc">&nbsp;                report.balanceSource()</b>
+&nbsp;                        + &quot; (revision &quot;
+<b class="nc">&nbsp;                        + report.balanceRevision()</b>
+&nbsp;                        + &quot;)&quot;,
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Milestone definition&quot;,
+&nbsp;                &quot;revision &quot;
+<b class="nc">&nbsp;                        + report.milestoneRevision()</b>
+&nbsp;                        + &quot;, &quot;
+<b class="nc">&nbsp;                        + report.configuredMilestones()</b>
+&nbsp;                        + &quot; milestone(s) from &quot;
+<b class="nc">&nbsp;                        + report.sourceFileCount()</b>
+&nbsp;                        + &quot; file(s), &quot;
+<b class="nc">&nbsp;                        + format(</b>
+<b class="nc">&nbsp;                        report.configuredMilestonePoints()</b>
+&nbsp;                )
+&nbsp;                        + &quot; points&quot;,
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Milestone fingerprint&quot;,
+<b class="nc">&nbsp;                shortFingerprint(</b>
+<b class="nc">&nbsp;                        report.milestoneFingerprint()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.DARK_AQUA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Freedom ceiling&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Freedom maximum&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        report.legacyFreedomCeiling()</b>
+&nbsp;                )
+&nbsp;                        + &quot; legacy -&gt; &quot;
+<b class="nc">&nbsp;                        + format(</b>
+<b class="nc">&nbsp;                        report.expandedFreedomCeiling()</b>
+&nbsp;                )
+&nbsp;                        + &quot; expanded&quot;,
+&nbsp;                ChatFormatting.AQUA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Order maximum&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        report.orderCeiling()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.GREEN
+&nbsp;        );
+&nbsp;
+&nbsp;        double ceilingRatio =
+<b class="nc">&nbsp;                report.orderCeiling() &lt;= 0.0D</b>
+<b class="nc">&nbsp;                        ? 0.0D</b>
+<b class="nc">&nbsp;                        : report.expandedFreedomCeiling()</b>
+<b class="nc">&nbsp;                          / report.orderCeiling();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Freedom / Order ceiling&quot;,
+<b class="nc">&nbsp;                format(ceilingRatio * 100.0D)</b>
+&nbsp;                        + &quot;%&quot;,
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Production-source checks&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+&nbsp;        for (RecognitionFreedomValidationHarness.Check check :
+<b class="nc">&nbsp;                report.checks()) {</b>
+&nbsp;
+&nbsp;            String line =
+<b class="nc">&nbsp;                    (check.passed()</b>
+<b class="nc">&nbsp;                            ? &quot;[PASS] &quot;</b>
+<b class="nc">&nbsp;                            : &quot;[FAIL] &quot;)</b>
+<b class="nc">&nbsp;                            + check.name()</b>
+<b class="nc">&nbsp;                            + (check.detail().isBlank()</b>
+<b class="nc">&nbsp;                            ? &quot;&quot;</b>
+<b class="nc">&nbsp;                            : &quot; — &quot; + check.detail());</b>
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(line)</b>
+<b class="nc">&nbsp;                            .withStyle(</b>
+<b class="nc">&nbsp;                                    check.passed()</b>
+<b class="nc">&nbsp;                                            ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                            : ChatFormatting.RED</b>
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Reachability comparison&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Pure paths on coarse grid&quot;,
+<b class="nc">&nbsp;                report.baselinePureCoarse()</b>
+&nbsp;                        + &quot; legacy -&gt; &quot;
+<b class="nc">&nbsp;                        + report.observedExpandedPure()</b>
+&nbsp;                        + &quot; expanded / &quot;
+<b class="nc">&nbsp;                        + report.totalPurePaths(),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Pure paths after refinement&quot;,
+<b class="nc">&nbsp;                report.refinedPurePaths()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + report.totalPurePaths(),</b>
+<b class="nc">&nbsp;                report.refinedPurePaths()</b>
+<b class="nc">&nbsp;                        == report.totalPurePaths()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Required crosses on coarse grid&quot;,
+<b class="nc">&nbsp;                report.baselineAdjacentCoarse()</b>
+&nbsp;                        + &quot; legacy -&gt; &quot;
+<b class="nc">&nbsp;                        + report.observedExpandedAdjacent()</b>
+&nbsp;                        + &quot; expanded / &quot;
+<b class="nc">&nbsp;                        + report.totalAdjacentPairs(),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Required crosses after refinement&quot;,
+<b class="nc">&nbsp;                report.refinedAdjacentPairs()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + report.totalAdjacentPairs(),</b>
+<b class="nc">&nbsp;                report.refinedAdjacentPairs()</b>
+<b class="nc">&nbsp;                        == report.totalAdjacentPairs()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Expanded observation profiles&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        report.expandedProfilesEvaluated()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Baseline comparison profiles&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        report.comparisonProfilesEvaluated()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Profiles gaining Freedom&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        report.freedomGainProfiles()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                report.freedomGainProfiles() &gt; 0</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.AQUA</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;New Chaotic selections&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        report.newChaoticSelectionProfiles()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                report.newChaoticSelectionProfiles() &gt; 0</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.LIGHT_PURPLE</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Chaotic Pure paths observed&quot;,
+<b class="nc">&nbsp;                report.chaoticPurePaths()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + report.totalChaoticPurePaths(),</b>
+<b class="nc">&nbsp;                report.chaoticPurePaths()</b>
+<b class="nc">&nbsp;                        == report.totalChaoticPurePaths()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Chaotic adjacent crossings observed&quot;,
+<b class="nc">&nbsp;                report.chaoticAdjacentPairs()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + report.totalChaoticAdjacentPairs(),</b>
+<b class="nc">&nbsp;                report.chaoticAdjacentPairs() &gt; 0</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!report.warnings().isEmpty()) {</b>
+<b class="nc">&nbsp;            sendHeader(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Validation notes&quot;,
+&nbsp;                    ChatFormatting.GOLD
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            for (String warning : report.warnings()) {</b>
+<b class="nc">&nbsp;                source.sendSuccess(</b>
+<b class="nc">&nbsp;                        () -&gt; Component.literal(</b>
+&nbsp;                                        &quot;- &quot; + warning
+&nbsp;                                )
+<b class="nc">&nbsp;                                .withStyle(</b>
+&nbsp;                                        ChatFormatting.YELLOW
+&nbsp;                                ),
+&nbsp;                        false
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;All Freedom simulations used temporary data; no player attachment was read or modified.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.DARK_GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return report.passed()</b>
+<b class="nc">&nbsp;                ? 1</b>
+<b class="nc">&nbsp;                : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendHeader(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String text,
+&nbsp;            ChatFormatting color
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(text)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                color,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendValue(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String label,
+&nbsp;            String value,
+&nbsp;            ChatFormatting valueColor
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent message =</b>
+<b class="nc">&nbsp;                Component.literal(label + &quot;: &quot;)</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY);</b>
+&nbsp;
+<b class="nc">&nbsp;        message.append(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+<b class="nc">&nbsp;                                value == null</b>
+<b class="nc">&nbsp;                                        ? &quot;&quot;</b>
+<b class="nc">&nbsp;                                        : value</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                valueColor == null</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.WHITE</b>
+<b class="nc">&nbsp;                                        : valueColor</b>
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; message,</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String shortFingerprint(
+&nbsp;            String fingerprint
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (fingerprint == null || fingerprint.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;none&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return fingerprint.length() &lt;= 12</b>
+<b class="nc">&nbsp;                ? fingerprint</b>
+<b class="nc">&nbsp;                : fingerprint.substring(0, 12);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String format(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.1f&quot;,
+<b class="nc">&nbsp;                !Double.isFinite(value) || value &lt; 0.0D</b>
+<b class="nc">&nbsp;                        ? 0.0D</b>
+<b class="nc">&nbsp;                        : value</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

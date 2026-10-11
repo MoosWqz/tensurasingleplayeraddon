@@ -1,0 +1,389 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AddonPlayerDataResetService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.lifecycle</a>
+</div>
+
+<h1>Coverage Summary for Class: AddonPlayerDataResetService (com.mooswqz.moostensuraaddon.lifecycle)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AddonPlayerDataResetService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AddonPlayerDataResetService$ResetReason</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AddonPlayerDataResetService$ResetResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AddonPlayerDataResetService$Status</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.lifecycle;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.BorrowedSkillData;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.GrantedSkillData;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.CivilianDefenseTracker;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCombatCreditTracker;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionDisplayNameSyncService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionProgressScreenService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionStrengthRewardService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionSubordinateCombatTracker;
+&nbsp;import com.mooswqz.moostensuraaddon.util.SubordinateOverviewService;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Single authoritative reset route for every life-bound addon subsystem.
+&nbsp; */
+&nbsp;public final class AddonPlayerDataResetService {
+&nbsp;
+&nbsp;    private AddonPlayerDataResetService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ResetResult resetForNewIncarnation(
+&nbsp;            ServerPlayer player,
+&nbsp;            ResetReason reason
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null || reason == null) {</b>
+<b class="nc">&nbsp;            return ResetResult.failed(</b>
+&nbsp;                    &quot;A player and reset reason are required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long now = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        RecognitionData recognitionData = player.getData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (recognitionData.isWriteBlockedByFutureVersion()) {</b>
+<b class="nc">&nbsp;            return ResetResult.failed(</b>
+&nbsp;                    &quot;A future recognition version is preserved read-only. Use the newer addon version that created it before resetting this incarnation.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AddonIncarnationState state =</b>
+<b class="nc">&nbsp;                AddonIncarnationState.load(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (state.isDuplicateReset(reason.id(), now)) {</b>
+<b class="nc">&nbsp;            return ResetResult.duplicate(</b>
+<b class="nc">&nbsp;                    state.getResetSequence(),</b>
+<b class="nc">&nbsp;                    state.getLifeToken()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        state.beginNewIncarnation(</b>
+<b class="nc">&nbsp;                reason.id(),</b>
+<b class="nc">&nbsp;                reason.guardDurationMillis(),</b>
+&nbsp;                now
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        recognitionData.resetForNewIncarnation(</b>
+<b class="nc">&nbsp;                state.getLifeToken()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.setData(</b>
+&nbsp;                AttachmentRegistry.GRANTED_SKILL_DATA,
+&nbsp;                new GrantedSkillData()
+&nbsp;        );
+<b class="nc">&nbsp;        player.setData(</b>
+&nbsp;                AttachmentRegistry.GRANTER_PROGRESS_DATA,
+&nbsp;                new GranterProgressData()
+&nbsp;        );
+<b class="nc">&nbsp;        player.setData(</b>
+&nbsp;                AttachmentRegistry.BORROWED_SKILL_DATA,
+&nbsp;                new BorrowedSkillData()
+&nbsp;        );
+<b class="nc">&nbsp;        player.setData(</b>
+&nbsp;                AttachmentRegistry.RECOGNITION_DATA,
+&nbsp;                recognitionData
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCombatCreditTracker.clearForPlayer(player);</b>
+<b class="nc">&nbsp;        RecognitionSubordinateCombatTracker.forgetOwner(</b>
+<b class="nc">&nbsp;                player.getUUID()</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Civilian encounter windows are short-lived server state and do not
+&nbsp;         * have an owner until a defender lands the killing blow. Clearing the
+&nbsp;         * server table prevents an encounter from the old incarnation being
+&nbsp;         * claimed by the new one.
+&nbsp;         */
+<b class="nc">&nbsp;        CivilianDefenseTracker.clearServer(player.getServer());</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionStrengthRewardService.reconcile(player);</b>
+<b class="nc">&nbsp;        RecognitionProgressScreenService.clear(player.getUUID());</b>
+<b class="nc">&nbsp;        SubordinateOverviewService.forget(player.getUUID());</b>
+<b class="nc">&nbsp;        RecognitionDisplayNameSyncService</b>
+<b class="nc">&nbsp;                .refreshAndBroadcast(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        return ResetResult.completed(</b>
+<b class="nc">&nbsp;                state.getResetSequence(),</b>
+<b class="nc">&nbsp;                state.getLifeToken()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum ResetReason {</b>
+<b class="nc">&nbsp;        CHARACTER_RESET(</b>
+&nbsp;                &quot;character_reset&quot;,
+&nbsp;                AddonLifecyclePolicy.CHARACTER_RESET_GUARD_MILLIS
+&nbsp;        ),
+<b class="nc">&nbsp;        ADMIN_COMMAND(</b>
+&nbsp;                &quot;admin_command&quot;,
+&nbsp;                AddonLifecyclePolicy.ADMIN_RESET_GUARD_MILLIS
+&nbsp;        );
+&nbsp;
+&nbsp;        private final String id;
+&nbsp;        private final long guardDurationMillis;
+&nbsp;
+&nbsp;        ResetReason(
+&nbsp;                String id,
+&nbsp;                long guardDurationMillis
+<b class="nc">&nbsp;        ) {</b>
+<b class="nc">&nbsp;            this.id = id;</b>
+<b class="nc">&nbsp;            this.guardDurationMillis = Math.max(</b>
+&nbsp;                    0L,
+&nbsp;                    guardDurationMillis
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        public String id() {
+<b class="nc">&nbsp;            return id;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public long guardDurationMillis() {
+<b class="nc">&nbsp;            return guardDurationMillis;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record ResetResult(</b>
+&nbsp;            Status status,
+&nbsp;            int resetSequence,
+&nbsp;            String lifeToken,
+&nbsp;            String message
+&nbsp;    ) {
+&nbsp;        public boolean successful() {
+<b class="nc">&nbsp;            return status == Status.COMPLETED</b>
+&nbsp;                    || status == Status.DUPLICATE_SUPPRESSED;
+&nbsp;        }
+&nbsp;
+&nbsp;        private static ResetResult completed(
+&nbsp;                int sequence,
+&nbsp;                String lifeToken
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new ResetResult(</b>
+&nbsp;                    Status.COMPLETED,
+&nbsp;                    sequence,
+&nbsp;                    lifeToken,
+&nbsp;                    &quot;Addon incarnation data reset successfully.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private static ResetResult duplicate(
+&nbsp;                int sequence,
+&nbsp;                String lifeToken
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new ResetResult(</b>
+&nbsp;                    Status.DUPLICATE_SUPPRESSED,
+&nbsp;                    sequence,
+&nbsp;                    lifeToken,
+&nbsp;                    &quot;A duplicate reset callback was suppressed.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private static ResetResult failed(
+&nbsp;                String message
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new ResetResult(</b>
+&nbsp;                    Status.FAILED,
+&nbsp;                    0,
+&nbsp;                    &quot;&quot;,
+<b class="nc">&nbsp;                    message == null ? &quot;Reset failed.&quot; : message</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum Status {</b>
+<b class="nc">&nbsp;        COMPLETED,</b>
+<b class="nc">&nbsp;        DUPLICATE_SUPPRESSED,</b>
+<b class="nc">&nbsp;        FAILED</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

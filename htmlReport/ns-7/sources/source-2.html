@@ -1,0 +1,626 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CheckNamedCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: CheckNamedCommand (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CheckNamedCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.5%
+  </span>
+  <span class="absValue">
+    (2/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.6%
+  </span>
+  <span class="absValue">
+    (4/153)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mojang.brigadier.CommandDispatcher;
+&nbsp;import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+&nbsp;import com.mojang.brigadier.exceptions.CommandSyntaxException;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.util.GranterActions;
+&nbsp;import com.mooswqz.moostensuraaddon.util.TensuraPlayerStateHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.util.XpUtils;
+&nbsp;import io.github.manasmods.manascore.skill.api.SkillAPI;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import io.github.manasmods.tensura.util.SubordinateHelper;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.commands.Commands;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;
+<b class="nc">&nbsp;public class CheckNamedCommand {</b>
+&nbsp;    private static final int REQUIRED_GRANTER_MASTERED_SKILLS = 5;
+&nbsp;    private static final int REQUIRED_GRANTER_SUBORDINATES = 5;
+&nbsp;    private static final double REQUIRED_GRANTER_EP = 200_000.0D;
+&nbsp;    private static final double SUBORDINATE_SCAN_RADIUS = 32.0D;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates the canonical nested debug branch:
+&nbsp;     *
+&nbsp;     * /moostensura debug named
+&nbsp;     */
+&nbsp;    public static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createDebugNode() {
+<b class="fc">&nbsp;        return createNamedNode(</b>
+&nbsp;                &quot;named&quot;
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated standalone compatibility alias for /checknamed; not registered for release.
+&nbsp;     */
+&nbsp;    public static void registerLegacyAlias(
+&nbsp;            CommandDispatcher&lt;CommandSourceStack&gt; dispatcher
+&nbsp;    ) {
+<b class="nc">&nbsp;        dispatcher.register(</b>
+<b class="nc">&nbsp;                createNamedNode(</b>
+&nbsp;                        &quot;checknamed&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createNamedNode(
+&nbsp;            String literal
+&nbsp;    ) {
+<b class="fc">&nbsp;        return Commands.literal(literal)</b>
+<b class="fc">&nbsp;                .requires(</b>
+&nbsp;                        DebugModeService
+&nbsp;                                ::canUseDebugTools
+&nbsp;                )
+<b class="fc">&nbsp;                .executes(context -&gt; inspectNamedState(</b>
+<b class="nc">&nbsp;                        context.getSource()</b>
+&nbsp;                ));
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int inspectNamedState(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) throws CommandSyntaxException {
+<b class="nc">&nbsp;        ServerPlayer player =</b>
+<b class="nc">&nbsp;                source.getPlayerOrException();</b>
+&nbsp;
+<b class="nc">&nbsp;        IExistence existence =</b>
+<b class="nc">&nbsp;                TensuraStorages.getExistenceFrom(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (existence == null) {</b>
+<b class="nc">&nbsp;            player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                    Component.translatable(</b>
+&nbsp;                                    &quot;moostensuraaddon.command.checknamed.failed&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.RED
+&nbsp;                            )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        GranterProgressData progress =</b>
+<b class="nc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry
+&nbsp;                                .GRANTER_PROGRESS_DATA
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        String storedName =</b>
+&nbsp;                TensuraPlayerStateHelper
+<b class="nc">&nbsp;                        .getStoredTensuraName(</b>
+&nbsp;                                player
+&nbsp;                        )
+<b class="nc">&nbsp;                        .orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean named =</b>
+&nbsp;                TensuraPlayerStateHelper
+<b class="nc">&nbsp;                        .isNamedOrEndowed(</b>
+&nbsp;                                player
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        boolean hasGranter =</b>
+<b class="nc">&nbsp;                hasGranter(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean hasBenevolentEmpowerment =</b>
+<b class="nc">&nbsp;                hasBenevolentEmpowerment(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        boolean hasAbsoluteGovernance =</b>
+<b class="nc">&nbsp;                hasAbsoluteGovernance(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        boolean hasAnyEvolvedGranterSkill =</b>
+&nbsp;                hasBenevolentEmpowerment
+&nbsp;                        || hasAbsoluteGovernance;
+&nbsp;
+<b class="nc">&nbsp;        boolean hasGreatSage =</b>
+<b class="nc">&nbsp;                GranterActions.hasGreatSage(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        int masteredSkillCount =</b>
+<b class="nc">&nbsp;                getMasteredSkillCount(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double ep =</b>
+<b class="nc">&nbsp;                existence.getEP();</b>
+&nbsp;
+<b class="nc">&nbsp;        double magicules =</b>
+<b class="nc">&nbsp;                existence.getMagicule();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;LivingEntity&gt; nearbyLivingEntities =</b>
+<b class="nc">&nbsp;                getNearbyLivingEntities(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;LivingEntity&gt; nearbySubordinates =</b>
+<b class="nc">&nbsp;                getNearbySubordinates(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        int nearbyLivingCount =</b>
+<b class="nc">&nbsp;                nearbyLivingEntities.size();</b>
+&nbsp;
+<b class="nc">&nbsp;        int nearbySubordinateCount =</b>
+<b class="nc">&nbsp;                nearbySubordinates.size();</b>
+&nbsp;
+<b class="nc">&nbsp;        int recognizedSubordinateCount =</b>
+<b class="nc">&nbsp;                progress.getRecognizedSubordinateCount();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean epOk =</b>
+&nbsp;                ep &gt;= REQUIRED_GRANTER_EP;
+&nbsp;
+<b class="nc">&nbsp;        boolean masteredSkillsOk =</b>
+&nbsp;                masteredSkillCount
+&nbsp;                        &gt;= REQUIRED_GRANTER_MASTERED_SKILLS;
+&nbsp;
+<b class="nc">&nbsp;        boolean nearbySubordinatesOk =</b>
+&nbsp;                nearbySubordinateCount
+&nbsp;                        &gt;= REQUIRED_GRANTER_SUBORDINATES;
+&nbsp;
+<b class="nc">&nbsp;        boolean recognizedSubordinatesOk =</b>
+&nbsp;                recognizedSubordinateCount
+&nbsp;                        &gt;= REQUIRED_GRANTER_SUBORDINATES;
+&nbsp;
+<b class="nc">&nbsp;        boolean subordinateRequirementOk =</b>
+&nbsp;                nearbySubordinatesOk
+&nbsp;                        || recognizedSubordinatesOk;
+&nbsp;
+<b class="nc">&nbsp;        boolean canNaturallyAwakenGranter =</b>
+&nbsp;                !hasGranter
+&nbsp;                        &amp;&amp; !hasAnyEvolvedGranterSkill
+&nbsp;                        &amp;&amp; !progress
+<b class="nc">&nbsp;                        .hasAwakenedGranterNaturally()</b>
+&nbsp;                        &amp;&amp; named
+&nbsp;                        &amp;&amp; hasGreatSage
+&nbsp;                        &amp;&amp; masteredSkillsOk
+&nbsp;                        &amp;&amp; subordinateRequirementOk
+&nbsp;                        &amp;&amp; epOk;
+&nbsp;
+<b class="nc">&nbsp;        player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                Component.translatable(</b>
+&nbsp;                                &quot;moostensuraaddon.command.checknamed.header&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GOLD
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                &quot;Identity / Existence&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.YELLOW
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendBooleanLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Named/endowed&quot;,
+&nbsp;                named
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Stored Tensura name&quot;,
+<b class="nc">&nbsp;                safeName(storedName)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Minecraft name&quot;,
+<b class="nc">&nbsp;                player.getGameProfile()</b>
+<b class="nc">&nbsp;                        .getName()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Display name&quot;,
+<b class="nc">&nbsp;                player.getDisplayName()</b>
+<b class="nc">&nbsp;                        .getString()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Custom name&quot;,
+<b class="nc">&nbsp;                getCustomName(player)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;EP&quot;,
+<b class="nc">&nbsp;                formatNumber(ep)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Magicules&quot;,
+<b class="nc">&nbsp;                formatNumber(magicules)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Level&quot;,
+<b class="nc">&nbsp;                String.valueOf(</b>
+&nbsp;                        player.experienceLevel
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Raw XP&quot;,
+<b class="nc">&nbsp;                String.valueOf(</b>
+<b class="nc">&nbsp;                        XpUtils.getTotalXp(</b>
+&nbsp;                                player
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Mastered skills&quot;,
+<b class="nc">&nbsp;                String.valueOf(</b>
+&nbsp;                        masteredSkillCount
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                &quot;Granter Awakening Debug&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendBooleanLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Has Granter&quot;,
+&nbsp;                hasGranter
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendBooleanLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Has Benevolent Empowerment&quot;,
+&nbsp;                hasBenevolentEmpowerment
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendBooleanLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Has Absolute Governance&quot;,
+&nbsp;                hasAbsoluteGovernance
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendBooleanLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Already awakened Granter naturally&quot;,
+<b class="nc">&nbsp;                progress.hasAwakenedGranterNaturally()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendRequirementLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Named/endowed&quot;,
+&nbsp;                named,
+&nbsp;                &quot;required&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendRequirementLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Great Sage&quot;,
+&nbsp;                hasGreatSage,
+&nbsp;                &quot;required&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendRequirementLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;EP&quot;,
+&nbsp;                epOk,
+<b class="nc">&nbsp;                formatNumber(ep)</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + formatNumber(</b>
+&nbsp;                        REQUIRED_GRANTER_EP
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendRequirementLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Mastered skills&quot;,
+&nbsp;                masteredSkillsOk,
+&nbsp;                masteredSkillCount
+&nbsp;                        + &quot; / &quot;
+&nbsp;                        + REQUIRED_GRANTER_MASTERED_SKILLS
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendRequirementLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Nearby subordinates&quot;,
+&nbsp;                nearbySubordinatesOk,
+&nbsp;                nearbySubordinateCount
+&nbsp;                        + &quot; / &quot;
+&nbsp;                        + REQUIRED_GRANTER_SUBORDINATES
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendRequirementLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Recognized subordinates&quot;,
+&nbsp;                recognizedSubordinatesOk,
+&nbsp;                recognizedSubordinateCount
+&nbsp;                        + &quot; / &quot;
+&nbsp;                        + REQUIRED_GRANTER_SUBORDINATES
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendRequirementLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Subordinate requirement&quot;,
+&nbsp;                subordinateRequirementOk,
+&nbsp;                &quot;nearby OR recognized&quot;
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Nearby living entities in &quot;
+<b class="nc">&nbsp;                        + formatNumber(</b>
+&nbsp;                        SUBORDINATE_SCAN_RADIUS
+&nbsp;                )
+&nbsp;                        + &quot; blocks&quot;,
+<b class="nc">&nbsp;                String.valueOf(</b>
+&nbsp;                        nearbyLivingCount
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendInfoLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Detected subordinate names&quot;,
+<b class="nc">&nbsp;                getEntityNamePreview(</b>
+&nbsp;                        nearbySubordinates
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendBooleanLine(</b>
+&nbsp;                player,
+&nbsp;                &quot;Can naturally awaken Granter now&quot;,
+&nbsp;                canNaturallyAwakenGranter
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!canNaturallyAwakenGranter) {</b>
+<b class="nc">&nbsp;            player.sendSystemMessage(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;If nearby living entities is high but nearby subordinates is 0, SubordinateHelper is probably not recognizing your named mobs as subordinates.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.GRAY
+&nbsp;                            )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasGranter(ServerPlayer player) {
+<b class="nc">&nbsp;        return SkillAPI.getSkillsFrom(player)</b>
+<b class="nc">&nbsp;                .getSkill(SkillRegistry.GRANTER.get().getRegistryName())</b>
+<b class="nc">&nbsp;                .isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasBenevolentEmpowerment(ServerPlayer player) {
+<b class="nc">&nbsp;        return SkillAPI.getSkillsFrom(player)</b>
+<b class="nc">&nbsp;                .getSkill(SkillRegistry.BENEVOLENT_EMPOWERMENT.get().getRegistryName())</b>
+<b class="nc">&nbsp;                .isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasAbsoluteGovernance(ServerPlayer player) {
+<b class="nc">&nbsp;        return SkillAPI.getSkillsFrom(player)</b>
+<b class="nc">&nbsp;                .getSkill(SkillRegistry.ABSOLUTE_GOVERNANCE.get().getRegistryName())</b>
+<b class="nc">&nbsp;                .isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int getMasteredSkillCount(ServerPlayer player) {
+<b class="nc">&nbsp;        return (int) SkillAPI.getSkillsFrom(player)</b>
+<b class="nc">&nbsp;                .getLearnedSkills()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .filter(instance -&gt; instance.isMastered(player))</b>
+<b class="nc">&nbsp;                .count();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;LivingEntity&gt; getNearbyLivingEntities(ServerPlayer player) {
+<b class="nc">&nbsp;        return player.level().getEntitiesOfClass(</b>
+&nbsp;                LivingEntity.class,
+<b class="nc">&nbsp;                player.getBoundingBox().inflate(SUBORDINATE_SCAN_RADIUS),</b>
+<b class="nc">&nbsp;                entity -&gt; entity != player</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;LivingEntity&gt; getNearbySubordinates(ServerPlayer player) {
+<b class="nc">&nbsp;        return player.level().getEntitiesOfClass(</b>
+&nbsp;                LivingEntity.class,
+<b class="nc">&nbsp;                player.getBoundingBox().inflate(SUBORDINATE_SCAN_RADIUS),</b>
+<b class="nc">&nbsp;                entity -&gt; entity != player &amp;&amp; SubordinateHelper.isSubordinate(player, entity)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendBooleanLine(ServerPlayer player, String label, boolean value) {
+<b class="nc">&nbsp;        player.sendSystemMessage(Component.literal(&quot; - &quot; + label + &quot;: &quot; + value)</b>
+<b class="nc">&nbsp;                .withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendRequirementLine(ServerPlayer player, String label, boolean passed, String details) {
+<b class="nc">&nbsp;        player.sendSystemMessage(Component.literal(&quot; - &quot; + label + &quot;: &quot; + (passed ? &quot;PASS&quot; : &quot;FAIL&quot;) + &quot; (&quot; + details + &quot;)&quot;)</b>
+<b class="nc">&nbsp;                .withStyle(passed ? ChatFormatting.GREEN : ChatFormatting.RED));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendInfoLine(ServerPlayer player, String label, String value) {
+<b class="nc">&nbsp;        player.sendSystemMessage(Component.literal(&quot; - &quot; + label + &quot;: &quot; + value)</b>
+<b class="nc">&nbsp;                .withStyle(ChatFormatting.GRAY));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getEntityNamePreview(List&lt;LivingEntity&gt; entities) {
+<b class="nc">&nbsp;        if (entities.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;&lt;none&gt;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder builder = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        int maxShown = Math.min(entities.size(), 5);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; maxShown; i++) {</b>
+<b class="nc">&nbsp;            if (i &gt; 0) {</b>
+<b class="nc">&nbsp;                builder.append(&quot;, &quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            builder.append(entities.get(i).getDisplayName().getString());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (entities.size() &gt; maxShown) {</b>
+<b class="nc">&nbsp;            builder.append(&quot; +&quot;).append(entities.size() - maxShown).append(&quot; more&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return builder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getCustomName(ServerPlayer player) {
+<b class="nc">&nbsp;        Component customName = player.getCustomName();</b>
+<b class="nc">&nbsp;        return customName == null ? &quot;&lt;none&gt;&quot; : customName.getString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String safeName(String name) {
+<b class="nc">&nbsp;        return name == null || name.isBlank() ? &quot;&lt;none&gt;&quot; : name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatNumber(double value) {
+<b class="nc">&nbsp;        return String.format(Locale.US, &quot;%,.0f&quot;, value);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

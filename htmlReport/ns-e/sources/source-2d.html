@@ -1,0 +1,1127 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionPathEvaluator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionPathEvaluator (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionPathEvaluator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/332)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.EnumMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * Converts stored recognition deeds into dimensions, path affinities and a
+&nbsp; * final recognition selection.
+&nbsp; *
+&nbsp; * Rules version 2 uses active axis components for qualification. Passive
+&nbsp; * Neutral posture remains diagnostic-only and cannot establish a path.
+&nbsp; *
+&nbsp; * All balancing values come from one immutable datapack snapshot captured at
+&nbsp; * the beginning of evaluate(). No JSON parsing or resource access occurs here.
+&nbsp; */
+&nbsp;public final class RecognitionPathEvaluator {
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Compatibility constants for older call sites and external integrations.
+&nbsp;     *
+&nbsp;     * Runtime code inside the addon uses RecognitionEvaluation#getBalance()
+&nbsp;     * instead, so datapack reloads can change the active values safely.
+&nbsp;     */
+&nbsp;    public static final double DEFAULT_ESTABLISHED_THRESHOLD =
+&nbsp;            35.0D;
+&nbsp;
+&nbsp;    public static final double DEFAULT_PURE_THRESHOLD =
+&nbsp;            70.0D;
+&nbsp;
+&nbsp;    public static final double DEFAULT_DOMINANCE_RATIO =
+&nbsp;            2.0D;
+&nbsp;
+&nbsp;    public static final double DEFAULT_RAW_PURE_THRESHOLD =
+&nbsp;            35.0D;
+&nbsp;
+&nbsp;    public static final double DEFAULT_RAW_DOMINANCE_RATIO =
+&nbsp;            1.6D;
+&nbsp;
+&nbsp;    public static final double MIN_DIRECTIONAL_MORALITY_EVIDENCE =
+&nbsp;            6.0D;
+&nbsp;
+&nbsp;    private RecognitionPathEvaluator() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RecognitionEvaluation evaluate(
+&nbsp;            RecognitionData rawData
+&nbsp;    ) {
+&nbsp;        RecognitionData data =
+<b class="nc">&nbsp;                rawData == null</b>
+<b class="nc">&nbsp;                        ? new RecognitionData()</b>
+<b class="nc">&nbsp;                        : rawData;</b>
+&nbsp;
+&nbsp;        RecognitionBalanceManager.State balanceState =
+<b class="nc">&nbsp;                RecognitionBalanceManager.getState();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot balance =</b>
+<b class="nc">&nbsp;                balanceState.snapshot();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionDimensions dimensions =</b>
+<b class="nc">&nbsp;                calculateDimensions(</b>
+&nbsp;                        data,
+&nbsp;                        balance
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPathComponents components =</b>
+<b class="nc">&nbsp;                RecognitionPathComponents.calculate(</b>
+&nbsp;                        dimensions,
+&nbsp;                        balance
+&nbsp;                );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Every path must have meaningful evidence on both defining axes
+&nbsp;         * before it can consume identity resonance or become selectable.
+&nbsp;         *
+&nbsp;         * Passive Neutral posture is intentionally absent from this gate.
+&nbsp;         *
+&nbsp;         * This prevents Order or Freedom from independently establishing a
+&nbsp;         * Good/Evil path when the player has no supporting morality evidence.
+&nbsp;         */
+<b class="nc">&nbsp;        Map&lt;RecognitionPath, Double&gt; rawPathScores =</b>
+<b class="nc">&nbsp;                applyComponentEvidenceGate(</b>
+&nbsp;                        components,
+<b class="nc">&nbsp;                        calculateRawPathScores(</b>
+&nbsp;                                data,
+&nbsp;                                components,
+&nbsp;                                dimensions,
+&nbsp;                                balance
+&nbsp;                        ),
+&nbsp;                        balance
+&nbsp;                );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Component-incomplete paths cannot consume the universal or focused
+&nbsp;         * identity pool.
+&nbsp;         */
+<b class="nc">&nbsp;        Map&lt;RecognitionPath, Double&gt; identityBoosts =</b>
+<b class="nc">&nbsp;                applyComponentEvidenceGate(</b>
+&nbsp;                        components,
+<b class="nc">&nbsp;                        calculateIdentityBoosts(</b>
+&nbsp;                                rawPathScores,
+<b class="nc">&nbsp;                                dimensions.identityStrength(),</b>
+&nbsp;                                balance
+&nbsp;                        ),
+&nbsp;                        balance
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;RecognitionPath, Double&gt; pathScores =</b>
+<b class="nc">&nbsp;                combineScores(</b>
+&nbsp;                        rawPathScores,
+&nbsp;                        identityBoosts
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.Selection selectionBalance =</b>
+<b class="nc">&nbsp;                balance.selection();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;RecognitionPathSelection&gt; selection =</b>
+&nbsp;                RecognitionPathSelector
+<b class="nc">&nbsp;                        .selectWithComponentPureGate(</b>
+&nbsp;                                pathScores,
+&nbsp;                                rawPathScores,
+&nbsp;                                components,
+&nbsp;                                selectionBalance
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionEvaluation(</b>
+&nbsp;                dimensions,
+&nbsp;                components,
+&nbsp;                rawPathScores,
+&nbsp;                identityBoosts,
+&nbsp;                pathScores,
+&nbsp;                selection,
+&nbsp;                balance,
+<b class="nc">&nbsp;                balanceState.revision()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionDimensions calculateDimensions(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        double good =</b>
+<b class="nc">&nbsp;                calculateGood(</b>
+&nbsp;                        data,
+&nbsp;                        balance
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double evil =</b>
+<b class="nc">&nbsp;                calculateEvil(</b>
+&nbsp;                        data,
+&nbsp;                        balance
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double order =</b>
+<b class="nc">&nbsp;                calculateOrder(</b>
+&nbsp;                        data,
+&nbsp;                        balance
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double freedom =</b>
+<b class="nc">&nbsp;                calculateFreedom(</b>
+&nbsp;                        data,
+&nbsp;                        balance
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double mastery =</b>
+<b class="nc">&nbsp;                calculateMastery(</b>
+&nbsp;                        data,
+&nbsp;                        balance
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double discovery =</b>
+<b class="nc">&nbsp;                calculateDiscovery(</b>
+&nbsp;                        data,
+&nbsp;                        balance
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        int distinctMajorEnemies =</b>
+<b class="nc">&nbsp;                data.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .MAJOR_ENEMY_TYPES_DEFEATED
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.IdentityStrength identityBalance =</b>
+<b class="nc">&nbsp;                balance.identityStrength();</b>
+&nbsp;
+<b class="nc">&nbsp;        double identityStrength =</b>
+<b class="nc">&nbsp;                Math.min(</b>
+<b class="nc">&nbsp;                        identityBalance.maximum(),</b>
+&nbsp;                        mastery
+<b class="nc">&nbsp;                                * identityBalance.masteryWeight()</b>
+&nbsp;                                + discovery
+<b class="nc">&nbsp;                                * identityBalance.discoveryWeight()</b>
+<b class="nc">&nbsp;                                + contribution(</b>
+&nbsp;                                distinctMajorEnemies,
+<b class="nc">&nbsp;                                identityBalance.majorEnemyTypes()</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionDimensions(</b>
+&nbsp;                good,
+&nbsp;                evil,
+&nbsp;                order,
+&nbsp;                freedom,
+&nbsp;                mastery,
+&nbsp;                discovery,
+<b class="nc">&nbsp;                sanitizeScore(</b>
+&nbsp;                        identityStrength
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double calculateGood(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.Good good =</b>
+<b class="nc">&nbsp;                balance.good();</b>
+&nbsp;
+&nbsp;        double points =
+<b class="nc">&nbsp;                data.getFlag(</b>
+&nbsp;                        RecognitionStatKeys.TRUE_HERO
+&nbsp;                )
+<b class="nc">&nbsp;                        ? good.trueHeroModifier()</b>
+<b class="nc">&nbsp;                        : 0.0D;</b>
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.RAID_VICTORIES
+&nbsp;                ),
+<b class="nc">&nbsp;                good.raidVictories()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.VILLAGERS_CURED
+&nbsp;                ),
+<b class="nc">&nbsp;                good.villagersCured()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.CIVILIANS_DEFENDED
+&nbsp;                ),
+<b class="nc">&nbsp;                good.civiliansDefended()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .MALEVOLENT_BOSS_TYPES_DEFEATED
+&nbsp;                ),
+<b class="nc">&nbsp;                good.malevolentBossTypesDefeated()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return sanitizeScore(points);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double calculateEvil(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.Evil evil =</b>
+<b class="nc">&nbsp;                balance.evil();</b>
+&nbsp;
+&nbsp;        double points =
+<b class="nc">&nbsp;                data.getFlag(</b>
+&nbsp;                        RecognitionStatKeys.TRUE_DEMON_LORD
+&nbsp;                )
+<b class="nc">&nbsp;                        ? evil.trueDemonLordModifier()</b>
+<b class="nc">&nbsp;                        : 0.0D;</b>
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.CIVILIAN_KILLS
+&nbsp;                ),
+<b class="nc">&nbsp;                evil.civilianKills()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.PASSIVE_BABY_KILLS
+&nbsp;                ),
+<b class="nc">&nbsp;                evil.passiveBabyKills()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.OWNED_COMPANION_KILLS
+&nbsp;                ),
+<b class="nc">&nbsp;                evil.ownedCompanionKills()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.OWNED_SUBORDINATE_KILLS
+&nbsp;                ),
+<b class="nc">&nbsp;                evil.ownedSubordinateKills()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .BENEVOLENT_BOSS_TYPES_KILLED
+&nbsp;                ),
+<b class="nc">&nbsp;                evil.benevolentBossTypesKilled()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return sanitizeScore(points);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double calculateOrder(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.Order order =</b>
+<b class="nc">&nbsp;                balance.order();</b>
+&nbsp;
+<b class="nc">&nbsp;        int recognizedSubordinates =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .CURRENT_SUBORDINATES
+&nbsp;                        ),
+<b class="nc">&nbsp;                        data.getCounter(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .HIGHEST_SUBORDINATES
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double points =</b>
+<b class="nc">&nbsp;                contribution(</b>
+&nbsp;                        recognizedSubordinates,
+<b class="nc">&nbsp;                        order.subordinateRosterPrimary()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+&nbsp;                recognizedSubordinates,
+<b class="nc">&nbsp;                order.subordinateRosterEstablished()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .SUBORDINATE_ASSISTED_MAJOR_VICTORIES
+&nbsp;                ),
+<b class="nc">&nbsp;                order.subordinateAssistedMajorVictories()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .UNIQUE_SUBORDINATES_EMPOWERED
+&nbsp;                ),
+<b class="nc">&nbsp;                order.uniqueSubordinatesEmpowered()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.MASS_GRANTS_PERFORMED
+&nbsp;                ),
+<b class="nc">&nbsp;                order.massGrantsPerformed()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .GLOBAL_TAKE_BACKS_PERFORMED
+&nbsp;                ),
+<b class="nc">&nbsp;                order.globalTakeBacksPerformed()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return sanitizeScore(points);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double calculateFreedom(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.Freedom freedom =</b>
+<b class="nc">&nbsp;                balance.freedom();</b>
+&nbsp;
+<b class="nc">&nbsp;        double points =</b>
+<b class="nc">&nbsp;                contribution(</b>
+<b class="nc">&nbsp;                        data.getUniqueValueCount(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .SOLO_MAJOR_ENEMY_TYPES_DEFEATED
+&nbsp;                        ),
+<b class="nc">&nbsp;                        freedom.soloMajorEnemyTypesDefeated()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+<b class="nc">&nbsp;                data.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys.DISCOVERY_MILESTONES
+&nbsp;                ),
+<b class="nc">&nbsp;                freedom.discoveryMilestones()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += RecognitionIndependenceMilestoneManager</b>
+<b class="nc">&nbsp;                .calculateScore(</b>
+&nbsp;                        data
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return sanitizeScore(points);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double calculateMastery(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.Mastery mastery =</b>
+<b class="nc">&nbsp;                balance.mastery();</b>
+&nbsp;
+<b class="nc">&nbsp;        int masteredSkills =</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys.MASTERED_SKILLS
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        int masteredCategories =</b>
+<b class="nc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .MASTERED_SKILL_CATEGORIES
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        int distinctMajorEnemies =</b>
+<b class="nc">&nbsp;                data.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .MAJOR_ENEMY_TYPES_DEFEATED
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double highestEp =</b>
+<b class="nc">&nbsp;                data.getMeasurement(</b>
+&nbsp;                        RecognitionStatKeys.HIGHEST_EP
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double points =</b>
+<b class="nc">&nbsp;                calculateSkillMasteryContribution(</b>
+&nbsp;                        masteredSkills,
+&nbsp;                        mastery
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+&nbsp;                masteredCategories,
+<b class="nc">&nbsp;                mastery.masteredSkillCategories()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += epContribution(</b>
+&nbsp;                highestEp,
+<b class="nc">&nbsp;                mastery.highestEp()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        points += contribution(</b>
+&nbsp;                distinctMajorEnemies,
+<b class="nc">&nbsp;                mastery.majorEnemyTypesDefeated()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return sanitizeScore(points);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double calculateDiscovery(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        return contribution(</b>
+<b class="nc">&nbsp;                data.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys.DISCOVERY_MILESTONES
+&nbsp;                ),
+<b class="nc">&nbsp;                balance.discovery().milestones()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;RecognitionPath, Double&gt;
+&nbsp;    calculateRawPathScores(
+&nbsp;            RecognitionData data,
+&nbsp;            RecognitionPathComponents components,
+&nbsp;            RecognitionDimensions dimensions,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        EnumMap&lt;RecognitionPath, Double&gt; scores =</b>
+&nbsp;                new EnumMap&lt;&gt;(
+&nbsp;                        RecognitionPath.class
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.RawPaths rawBalance =</b>
+<b class="nc">&nbsp;                balance.rawPaths();</b>
+&nbsp;
+<b class="nc">&nbsp;        double good =</b>
+<b class="nc">&nbsp;                components.good();</b>
+&nbsp;
+<b class="nc">&nbsp;        double evil =</b>
+<b class="nc">&nbsp;                components.evil();</b>
+&nbsp;
+<b class="nc">&nbsp;        double lawful =</b>
+<b class="nc">&nbsp;                components.lawful();</b>
+&nbsp;
+<b class="nc">&nbsp;        double chaotic =</b>
+<b class="nc">&nbsp;                components.chaotic();</b>
+&nbsp;
+<b class="nc">&nbsp;        double neutralMorality =</b>
+<b class="nc">&nbsp;                components.neutralMorality();</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Rules version 2 uses only actively demonstrated balance between
+&nbsp;         * Order and Freedom. Passive posture remains display-only.
+&nbsp;         */
+<b class="nc">&nbsp;        double neutralBehaviour =</b>
+<b class="nc">&nbsp;                components.activeNeutralBehaviour();</b>
+&nbsp;
+&nbsp;        double darkHeroContradiction =
+<b class="nc">&nbsp;                data.getFlag(</b>
+&nbsp;                        RecognitionStatKeys.TRUE_DEMON_LORD
+<b class="nc">&nbsp;                ) &amp;&amp; good &gt; evil</b>
+<b class="nc">&nbsp;                        ? Math.min(</b>
+<b class="nc">&nbsp;                        rawBalance.contradictionMaximum(),</b>
+&nbsp;                        good
+<b class="nc">&nbsp;                        * rawBalance.contradictionFactor()</b>
+&nbsp;                )
+<b class="nc">&nbsp;                        : 0.0D;</b>
+&nbsp;
+&nbsp;        double fallenHeroContradiction =
+<b class="nc">&nbsp;                data.getFlag(</b>
+&nbsp;                        RecognitionStatKeys.TRUE_HERO
+<b class="nc">&nbsp;                ) &amp;&amp; evil &gt; good</b>
+<b class="nc">&nbsp;                        ? Math.min(</b>
+<b class="nc">&nbsp;                        rawBalance.contradictionMaximum(),</b>
+&nbsp;                        evil
+<b class="nc">&nbsp;                        * rawBalance.contradictionFactor()</b>
+&nbsp;                )
+<b class="nc">&nbsp;                        : 0.0D;</b>
+&nbsp;
+<b class="nc">&nbsp;        scores.put(</b>
+&nbsp;                RecognitionPath.LAWFUL_GOOD,
+<b class="nc">&nbsp;                combineRaw(</b>
+&nbsp;                        good,
+&nbsp;                        lawful,
+&nbsp;                        rawBalance
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        scores.put(</b>
+&nbsp;                RecognitionPath.NEUTRAL_GOOD,
+<b class="nc">&nbsp;                combineRaw(</b>
+&nbsp;                        good,
+&nbsp;                        neutralBehaviour,
+&nbsp;                        rawBalance
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        scores.put(</b>
+&nbsp;                RecognitionPath.CHAOTIC_GOOD,
+<b class="nc">&nbsp;                combineRaw(</b>
+&nbsp;                        good,
+&nbsp;                        chaotic,
+&nbsp;                        rawBalance
+&nbsp;                ) + darkHeroContradiction
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        scores.put(</b>
+&nbsp;                RecognitionPath.LAWFUL_NEUTRAL,
+<b class="nc">&nbsp;                combineRaw(</b>
+&nbsp;                        neutralMorality,
+&nbsp;                        lawful,
+&nbsp;                        rawBalance
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double trueNeutralDiscoverySupport =</b>
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        rawBalance
+<b class="nc">&nbsp;                                .trueNeutralDiscoveryMaximum(),</b>
+<b class="nc">&nbsp;                        dimensions.discovery()</b>
+&nbsp;                                * rawBalance
+<b class="nc">&nbsp;                                .trueNeutralDiscoveryFactor()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        scores.put(</b>
+&nbsp;                RecognitionPath.TRUE_NEUTRAL,
+<b class="nc">&nbsp;                combineRaw(</b>
+&nbsp;                        neutralMorality,
+&nbsp;                        neutralBehaviour,
+&nbsp;                        rawBalance
+&nbsp;                ) + trueNeutralDiscoverySupport
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double chaoticNeutralDiscoverySupport =</b>
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        rawBalance
+<b class="nc">&nbsp;                                .chaoticNeutralDiscoveryMaximum(),</b>
+<b class="nc">&nbsp;                        dimensions.discovery()</b>
+&nbsp;                                * rawBalance
+<b class="nc">&nbsp;                                .chaoticNeutralDiscoveryFactor()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        scores.put(</b>
+&nbsp;                RecognitionPath.CHAOTIC_NEUTRAL,
+<b class="nc">&nbsp;                combineRaw(</b>
+&nbsp;                        neutralMorality,
+&nbsp;                        chaotic,
+&nbsp;                        rawBalance
+&nbsp;                ) + chaoticNeutralDiscoverySupport
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        scores.put(</b>
+&nbsp;                RecognitionPath.LAWFUL_EVIL,
+<b class="nc">&nbsp;                combineRaw(</b>
+&nbsp;                        evil,
+&nbsp;                        lawful,
+&nbsp;                        rawBalance
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        scores.put(</b>
+&nbsp;                RecognitionPath.NEUTRAL_EVIL,
+<b class="nc">&nbsp;                combineRaw(</b>
+&nbsp;                        evil,
+&nbsp;                        neutralBehaviour,
+&nbsp;                        rawBalance
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        scores.put(</b>
+&nbsp;                RecognitionPath.CHAOTIC_EVIL,
+<b class="nc">&nbsp;                combineRaw(</b>
+&nbsp;                        evil,
+&nbsp;                        chaotic,
+&nbsp;                        rawBalance
+&nbsp;                ) + fallenHeroContradiction
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return scores;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes paths that do not have meaningful active evidence on both axes.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This gate is applied before and after identity distribution. Identity
+&nbsp;     * can strengthen an established direction, but it cannot fabricate a
+&nbsp;     * missing morality or temperament component.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    private static Map&lt;RecognitionPath, Double&gt;
+&nbsp;    applyComponentEvidenceGate(
+&nbsp;            RecognitionPathComponents components,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; scores,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        EnumMap&lt;RecognitionPath, Double&gt; gatedScores =</b>
+&nbsp;                new EnumMap&lt;&gt;(
+&nbsp;                        RecognitionPath.class
+&nbsp;                );
+&nbsp;
+&nbsp;        RecognitionComponentQualificationRules rules =
+&nbsp;                RecognitionComponentQualificationRules
+<b class="nc">&nbsp;                        .from(</b>
+<b class="nc">&nbsp;                                balance == null</b>
+<b class="nc">&nbsp;                                        ? null</b>
+<b class="nc">&nbsp;                                        : balance.selection()</b>
+&nbsp;                        );
+&nbsp;
+&nbsp;        RecognitionPathComponents safeComponents =
+<b class="nc">&nbsp;                components == null</b>
+<b class="nc">&nbsp;                        ? RecognitionPathComponents.empty()</b>
+<b class="nc">&nbsp;                        : components;</b>
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            double score =</b>
+<b class="nc">&nbsp;                    getScore(</b>
+&nbsp;                            scores,
+&nbsp;                            path
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (!safeComponents.hasEstablishedEvidence(</b>
+&nbsp;                    path,
+&nbsp;                    rules
+&nbsp;            )) {
+<b class="nc">&nbsp;                score = 0.0D;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            gatedScores.put(</b>
+&nbsp;                    path,
+<b class="nc">&nbsp;                    score</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return gatedScores;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;RecognitionPath, Double&gt;
+&nbsp;    calculateIdentityBoosts(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; rawScores,
+&nbsp;            double identityStrength,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+<b class="nc">&nbsp;        EnumMap&lt;RecognitionPath, Double&gt; boosts =</b>
+&nbsp;                new EnumMap&lt;&gt;(
+&nbsp;                        RecognitionPath.class
+&nbsp;                );
+&nbsp;
+&nbsp;        RecognitionBalanceSnapshot.IdentityDistribution
+<b class="nc">&nbsp;                identityBalance =</b>
+<b class="nc">&nbsp;                balance.identityDistribution();</b>
+&nbsp;
+<b class="nc">&nbsp;        double safeIdentity =</b>
+<b class="nc">&nbsp;                sanitizeScore(</b>
+&nbsp;                        identityStrength
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double universalBoost =</b>
+&nbsp;                safeIdentity
+<b class="nc">&nbsp;                        * identityBalance.universalShare();</b>
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            boosts.put(</b>
+&nbsp;                    path,
+<b class="nc">&nbsp;                    universalBoost</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double focusedPool =</b>
+&nbsp;                safeIdentity
+<b class="nc">&nbsp;                        * identityBalance.focusedShare();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (focusedPool &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return boosts;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RecognitionPath&gt; rankedPaths =</b>
+<b class="nc">&nbsp;                rankPaths(</b>
+&nbsp;                        rawScores
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (rankedPaths.isEmpty()) {</b>
+<b class="nc">&nbsp;            return boosts;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="nc">&nbsp;                rankedPaths.get(0);</b>
+&nbsp;
+&nbsp;        RecognitionPath secondaryPath =
+<b class="nc">&nbsp;                rankedPaths.size() &gt; 1</b>
+<b class="nc">&nbsp;                        ? rankedPaths.get(1)</b>
+<b class="nc">&nbsp;                        : null;</b>
+&nbsp;
+<b class="nc">&nbsp;        double primaryRaw =</b>
+<b class="nc">&nbsp;                getScore(</b>
+&nbsp;                        rawScores,
+&nbsp;                        primaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double secondaryRaw =</b>
+<b class="nc">&nbsp;                getScore(</b>
+&nbsp;                        rawScores,
+&nbsp;                        secondaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (primaryRaw</b>
+<b class="nc">&nbsp;                &lt; identityBalance.minimumFocusAffinity()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return boosts;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean secondaryQualifies =</b>
+&nbsp;                secondaryPath != null
+&nbsp;                        &amp;&amp; secondaryRaw
+<b class="nc">&nbsp;                        &gt;= identityBalance.minimumFocusAffinity()</b>
+&nbsp;                        &amp;&amp; secondaryRaw
+&nbsp;                        &gt;= primaryRaw
+<b class="nc">&nbsp;                        * identityBalance.secondaryFocusRatio();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!secondaryQualifies) {</b>
+<b class="nc">&nbsp;            boosts.put(</b>
+&nbsp;                    primaryPath,
+<b class="nc">&nbsp;                    boosts.get(primaryPath)</b>
+&nbsp;                            + focusedPool
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return boosts;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double combinedRaw =</b>
+&nbsp;                primaryRaw
+&nbsp;                        + secondaryRaw;
+&nbsp;
+<b class="nc">&nbsp;        if (combinedRaw &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return boosts;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boosts.put(</b>
+&nbsp;                primaryPath,
+<b class="nc">&nbsp;                boosts.get(primaryPath)</b>
+&nbsp;                        + focusedPool
+&nbsp;                        * primaryRaw
+&nbsp;                        / combinedRaw
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boosts.put(</b>
+&nbsp;                secondaryPath,
+<b class="nc">&nbsp;                boosts.get(secondaryPath)</b>
+&nbsp;                        + focusedPool
+&nbsp;                        * secondaryRaw
+&nbsp;                        / combinedRaw
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return boosts;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;RecognitionPath, Double&gt; combineScores(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; rawScores,
+&nbsp;            Map&lt;RecognitionPath, Double&gt; identityBoosts
+&nbsp;    ) {
+<b class="nc">&nbsp;        EnumMap&lt;RecognitionPath, Double&gt; result =</b>
+&nbsp;                new EnumMap&lt;&gt;(
+&nbsp;                        RecognitionPath.class
+&nbsp;                );
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            result.put(</b>
+&nbsp;                    path,
+<b class="nc">&nbsp;                    sanitizeScore(</b>
+<b class="nc">&nbsp;                            getScore(</b>
+&nbsp;                                    rawScores,
+&nbsp;                                    path
+<b class="nc">&nbsp;                            ) + getScore(</b>
+&nbsp;                                    identityBoosts,
+&nbsp;                                    path
+&nbsp;                            )
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;RecognitionPath&gt; rankPaths(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; scores
+&nbsp;    ) {
+<b class="nc">&nbsp;        List&lt;RecognitionPath&gt; rankedPaths =</b>
+&nbsp;                new ArrayList&lt;&gt;(
+<b class="nc">&nbsp;                        List.of(</b>
+<b class="nc">&nbsp;                                RecognitionPath.values()</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        rankedPaths.sort((first, second) -&gt; {</b>
+<b class="nc">&nbsp;            int scoreComparison =</b>
+<b class="nc">&nbsp;                    Double.compare(</b>
+<b class="nc">&nbsp;                            getScore(</b>
+&nbsp;                                    scores,
+&nbsp;                                    second
+&nbsp;                            ),
+<b class="nc">&nbsp;                            getScore(</b>
+&nbsp;                                    scores,
+&nbsp;                                    first
+&nbsp;                            )
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (scoreComparison != 0) {</b>
+<b class="nc">&nbsp;                return scoreComparison;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return Integer.compare(</b>
+<b class="nc">&nbsp;                    first.ordinal(),</b>
+<b class="nc">&nbsp;                    second.ordinal()</b>
+&nbsp;            );
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        return rankedPaths;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double combineRaw(
+&nbsp;            double moralComponent,
+&nbsp;            double temperamentComponent,
+&nbsp;            RecognitionBalanceSnapshot.RawPaths rawBalance
+&nbsp;    ) {
+<b class="nc">&nbsp;        double score =</b>
+&nbsp;                moralComponent
+<b class="nc">&nbsp;                        * rawBalance.moralWeight()</b>
+&nbsp;                        + temperamentComponent
+<b class="nc">&nbsp;                        * rawBalance.temperamentWeight()</b>
+<b class="nc">&nbsp;                        + Math.min(</b>
+&nbsp;                        moralComponent,
+&nbsp;                        temperamentComponent
+<b class="nc">&nbsp;                ) * rawBalance.overlapWeight();</b>
+&nbsp;
+<b class="nc">&nbsp;        return sanitizeScore(score);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double calculateSkillMasteryContribution(
+&nbsp;            int masteredSkills,
+&nbsp;            RecognitionBalanceSnapshot.Mastery mastery
+&nbsp;    ) {
+<b class="nc">&nbsp;        int remainingSkills =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        0,
+&nbsp;                        masteredSkills
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double contribution =</b>
+&nbsp;                0.0D;
+&nbsp;
+&nbsp;        for (RecognitionBalanceSnapshot.SkillTier tier :
+<b class="nc">&nbsp;                mastery.skillTiers()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            if (remainingSkills &lt;= 0) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            int appliedEntries =</b>
+<b class="nc">&nbsp;                    Math.min(</b>
+&nbsp;                            remainingSkills,
+<b class="nc">&nbsp;                            tier.entries()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            contribution +=</b>
+&nbsp;                    appliedEntries
+<b class="nc">&nbsp;                            * tier.pointsPerEntry();</b>
+&nbsp;
+<b class="nc">&nbsp;            remainingSkills -=</b>
+&nbsp;                    appliedEntries;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(</b>
+<b class="nc">&nbsp;                mastery.skillMaximum(),</b>
+<b class="nc">&nbsp;                sanitizeScore(</b>
+&nbsp;                        contribution
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double contribution(
+&nbsp;            int count,
+&nbsp;            RecognitionBalanceSnapshot.Contribution contribution
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (count &lt;= 0</b>
+&nbsp;                || contribution == null
+<b class="nc">&nbsp;                || contribution.pointsPerEntry() &lt;= 0.0D</b>
+<b class="nc">&nbsp;                || contribution.maximum() &lt;= 0.0D) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(</b>
+<b class="nc">&nbsp;                contribution.maximum(),</b>
+&nbsp;                count
+<b class="nc">&nbsp;                        * contribution.pointsPerEntry()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double epContribution(
+&nbsp;            double ep,
+&nbsp;            RecognitionBalanceSnapshot.EpContribution contribution
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(ep)</b>
+&nbsp;                || ep &lt;= 0.0D
+&nbsp;                || contribution == null
+<b class="nc">&nbsp;                || contribution.epPerUnit() &lt;= 0.0D</b>
+<b class="nc">&nbsp;                || contribution.pointsPerUnit() &lt;= 0.0D</b>
+<b class="nc">&nbsp;                || contribution.maximum() &lt;= 0.0D) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.min(</b>
+<b class="nc">&nbsp;                contribution.maximum(),</b>
+&nbsp;                ep
+<b class="nc">&nbsp;                        / contribution.epPerUnit()</b>
+<b class="nc">&nbsp;                        * contribution.pointsPerUnit()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double getScore(
+&nbsp;            Map&lt;RecognitionPath, Double&gt; scores,
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (scores == null</b>
+&nbsp;                || path == null) {
+&nbsp;
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Double score =</b>
+<b class="nc">&nbsp;                scores.get(path);</b>
+&nbsp;
+<b class="nc">&nbsp;        return score == null</b>
+<b class="nc">&nbsp;                ? 0.0D</b>
+<b class="nc">&nbsp;                : sanitizeScore(</b>
+<b class="nc">&nbsp;                score</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeScore(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(value)</b>
+&nbsp;                || value &lt; 0.0D) {
+&nbsp;
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

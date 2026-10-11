@@ -1,0 +1,526 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionPathComponents</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionPathComponents (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionPathComponents</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/149)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionPathComponents$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/151)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;/**
+&nbsp; * Immutable axis components used by component-aware recognition selection.
+&nbsp; *
+&nbsp; * &lt;p&gt;Neutral morality is active evidence: moral balance and meaningful
+&nbsp; * discovery. Neutral behaviour is split into active balance and passive
+&nbsp; * posture. Only {@link #activeNeutralBehaviour()} is allowed to establish or
+&nbsp; * Pure-qualify a path. Passive posture remains available to diagnostics and
+&nbsp; * the progress screen as a low-level hint.&lt;/p&gt;
+&nbsp; */
+<b class="nc">&nbsp;public record RecognitionPathComponents(</b>
+&nbsp;        double good,
+&nbsp;        double neutralMorality,
+&nbsp;        double evil,
+&nbsp;        double lawful,
+&nbsp;        double activeNeutralBehaviour,
+&nbsp;        double passiveNeutralPosture,
+&nbsp;        double displayNeutralBehaviour,
+&nbsp;        double chaotic,
+&nbsp;        double neutralMoralBalance,
+&nbsp;        double neutralMoralDiscovery
+&nbsp;) {
+&nbsp;
+<b class="nc">&nbsp;    public RecognitionPathComponents {</b>
+<b class="nc">&nbsp;        good = sanitize(good);</b>
+<b class="nc">&nbsp;        neutralMorality = sanitize(neutralMorality);</b>
+<b class="nc">&nbsp;        evil = sanitize(evil);</b>
+<b class="nc">&nbsp;        lawful = sanitize(lawful);</b>
+<b class="nc">&nbsp;        activeNeutralBehaviour =</b>
+<b class="nc">&nbsp;                sanitize(activeNeutralBehaviour);</b>
+<b class="nc">&nbsp;        passiveNeutralPosture =</b>
+<b class="nc">&nbsp;                sanitize(passiveNeutralPosture);</b>
+<b class="nc">&nbsp;        displayNeutralBehaviour =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        activeNeutralBehaviour,
+<b class="nc">&nbsp;                        sanitize(displayNeutralBehaviour)</b>
+&nbsp;                );
+<b class="nc">&nbsp;        chaotic = sanitize(chaotic);</b>
+<b class="nc">&nbsp;        neutralMoralBalance =</b>
+<b class="nc">&nbsp;                sanitize(neutralMoralBalance);</b>
+<b class="nc">&nbsp;        neutralMoralDiscovery =</b>
+<b class="nc">&nbsp;                sanitize(neutralMoralDiscovery);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RecognitionPathComponents calculate(
+&nbsp;            RecognitionDimensions dimensions,
+&nbsp;            RecognitionBalanceSnapshot balance
+&nbsp;    ) {
+&nbsp;        RecognitionDimensions safeDimensions =
+<b class="nc">&nbsp;                dimensions == null</b>
+<b class="nc">&nbsp;                        ? new RecognitionDimensions(</b>
+&nbsp;                        0.0D,
+&nbsp;                        0.0D,
+&nbsp;                        0.0D,
+&nbsp;                        0.0D,
+&nbsp;                        0.0D,
+&nbsp;                        0.0D,
+&nbsp;                        0.0D
+&nbsp;                )
+<b class="nc">&nbsp;                        : dimensions;</b>
+&nbsp;
+&nbsp;        RecognitionBalanceSnapshot safeBalance =
+<b class="nc">&nbsp;                balance == null</b>
+&nbsp;                        ? RecognitionBalanceSnapshot
+<b class="nc">&nbsp;                        .createDefaults()</b>
+<b class="nc">&nbsp;                        : balance;</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.NeutralMorality morality =</b>
+<b class="nc">&nbsp;                safeBalance.neutrality()</b>
+<b class="nc">&nbsp;                        .morality();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.NeutralBehaviour behaviour =</b>
+<b class="nc">&nbsp;                safeBalance.neutrality()</b>
+<b class="nc">&nbsp;                        .behaviour();</b>
+&nbsp;
+<b class="nc">&nbsp;        double neutralMoralBalance =</b>
+<b class="nc">&nbsp;                Math.min(</b>
+<b class="nc">&nbsp;                        safeDimensions.good(),</b>
+<b class="nc">&nbsp;                        safeDimensions.evil()</b>
+<b class="nc">&nbsp;                ) * morality.balanceWeight();</b>
+&nbsp;
+<b class="nc">&nbsp;        double moralVolume =</b>
+<b class="nc">&nbsp;                safeDimensions.good()</b>
+<b class="nc">&nbsp;                        + safeDimensions.evil();</b>
+&nbsp;
+<b class="nc">&nbsp;        double moralQuietness =</b>
+&nbsp;                1.0D / (
+&nbsp;                        1.0D
+&nbsp;                                + moralVolume
+<b class="nc">&nbsp;                                / morality.moralVolumeDivisor()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double neutralMoralDiscovery =</b>
+<b class="nc">&nbsp;                safeDimensions.discovery()</b>
+<b class="nc">&nbsp;                        * morality.discoveryWeight()</b>
+&nbsp;                        * moralQuietness;
+&nbsp;
+<b class="nc">&nbsp;        double neutralMorality =</b>
+<b class="nc">&nbsp;                Math.min(</b>
+<b class="nc">&nbsp;                        morality.maximum(),</b>
+<b class="nc">&nbsp;                        sanitize(</b>
+&nbsp;                                neutralMoralBalance
+&nbsp;                                        + neutralMoralDiscovery
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double activeNeutralBehaviour =</b>
+<b class="nc">&nbsp;                Math.min(</b>
+<b class="nc">&nbsp;                        behaviour.maximum(),</b>
+<b class="nc">&nbsp;                        sanitize(</b>
+<b class="nc">&nbsp;                                Math.min(</b>
+<b class="nc">&nbsp;                                        safeDimensions.order(),</b>
+<b class="nc">&nbsp;                                        safeDimensions.freedom()</b>
+<b class="nc">&nbsp;                                ) * behaviour.balanceWeight()</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double behaviourVolume =</b>
+<b class="nc">&nbsp;                safeDimensions.order()</b>
+<b class="nc">&nbsp;                        + safeDimensions.freedom();</b>
+&nbsp;
+<b class="nc">&nbsp;        double passiveNeutralPosture =</b>
+<b class="nc">&nbsp;                Math.min(</b>
+<b class="nc">&nbsp;                        behaviour.maximum(),</b>
+<b class="nc">&nbsp;                        sanitize(</b>
+<b class="nc">&nbsp;                                behaviour.postureBase()</b>
+&nbsp;                                        / (
+&nbsp;                                        1.0D
+&nbsp;                                                + behaviourVolume
+&nbsp;                                                / behaviour
+<b class="nc">&nbsp;                                                .behaviourVolumeDivisor()</b>
+&nbsp;                                )
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double displayNeutralBehaviour =</b>
+<b class="nc">&nbsp;                Math.min(</b>
+<b class="nc">&nbsp;                        behaviour.maximum(),</b>
+<b class="nc">&nbsp;                        sanitize(</b>
+&nbsp;                                activeNeutralBehaviour
+&nbsp;                                        + passiveNeutralPosture
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionPathComponents(</b>
+<b class="nc">&nbsp;                safeDimensions.getGoodResonance(),</b>
+&nbsp;                neutralMorality,
+<b class="nc">&nbsp;                safeDimensions.getEvilResonance(),</b>
+<b class="nc">&nbsp;                safeDimensions.getLawfulResonance(),</b>
+&nbsp;                activeNeutralBehaviour,
+&nbsp;                passiveNeutralPosture,
+&nbsp;                displayNeutralBehaviour,
+<b class="nc">&nbsp;                safeDimensions.getChaoticResonance(),</b>
+&nbsp;                neutralMoralBalance,
+&nbsp;                neutralMoralDiscovery
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RecognitionPathComponents empty() {
+<b class="nc">&nbsp;        return calculate(</b>
+&nbsp;                null,
+&nbsp;                null
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public double moralityFor(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (path.getMorality()) {</b>
+<b class="nc">&nbsp;            case GOOD -&gt; good;</b>
+<b class="nc">&nbsp;            case NEUTRAL -&gt; neutralMorality;</b>
+<b class="nc">&nbsp;            case EVIL -&gt; evil;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public double temperamentFor(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (path.getTemperament()) {</b>
+<b class="nc">&nbsp;            case LAWFUL -&gt; lawful;</b>
+<b class="nc">&nbsp;            case NEUTRAL -&gt; activeNeutralBehaviour;</b>
+<b class="nc">&nbsp;            case CHAOTIC -&gt; chaotic;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public double displayTemperamentFor(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (path.getTemperament()) {</b>
+<b class="nc">&nbsp;            case LAWFUL -&gt; lawful;</b>
+<b class="nc">&nbsp;            case NEUTRAL -&gt; displayNeutralBehaviour;</b>
+<b class="nc">&nbsp;            case CHAOTIC -&gt; chaotic;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public double strongestCompetingMorality(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (path.getMorality()) {</b>
+&nbsp;            case GOOD -&gt;
+<b class="nc">&nbsp;                    Math.max(</b>
+&nbsp;                            neutralMorality,
+&nbsp;                            evil
+&nbsp;                    );
+&nbsp;
+&nbsp;            case NEUTRAL -&gt;
+<b class="nc">&nbsp;                    Math.max(</b>
+&nbsp;                            good,
+&nbsp;                            evil
+&nbsp;                    );
+&nbsp;
+&nbsp;            case EVIL -&gt;
+<b class="nc">&nbsp;                    Math.max(</b>
+&nbsp;                            good,
+&nbsp;                            neutralMorality
+&nbsp;                    );
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public double strongestCompetingTemperament(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return switch (path.getTemperament()) {</b>
+&nbsp;            case LAWFUL -&gt;
+<b class="nc">&nbsp;                    Math.max(</b>
+&nbsp;                            activeNeutralBehaviour,
+&nbsp;                            chaotic
+&nbsp;                    );
+&nbsp;
+&nbsp;            case NEUTRAL -&gt;
+<b class="nc">&nbsp;                    Math.max(</b>
+&nbsp;                            lawful,
+&nbsp;                            chaotic
+&nbsp;                    );
+&nbsp;
+&nbsp;            case CHAOTIC -&gt;
+<b class="nc">&nbsp;                    Math.max(</b>
+&nbsp;                            lawful,
+&nbsp;                            activeNeutralBehaviour
+&nbsp;                    );
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasEstablishedEvidence(
+&nbsp;            RecognitionPath path,
+&nbsp;            RecognitionComponentQualificationRules rules
+&nbsp;    ) {
+&nbsp;        RecognitionComponentQualificationRules safeRules =
+<b class="nc">&nbsp;                rules == null</b>
+&nbsp;                        ? RecognitionComponentQualificationRules
+<b class="nc">&nbsp;                        .defaults()</b>
+<b class="nc">&nbsp;                        : rules;</b>
+&nbsp;
+<b class="nc">&nbsp;        return moralityFor(path)</b>
+<b class="nc">&nbsp;                &gt;= safeRules.establishedComponentMinimum()</b>
+<b class="nc">&nbsp;                &amp;&amp; temperamentFor(path)</b>
+<b class="nc">&nbsp;                &gt;= safeRules.establishedComponentMinimum();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasPureEvidence(
+&nbsp;            RecognitionPath path,
+&nbsp;            RecognitionComponentQualificationRules rules
+&nbsp;    ) {
+&nbsp;        RecognitionComponentQualificationRules safeRules =
+<b class="nc">&nbsp;                rules == null</b>
+&nbsp;                        ? RecognitionComponentQualificationRules
+<b class="nc">&nbsp;                        .defaults()</b>
+<b class="nc">&nbsp;                        : rules;</b>
+&nbsp;
+<b class="nc">&nbsp;        double morality =</b>
+<b class="nc">&nbsp;                moralityFor(path);</b>
+&nbsp;
+<b class="nc">&nbsp;        double temperament =</b>
+<b class="nc">&nbsp;                temperamentFor(path);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (morality</b>
+<b class="nc">&nbsp;                &lt; safeRules.pureComponentMinimum()</b>
+&nbsp;                || temperament
+<b class="nc">&nbsp;                &lt; safeRules.pureComponentMinimum()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return reachesDominance(</b>
+&nbsp;                morality,
+<b class="nc">&nbsp;                strongestCompetingMorality(path),</b>
+<b class="nc">&nbsp;                safeRules.moralityDominanceRatio()</b>
+<b class="nc">&nbsp;        ) &amp;&amp; reachesDominance(</b>
+&nbsp;                temperament,
+<b class="nc">&nbsp;                strongestCompetingTemperament(path),</b>
+<b class="nc">&nbsp;                safeRules.temperamentDominanceRatio()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public double moralityDominance(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        return dominance(</b>
+<b class="nc">&nbsp;                moralityFor(path),</b>
+<b class="nc">&nbsp;                strongestCompetingMorality(path)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public double temperamentDominance(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        return dominance(</b>
+<b class="nc">&nbsp;                temperamentFor(path),</b>
+<b class="nc">&nbsp;                strongestCompetingTemperament(path)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean reachesDominance(
+&nbsp;            double target,
+&nbsp;            double competitor,
+&nbsp;            double ratio
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (target &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (competitor &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return target</b>
+&nbsp;                &gt;= competitor
+<b class="nc">&nbsp;                * Math.max(</b>
+&nbsp;                1.0D,
+&nbsp;                ratio
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double dominance(
+&nbsp;            double target,
+&nbsp;            double competitor
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (target &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return competitor &lt;= 0.0D</b>
+<b class="nc">&nbsp;                ? Double.POSITIVE_INFINITY</b>
+<b class="nc">&nbsp;                : target / competitor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitize(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return !Double.isFinite(value)</b>
+<b class="nc">&nbsp;                || value &lt; 0.0D</b>
+<b class="nc">&nbsp;                ? 0.0D</b>
+<b class="nc">&nbsp;                : value;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

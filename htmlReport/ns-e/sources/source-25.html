@@ -1,0 +1,292 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionIndependenceProgress</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionIndependenceProgress (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionIndependenceProgress</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.5%
+  </span>
+  <span class="absValue">
+    (3/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.7%
+  </span>
+  <span class="absValue">
+    (7/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import net.minecraft.advancements.AdvancementHolder;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.MinecraftServer;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Event-driven recording and one-time backfill for configured independence
+&nbsp; * advancements.
+&nbsp; */
+&nbsp;public final class RecognitionIndependenceProgress {
+&nbsp;
+&nbsp;    private RecognitionIndependenceProgress() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Backfills only the currently configured advancement IDs when the
+&nbsp;     * datapack-definition fingerprint changes for this player.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Once the fingerprint matches, this method is a string comparison and
+&nbsp;     * performs no advancement lookup.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static boolean synchronize(
+&nbsp;            ServerPlayer player,
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null</b>
+&nbsp;                || data == null) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        RecognitionIndependenceMilestoneManager.State state =
+&nbsp;                RecognitionIndependenceMilestoneManager
+<b class="fc">&nbsp;                        .getState();</b>
+&nbsp;
+<b class="fc">&nbsp;        String storedFingerprint =</b>
+<b class="fc">&nbsp;                data.getString(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .INDEPENDENCE_DEFINITION_FINGERPRINT
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        if (state.fingerprint()</b>
+<b class="pc">&nbsp;                .equals(</b>
+&nbsp;                        storedFingerprint
+&nbsp;                )) {
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MinecraftServer server =</b>
+<b class="nc">&nbsp;                player.getServer();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (server == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean changed =</b>
+&nbsp;                false;
+&nbsp;
+&nbsp;        for (RecognitionIndependenceMilestoneManager.Milestone milestone :
+<b class="nc">&nbsp;                state.milestones()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            AdvancementHolder advancement =</b>
+<b class="nc">&nbsp;                    server.getAdvancements()</b>
+<b class="nc">&nbsp;                            .get(</b>
+<b class="nc">&nbsp;                                    milestone.advancementId()</b>
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;            if (advancement == null) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (player.getAdvancements()</b>
+<b class="nc">&nbsp;                    .getOrStartProgress(</b>
+&nbsp;                            advancement
+&nbsp;                    )
+<b class="nc">&nbsp;                    .isDone()) {</b>
+&nbsp;
+<b class="nc">&nbsp;                changed |=</b>
+<b class="nc">&nbsp;                        data.addUniqueValue(</b>
+&nbsp;                                RecognitionStatKeys
+&nbsp;                                        .INDEPENDENCE_MILESTONES,
+<b class="nc">&nbsp;                                milestone.id()</b>
+<b class="nc">&nbsp;                                        .toString()</b>
+&nbsp;                        );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        data.setString(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .INDEPENDENCE_DEFINITION_FINGERPRINT,
+<b class="nc">&nbsp;                state.fingerprint()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean recordEarned(
+&nbsp;            ServerPlayer player,
+&nbsp;            ResourceLocation advancementId
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null</b>
+&nbsp;                || advancementId == null) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data =</b>
+<b class="nc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry
+&nbsp;                                .RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+&nbsp;        RecognitionIndependenceMilestoneManager.State state =
+&nbsp;                RecognitionIndependenceMilestoneManager
+<b class="nc">&nbsp;                        .getState();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIndependenceMilestoneManager.Milestone milestone =</b>
+<b class="nc">&nbsp;                state.byAdvancement()</b>
+<b class="nc">&nbsp;                        .get(</b>
+&nbsp;                                advancementId
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        if (milestone == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean newlyRecorded =</b>
+<b class="nc">&nbsp;                data.addUniqueValue(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .INDEPENDENCE_MILESTONES,
+<b class="nc">&nbsp;                        milestone.id()</b>
+<b class="nc">&nbsp;                                .toString()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!newlyRecorded) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistoryIntegration</b>
+<b class="nc">&nbsp;                .recordIndependenceMilestone(</b>
+&nbsp;                        data,
+<b class="nc">&nbsp;                        milestone.points(),</b>
+<b class="nc">&nbsp;                        getOverworldGameTime(</b>
+&nbsp;                                player
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static long getOverworldGameTime(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return 0L;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (player.getServer() != null) {</b>
+<b class="nc">&nbsp;            return Math.max(</b>
+&nbsp;                    0L,
+<b class="nc">&nbsp;                    player.getServer()</b>
+<b class="nc">&nbsp;                            .overworld()</b>
+<b class="nc">&nbsp;                            .getGameTime()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.max(</b>
+&nbsp;                0L,
+<b class="nc">&nbsp;                player.level()</b>
+<b class="nc">&nbsp;                        .getGameTime()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

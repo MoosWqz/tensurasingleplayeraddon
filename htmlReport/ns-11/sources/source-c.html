@@ -1,0 +1,829 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GranterActions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: GranterActions (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GranterActions</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3%
+  </span>
+  <span class="absValue">
+    (1/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.7%
+  </span>
+  <span class="absValue">
+    (1/136)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1%
+  </span>
+  <span class="absValue">
+    (3/295)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.GrantedSkillData;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.GranterProgressData;
+&nbsp;import com.mooswqz.moostensuraaddon.config.MoosTensuraConfig;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionAuthorityProgress;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenGranterScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.skill.GranterMode;
+&nbsp;import com.mooswqz.moostensuraaddon.skill.SkillRegistry;
+&nbsp;import io.github.manasmods.manascore.skill.api.ManasSkill;
+&nbsp;import io.github.manasmods.manascore.skill.api.ManasSkillInstance;
+&nbsp;import io.github.manasmods.manascore.skill.api.SkillAPI;
+&nbsp;import io.github.manasmods.manascore.skill.api.Skills;
+&nbsp;import io.github.manasmods.tensura.ability.skill.Skill;
+&nbsp;import io.github.manasmods.tensura.registry.skill.UniqueSkills;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import io.github.manasmods.tensura.util.ObjectSelectionHelper;
+&nbsp;import io.github.manasmods.tensura.util.SubordinateHelper;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.entity.LivingEntity;
+&nbsp;import net.neoforged.neoforge.network.PacketDistributor;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;
+<b class="nc">&nbsp;public class GranterActions {</b>
+&nbsp;    private static final String SELECTED_SKILL_TAG = &quot;SelectedSkill&quot;;
+&nbsp;
+&nbsp;    private static final double TARGET_RANGE = 16.0D;
+&nbsp;    private static final double TARGET_RADIUS = 0.5D;
+&nbsp;
+&nbsp;    private static final int MASTERY_SUCCESSFUL_GRANT = 25;
+&nbsp;    private static final int MASTERY_SUCCESSFUL_TAKE_BACK = 5;
+&nbsp;    private static final int MASTERY_NEW_SUBORDINATE_BONUS = 25;
+&nbsp;    private static final int MASTERY_NEW_SKILL_TYPE_BONUS = 15;
+&nbsp;
+&nbsp;    public static void openSkillSelection(ServerPlayer player) {
+<b class="nc">&nbsp;        PacketDistributor.sendToPlayer(player, new OpenGranterScreenPayload());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void setSelectedSkill(ServerPlayer player, ResourceLocation skillId) {
+<b class="nc">&nbsp;        Optional&lt;ManasSkillInstance&gt; selectionSkillOptional = getSelectionSkillInstance(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selectionSkillOptional.isEmpty()) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.no_granter&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!canPlayerSelectSkill(player, skillId)) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.invalid_selection&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ManasSkillInstance selectionInstance = selectionSkillOptional.get();</b>
+<b class="nc">&nbsp;        selectionInstance.getOrCreateTag().putString(SELECTED_SKILL_TAG, skillId.toString());</b>
+<b class="nc">&nbsp;        selectionInstance.markDirty();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendFeedback(player, Component.translatable(</b>
+&nbsp;                &quot;moostensuraaddon.granter.selected&quot;,
+<b class="nc">&nbsp;                getSkillDisplayName(player, skillId)</b>
+<b class="nc">&nbsp;        ).withStyle(ChatFormatting.AQUA));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;ResourceLocation&gt; getSelectedSkillId(ManasSkillInstance granterInstance) {
+<b class="nc">&nbsp;        if (granterInstance == null || !granterInstance.getOrCreateTag().contains(SELECTED_SKILL_TAG)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String raw = granterInstance.getOrCreateTag().getString(SELECTED_SKILL_TAG);</b>
+<b class="nc">&nbsp;        ResourceLocation id = ResourceLocation.tryParse(raw);</b>
+&nbsp;
+<b class="nc">&nbsp;        return Optional.ofNullable(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean canPlayerSelectSkill(ServerPlayer player, ResourceLocation skillId) {
+<b class="nc">&nbsp;        if (!isGrantableSkill(skillId)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;ManasSkillInstance&gt; skillOptional = SkillAPI.getSkillsFrom(player).getSkill(skillId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (skillOptional.isEmpty()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (hasUltimateGranterSkill(player)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return skillOptional.get().isMastered(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isGrantableSkill(ResourceLocation skillId) {
+<b class="nc">&nbsp;        if (skillId == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (MoosTensuraConfig.isSkillBlacklisted(skillId, MoosTensuraConfig.SkillAction.GRANT)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (skillId.equals(SkillRegistry.GRANTER.get().getRegistryName())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (skillId.equals(SkillRegistry.BENEVOLENT_EMPOWERMENT.get().getRegistryName())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (skillId.equals(SkillRegistry.ABSOLUTE_GOVERNANCE.get().getRegistryName())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ManasSkill skill = SkillAPI.getSkillRegistry().get(skillId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!(skill instanceof Skill tensuraSkill)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Skill.SkillType type = tensuraSkill.getType();</b>
+&nbsp;
+<b class="nc">&nbsp;        return type == Skill.SkillType.COMMON</b>
+&nbsp;                || type == Skill.SkillType.EXTRA
+&nbsp;                || type == Skill.SkillType.RESISTANCE
+&nbsp;                || type == Skill.SkillType.UNIQUE;
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void grantSelectedSkill(ServerPlayer player, ManasSkillInstance granterInstance) {
+<b class="nc">&nbsp;        if (granterInstance.onCoolDown(GranterMode.GRANT.id())) {</b>
+<b class="nc">&nbsp;            int remainingTicks = granterInstance.getCoolDown(GranterMode.GRANT.id());</b>
+<b class="nc">&nbsp;            int remainingSeconds = (int) Math.ceil(remainingTicks / 20.0D);</b>
+&nbsp;
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(</b>
+&nbsp;                    &quot;moostensuraaddon.granter.error.grant_cooldown&quot;,
+<b class="nc">&nbsp;                    remainingSeconds</b>
+<b class="nc">&nbsp;            ).withStyle(ChatFormatting.RED));</b>
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;ResourceLocation&gt; selectedOptional = getSelectedSkillId(granterInstance);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selectedOptional.isEmpty()) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.no_skill_selected&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ResourceLocation selectedSkillId = selectedOptional.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;ManasSkillInstance&gt; sourceSkillOptional =</b>
+<b class="nc">&nbsp;                SkillAPI.getSkillsFrom(player).getSkill(selectedSkillId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (sourceSkillOptional.isEmpty() || !sourceSkillOptional.get().isMastered(player)) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.not_mastered&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LivingEntity target = getLookedAtSubordinate(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (target == null) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.no_subordinate&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Skills targetSkills = SkillAPI.getSkillsFrom(target);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (targetSkills.getSkill(selectedSkillId).isPresent()) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.target_already_has&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ManasSkill selectedSkill = SkillAPI.getSkillRegistry().get(selectedSkillId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selectedSkill == null) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.unknown_skill&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!hasEnoughGrantMagicules(player)) {</b>
+<b class="nc">&nbsp;            double currentMagicules = getCurrentMagicules(player);</b>
+&nbsp;
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(</b>
+&nbsp;                    &quot;moostensuraaddon.granter.error.not_enough_grant_magicules&quot;,
+<b class="nc">&nbsp;                    formatNumber(getGrantMagiculeCost()),</b>
+<b class="nc">&nbsp;                    formatNumber(currentMagicules)</b>
+<b class="nc">&nbsp;            ).withStyle(ChatFormatting.RED));</b>
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ManasSkillInstance sourceInstance = sourceSkillOptional.get();</b>
+<b class="nc">&nbsp;        ManasSkillInstance grantedInstance = selectedSkill.createDefaultInstance();</b>
+&nbsp;
+<b class="nc">&nbsp;        grantedInstance.setMastery(Math.min(sourceInstance.getMastery(), grantedInstance.getMaxMastery()));</b>
+<b class="nc">&nbsp;        grantedInstance.getOrCreateTag().putBoolean(&quot;NoMagiculeCost&quot;, true);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean learned = targetSkills.learnSkill(</b>
+&nbsp;                grantedInstance,
+<b class="nc">&nbsp;                Component.translatable(&quot;moostensuraaddon.granter.learned&quot;, player.getDisplayName())</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!learned) {</b>
+<b class="nc">&nbsp;            sendGrantFailureReason(player, target, selectedSkillId);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillToggleHelper.autoToggleIfPossible(target, grantedInstance);</b>
+&nbsp;
+<b class="nc">&nbsp;        GrantedSkillData data = target.getData(AttachmentRegistry.GRANTED_SKILL_DATA);</b>
+<b class="nc">&nbsp;        data.addGrant(selectedSkillId.toString(), player.getUUID(), false);</b>
+<b class="nc">&nbsp;        target.setData(AttachmentRegistry.GRANTED_SKILL_DATA, data);</b>
+&nbsp;
+<b class="nc">&nbsp;        consumeGrantMagicules(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        granterInstance.setCoolDown(GranterMode.GRANT.id(), getGrantCooldownTicks());</b>
+&nbsp;
+<b class="nc">&nbsp;        recordSuccessfulGrantAndSyncMastery(player, granterInstance, target, selectedSkillId);</b>
+&nbsp;
+<b class="nc">&nbsp;        granterInstance.markDirty();</b>
+&nbsp;
+<b class="nc">&nbsp;        AddonAdvancementHelper.awardFirstGift(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (granterInstance.isMastered(player)) {</b>
+<b class="nc">&nbsp;            AddonAdvancementHelper.awardGranterMastered(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendFeedback(player, Component.translatable(</b>
+&nbsp;                &quot;moostensuraaddon.granter.granted_with_cost&quot;,
+<b class="nc">&nbsp;                getSkillDisplayName(player, selectedSkillId),</b>
+<b class="nc">&nbsp;                target.getDisplayName(),</b>
+<b class="nc">&nbsp;                formatNumber(getGrantMagiculeCost())</b>
+<b class="nc">&nbsp;        ).withStyle(ChatFormatting.GREEN));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void takeBackSelectedSkill(ServerPlayer player, ManasSkillInstance granterInstance) {
+<b class="nc">&nbsp;        Optional&lt;ResourceLocation&gt; selectedOptional = getSelectedSkillId(granterInstance);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selectedOptional.isEmpty()) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.no_skill_selected&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ResourceLocation selectedSkillId = selectedOptional.get();</b>
+<b class="nc">&nbsp;        LivingEntity target = getLookedAtSubordinate(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (target == null) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.no_subordinate&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        GrantedSkillData data = target.getData(AttachmentRegistry.GRANTED_SKILL_DATA);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;GrantedSkillData.GrantedSkillRecord&gt; recordOptional =</b>
+<b class="nc">&nbsp;                data.getGrant(selectedSkillId.toString(), player.getUUID());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (recordOptional.isEmpty()) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.not_granted_by_you&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        GrantedSkillData.GrantedSkillRecord record = recordOptional.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!record.targetHadSkillBefore()) {</b>
+<b class="nc">&nbsp;            SkillAPI.getSkillsFrom(target).forgetSkill(</b>
+&nbsp;                    selectedSkillId,
+<b class="nc">&nbsp;                    Component.translatable(&quot;moostensuraaddon.granter.taken_back&quot;, player.getDisplayName())</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        data.removeGrant(selectedSkillId.toString(), player.getUUID());</b>
+<b class="nc">&nbsp;        target.setData(AttachmentRegistry.GRANTED_SKILL_DATA, data);</b>
+&nbsp;
+<b class="nc">&nbsp;        recordSuccessfulTakeBackAndSyncMastery(player, granterInstance, target);</b>
+&nbsp;
+<b class="nc">&nbsp;        AddonAdvancementHelper.awardWhatWasGivenCanReturn(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (granterInstance.isMastered(player)) {</b>
+<b class="nc">&nbsp;            AddonAdvancementHelper.awardGranterMastered(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendFeedback(player, Component.translatable(</b>
+&nbsp;                &quot;moostensuraaddon.granter.take_back_success&quot;,
+<b class="nc">&nbsp;                getSkillDisplayName(player, selectedSkillId),</b>
+<b class="nc">&nbsp;                target.getDisplayName()</b>
+<b class="nc">&nbsp;        ).withStyle(ChatFormatting.GREEN));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void listSubordinateSkills(ServerPlayer player) {
+<b class="nc">&nbsp;        openSubordinateOverview(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void openSubordinateOverview(ServerPlayer player) {
+<b class="nc">&nbsp;        LivingEntity target = getLookedAtSubordinate(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (target == null) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.no_subordinate&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        recognizeSubordinate(player, target);</b>
+&nbsp;
+<b class="nc">&nbsp;        PacketDistributor.sendToPlayer(player, new OpenSubordinateOverviewScreenPayload(</b>
+<b class="nc">&nbsp;                List.of(buildSubordinateOverviewEntry(player, target))</b>
+&nbsp;        ));
+&nbsp;    }
+&nbsp;
+&nbsp;    public static OpenSubordinateOverviewScreenPayload.TargetEntry buildSubordinateOverviewEntry(
+&nbsp;            ServerPlayer viewer,
+&nbsp;            LivingEntity target
+&nbsp;    ) {
+<b class="nc">&nbsp;        IExistence existence = TensuraStorages.getExistenceFrom(target);</b>
+&nbsp;
+<b class="nc">&nbsp;        double magicules = existence == null ? 0.0D : existence.getMagicule();</b>
+<b class="nc">&nbsp;        double ep = existence == null ? 0.0D : existence.getEP();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;OpenSubordinateOverviewScreenPayload.SkillEntry&gt; skillEntries = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        GrantedSkillData grantedSkillData = target.getData(AttachmentRegistry.GRANTED_SKILL_DATA);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(target).getLearnedSkills()) {</b>
+<b class="nc">&nbsp;            if (instance == null || instance.getSkillId() == null) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            ResourceLocation skillId = instance.getSkillId();</b>
+<b class="nc">&nbsp;            Component displayName = instance.getDisplayName();</b>
+&nbsp;
+<b class="nc">&nbsp;            SkillCategoryHelper.SkillCategory category = SkillCategoryHelper.getCategory(skillId, displayName);</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean grantedByViewer = grantedSkillData.getGrant(skillId.toString(), viewer.getUUID()).isPresent();</b>
+&nbsp;
+<b class="nc">&nbsp;            skillEntries.add(new OpenSubordinateOverviewScreenPayload.SkillEntry(</b>
+<b class="nc">&nbsp;                    skillId.toString(),</b>
+<b class="nc">&nbsp;                    displayName.getString(),</b>
+<b class="nc">&nbsp;                    SkillCategoryHelper.getCategoryHeader(category).getString(),</b>
+<b class="nc">&nbsp;                    category.sortOrder(),</b>
+<b class="nc">&nbsp;                    instance.isMastered(target),</b>
+&nbsp;                    grantedByViewer
+&nbsp;            ));
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        skillEntries.sort(Comparator</b>
+<b class="nc">&nbsp;                .comparingInt(OpenSubordinateOverviewScreenPayload.SkillEntry::categoryOrder)</b>
+<b class="nc">&nbsp;                .thenComparing(OpenSubordinateOverviewScreenPayload.SkillEntry::displayName, String.CASE_INSENSITIVE_ORDER)</b>
+<b class="nc">&nbsp;                .thenComparing(OpenSubordinateOverviewScreenPayload.SkillEntry::skillId));</b>
+&nbsp;
+<b class="nc">&nbsp;        return new OpenSubordinateOverviewScreenPayload.TargetEntry(</b>
+<b class="nc">&nbsp;                target.getUUID().toString(),</b>
+<b class="nc">&nbsp;                target.getDisplayName().getString(),</b>
+<b class="nc">&nbsp;                target.getHealth(),</b>
+<b class="nc">&nbsp;                target.getMaxHealth(),</b>
+&nbsp;                magicules,
+&nbsp;                ep,
+&nbsp;                skillEntries
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean giveGranter(ServerPlayer player) {
+<b class="nc">&nbsp;        Skills skills = SkillAPI.getSkillsFrom(player);</b>
+<b class="nc">&nbsp;        ResourceLocation granterId = SkillRegistry.GRANTER.get().getRegistryName();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (skills.getSkill(granterId).isPresent()) {</b>
+<b class="nc">&nbsp;            AddonAdvancementHelper.awardAuthorityToBestow(player);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean learned = skills.learnSkill(</b>
+<b class="nc">&nbsp;                SkillRegistry.GRANTER.get().createDefaultInstance(),</b>
+<b class="nc">&nbsp;                Component.translatable(&quot;moostensuraaddon.granter.acquired&quot;)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (learned) {</b>
+<b class="nc">&nbsp;            AddonAdvancementHelper.awardAuthorityToBestow(player);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return learned;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean hasGreatSage(ServerPlayer player) {
+<b class="fc">&nbsp;        ResourceLocation greatSageId = UniqueSkills.GREAT_SAGE.get().getRegistryName();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (SkillAPI.getSkillsFrom(player).getSkill(greatSageId).isPresent()) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return SkillAPI.getSkillsFrom(player)</b>
+<b class="nc">&nbsp;                .getLearnedSkills()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .anyMatch(GranterActions::isGreatSageSkill);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isGreatSageSkill(ManasSkillInstance instance) {
+<b class="nc">&nbsp;        if (instance == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ResourceLocation skillId = instance.getSkillId();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (skillId != null &amp;&amp; skillId.toString().equals(&quot;tensura:great_sage&quot;)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String displayName = instance.getDisplayName().getString();</b>
+&nbsp;
+<b class="nc">&nbsp;        return displayName.equalsIgnoreCase(&quot;Great Sage&quot;)</b>
+<b class="nc">&nbsp;                || displayName.equalsIgnoreCase(&quot;The Great Sage&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;ManasSkillInstance&gt; getSelectionSkillInstance(ServerPlayer player) {
+<b class="nc">&nbsp;        Skills skills = SkillAPI.getSkillsFrom(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;ManasSkillInstance&gt; benevolentOptional =</b>
+<b class="nc">&nbsp;                skills.getSkill(SkillRegistry.BENEVOLENT_EMPOWERMENT.get().getRegistryName());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (benevolentOptional.isPresent()) {</b>
+<b class="nc">&nbsp;            return benevolentOptional;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;ManasSkillInstance&gt; absoluteOptional =</b>
+<b class="nc">&nbsp;                skills.getSkill(SkillRegistry.ABSOLUTE_GOVERNANCE.get().getRegistryName());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (absoluteOptional.isPresent()) {</b>
+<b class="nc">&nbsp;            return absoluteOptional;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return skills.getSkill(SkillRegistry.GRANTER.get().getRegistryName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasUltimateGranterSkill(ServerPlayer player) {
+<b class="nc">&nbsp;        Skills skills = SkillAPI.getSkillsFrom(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        return skills.getSkill(SkillRegistry.BENEVOLENT_EMPOWERMENT.get().getRegistryName()).isPresent()</b>
+<b class="nc">&nbsp;                || skills.getSkill(SkillRegistry.ABSOLUTE_GOVERNANCE.get().getRegistryName()).isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static LivingEntity getLookedAtSubordinate(ServerPlayer player) {
+<b class="nc">&nbsp;        LivingEntity target = ObjectSelectionHelper.getTargetingEntity(</b>
+&nbsp;                LivingEntity.class,
+&nbsp;                player,
+&nbsp;                TARGET_RANGE,
+&nbsp;                TARGET_RADIUS,
+&nbsp;                false,
+&nbsp;                true,
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (target == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return SubordinateHelper.isSubordinate(player, target) ? target : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void recordSuccessfulGrantAndSyncMastery(
+&nbsp;            ServerPlayer player,
+&nbsp;            ManasSkillInstance granterInstance,
+&nbsp;            LivingEntity target,
+&nbsp;            ResourceLocation grantedSkillId
+&nbsp;    ) {
+<b class="nc">&nbsp;        GranterProgressData progress = player.getData(AttachmentRegistry.GRANTER_PROGRESS_DATA);</b>
+&nbsp;
+<b class="nc">&nbsp;        progress.incrementSuccessfulGrants();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean newSubordinate = progress.recognizeSubordinate(target.getUUID());</b>
+<b class="nc">&nbsp;        boolean newSkillType = progress.recordGrantedSkillType(grantedSkillId.toString());</b>
+&nbsp;
+<b class="nc">&nbsp;        int masteryGain = MASTERY_SUCCESSFUL_GRANT;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (newSubordinate) {</b>
+<b class="nc">&nbsp;            masteryGain += MASTERY_NEW_SUBORDINATE_BONUS;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (newSkillType) {</b>
+<b class="nc">&nbsp;            masteryGain += MASTERY_NEW_SKILL_TYPE_BONUS;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        addEarnedMasteryAndSyncToTensura(granterInstance, progress, masteryGain);</b>
+&nbsp;
+<b class="nc">&nbsp;        player.setData(AttachmentRegistry.GRANTER_PROGRESS_DATA, progress);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionAuthorityProgress.recordEmpoweredSubordinate(</b>
+&nbsp;                player,
+&nbsp;                target
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendMasteryProgressMessage(</b>
+&nbsp;                player,
+&nbsp;                masteryGain,
+&nbsp;                granterInstance,
+<b class="nc">&nbsp;                &quot;Grants: &quot; + progress.getSuccessfulGrants()</b>
+<b class="nc">&nbsp;                        + &quot; | Recognized: &quot; + progress.getRecognizedSubordinateCount()</b>
+<b class="nc">&nbsp;                        + &quot; | Skill Types: &quot; + progress.getGrantedSkillTypeCount()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void recordSuccessfulTakeBackAndSyncMastery(
+&nbsp;            ServerPlayer player,
+&nbsp;            ManasSkillInstance granterInstance,
+&nbsp;            LivingEntity target
+&nbsp;    ) {
+<b class="nc">&nbsp;        GranterProgressData progress = player.getData(AttachmentRegistry.GRANTER_PROGRESS_DATA);</b>
+&nbsp;
+<b class="nc">&nbsp;        progress.incrementSuccessfulTakeBacks();</b>
+<b class="nc">&nbsp;        progress.recognizeSubordinate(target.getUUID());</b>
+&nbsp;
+<b class="nc">&nbsp;        addEarnedMasteryAndSyncToTensura(granterInstance, progress, MASTERY_SUCCESSFUL_TAKE_BACK);</b>
+&nbsp;
+<b class="nc">&nbsp;        player.setData(AttachmentRegistry.GRANTER_PROGRESS_DATA, progress);</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionAuthorityProgress.synchronize(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        sendMasteryProgressMessage(</b>
+&nbsp;                player,
+&nbsp;                MASTERY_SUCCESSFUL_TAKE_BACK,
+&nbsp;                granterInstance,
+<b class="nc">&nbsp;                &quot;Take Backs: &quot; + progress.getSuccessfulTakeBacks()</b>
+<b class="nc">&nbsp;                        + &quot; | Recognized: &quot; + progress.getRecognizedSubordinateCount()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void recognizeSubordinate(
+&nbsp;            ServerPlayer player,
+&nbsp;            LivingEntity target
+&nbsp;    ) {
+<b class="nc">&nbsp;        GranterProgressData progress = player.getData(</b>
+&nbsp;                AttachmentRegistry.GRANTER_PROGRESS_DATA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean changed = progress.recognizeSubordinate(</b>
+<b class="nc">&nbsp;                target.getUUID()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (changed) {</b>
+<b class="nc">&nbsp;            player.setData(</b>
+&nbsp;                    AttachmentRegistry.GRANTER_PROGRESS_DATA,
+&nbsp;                    progress
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionAuthorityProgress.synchronize(player);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addEarnedMasteryAndSyncToTensura(
+&nbsp;            ManasSkillInstance granterInstance,
+&nbsp;            GranterProgressData progress,
+&nbsp;            int masteryGain
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (masteryGain &lt;= 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int currentRealMastery = (int) Math.floor(Math.max(0.0D, granterInstance.getMastery()));</b>
+<b class="nc">&nbsp;        int maxMastery = (int) Math.floor(Math.max(0.0D, granterInstance.getMaxMastery()));</b>
+&nbsp;
+<b class="nc">&nbsp;        progress.addEarnedGranterMastery(masteryGain, currentRealMastery, maxMastery);</b>
+&nbsp;
+<b class="nc">&nbsp;        syncStoredMasteryToTensura(granterInstance, progress);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void syncStoredMasteryToTensura(
+&nbsp;            ManasSkillInstance granterInstance,
+&nbsp;            GranterProgressData progress
+&nbsp;    ) {
+<b class="nc">&nbsp;        int currentRealMastery = (int) Math.floor(Math.max(0.0D, granterInstance.getMastery()));</b>
+<b class="nc">&nbsp;        int maxMastery = (int) Math.floor(Math.max(0.0D, granterInstance.getMaxMastery()));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (maxMastery &lt;= 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int desiredMastery = Math.min(progress.getEarnedGranterMastery(), maxMastery);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (currentRealMastery &gt;= desiredMastery) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        granterInstance.setMastery(desiredMastery);</b>
+<b class="nc">&nbsp;        granterInstance.markDirty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendMasteryProgressMessage(
+&nbsp;            ServerPlayer player,
+&nbsp;            int masteryGain,
+&nbsp;            ManasSkillInstance granterInstance,
+&nbsp;            String extra
+&nbsp;    ) {
+<b class="nc">&nbsp;        int currentMastery = (int) Math.floor(Math.max(0.0D, granterInstance.getMastery()));</b>
+<b class="nc">&nbsp;        int maxMastery = (int) Math.floor(Math.max(0.0D, granterInstance.getMaxMastery()));</b>
+<b class="nc">&nbsp;        double percent = maxMastery &lt;= 0 ? 0.0D : (currentMastery * 100.0D / maxMastery);</b>
+&nbsp;
+<b class="nc">&nbsp;        sendFeedback(player, Component.literal(</b>
+&nbsp;                &quot;[Granter Progress] +&quot; + masteryGain + &quot; mastery&quot;
+&nbsp;                        + &quot; | Mastery: &quot; + currentMastery + &quot; / &quot; + maxMastery
+<b class="nc">&nbsp;                        + &quot; (&quot; + formatPercent(percent) + &quot;)&quot;</b>
+&nbsp;                        + &quot; | &quot; + extra
+<b class="nc">&nbsp;        ).withStyle(ChatFormatting.DARK_GRAY));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendGrantFailureReason(ServerPlayer player, LivingEntity target, ResourceLocation skillId) {
+<b class="nc">&nbsp;        if (SkillAPI.getSkillsFrom(target).getSkill(skillId).isPresent()) {</b>
+<b class="nc">&nbsp;            sendFeedback(player, Component.translatable(&quot;moostensuraaddon.granter.error.target_already_has&quot;)</b>
+<b class="nc">&nbsp;                    .withStyle(ChatFormatting.RED));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        IExistence targetExistence = TensuraStorages.getExistenceFrom(target);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (targetExistence != null) {</b>
+<b class="nc">&nbsp;            double magicules = targetExistence.getMagicule();</b>
+<b class="nc">&nbsp;            double ep = targetExistence.getEP();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (magicules &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;                sendFeedback(player, Component.translatable(</b>
+&nbsp;                        &quot;moostensuraaddon.granter.error.not_enough_magicules&quot;,
+<b class="nc">&nbsp;                        target.getDisplayName()</b>
+<b class="nc">&nbsp;                ).withStyle(ChatFormatting.RED));</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (ep &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;                sendFeedback(player, Component.translatable(</b>
+&nbsp;                        &quot;moostensuraaddon.granter.error.not_enough_ep&quot;,
+<b class="nc">&nbsp;                        target.getDisplayName()</b>
+<b class="nc">&nbsp;                ).withStyle(ChatFormatting.RED));</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sendFeedback(player, Component.translatable(</b>
+&nbsp;                &quot;moostensuraaddon.granter.error.grant_failed_detailed&quot;,
+<b class="nc">&nbsp;                target.getDisplayName(),</b>
+<b class="nc">&nbsp;                getSkillDisplayName(player, skillId)</b>
+<b class="nc">&nbsp;        ).withStyle(ChatFormatting.RED));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Component getSkillDisplayName(ServerPlayer player, ResourceLocation skillId) {
+<b class="nc">&nbsp;        if (player != null &amp;&amp; skillId != null) {</b>
+<b class="nc">&nbsp;            Optional&lt;ManasSkillInstance&gt; playerSkill = SkillAPI.getSkillsFrom(player).getSkill(skillId);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (playerSkill.isPresent()) {</b>
+<b class="nc">&nbsp;                return playerSkill.get().getDisplayName().copy();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return skillId == null ? Component.literal(&quot;Unknown Skill&quot;) : Component.literal(skillId.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendFeedback(ServerPlayer player, Component message) {
+<b class="nc">&nbsp;        ActionbarHelper.send(player, message);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double getGrantMagiculeCost() {
+<b class="nc">&nbsp;        return MoosTensuraConfig.GRANTER_GRANT_MAGICULE_COST.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int getGrantCooldownTicks() {
+<b class="nc">&nbsp;        return MoosTensuraConfig.GRANTER_GRANT_COOLDOWN_TICKS.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasEnoughGrantMagicules(ServerPlayer player) {
+<b class="nc">&nbsp;        return getCurrentMagicules(player) &gt;= getGrantMagiculeCost();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double getCurrentMagicules(ServerPlayer player) {
+<b class="nc">&nbsp;        IExistence existence = TensuraStorages.getExistenceFrom(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (existence == null) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return existence.getMagicule();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void consumeGrantMagicules(ServerPlayer player) {
+<b class="nc">&nbsp;        IExistence existence = TensuraStorages.getExistenceFrom(player);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (existence == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double currentMagicules = existence.getMagicule();</b>
+<b class="nc">&nbsp;        existence.setMagicule(Math.max(0.0D, currentMagicules - getGrantMagiculeCost()));</b>
+<b class="nc">&nbsp;        existence.markDirty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatNumber(double value) {
+<b class="nc">&nbsp;        return String.format(Locale.US, &quot;%,.0f&quot;, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatPercent(double value) {
+<b class="nc">&nbsp;        return String.format(Locale.US, &quot;%.1f%%&quot;, value);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

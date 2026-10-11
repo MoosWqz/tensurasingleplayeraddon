@@ -1,0 +1,658 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SubordinateListWidget</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen.skillui</a>
+</div>
+
+<h1>Coverage Summary for Class: SubordinateListWidget (com.mooswqz.moostensuraaddon.client.screen.skillui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SubordinateListWidget</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/107)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/214)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen.skillui;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.network.OpenSubordinateOverviewScreenPayload;
+&nbsp;import com.mooswqz.moostensuraaddon.util.SubordinateOverviewPolicy;
+&nbsp;import com.mooswqz.moostensuraaddon.util.UiTranslationToken;
+&nbsp;import net.minecraft.client.Minecraft;
+&nbsp;import net.minecraft.client.gui.Font;
+&nbsp;import net.minecraft.client.gui.GuiGraphics;
+&nbsp;import net.minecraft.client.gui.components.AbstractWidget;
+&nbsp;import net.minecraft.client.gui.narration.NarratedElementType;
+&nbsp;import net.minecraft.client.gui.narration.NarrationElementOutput;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import org.lwjgl.glfw.GLFW;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;public final class SubordinateListWidget extends AbstractWidget {
+&nbsp;
+&nbsp;    private static final int INNER_PADDING = 2;
+&nbsp;    private static final int SCROLLBAR_WIDTH = 7;
+&nbsp;    private static final int ROW_HEIGHT = 34;
+&nbsp;
+&nbsp;    private final Font font;
+&nbsp;    private final SkillUiTheme theme;
+<b class="nc">&nbsp;    private final List&lt;OpenSubordinateOverviewScreenPayload.TargetEntry&gt;</b>
+&nbsp;            allTargets = new ArrayList&lt;&gt;();
+<b class="nc">&nbsp;    private final List&lt;OpenSubordinateOverviewScreenPayload.TargetEntry&gt;</b>
+&nbsp;            filteredTargets = new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;    private Consumer&lt;OpenSubordinateOverviewScreenPayload.TargetEntry&gt;</b>
+&nbsp;            selectionListener = target -&gt; {
+<b class="nc">&nbsp;    };</b>
+<b class="nc">&nbsp;    private String query = &quot;&quot;;</b>
+<b class="nc">&nbsp;    private String selectedUuid = &quot;&quot;;</b>
+&nbsp;    private int focusedIndex;
+&nbsp;    private double scrollOffset;
+&nbsp;    private OpenSubordinateOverviewScreenPayload.TargetEntry hoveredTarget;
+&nbsp;
+&nbsp;    public SubordinateListWidget(
+&nbsp;            int x,
+&nbsp;            int y,
+&nbsp;            int width,
+&nbsp;            int height,
+&nbsp;            Font font,
+&nbsp;            SkillUiTheme theme
+&nbsp;    ) {
+<b class="nc">&nbsp;        super(</b>
+&nbsp;                x,
+&nbsp;                y,
+<b class="nc">&nbsp;                Math.max(1, width),</b>
+<b class="nc">&nbsp;                Math.max(1, height),</b>
+<b class="nc">&nbsp;                SkillUiText.component(&quot;narration.subordinate_list&quot;)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        this.font = font == null</b>
+<b class="nc">&nbsp;                ? Minecraft.getInstance().font</b>
+<b class="nc">&nbsp;                : font;</b>
+<b class="nc">&nbsp;        this.theme = theme == null</b>
+<b class="nc">&nbsp;                ? SkillUiTheme.GRANTER</b>
+<b class="nc">&nbsp;                : theme;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTargets(
+&nbsp;            List&lt;OpenSubordinateOverviewScreenPayload.TargetEntry&gt; targets
+&nbsp;    ) {
+<b class="nc">&nbsp;        allTargets.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (targets != null) {</b>
+<b class="nc">&nbsp;            allTargets.addAll(</b>
+<b class="nc">&nbsp;                    targets.stream()</b>
+<b class="nc">&nbsp;                            .filter(target -&gt; target != null)</b>
+<b class="nc">&nbsp;                            .toList()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        rebuildFilter();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setQuery(
+&nbsp;            String query
+&nbsp;    ) {
+<b class="nc">&nbsp;        this.query = query == null ? &quot;&quot; : query;</b>
+<b class="nc">&nbsp;        rebuildFilter();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelectionListener(
+&nbsp;            Consumer&lt;OpenSubordinateOverviewScreenPayload.TargetEntry&gt;
+&nbsp;                    selectionListener
+&nbsp;    ) {
+<b class="nc">&nbsp;        this.selectionListener = selectionListener == null</b>
+<b class="nc">&nbsp;                ? target -&gt; {</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;                : selectionListener;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void select(
+&nbsp;            String targetUuid
+&nbsp;    ) {
+<b class="nc">&nbsp;        selectedUuid = targetUuid == null ? &quot;&quot; : targetUuid;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; filteredTargets.size(); index++) {</b>
+<b class="nc">&nbsp;            if (filteredTargets.get(index).targetUuid()</b>
+<b class="nc">&nbsp;                    .equals(selectedUuid)) {</b>
+<b class="nc">&nbsp;                focusedIndex = index;</b>
+<b class="nc">&nbsp;                ensureFocusedVisible();</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!filteredTargets.isEmpty()) {</b>
+<b class="nc">&nbsp;            focusedIndex = Math.min(</b>
+&nbsp;                    focusedIndex,
+<b class="nc">&nbsp;                    filteredTargets.size() - 1</b>
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            focusedIndex = 0;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;OpenSubordinateOverviewScreenPayload.TargetEntry&gt;
+&nbsp;    selectedTarget() {
+<b class="nc">&nbsp;        return allTargets.stream()</b>
+<b class="nc">&nbsp;                .filter(target -&gt; target.targetUuid().equals(selectedUuid))</b>
+<b class="nc">&nbsp;                .findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int visibleTargetCount() {
+<b class="nc">&nbsp;        return filteredTargets.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;OpenSubordinateOverviewScreenPayload.TargetEntry&gt;
+&nbsp;    hoveredTarget() {
+<b class="nc">&nbsp;        return Optional.ofNullable(hoveredTarget);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void renderWidget(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+<b class="nc">&nbsp;        SkillUiLayout.Rect bounds = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                getX(),</b>
+<b class="nc">&nbsp;                getY(),</b>
+<b class="nc">&nbsp;                getWidth(),</b>
+<b class="nc">&nbsp;                getHeight()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+&nbsp;                bounds,
+<b class="nc">&nbsp;                isFocused()</b>
+<b class="nc">&nbsp;                        ? theme.accentColor()</b>
+<b class="nc">&nbsp;                        : theme.panelBorderColor(),</b>
+<b class="nc">&nbsp;                theme.panelFillColor(),</b>
+<b class="nc">&nbsp;                isFocused() ? 2 : 1</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int contentLeft = getX() + INNER_PADDING;</b>
+<b class="nc">&nbsp;        int contentTop = getY() + INNER_PADDING;</b>
+<b class="nc">&nbsp;        int contentRight = getX() + getWidth() - INNER_PADDING;</b>
+<b class="nc">&nbsp;        int contentBottom = getY() + getHeight() - INNER_PADDING;</b>
+<b class="nc">&nbsp;        hoveredTarget = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (filteredTargets.isEmpty()) {</b>
+<b class="nc">&nbsp;            SkillUiRenderHelper.drawCenteredText(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    font,
+<b class="nc">&nbsp;                    SkillUiText.component(&quot;empty.no_matching_subordinates&quot;),</b>
+<b class="nc">&nbsp;                    getX() + getWidth() / 2,</b>
+<b class="nc">&nbsp;                    getY() + getHeight() / 2 - 4,</b>
+<b class="nc">&nbsp;                    theme.mutedTextColor()</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.enableScissor(</b>
+&nbsp;                contentLeft,
+&nbsp;                contentTop,
+&nbsp;                contentRight,
+&nbsp;                contentBottom
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int firstIndex = Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                (int) Math.floor(scrollOffset / ROW_HEIGHT)</b>
+&nbsp;        );
+<b class="nc">&nbsp;        int offsetInsideRow = (int) Math.floor(scrollOffset)</b>
+&nbsp;                - firstIndex * ROW_HEIGHT;
+<b class="nc">&nbsp;        int visibleRows = getHeight() / ROW_HEIGHT + 2;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = firstIndex;</b>
+<b class="nc">&nbsp;             index &lt; filteredTargets.size()</b>
+<b class="nc">&nbsp;                     &amp;&amp; index &lt; firstIndex + visibleRows;</b>
+<b class="nc">&nbsp;             index++) {</b>
+<b class="nc">&nbsp;            int rowTop = contentTop</b>
+&nbsp;                    + (index - firstIndex) * ROW_HEIGHT
+&nbsp;                    - offsetInsideRow;
+<b class="nc">&nbsp;            int rowBottom = rowTop + ROW_HEIGHT - 2;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (rowBottom &lt;= contentTop || rowTop &gt;= contentBottom) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            OpenSubordinateOverviewScreenPayload.TargetEntry target =</b>
+<b class="nc">&nbsp;                    filteredTargets.get(index);</b>
+<b class="nc">&nbsp;            boolean hovered = mouseX &gt;= contentLeft</b>
+&nbsp;                    &amp;&amp; mouseX &lt; contentRight - SCROLLBAR_WIDTH
+&nbsp;                    &amp;&amp; mouseY &gt;= rowTop
+&nbsp;                    &amp;&amp; mouseY &lt; rowBottom;
+&nbsp;
+<b class="nc">&nbsp;            if (hovered) {</b>
+<b class="nc">&nbsp;                hoveredTarget = target;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            renderTargetRow(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    target,
+&nbsp;                    index,
+&nbsp;                    contentLeft,
+&nbsp;                    rowTop,
+&nbsp;                    contentRight - SCROLLBAR_WIDTH,
+&nbsp;                    hovered
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.disableScissor();</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawScrollbar(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                bounds.inset(INNER_PADDING),</b>
+&nbsp;                scrollOffset,
+<b class="nc">&nbsp;                maximumScroll(),</b>
+<b class="nc">&nbsp;                filteredTargets.size() * ROW_HEIGHT,</b>
+&nbsp;                theme
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderTargetRow(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            OpenSubordinateOverviewScreenPayload.TargetEntry target,
+&nbsp;            int index,
+&nbsp;            int left,
+&nbsp;            int top,
+&nbsp;            int right,
+&nbsp;            boolean hovered
+&nbsp;    ) {
+<b class="nc">&nbsp;        boolean selected = target.targetUuid().equals(selectedUuid);</b>
+<b class="nc">&nbsp;        boolean focused = index == focusedIndex;</b>
+<b class="nc">&nbsp;        int fillColor = selected</b>
+<b class="nc">&nbsp;                ? theme.selectedRowFillColor()</b>
+<b class="nc">&nbsp;                : hovered</b>
+<b class="nc">&nbsp;                  ? theme.hoveredRowFillColor()</b>
+<b class="nc">&nbsp;                  : theme.rowFillColor();</b>
+<b class="nc">&nbsp;        int borderColor = selected || focused</b>
+<b class="nc">&nbsp;                ? theme.accentColor()</b>
+<b class="nc">&nbsp;                : theme.panelBorderColor();</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+&nbsp;                new SkillUiLayout.Rect(
+&nbsp;                        left,
+&nbsp;                        top,
+<b class="nc">&nbsp;                        Math.max(1, right - left),</b>
+&nbsp;                        ROW_HEIGHT - 2
+&nbsp;                ),
+&nbsp;                borderColor,
+&nbsp;                fillColor,
+<b class="nc">&nbsp;                focused ? 2 : 1</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                UiTranslationToken.toComponent(target.targetName()),</b>
+&nbsp;                left + 6,
+&nbsp;                top + 4,
+<b class="nc">&nbsp;                Math.max(1, right - left - 12),</b>
+<b class="nc">&nbsp;                selected</b>
+<b class="nc">&nbsp;                        ? theme.accentColor()</b>
+<b class="nc">&nbsp;                        : theme.primaryTextColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                SkillUiText.component(</b>
+&nbsp;                        &quot;overview.type_distance&quot;,
+<b class="nc">&nbsp;                        UiTranslationToken.toComponent(target.typeName()),</b>
+<b class="nc">&nbsp;                        formatDistance(target.distance())</b>
+&nbsp;                ),
+&nbsp;                left + 6,
+&nbsp;                top + 15,
+<b class="nc">&nbsp;                Math.max(1, right - left - 12),</b>
+<b class="nc">&nbsp;                theme.secondaryTextColor()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                SkillUiText.component(</b>
+<b class="nc">&nbsp;                        target.skills().size() == 1</b>
+<b class="nc">&nbsp;                                ? &quot;count.skill_one&quot;</b>
+<b class="nc">&nbsp;                                : &quot;count.skill_many&quot;,</b>
+<b class="nc">&nbsp;                        target.skills().size()</b>
+&nbsp;                ),
+&nbsp;                left + 6,
+&nbsp;                top + 25,
+<b class="nc">&nbsp;                Math.max(1, right - left - 12),</b>
+<b class="nc">&nbsp;                theme.mutedTextColor()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean mouseClicked(
+&nbsp;            double mouseX,
+&nbsp;            double mouseY,
+&nbsp;            int button
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!active</b>
+&nbsp;                || !visible
+&nbsp;                || button != GLFW.GLFW_MOUSE_BUTTON_LEFT
+<b class="nc">&nbsp;                || !isMouseOver(mouseX, mouseY)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int localY = (int) Math.floor(mouseY)</b>
+<b class="nc">&nbsp;                - getY()</b>
+&nbsp;                - INNER_PADDING
+<b class="nc">&nbsp;                + (int) Math.floor(scrollOffset);</b>
+<b class="nc">&nbsp;        int index = localY / ROW_HEIGHT;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (index &lt; 0 || index &gt;= filteredTargets.size()) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        setFocused(true);</b>
+<b class="nc">&nbsp;        focusedIndex = index;</b>
+<b class="nc">&nbsp;        OpenSubordinateOverviewScreenPayload.TargetEntry target =</b>
+<b class="nc">&nbsp;                filteredTargets.get(index);</b>
+<b class="nc">&nbsp;        selectedUuid = target.targetUuid();</b>
+<b class="nc">&nbsp;        selectionListener.accept(target);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean mouseScrolled(
+&nbsp;            double mouseX,
+&nbsp;            double mouseY,
+&nbsp;            double scrollX,
+&nbsp;            double scrollY
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!visible</b>
+<b class="nc">&nbsp;                || !isMouseOver(mouseX, mouseY)</b>
+<b class="nc">&nbsp;                || maximumScroll() &lt;= 0.0D) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        scrollOffset = clampScroll(</b>
+&nbsp;                scrollOffset - scrollY * ROW_HEIGHT * 0.8D
+&nbsp;        );
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean keyPressed(
+&nbsp;            int keyCode,
+&nbsp;            int scanCode,
+&nbsp;            int modifiers
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!active || !visible || !isFocused()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        switch (keyCode) {</b>
+&nbsp;            case GLFW.GLFW_KEY_UP -&gt; {
+<b class="nc">&nbsp;                moveFocus(-1);</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case GLFW.GLFW_KEY_DOWN -&gt; {
+<b class="nc">&nbsp;                moveFocus(1);</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case GLFW.GLFW_KEY_HOME -&gt; {
+<b class="nc">&nbsp;                focusedIndex = 0;</b>
+<b class="nc">&nbsp;                selectFocused();</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case GLFW.GLFW_KEY_END -&gt; {
+<b class="nc">&nbsp;                focusedIndex = Math.max(</b>
+&nbsp;                        0,
+<b class="nc">&nbsp;                        filteredTargets.size() - 1</b>
+&nbsp;                );
+<b class="nc">&nbsp;                selectFocused();</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case GLFW.GLFW_KEY_ENTER,
+&nbsp;                 GLFW.GLFW_KEY_KP_ENTER,
+&nbsp;                 GLFW.GLFW_KEY_SPACE -&gt; {
+<b class="nc">&nbsp;                selectFocused();</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            default -&gt; {
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void moveFocus(
+&nbsp;            int direction
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (filteredTargets.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        focusedIndex = Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                Math.min(</b>
+<b class="nc">&nbsp;                        filteredTargets.size() - 1,</b>
+&nbsp;                        focusedIndex + direction
+&nbsp;                )
+&nbsp;        );
+<b class="nc">&nbsp;        selectFocused();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void selectFocused() {
+<b class="nc">&nbsp;        if (filteredTargets.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        OpenSubordinateOverviewScreenPayload.TargetEntry target =</b>
+<b class="nc">&nbsp;                filteredTargets.get(focusedIndex);</b>
+<b class="nc">&nbsp;        selectedUuid = target.targetUuid();</b>
+<b class="nc">&nbsp;        ensureFocusedVisible();</b>
+<b class="nc">&nbsp;        selectionListener.accept(target);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void rebuildFilter() {
+<b class="nc">&nbsp;        filteredTargets.clear();</b>
+&nbsp;
+&nbsp;        for (OpenSubordinateOverviewScreenPayload.TargetEntry target :
+<b class="nc">&nbsp;                allTargets) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; skillSearchTexts = target.skills()</b>
+<b class="nc">&nbsp;                    .stream()</b>
+<b class="nc">&nbsp;                    .map(skill -&gt; skill.displayName()</b>
+&nbsp;                            + &quot; &quot;
+<b class="nc">&nbsp;                            + skill.skillId()</b>
+&nbsp;                            + &quot; &quot;
+<b class="nc">&nbsp;                            + skill.categoryName())</b>
+<b class="nc">&nbsp;                    .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (SubordinateOverviewPolicy.matchesTarget(</b>
+&nbsp;                    query,
+<b class="nc">&nbsp;                    UiTranslationToken.toComponent(target.targetName()).getString(),</b>
+<b class="nc">&nbsp;                    UiTranslationToken.toComponent(target.typeName()).getString(),</b>
+&nbsp;                    skillSearchTexts
+&nbsp;            )) {
+<b class="nc">&nbsp;                filteredTargets.add(target);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        scrollOffset = clampScroll(scrollOffset);</b>
+<b class="nc">&nbsp;        focusedIndex = Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        focusedIndex,
+<b class="nc">&nbsp;                        Math.max(0, filteredTargets.size() - 1)</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void ensureFocusedVisible() {
+<b class="nc">&nbsp;        int rowTop = focusedIndex * ROW_HEIGHT;</b>
+<b class="nc">&nbsp;        int rowBottom = rowTop + ROW_HEIGHT;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (rowTop &lt; scrollOffset) {</b>
+<b class="nc">&nbsp;            scrollOffset = rowTop;</b>
+<b class="nc">&nbsp;        } else if (rowBottom &gt; scrollOffset + getHeight()) {</b>
+<b class="nc">&nbsp;            scrollOffset = rowBottom - getHeight();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        scrollOffset = clampScroll(scrollOffset);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private double maximumScroll() {
+<b class="nc">&nbsp;        return Math.max(</b>
+&nbsp;                0.0D,
+<b class="nc">&nbsp;                filteredTargets.size() * ROW_HEIGHT</b>
+<b class="nc">&nbsp;                        - Math.max(1, getHeight() - INNER_PADDING * 2)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private double clampScroll(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return Math.max(</b>
+&nbsp;                0.0D,
+<b class="nc">&nbsp;                Math.min(maximumScroll(), value)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatDistance(
+&nbsp;            double distance
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                java.util.Locale.US,
+<b class="nc">&nbsp;                distance &lt; 10.0D ? &quot;%.1f m&quot; : &quot;%.0f m&quot;,</b>
+<b class="nc">&nbsp;                distance</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void updateWidgetNarration(
+&nbsp;            NarrationElementOutput narrationElementOutput
+&nbsp;    ) {
+<b class="nc">&nbsp;        narrationElementOutput.add(</b>
+&nbsp;                NarratedElementType.TITLE,
+<b class="nc">&nbsp;                getMessage()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!filteredTargets.isEmpty()) {</b>
+<b class="nc">&nbsp;            OpenSubordinateOverviewScreenPayload.TargetEntry focused =</b>
+<b class="nc">&nbsp;                    filteredTargets.get(</b>
+<b class="nc">&nbsp;                            Math.min(</b>
+&nbsp;                                    focusedIndex,
+<b class="nc">&nbsp;                                    filteredTargets.size() - 1</b>
+&nbsp;                            )
+&nbsp;                    );
+<b class="nc">&nbsp;            narrationElementOutput.add(</b>
+&nbsp;                    NarratedElementType.POSITION,
+<b class="nc">&nbsp;                    UiTranslationToken.toComponent(focused.targetName())</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        narrationElementOutput.add(</b>
+&nbsp;                NarratedElementType.USAGE,
+<b class="nc">&nbsp;                SkillUiText.component(</b>
+&nbsp;                        &quot;narration.subordinate_list_usage&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

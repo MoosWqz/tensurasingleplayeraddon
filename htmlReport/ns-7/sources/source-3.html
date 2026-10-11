@@ -1,0 +1,993 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DebugCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: DebugCommand (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DebugCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.9%
+  </span>
+  <span class="absValue">
+    (2/51)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.7%
+  </span>
+  <span class="absValue">
+    (3/53)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22%
+  </span>
+  <span class="absValue">
+    (58/264)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DebugCommand$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    3.8%
+  </span>
+  <span class="absValue">
+    (2/52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.7%
+  </span>
+  <span class="absValue">
+    (3/53)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.9%
+  </span>
+  <span class="absValue">
+    (58/265)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mojang.brigadier.CommandDispatcher;
+&nbsp;import com.mojang.brigadier.arguments.StringArgumentType;
+&nbsp;import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+&nbsp;import com.mojang.brigadier.tree.CommandNode;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionNameColorService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionPath;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.commands.Commands;
+&nbsp;import net.minecraft.commands.SharedSuggestionProvider;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;import net.minecraft.server.MinecraftServer;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;public final class DebugCommand {
+&nbsp;
+&nbsp;    private DebugCommand() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Attaches the debug command directly to the canonical /moostensura root.
+&nbsp;     *
+&nbsp;     * MoosTensuraCommand.register(...) must run before this method.
+&nbsp;     */
+&nbsp;    public static void attachToMoosTensuraRoot(
+&nbsp;            CommandDispatcher&lt;CommandSourceStack&gt; dispatcher
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (dispatcher == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;A command dispatcher is required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        CommandNode&lt;CommandSourceStack&gt; moosTensuraRoot =</b>
+<b class="fc">&nbsp;                dispatcher.getRoot()</b>
+<b class="fc">&nbsp;                        .getChild(&quot;moostensura&quot;);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (moosTensuraRoot == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(</b>
+&nbsp;                    &quot;Cannot attach the debug command because &quot;
+&nbsp;                            + &quot;/moostensura has not been registered.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Protect against accidental duplicate attachment if command
+&nbsp;         * registration is invoked more than once.
+&nbsp;         */
+<b class="pc">&nbsp;        if (moosTensuraRoot.getChild(&quot;debug&quot;) != null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        moosTensuraRoot.addChild(</b>
+<b class="fc">&nbsp;                createDebugNode().build()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createDebugNode() {
+<b class="fc">&nbsp;        return Commands.literal(&quot;debug&quot;)</b>
+<b class="fc">&nbsp;                .requires(</b>
+&nbsp;                        DebugModeService
+&nbsp;                                ::canViewDebugStatus
+&nbsp;                )
+&nbsp;
+&nbsp;                /*
+&nbsp;                 * /moostensura debug
+&nbsp;                 */
+<b class="fc">&nbsp;                .executes(context -&gt;</b>
+<b class="nc">&nbsp;                        showStatus(</b>
+<b class="nc">&nbsp;                                context.getSource()</b>
+&nbsp;                        )
+&nbsp;                )
+&nbsp;
+&nbsp;                /*
+&nbsp;                 * /moostensura debug status
+&nbsp;                 */
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;status&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt;</b>
+<b class="nc">&nbsp;                                        showStatus(</b>
+<b class="nc">&nbsp;                                                context.getSource()</b>
+&nbsp;                                        )
+&nbsp;                                )
+&nbsp;                )
+&nbsp;
+&nbsp;                /*
+&nbsp;                 * /moostensura debug enable
+&nbsp;                 * /moostensura debug enable confirm
+&nbsp;                 */
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;enable&quot;)</b>
+<b class="fc">&nbsp;                                .requires(</b>
+&nbsp;                                        DebugModeService
+&nbsp;                                                ::canControlDebugMode
+&nbsp;                                )
+<b class="fc">&nbsp;                                .executes(context -&gt;</b>
+<b class="nc">&nbsp;                                        requestEnable(</b>
+<b class="nc">&nbsp;                                                context.getSource()</b>
+&nbsp;                                        )
+&nbsp;                                )
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;confirm&quot;)</b>
+<b class="fc">&nbsp;                                                .executes(context -&gt;</b>
+<b class="nc">&nbsp;                                                        confirmEnable(</b>
+<b class="nc">&nbsp;                                                                context.getSource()</b>
+&nbsp;                                                        )
+&nbsp;                                                )
+&nbsp;                                )
+&nbsp;                )
+&nbsp;
+&nbsp;                /*
+&nbsp;                 * /moostensura debug disable
+&nbsp;                 */
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;disable&quot;)</b>
+<b class="fc">&nbsp;                                .requires(</b>
+&nbsp;                                        DebugModeService
+&nbsp;                                                ::canControlDebugMode
+&nbsp;                                )
+<b class="fc">&nbsp;                                .executes(context -&gt;</b>
+<b class="nc">&nbsp;                                        disable(</b>
+<b class="nc">&nbsp;                                                context.getSource()</b>
+&nbsp;                                        )
+&nbsp;                                )
+&nbsp;                )
+&nbsp;
+&nbsp;                /*
+&nbsp;                 * Canonical nested developer tools.
+&nbsp;                 */
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        RecognitionDebugCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        RecognitionCommittedResultCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        RecognitionFreedomDebugCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        RecognitionIdentityHistoryDebugCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        RecognitionReleaseDebugCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        RecognitionStrengthRewardDebugCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        RecognitionTechnicalHardeningDebugCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        RecognitionMigrationDebugCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        RecognitionAttributionDebugCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        CheckNamedCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+<b class="fc">&nbsp;                .then(</b>
+&nbsp;                        UpgradeSageCommand
+<b class="fc">&nbsp;                                .createDebugNode()</b>
+&nbsp;                )
+&nbsp;
+&nbsp;                /*
+&nbsp;                 * /moostensura debug namecolors
+&nbsp;                 *
+&nbsp;                 * This branch only exists in the command tree presented to
+&nbsp;                 * administrators while debug mode is enabled.
+&nbsp;                 */
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;namecolors&quot;)</b>
+<b class="fc">&nbsp;                                .requires(</b>
+&nbsp;                                        DebugModeService
+&nbsp;                                                ::canUseDebugTools
+&nbsp;                                )
+<b class="fc">&nbsp;                                .executes(context -&gt;</b>
+<b class="nc">&nbsp;                                        showBaseColors(</b>
+<b class="nc">&nbsp;                                                context.getSource()</b>
+&nbsp;                                        )
+&nbsp;                                )
+<b class="fc">&nbsp;                                .then(</b>
+<b class="fc">&nbsp;                                        Commands.literal(&quot;crossings&quot;)</b>
+<b class="fc">&nbsp;                                                .then(</b>
+<b class="fc">&nbsp;                                                        Commands.argument(</b>
+&nbsp;                                                                        &quot;primaryPath&quot;,
+<b class="fc">&nbsp;                                                                        StringArgumentType.word()</b>
+&nbsp;                                                                )
+<b class="fc">&nbsp;                                                                .suggests(</b>
+&nbsp;                                                                        (
+&nbsp;                                                                                context,
+&nbsp;                                                                                builder
+&nbsp;                                                                        ) -&gt;
+<b class="nc">&nbsp;                                                                                SharedSuggestionProvider.suggest(</b>
+<b class="nc">&nbsp;                                                                                        Arrays.stream(</b>
+<b class="nc">&nbsp;                                                                                                        RecognitionPath.values()</b>
+&nbsp;                                                                                                )
+<b class="nc">&nbsp;                                                                                                .map(</b>
+&nbsp;                                                                                                        RecognitionPath
+&nbsp;                                                                                                                ::getId
+&nbsp;                                                                                                ),
+&nbsp;                                                                                        builder
+&nbsp;                                                                                )
+&nbsp;                                                                )
+<b class="fc">&nbsp;                                                                .executes(context -&gt;</b>
+<b class="nc">&nbsp;                                                                        showCrossings(</b>
+<b class="nc">&nbsp;                                                                                context.getSource(),</b>
+<b class="nc">&nbsp;                                                                                StringArgumentType.getString(</b>
+&nbsp;                                                                                        context,
+&nbsp;                                                                                        &quot;primaryPath&quot;
+&nbsp;                                                                                )
+&nbsp;                                                                        )
+&nbsp;                                                                )
+&nbsp;                                                )
+&nbsp;                                )
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int showStatus(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+&nbsp;        boolean enabled =
+<b class="nc">&nbsp;                DebugModeService.isEnabled();</b>
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Moos Tensura Addon Debug Mode&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;State: &quot;
+&nbsp;                                        + (
+<b class="nc">&nbsp;                                        enabled</b>
+<b class="nc">&nbsp;                                                ? &quot;ENABLED&quot;</b>
+<b class="nc">&nbsp;                                                : &quot;DISABLED&quot;</b>
+&nbsp;                                )
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                enabled</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.GRAY</b>
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Config authority: server&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Standard debug permission: level &quot;
+&nbsp;                                        + DebugModeService
+&nbsp;                                        .STANDARD_DEBUG_PERMISSION_LEVEL
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Dangerous debug permission: level &quot;
+&nbsp;                                        + DebugModeService
+&nbsp;                                        .DANGEROUS_DEBUG_PERMISSION_LEVEL
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!enabled</b>
+<b class="nc">&nbsp;                &amp;&amp; source.hasPermission(</b>
+&nbsp;                DebugModeService
+&nbsp;                        .DANGEROUS_DEBUG_PERMISSION_LEVEL
+&nbsp;        )) {
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Use /moostensura debug enable to begin the confirmation process.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.YELLOW
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (enabled) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Available tools: recognition, committed, freedom, history, release, strength, hardening, migration, attribution, named, sage and namecolors.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.AQUA
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Use /moostensura debug &lt;tool&gt; to open a developer branch.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.DARK_AQUA
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int requestEnable(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (DebugModeService.isEnabled()) {</b>
+<b class="nc">&nbsp;            AdminConfirmationTracker.clear(</b>
+&nbsp;                    source
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Debug mode is already enabled.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.YELLOW
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AdminConfirmationTracker.arm(</b>
+&nbsp;                source,
+&nbsp;                AdminConfirmationTracker.Action
+&nbsp;                        .ENABLE_DEBUG_MODE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Debug mode confirmation required&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Enabling debug mode exposes developer diagnostics and testing commands to authorized administrators.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.YELLOW
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Normal players remain blocked by server command permissions.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Run /moostensura debug enable confirm within &quot;
+&nbsp;                                        + AdminConfirmationTracker
+&nbsp;                                        .CONFIRMATION_WINDOW_SECONDS
+&nbsp;                                        + &quot; seconds.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int confirmEnable(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (DebugModeService.isEnabled()) {</b>
+<b class="nc">&nbsp;            AdminConfirmationTracker.clear(</b>
+&nbsp;                    source
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Debug mode is already enabled.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.YELLOW
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            refreshCommandTrees(source);</b>
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AdminConfirmationTracker.Result confirmation =</b>
+<b class="nc">&nbsp;                AdminConfirmationTracker.consume(</b>
+&nbsp;                        source,
+&nbsp;                        AdminConfirmationTracker.Action
+&nbsp;                                .ENABLE_DEBUG_MODE
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!confirmation.confirmed()) {</b>
+<b class="nc">&nbsp;            return sendConfirmationFailure(</b>
+&nbsp;                    source,
+&nbsp;                    confirmation
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean changed =</b>
+<b class="nc">&nbsp;                DebugModeService.setEnabled(</b>
+&nbsp;                        true
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!changed) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Debug mode was already enabled.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.YELLOW
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            refreshCommandTrees(source);</b>
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Debug mode enabled.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GREEN,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                true
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;The server config was saved immediately.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Use /moostensura debug disable when testing is finished.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.AQUA
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Resend the command tree so debug-only branches become visible
+&nbsp;         * immediately without requiring a reconnect.
+&nbsp;         */
+<b class="nc">&nbsp;        refreshCommandTrees(source);</b>
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int disable(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        AdminConfirmationTracker.clear(</b>
+&nbsp;                source
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean changed =</b>
+<b class="nc">&nbsp;                DebugModeService.setEnabled(</b>
+&nbsp;                        false
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!changed) {</b>
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Debug mode is already disabled.&quot;
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.GRAY
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            refreshCommandTrees(source);</b>
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Debug mode disabled.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GREEN,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                true
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Developer tools are no longer available.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Resend the command tree so debug-only branches disappear
+&nbsp;         * immediately.
+&nbsp;         */
+<b class="nc">&nbsp;        refreshCommandTrees(source);</b>
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int showBaseColors(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Recognition Name Colors&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Normal paths use the base RGB color. Pure paths use the same color in bold.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            MutableComponent normalPreview =</b>
+&nbsp;                    RecognitionNameColorService
+<b class="nc">&nbsp;                            .createBasePreview(</b>
+&nbsp;                                    path,
+&nbsp;                                    false
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; normalPreview,</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            MutableComponent purePreview =</b>
+&nbsp;                    RecognitionNameColorService
+<b class="nc">&nbsp;                            .createBasePreview(</b>
+&nbsp;                                    path,
+&nbsp;                                    true
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; purePreview,</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Crossing preview: /moostensura debug namecolors crossings &lt;primaryPath&gt;&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.AQUA
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Example: /moostensura debug namecolors crossings lawful_evil&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.DARK_AQUA
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int showCrossings(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String rawPrimaryPath
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionPath primaryPath =</b>
+<b class="nc">&nbsp;                findPath(</b>
+&nbsp;                        rawPrimaryPath
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (primaryPath == null) {</b>
+<b class="nc">&nbsp;            source.sendFailure(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+&nbsp;                                    &quot;Unknown recognition path: &quot;
+&nbsp;                                            + rawPrimaryPath
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.RED
+&nbsp;                            )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; Component.literal(</b>
+&nbsp;                                    &quot;Valid paths: &quot;
+<b class="nc">&nbsp;                                            + String.join(</b>
+&nbsp;                                            &quot;, &quot;,
+<b class="nc">&nbsp;                                            Arrays.stream(</b>
+<b class="nc">&nbsp;                                                            RecognitionPath.values()</b>
+&nbsp;                                                    )
+<b class="nc">&nbsp;                                                    .map(</b>
+&nbsp;                                                            RecognitionPath
+&nbsp;                                                                    ::getId
+&nbsp;                                                    )
+<b class="nc">&nbsp;                                                    .toList()</b>
+&nbsp;                                    )
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+&nbsp;                                    ChatFormatting.GRAY
+&nbsp;                            ),
+&nbsp;                    false
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Recognition Crossings — Primary: &quot;
+&nbsp;                                        + RecognitionNameColorService
+<b class="nc">&nbsp;                                        .getDisplayName(</b>
+&nbsp;                                                primaryPath
+&nbsp;                                        )
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.LIGHT_PURPLE,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Every result below is 70% primary and 30% secondary.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.GRAY
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+&nbsp;        for (RecognitionPath secondaryPath :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            if (secondaryPath == primaryPath) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            MutableComponent preview =</b>
+&nbsp;                    RecognitionNameColorService
+<b class="nc">&nbsp;                            .createCrossingPreview(</b>
+&nbsp;                                    primaryPath,
+&nbsp;                                    secondaryPath
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; preview,</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Reverse the primary path to preview the opposite 70/30 weighting.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.DARK_AQUA
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionPath findPath(
+&nbsp;            String rawPath
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (rawPath == null</b>
+<b class="nc">&nbsp;                || rawPath.isBlank()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String normalized =</b>
+<b class="nc">&nbsp;                rawPath.trim()</b>
+<b class="nc">&nbsp;                        .toLowerCase(</b>
+&nbsp;                                Locale.ROOT
+&nbsp;                        );
+&nbsp;
+&nbsp;        for (RecognitionPath path :
+<b class="nc">&nbsp;                RecognitionPath.values()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            if (path.getId()</b>
+<b class="nc">&nbsp;                    .equals(normalized)) {</b>
+&nbsp;
+<b class="nc">&nbsp;                return path;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int sendConfirmationFailure(
+&nbsp;            CommandSourceStack source,
+&nbsp;            AdminConfirmationTracker.Result confirmation
+&nbsp;    ) {
+<b class="nc">&nbsp;        String explanation =</b>
+<b class="nc">&nbsp;                switch (confirmation.status()) {</b>
+&nbsp;                    case EXPIRED -&gt;
+<b class="nc">&nbsp;                            &quot;The debug-mode confirmation expired.&quot;;</b>
+&nbsp;
+&nbsp;                    case DIFFERENT_ACTION -&gt;
+<b class="nc">&nbsp;                            &quot;A different administrative action was awaiting confirmation.&quot;;</b>
+&nbsp;
+&nbsp;                    case DIFFERENT_TARGET -&gt;
+<b class="nc">&nbsp;                            &quot;The pending confirmation belonged to a different target.&quot;;</b>
+&nbsp;
+&nbsp;                    case MISSING, CONFIRMED -&gt;
+<b class="nc">&nbsp;                            &quot;No debug-mode confirmation request exists.&quot;;</b>
+&nbsp;                };
+&nbsp;
+<b class="nc">&nbsp;        source.sendFailure(</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                explanation
+&nbsp;                                        + &quot; Run /moostensura debug enable first, then confirm within &quot;
+&nbsp;                                        + AdminConfirmationTracker
+&nbsp;                                        .CONFIRMATION_WINDOW_SECONDS
+&nbsp;                                        + &quot; seconds.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                ChatFormatting.RED
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Command requirements are used when Minecraft constructs the client-side
+&nbsp;     * command tree.
+&nbsp;     *
+&nbsp;     * Resending that tree makes commands controlled by debug mode appear or
+&nbsp;     * disappear immediately after the setting changes.
+&nbsp;     */
+&nbsp;    private static void refreshCommandTrees(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (source == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MinecraftServer server =</b>
+<b class="nc">&nbsp;                source.getServer();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (server == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        for (ServerPlayer player :
+<b class="nc">&nbsp;                server.getPlayerList()</b>
+<b class="nc">&nbsp;                        .getPlayers()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            server.getCommands()</b>
+<b class="nc">&nbsp;                    .sendCommands(player);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

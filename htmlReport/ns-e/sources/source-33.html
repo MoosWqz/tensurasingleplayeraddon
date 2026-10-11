@@ -1,0 +1,965 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionReleaseValidationHarness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionReleaseValidationHarness (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionReleaseValidationHarness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/87)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/235)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionReleaseValidationHarness$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionReleaseValidationHarness$Check</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionReleaseValidationHarness$PathCoverage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionReleaseValidationHarness$Report</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/103)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/264)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;/**
+&nbsp; * Debug-only release audit for the recognition system.
+&nbsp; *
+&nbsp; * &lt;p&gt;The audit composes the permanent balance validator and Freedom validator
+&nbsp; * with the explicit 1.4.0 release policy. It uses temporary data only and
+&nbsp; * never mutates a player, world, commitment, datapack definition or cache
+&nbsp; * entry outside the validators&#39; existing read-only caches.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionReleaseValidationHarness {
+&nbsp;
+&nbsp;    private static final double EPSILON =
+&nbsp;            0.000_001D;
+&nbsp;
+&nbsp;    private RecognitionReleaseValidationHarness() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Report validate() {
+&nbsp;        RecognitionBalanceManager.State balanceState =
+<b class="nc">&nbsp;                RecognitionBalanceManager.getState();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot balance =</b>
+<b class="nc">&nbsp;                balanceState.snapshot();</b>
+&nbsp;
+&nbsp;        RecognitionBalanceValidationHarness.Report recognitionReport =
+<b class="nc">&nbsp;                RecognitionBalanceValidationHarness.validate();</b>
+&nbsp;
+&nbsp;        RecognitionFreedomValidationHarness.Report freedomReport =
+<b class="nc">&nbsp;                RecognitionFreedomValidationHarness.validate();</b>
+&nbsp;
+&nbsp;        RecognitionStrengthRewardValidationHarness.Report strengthReport =
+<b class="nc">&nbsp;                RecognitionStrengthRewardValidationHarness.validate();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Check&gt; checks =</b>
+&nbsp;                new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; warnings =</b>
+&nbsp;                new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Release policy identifier&quot;,
+&nbsp;                        RecognitionReleasePolicy.POLICY_VERSION == 2
+&nbsp;                                &amp;&amp; RecognitionStrengthRewardFormula
+&nbsp;                                .PROFILE_ID
+<b class="nc">&nbsp;                                .equals(</b>
+&nbsp;                                        RecognitionReleasePolicy.POLICY_ID
+&nbsp;                                ),
+&nbsp;                        &quot;version &quot;
+&nbsp;                                + RecognitionReleasePolicy.POLICY_VERSION
+&nbsp;                                + &quot; / &quot;
+&nbsp;                                + RecognitionReleasePolicy.POLICY_ID
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Explicit permanent strength reward policy&quot;,
+&nbsp;                        RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .grantsAttributeModifiers()</b>
+&nbsp;                                &amp;&amp; RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .grantsCombatMultipliers()</b>
+&nbsp;                                &amp;&amp; !RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .grantsHistoryModifierPower(),</b>
+&nbsp;                        RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .rewardProfileSummary()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Recognition result version&quot;,
+&nbsp;                        RecognitionCommitRecord
+&nbsp;                                .CURRENT_RESULT_VERSION
+&nbsp;                                == RecognitionReleasePolicy
+&nbsp;                                .EXPECTED_RESULT_VERSION,
+&nbsp;                        RecognitionCommitRecord
+&nbsp;                                .CURRENT_RESULT_VERSION
+&nbsp;                                + &quot; / expected &quot;
+&nbsp;                                + RecognitionReleasePolicy
+&nbsp;                                .EXPECTED_RESULT_VERSION
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Recognition rules version&quot;,
+&nbsp;                        RecognitionCommitRecord
+&nbsp;                                .CURRENT_RULES_VERSION
+&nbsp;                                == RecognitionReleasePolicy
+&nbsp;                                .EXPECTED_RULES_VERSION,
+&nbsp;                        RecognitionCommitRecord
+&nbsp;                                .CURRENT_RULES_VERSION
+&nbsp;                                + &quot; / expected &quot;
+&nbsp;                                + RecognitionReleasePolicy
+&nbsp;                                .EXPECTED_RULES_VERSION
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Reward profile version&quot;,
+&nbsp;                        RecognitionCommitRecord
+&nbsp;                                .CURRENT_REWARD_PROFILE_VERSION
+&nbsp;                                == RecognitionReleasePolicy
+&nbsp;                                .EXPECTED_REWARD_PROFILE_VERSION,
+&nbsp;                        RecognitionCommitRecord
+&nbsp;                                .CURRENT_REWARD_PROFILE_VERSION
+&nbsp;                                + &quot; / expected &quot;
+&nbsp;                                + RecognitionReleasePolicy
+&nbsp;                                .EXPECTED_REWARD_PROFILE_VERSION
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Recognition strength formula validator&quot;,
+<b class="nc">&nbsp;                        strengthReport.passed(),</b>
+<b class="nc">&nbsp;                        strengthReport.passedChecks()</b>
+&nbsp;                                + &quot; passed / &quot;
+<b class="nc">&nbsp;                                + strengthReport.failedChecks()</b>
+&nbsp;                                + &quot; failed&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Recognition strength release caps&quot;,
+<b class="nc">&nbsp;                        approximatelyEqual(</b>
+&nbsp;                                RecognitionStrengthRewardFormula
+<b class="nc">&nbsp;                                        .maximumReward(false),</b>
+&nbsp;                                0.20D
+&nbsp;                        )
+<b class="nc">&nbsp;                                &amp;&amp; approximatelyEqual(</b>
+&nbsp;                                RecognitionStrengthRewardFormula
+<b class="nc">&nbsp;                                        .maximumReward(true),</b>
+&nbsp;                                0.225D
+&nbsp;                        ),
+&nbsp;                        &quot;combined max &quot;
+<b class="nc">&nbsp;                                + formatPercent(</b>
+&nbsp;                                RecognitionStrengthRewardFormula
+<b class="nc">&nbsp;                                        .maximumReward(false)</b>
+&nbsp;                        )
+&nbsp;                                + &quot; / Pure max &quot;
+<b class="nc">&nbsp;                                + formatPercent(</b>
+&nbsp;                                RecognitionStrengthRewardFormula
+<b class="nc">&nbsp;                                        .maximumReward(true)</b>
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Awakening is evidence, not a hard gate&quot;,
+&nbsp;                        RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .awakeningActsAsDirectionalEvidence()</b>
+&nbsp;                                &amp;&amp; !RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .requiresTrueHeroForPureGood()</b>
+&nbsp;                                &amp;&amp; !RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .requiresTrueDemonLordForPureEvil()</b>
+&nbsp;                                &amp;&amp; !RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .requiresAwakeningForTrueNeutral(),</b>
+&nbsp;                        RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .awakeningPolicySummary()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double trueHeroModifier =</b>
+<b class="nc">&nbsp;                balance.good()</b>
+<b class="nc">&nbsp;                        .trueHeroModifier();</b>
+&nbsp;
+<b class="nc">&nbsp;        double trueDemonLordModifier =</b>
+<b class="nc">&nbsp;                balance.evil()</b>
+<b class="nc">&nbsp;                        .trueDemonLordModifier();</b>
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;TH/TDL directional modifiers are positive and symmetric&quot;,
+&nbsp;                        trueHeroModifier &gt; 0.0D
+&nbsp;                                &amp;&amp; trueDemonLordModifier &gt; 0.0D
+<b class="nc">&nbsp;                                &amp;&amp; approximatelyEqual(</b>
+&nbsp;                                trueHeroModifier,
+&nbsp;                                trueDemonLordModifier
+&nbsp;                        ),
+&nbsp;                        &quot;TH &quot;
+<b class="nc">&nbsp;                                + format(trueHeroModifier)</b>
+&nbsp;                                + &quot; / TDL &quot;
+<b class="nc">&nbsp;                                + format(trueDemonLordModifier)</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionEvaluation emptyEvaluation =</b>
+<b class="nc">&nbsp;                RecognitionPathEvaluator.evaluate(</b>
+&nbsp;                        new RecognitionData()
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Empty deed profile has no recognition selection&quot;,
+<b class="nc">&nbsp;                        emptyEvaluation.getSelection()</b>
+<b class="nc">&nbsp;                                .isEmpty(),</b>
+<b class="nc">&nbsp;                        emptyEvaluation.getSelection()</b>
+<b class="nc">&nbsp;                                .map(selection -&gt;</b>
+<b class="nc">&nbsp;                                        selection.primaryPath()</b>
+<b class="nc">&nbsp;                                                .getId()</b>
+&nbsp;                                )
+<b class="nc">&nbsp;                                .orElse(&quot;none&quot;)</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;All Pure paths remain reachable&quot;,
+<b class="nc">&nbsp;                        recognitionReport.exactPurePaths()</b>
+&nbsp;                                == RecognitionReleasePolicy
+&nbsp;                                .EXPECTED_PURE_PATHS
+&nbsp;                                &amp;&amp; recognitionReport
+<b class="nc">&nbsp;                                .exactPurePaths()</b>
+&nbsp;                                == recognitionReport
+<b class="nc">&nbsp;                                .totalPurePaths(),</b>
+<b class="nc">&nbsp;                        recognitionReport.exactPurePaths()</b>
+&nbsp;                                + &quot; / &quot;
+<b class="nc">&nbsp;                                + recognitionReport.totalPurePaths()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;All required adjacent crossings remain reachable&quot;,
+<b class="nc">&nbsp;                        recognitionReport.exactAdjacentPairs()</b>
+&nbsp;                                == RecognitionReleasePolicy
+&nbsp;                                .EXPECTED_REQUIRED_ADJACENT_CROSSES
+&nbsp;                                &amp;&amp; recognitionReport
+<b class="nc">&nbsp;                                .exactAdjacentPairs()</b>
+&nbsp;                                == recognitionReport
+<b class="nc">&nbsp;                                .totalAdjacentPairs(),</b>
+<b class="nc">&nbsp;                        recognitionReport.exactAdjacentPairs()</b>
+&nbsp;                                + &quot; / &quot;
+<b class="nc">&nbsp;                                + recognitionReport.totalAdjacentPairs()</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        PathCoverage coverage =</b>
+<b class="nc">&nbsp;                pathCoverage(</b>
+&nbsp;                        recognitionReport
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Pure morality coverage&quot;,
+<b class="nc">&nbsp;                        coverage.goodPurePaths() == 3</b>
+<b class="nc">&nbsp;                                &amp;&amp; coverage.neutralPurePaths() == 3</b>
+<b class="nc">&nbsp;                                &amp;&amp; coverage.evilPurePaths() == 3,</b>
+&nbsp;                        &quot;Good &quot;
+<b class="nc">&nbsp;                                + coverage.goodPurePaths()</b>
+&nbsp;                                + &quot;/3, Neutral &quot;
+<b class="nc">&nbsp;                                + coverage.neutralPurePaths()</b>
+&nbsp;                                + &quot;/3, Evil &quot;
+<b class="nc">&nbsp;                                + coverage.evilPurePaths()</b>
+&nbsp;                                + &quot;/3&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Pure results are not identity-heavy&quot;,
+<b class="nc">&nbsp;                        coverage.identityHeavyPurePaths() == 0,</b>
+<b class="nc">&nbsp;                        coverage.identityHeavyPurePaths()</b>
+&nbsp;                                + &quot; identity-heavy Pure result(s)&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Freedom expansion validator&quot;,
+<b class="nc">&nbsp;                        freedomReport.passed(),</b>
+<b class="nc">&nbsp;                        freedomReport.passed()</b>
+<b class="nc">&nbsp;                                ? &quot;PASS&quot;</b>
+<b class="nc">&nbsp;                                : &quot;FAIL&quot;</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        double freedomOrderRatio =</b>
+<b class="nc">&nbsp;                ratio(</b>
+<b class="nc">&nbsp;                        freedomReport.expandedFreedomCeiling(),</b>
+<b class="nc">&nbsp;                        freedomReport.orderCeiling()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Freedom and Order ceiling parity&quot;,
+&nbsp;                        freedomOrderRatio
+&nbsp;                                &gt;= RecognitionReleasePolicy
+&nbsp;                                .MIN_FREEDOM_ORDER_RATIO
+&nbsp;                                &amp;&amp; freedomOrderRatio
+&nbsp;                                &lt;= RecognitionReleasePolicy
+&nbsp;                                .MAX_FREEDOM_ORDER_RATIO,
+<b class="nc">&nbsp;                        formatPercent(freedomOrderRatio)</b>
+&nbsp;                                + &quot; within &quot;
+<b class="nc">&nbsp;                                + formatPercent(</b>
+&nbsp;                                RecognitionReleasePolicy
+&nbsp;                                        .MIN_FREEDOM_ORDER_RATIO
+&nbsp;                        )
+&nbsp;                                + &quot;–&quot;
+<b class="nc">&nbsp;                                + formatPercent(</b>
+&nbsp;                                RecognitionReleasePolicy
+&nbsp;                                        .MAX_FREEDOM_ORDER_RATIO
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                check(</b>
+&nbsp;                        &quot;Self-reliance contributes meaningful Freedom&quot;,
+<b class="nc">&nbsp;                        freedomReport.configuredMilestonePoints()</b>
+&nbsp;                                &gt; 0.0D
+&nbsp;                                &amp;&amp; freedomReport
+<b class="nc">&nbsp;                                .expandedFreedomCeiling()</b>
+&nbsp;                                &gt; freedomReport
+<b class="nc">&nbsp;                                .legacyFreedomCeiling(),</b>
+<b class="nc">&nbsp;                        format(</b>
+&nbsp;                                freedomReport
+<b class="nc">&nbsp;                                        .configuredMilestonePoints()</b>
+&nbsp;                        )
+&nbsp;                                + &quot; configured points; ceiling &quot;
+<b class="nc">&nbsp;                                + format(</b>
+&nbsp;                                freedomReport
+<b class="nc">&nbsp;                                        .legacyFreedomCeiling()</b>
+&nbsp;                        )
+&nbsp;                                + &quot; -&gt; &quot;
+<b class="nc">&nbsp;                                + format(</b>
+&nbsp;                                freedomReport
+<b class="nc">&nbsp;                                        .expandedFreedomCeiling()</b>
+&nbsp;                        )
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean canonicalDefaults =</b>
+<b class="nc">&nbsp;                isCanonicalDefaultSource(</b>
+<b class="nc">&nbsp;                        balance.sourceId()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        addCanonicalBalanceChecks(</b>
+&nbsp;                checks,
+&nbsp;                balance,
+&nbsp;                canonicalDefaults
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!canonicalDefaults) {</b>
+<b class="nc">&nbsp;            warnings.add(</b>
+&nbsp;                    &quot;A custom recognition-balance source is active. Reachability and safety were validated, but canonical 1.4.0 numeric defaults were not enforced.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        warnings.addAll(</b>
+<b class="nc">&nbsp;                recognitionReport.warnings()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        warnings.addAll(</b>
+<b class="nc">&nbsp;                freedomReport.warnings()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int passedChecks =</b>
+&nbsp;                0;
+&nbsp;
+<b class="nc">&nbsp;        for (Check check : checks) {</b>
+<b class="nc">&nbsp;            if (check.passed()) {</b>
+<b class="nc">&nbsp;                passedChecks++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new Report(</b>
+<b class="nc">&nbsp;                passedChecks == checks.size(),</b>
+&nbsp;                RecognitionReleasePolicy.POLICY_VERSION,
+&nbsp;                RecognitionReleasePolicy.POLICY_ID,
+&nbsp;                RecognitionReleasePolicy.DISPLAY_NAME,
+<b class="nc">&nbsp;                balance.sourceId(),</b>
+<b class="nc">&nbsp;                balanceState.revision(),</b>
+&nbsp;                canonicalDefaults,
+&nbsp;                RecognitionCommitRecord
+&nbsp;                        .CURRENT_RESULT_VERSION,
+&nbsp;                RecognitionCommitRecord
+&nbsp;                        .CURRENT_RULES_VERSION,
+&nbsp;                RecognitionCommitRecord
+&nbsp;                        .CURRENT_REWARD_PROFILE_VERSION,
+<b class="nc">&nbsp;                recognitionReport.exactPurePaths(),</b>
+<b class="nc">&nbsp;                recognitionReport.totalPurePaths(),</b>
+<b class="nc">&nbsp;                recognitionReport.exactAdjacentPairs(),</b>
+<b class="nc">&nbsp;                recognitionReport.totalAdjacentPairs(),</b>
+<b class="nc">&nbsp;                coverage.goodPurePaths(),</b>
+<b class="nc">&nbsp;                coverage.neutralPurePaths(),</b>
+<b class="nc">&nbsp;                coverage.evilPurePaths(),</b>
+<b class="nc">&nbsp;                coverage.identityHeavyPurePaths(),</b>
+<b class="nc">&nbsp;                freedomReport.legacyFreedomCeiling(),</b>
+<b class="nc">&nbsp;                freedomReport.expandedFreedomCeiling(),</b>
+<b class="nc">&nbsp;                freedomReport.orderCeiling(),</b>
+&nbsp;                freedomOrderRatio,
+<b class="nc">&nbsp;                freedomReport.configuredMilestonePoints(),</b>
+&nbsp;                passedChecks,
+<b class="nc">&nbsp;                checks.size() - passedChecks,</b>
+<b class="nc">&nbsp;                List.copyOf(checks),</b>
+<b class="nc">&nbsp;                List.copyOf(warnings)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addCanonicalBalanceChecks(
+&nbsp;            List&lt;Check&gt; checks,
+&nbsp;            RecognitionBalanceSnapshot balance,
+&nbsp;            boolean canonicalDefaults
+&nbsp;    ) {
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.Selection selection =</b>
+<b class="nc">&nbsp;                balance.selection();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot.IdentityDistribution identity =</b>
+<b class="nc">&nbsp;                balance.identityDistribution();</b>
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                policyOrDefaultCheck(</b>
+&nbsp;                        &quot;Established threshold&quot;,
+&nbsp;                        canonicalDefaults,
+<b class="nc">&nbsp;                        selection.establishedThreshold(),</b>
+&nbsp;                        35.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                policyOrDefaultCheck(</b>
+&nbsp;                        &quot;Pure threshold&quot;,
+&nbsp;                        canonicalDefaults,
+<b class="nc">&nbsp;                        selection.pureThreshold(),</b>
+&nbsp;                        70.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                policyOrDefaultCheck(</b>
+&nbsp;                        &quot;Final dominance ratio&quot;,
+&nbsp;                        canonicalDefaults,
+<b class="nc">&nbsp;                        selection.dominanceRatio(),</b>
+&nbsp;                        2.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                policyOrDefaultCheck(</b>
+&nbsp;                        &quot;Raw Pure threshold&quot;,
+&nbsp;                        canonicalDefaults,
+<b class="nc">&nbsp;                        selection.rawPureThreshold(),</b>
+&nbsp;                        35.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                policyOrDefaultCheck(</b>
+&nbsp;                        &quot;Raw dominance ratio&quot;,
+&nbsp;                        canonicalDefaults,
+<b class="nc">&nbsp;                        selection.rawDominanceRatio(),</b>
+&nbsp;                        1.6D
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                policyOrDefaultCheck(</b>
+&nbsp;                        &quot;Directional morality minimum&quot;,
+&nbsp;                        canonicalDefaults,
+<b class="nc">&nbsp;                        selection.minimumDirectionalMoralityEvidence(),</b>
+&nbsp;                        6.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                policyOrDefaultCheck(</b>
+&nbsp;                        &quot;Universal identity share&quot;,
+&nbsp;                        canonicalDefaults,
+<b class="nc">&nbsp;                        identity.universalShare(),</b>
+&nbsp;                        0.15D
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                policyOrDefaultCheck(</b>
+&nbsp;                        &quot;Focused identity share&quot;,
+&nbsp;                        canonicalDefaults,
+<b class="nc">&nbsp;                        identity.focusedShare(),</b>
+&nbsp;                        0.60D
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                policyOrDefaultCheck(</b>
+&nbsp;                        &quot;True Hero modifier&quot;,
+&nbsp;                        canonicalDefaults,
+<b class="nc">&nbsp;                        balance.good()</b>
+<b class="nc">&nbsp;                                .trueHeroModifier(),</b>
+&nbsp;                        15.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        checks.add(</b>
+<b class="nc">&nbsp;                policyOrDefaultCheck(</b>
+&nbsp;                        &quot;True Demon Lord modifier&quot;,
+&nbsp;                        canonicalDefaults,
+<b class="nc">&nbsp;                        balance.evil()</b>
+<b class="nc">&nbsp;                                .trueDemonLordModifier(),</b>
+&nbsp;                        15.0D
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Check policyOrDefaultCheck(
+&nbsp;            String name,
+&nbsp;            boolean canonicalDefaults,
+&nbsp;            double actual,
+&nbsp;            double expected
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!canonicalDefaults) {</b>
+<b class="nc">&nbsp;            return check(</b>
+&nbsp;                    name,
+&nbsp;                    true,
+&nbsp;                    &quot;custom datapack value &quot;
+<b class="nc">&nbsp;                            + format(actual)</b>
+&nbsp;                            + &quot;; canonical default check skipped&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return check(</b>
+&nbsp;                name,
+<b class="nc">&nbsp;                approximatelyEqual(</b>
+&nbsp;                        actual,
+&nbsp;                        expected
+&nbsp;                ),
+<b class="nc">&nbsp;                format(actual)</b>
+&nbsp;                        + &quot; / expected &quot;
+<b class="nc">&nbsp;                        + format(expected)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static PathCoverage pathCoverage(
+&nbsp;            RecognitionBalanceValidationHarness.Report report
+&nbsp;    ) {
+<b class="nc">&nbsp;        int good = 0;</b>
+<b class="nc">&nbsp;        int neutral = 0;</b>
+<b class="nc">&nbsp;        int evil = 0;</b>
+<b class="nc">&nbsp;        int identityHeavy = 0;</b>
+&nbsp;
+&nbsp;        for (RecognitionBalanceValidationHarness.PathResult result :
+<b class="nc">&nbsp;                report.paths()) {</b>
+<b class="nc">&nbsp;            if (result == null</b>
+<b class="nc">&nbsp;                    || result.path() == null</b>
+<b class="nc">&nbsp;                    || result.result() == null</b>
+<b class="nc">&nbsp;                    || !result.result().exact()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            switch (result.path().getMorality()) {</b>
+<b class="nc">&nbsp;                case GOOD -&gt; good++;</b>
+<b class="nc">&nbsp;                case NEUTRAL -&gt; neutral++;</b>
+<b class="nc">&nbsp;                case EVIL -&gt; evil++;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (result.identityHeavy()) {</b>
+<b class="nc">&nbsp;                identityHeavy++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new PathCoverage(</b>
+&nbsp;                good,
+&nbsp;                neutral,
+&nbsp;                evil,
+&nbsp;                identityHeavy
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isCanonicalDefaultSource(
+&nbsp;            String sourceId
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (sourceId == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String cleaned =</b>
+<b class="nc">&nbsp;                sourceId.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;        return &quot;moostensuraaddon:default&quot;.equals(cleaned)</b>
+<b class="nc">&nbsp;                || &quot;built-in defaults&quot;.equalsIgnoreCase(cleaned);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double ratio(
+&nbsp;            double numerator,
+&nbsp;            double denominator
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(numerator)</b>
+<b class="nc">&nbsp;                || !Double.isFinite(denominator)</b>
+&nbsp;                || numerator &lt; 0.0D
+&nbsp;                || denominator &lt;= 0.0D) {
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return numerator / denominator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean approximatelyEqual(
+&nbsp;            double first,
+&nbsp;            double second
+&nbsp;    ) {
+<b class="nc">&nbsp;        return Double.isFinite(first)</b>
+<b class="nc">&nbsp;                &amp;&amp; Double.isFinite(second)</b>
+<b class="nc">&nbsp;                &amp;&amp; Math.abs(first - second)</b>
+&nbsp;                &lt;= EPSILON;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Check check(
+&nbsp;            String name,
+&nbsp;            boolean passed,
+&nbsp;            String detail
+&nbsp;    ) {
+<b class="nc">&nbsp;        return new Check(</b>
+&nbsp;                name,
+&nbsp;                passed,
+&nbsp;                detail
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String format(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.2f&quot;,
+<b class="nc">&nbsp;                Double.isFinite(value)</b>
+<b class="nc">&nbsp;                        ? value</b>
+<b class="nc">&nbsp;                        : 0.0D</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatPercent(
+&nbsp;            double ratio
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.1f%%&quot;,
+<b class="nc">&nbsp;                Double.isFinite(ratio)</b>
+<b class="nc">&nbsp;                        ? ratio * 100.0D</b>
+<b class="nc">&nbsp;                        : 0.0D</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Check(</b>
+&nbsp;            String name,
+&nbsp;            boolean passed,
+&nbsp;            String detail
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public Check {</b>
+<b class="nc">&nbsp;            name = name == null || name.isBlank()</b>
+<b class="nc">&nbsp;                    ? &quot;Unnamed check&quot;</b>
+<b class="nc">&nbsp;                    : name.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            detail = detail == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : detail.trim();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Report(</b>
+&nbsp;            boolean passed,
+&nbsp;            int policyVersion,
+&nbsp;            String policyId,
+&nbsp;            String policyDisplayName,
+&nbsp;            String balanceSource,
+&nbsp;            long balanceRevision,
+&nbsp;            boolean canonicalDefaults,
+&nbsp;            int resultVersion,
+&nbsp;            int rulesVersion,
+&nbsp;            int rewardProfileVersion,
+&nbsp;            int purePaths,
+&nbsp;            int totalPurePaths,
+&nbsp;            int requiredAdjacentCrosses,
+&nbsp;            int totalRequiredAdjacentCrosses,
+&nbsp;            int goodPurePaths,
+&nbsp;            int neutralPurePaths,
+&nbsp;            int evilPurePaths,
+&nbsp;            int identityHeavyPurePaths,
+&nbsp;            double legacyFreedomCeiling,
+&nbsp;            double expandedFreedomCeiling,
+&nbsp;            double orderCeiling,
+&nbsp;            double freedomOrderRatio,
+&nbsp;            double configuredSelfReliancePoints,
+&nbsp;            int passedChecks,
+&nbsp;            int failedChecks,
+&nbsp;            List&lt;Check&gt; checks,
+&nbsp;            List&lt;String&gt; warnings
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public Report {</b>
+<b class="nc">&nbsp;            policyId = policyId == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : policyId.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            policyDisplayName = policyDisplayName == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : policyDisplayName.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            balanceSource = balanceSource == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="nc">&nbsp;                    : balanceSource.trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            checks = checks == null</b>
+<b class="nc">&nbsp;                    ? List.of()</b>
+<b class="nc">&nbsp;                    : List.copyOf(checks);</b>
+&nbsp;
+<b class="nc">&nbsp;            warnings = warnings == null</b>
+<b class="nc">&nbsp;                    ? List.of()</b>
+<b class="nc">&nbsp;                    : List.copyOf(warnings);</b>
+&nbsp;
+<b class="nc">&nbsp;            passedChecks = Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    passedChecks
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            failedChecks = Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    failedChecks
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record PathCoverage(</b>
+&nbsp;            int goodPurePaths,
+&nbsp;            int neutralPurePaths,
+&nbsp;            int evilPurePaths,
+&nbsp;            int identityHeavyPurePaths
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

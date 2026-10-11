@@ -1,0 +1,296 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UltimateBorrowSeizeValidationHarness</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.util</a>
+</div>
+
+<h1>Coverage Summary for Class: UltimateBorrowSeizeValidationHarness (com.mooswqz.moostensuraaddon.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UltimateBorrowSeizeValidationHarness</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UltimateBorrowSeizeValidationHarness$ValidationResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.util;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;public final class UltimateBorrowSeizeValidationHarness {
+&nbsp;
+&nbsp;    private UltimateBorrowSeizeValidationHarness() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ValidationResult validate() {
+<b class="nc">&nbsp;        List&lt;String&gt; passed = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; failed = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                &quot;empty request&quot;,
+<b class="nc">&nbsp;                UltimateBorrowSeizePolicy.analyseRequest(</b>
+<b class="nc">&nbsp;                        List.of()</b>
+<b class="nc">&nbsp;                ).uniqueSkillIds().isEmpty(),</b>
+&nbsp;                passed,
+&nbsp;                failed
+&nbsp;        );
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                &quot;duplicates removed&quot;,
+<b class="nc">&nbsp;                UltimateBorrowSeizePolicy.analyseRequest(</b>
+<b class="nc">&nbsp;                        List.of(&quot;a:b&quot;, &quot;a:b&quot;, &quot;c:d&quot;)</b>
+<b class="nc">&nbsp;                ).uniqueSkillIds().equals(</b>
+<b class="nc">&nbsp;                        List.of(&quot;a:b&quot;, &quot;c:d&quot;)</b>
+&nbsp;                ),
+&nbsp;                passed,
+&nbsp;                failed
+&nbsp;        );
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                &quot;blank rejected&quot;,
+<b class="nc">&nbsp;                UltimateBorrowSeizePolicy.analyseRequest(</b>
+<b class="nc">&nbsp;                        List.of(&quot;a:b&quot;, &quot; &quot;, &quot;c:d&quot;)</b>
+<b class="nc">&nbsp;                ).rejectedCount() == 1,</b>
+&nbsp;                passed,
+&nbsp;                failed
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; overLimit = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0;</b>
+<b class="nc">&nbsp;             index &lt; UltimateBorrowSeizePolicy.MAX_SELECTED_SKILLS + 1;</b>
+<b class="nc">&nbsp;             index++) {</b>
+<b class="nc">&nbsp;            overLimit.add(&quot;test:skill_&quot; + index);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                &quot;selection limit&quot;,
+<b class="nc">&nbsp;                UltimateBorrowSeizePolicy.analyseRequest(</b>
+&nbsp;                        overLimit
+<b class="nc">&nbsp;                ).overLimit(),</b>
+&nbsp;                passed,
+&nbsp;                failed
+&nbsp;        );
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                &quot;total cost&quot;,
+<b class="nc">&nbsp;                UltimateBorrowSeizePolicy.calculateTotalCost(</b>
+&nbsp;                        150_000.0D,
+&nbsp;                        4
+&nbsp;                ) == 600_000.0D,
+&nbsp;                passed,
+&nbsp;                failed
+&nbsp;        );
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                &quot;negative cost sanitised&quot;,
+<b class="nc">&nbsp;                UltimateBorrowSeizePolicy.calculateTotalCost(</b>
+&nbsp;                        -10.0D,
+&nbsp;                        4
+&nbsp;                ) == 0.0D,
+&nbsp;                passed,
+&nbsp;                failed
+&nbsp;        );
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                &quot;seize risk scales&quot;,
+<b class="nc">&nbsp;                UltimateBorrowSeizePolicy.calculateSeizeDeathChance(</b>
+&nbsp;                        0.05D,
+&nbsp;                        0.50D,
+&nbsp;                        4
+&nbsp;                ) == 0.20D,
+&nbsp;                passed,
+&nbsp;                failed
+&nbsp;        );
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                &quot;seize risk capped&quot;,
+<b class="nc">&nbsp;                UltimateBorrowSeizePolicy.calculateSeizeDeathChance(</b>
+&nbsp;                        0.20D,
+&nbsp;                        0.50D,
+&nbsp;                        4
+&nbsp;                ) == 0.50D,
+&nbsp;                passed,
+&nbsp;                failed
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, Double&gt; chances = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        chances.put(&quot;a:b&quot;, 0.05D);</b>
+<b class="nc">&nbsp;        chances.put(&quot;c:d&quot;, 0.25D);</b>
+&nbsp;
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                &quot;highest borrow chance&quot;,
+<b class="nc">&nbsp;                UltimateBorrowSeizePolicy.highestBorrowChance(</b>
+<b class="nc">&nbsp;                        List.of(&quot;a:b&quot;, &quot;c:d&quot;),</b>
+&nbsp;                        chances
+&nbsp;                ) == 0.25D,
+&nbsp;                passed,
+&nbsp;                failed
+&nbsp;        );
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                &quot;chance clamped&quot;,
+<b class="nc">&nbsp;                UltimateBorrowSeizePolicy.highestBorrowChance(</b>
+<b class="nc">&nbsp;                        List.of(&quot;broken:chance&quot;),</b>
+<b class="nc">&nbsp;                        Map.of(&quot;broken:chance&quot;, 4.0D)</b>
+&nbsp;                ) == 1.0D,
+&nbsp;                passed,
+&nbsp;                failed
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return new ValidationResult(</b>
+<b class="nc">&nbsp;                passed.size(),</b>
+<b class="nc">&nbsp;                failed.size(),</b>
+<b class="nc">&nbsp;                List.copyOf(passed),</b>
+<b class="nc">&nbsp;                List.copyOf(failed)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void check(
+&nbsp;            String name,
+&nbsp;            boolean condition,
+&nbsp;            List&lt;String&gt; passed,
+&nbsp;            List&lt;String&gt; failed
+&nbsp;    ) {
+<b class="nc">&nbsp;        (condition ? passed : failed).add(name);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record ValidationResult(</b>
+&nbsp;            int passed,
+&nbsp;            int failed,
+&nbsp;            List&lt;String&gt; passedChecks,
+&nbsp;            List&lt;String&gt; failedChecks
+&nbsp;    ) {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

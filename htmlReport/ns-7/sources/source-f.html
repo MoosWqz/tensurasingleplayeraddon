@@ -1,0 +1,690 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionReleaseDebugCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.command</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionReleaseDebugCommand (com.mooswqz.moostensuraaddon.command)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionReleaseDebugCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.3%
+  </span>
+  <span class="absValue">
+    (1/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.1%
+  </span>
+  <span class="absValue">
+    (6/191)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.command;
+&nbsp;
+&nbsp;import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+&nbsp;import com.mooswqz.moostensuraaddon.debug.DebugModeService;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionBalanceManager;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionBalanceSnapshot;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionCommitRecord;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionReleasePolicy;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionReleaseValidationHarness;
+&nbsp;import com.mooswqz.moostensuraaddon.recognition.RecognitionStrengthRewardFormula;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.commands.CommandSourceStack;
+&nbsp;import net.minecraft.commands.Commands;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;/**
+&nbsp; * Debug-only inspection and validation of the locked 1.4.0 recognition-strength policy.
+&nbsp; */
+&nbsp;public final class RecognitionReleaseDebugCommand {
+&nbsp;
+&nbsp;    private RecognitionReleaseDebugCommand() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * /moostensura debug release
+&nbsp;     * /moostensura debug release validate
+&nbsp;     */
+&nbsp;    public static LiteralArgumentBuilder&lt;CommandSourceStack&gt;
+&nbsp;    createDebugNode() {
+<b class="fc">&nbsp;        return Commands.literal(&quot;release&quot;)</b>
+<b class="fc">&nbsp;                .requires(</b>
+&nbsp;                        DebugModeService::canUseDebugTools
+&nbsp;                )
+<b class="fc">&nbsp;                .executes(context -&gt; showPolicy(</b>
+<b class="nc">&nbsp;                        context.getSource()</b>
+&nbsp;                ))
+<b class="fc">&nbsp;                .then(</b>
+<b class="fc">&nbsp;                        Commands.literal(&quot;validate&quot;)</b>
+<b class="fc">&nbsp;                                .executes(context -&gt; validate(</b>
+<b class="nc">&nbsp;                                        context.getSource()</b>
+&nbsp;                                ))
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int showPolicy(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+&nbsp;        RecognitionBalanceManager.State state =
+<b class="nc">&nbsp;                RecognitionBalanceManager.getState();</b>
+&nbsp;
+<b class="nc">&nbsp;        RecognitionBalanceSnapshot balance =</b>
+<b class="nc">&nbsp;                state.snapshot();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Recognition Release Policy&quot;,
+&nbsp;                ChatFormatting.LIGHT_PURPLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Policy&quot;,
+&nbsp;                RecognitionReleasePolicy.DISPLAY_NAME
+&nbsp;                        + &quot; (&quot;
+&nbsp;                        + RecognitionReleasePolicy.POLICY_ID
+&nbsp;                        + &quot;, version &quot;
+&nbsp;                        + RecognitionReleasePolicy.POLICY_VERSION
+&nbsp;                        + &quot;)&quot;,
+&nbsp;                ChatFormatting.AQUA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Result / rules / reward versions&quot;,
+&nbsp;                RecognitionCommitRecord.CURRENT_RESULT_VERSION
+&nbsp;                        + &quot; / &quot;
+&nbsp;                        + RecognitionCommitRecord.CURRENT_RULES_VERSION
+&nbsp;                        + &quot; / &quot;
+&nbsp;                        + RecognitionCommitRecord
+&nbsp;                        .CURRENT_REWARD_PROFILE_VERSION,
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Reward decision&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Attribute modifiers&quot;,
+<b class="nc">&nbsp;                yesNo(</b>
+&nbsp;                        RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .grantsAttributeModifiers()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Combat multipliers&quot;,
+<b class="nc">&nbsp;                yesNo(</b>
+&nbsp;                        RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .grantsCombatMultipliers()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Legacy-based power&quot;,
+<b class="nc">&nbsp;                yesNo(</b>
+&nbsp;                        RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .grantsHistoryModifierPower()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Base / maximum combined strength&quot;,
+<b class="nc">&nbsp;                formatPercent(</b>
+&nbsp;                        RecognitionStrengthRewardFormula.BASE_REWARD
+&nbsp;                )
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + formatPercent(</b>
+&nbsp;                        RecognitionStrengthRewardFormula
+<b class="nc">&nbsp;                                .maximumReward(false)</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Pure maximum strength&quot;,
+<b class="nc">&nbsp;                formatPercent(</b>
+&nbsp;                        RecognitionStrengthRewardFormula
+<b class="nc">&nbsp;                                .maximumReward(true)</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                RecognitionReleasePolicy
+<b class="nc">&nbsp;                                        .rewardProfileSummary()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Awakening decision&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;True Hero required for Pure Good&quot;,
+<b class="nc">&nbsp;                yesNo(</b>
+&nbsp;                        RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .requiresTrueHeroForPureGood()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;True Demon Lord required for Pure Evil&quot;,
+<b class="nc">&nbsp;                yesNo(</b>
+&nbsp;                        RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .requiresTrueDemonLordForPureEvil()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Awakening required for True Neutral&quot;,
+<b class="nc">&nbsp;                yesNo(</b>
+&nbsp;                        RecognitionReleasePolicy
+<b class="nc">&nbsp;                                .requiresAwakeningForTrueNeutral()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;True Hero directional modifier&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        balance.good()</b>
+<b class="nc">&nbsp;                                .trueHeroModifier()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;True Demon Lord directional modifier&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        balance.evil()</b>
+<b class="nc">&nbsp;                                .trueDemonLordModifier()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                RecognitionReleasePolicy
+<b class="nc">&nbsp;                                        .awakeningPolicySummary()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Active balance&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Source&quot;,
+<b class="nc">&nbsp;                balance.sourceId(),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Revision&quot;,
+<b class="nc">&nbsp;                Long.toString(state.revision()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Established / Pure&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        balance.selection()</b>
+<b class="nc">&nbsp;                                .establishedThreshold()</b>
+&nbsp;                )
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + format(</b>
+<b class="nc">&nbsp;                        balance.selection()</b>
+<b class="nc">&nbsp;                                .pureThreshold()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Final / raw dominance&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        balance.selection()</b>
+<b class="nc">&nbsp;                                .dominanceRatio()</b>
+&nbsp;                )
+&nbsp;                        + &quot;x / &quot;
+<b class="nc">&nbsp;                        + format(</b>
+<b class="nc">&nbsp;                        balance.selection()</b>
+<b class="nc">&nbsp;                                .rawDominanceRatio()</b>
+&nbsp;                )
+&nbsp;                        + &quot;x&quot;,
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Use /moostensura debug release validate to run the complete release audit.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_AQUA),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int validate(
+&nbsp;            CommandSourceStack source
+&nbsp;    ) {
+&nbsp;        RecognitionReleaseValidationHarness.Report report =
+<b class="nc">&nbsp;                RecognitionReleaseValidationHarness.validate();</b>
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Recognition Release Validation&quot;,
+&nbsp;                ChatFormatting.LIGHT_PURPLE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+&nbsp;                                &quot;Read-only audit. No player, world, commitment, reward or datapack data was modified.&quot;
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.DARK_GRAY),</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Policy&quot;,
+<b class="nc">&nbsp;                report.policyDisplayName()</b>
+&nbsp;                        + &quot; (&quot;
+<b class="nc">&nbsp;                        + report.policyId()</b>
+&nbsp;                        + &quot;, version &quot;
+<b class="nc">&nbsp;                        + report.policyVersion()</b>
+&nbsp;                        + &quot;)&quot;,
+&nbsp;                ChatFormatting.AQUA
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Balance&quot;,
+<b class="nc">&nbsp;                report.balanceSource()</b>
+&nbsp;                        + &quot; (revision &quot;
+<b class="nc">&nbsp;                        + report.balanceRevision()</b>
+&nbsp;                        + &quot;)&quot;,
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Canonical defaults&quot;,
+<b class="nc">&nbsp;                Boolean.toString(</b>
+<b class="nc">&nbsp;                        report.canonicalDefaults()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                report.canonicalDefaults()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Checks&quot;,
+<b class="nc">&nbsp;                report.passedChecks()</b>
+&nbsp;                        + &quot; passed / &quot;
+<b class="nc">&nbsp;                        + report.failedChecks()</b>
+&nbsp;                        + &quot; failed&quot;,
+<b class="nc">&nbsp;                report.passed()</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.RED</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Release invariants&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Pure paths&quot;,
+<b class="nc">&nbsp;                report.purePaths()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + report.totalPurePaths(),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Required adjacent crossings&quot;,
+<b class="nc">&nbsp;                report.requiredAdjacentCrosses()</b>
+&nbsp;                        + &quot; / &quot;
+<b class="nc">&nbsp;                        + report.totalRequiredAdjacentCrosses(),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Pure morality coverage&quot;,
+&nbsp;                &quot;Good &quot;
+<b class="nc">&nbsp;                        + report.goodPurePaths()</b>
+&nbsp;                        + &quot;/3, Neutral &quot;
+<b class="nc">&nbsp;                        + report.neutralPurePaths()</b>
+&nbsp;                        + &quot;/3, Evil &quot;
+<b class="nc">&nbsp;                        + report.evilPurePaths()</b>
+&nbsp;                        + &quot;/3&quot;,
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Identity-heavy Pure results&quot;,
+<b class="nc">&nbsp;                Integer.toString(</b>
+<b class="nc">&nbsp;                        report.identityHeavyPurePaths()</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                report.identityHeavyPurePaths() == 0</b>
+<b class="nc">&nbsp;                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                        : ChatFormatting.YELLOW</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Freedom ceiling&quot;,
+<b class="nc">&nbsp;                format(report.legacyFreedomCeiling())</b>
+&nbsp;                        + &quot; -&gt; &quot;
+<b class="nc">&nbsp;                        + format(report.expandedFreedomCeiling()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Order ceiling&quot;,
+<b class="nc">&nbsp;                format(report.orderCeiling()),</b>
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Freedom / Order ratio&quot;,
+<b class="nc">&nbsp;                formatPercent(</b>
+<b class="nc">&nbsp;                        report.freedomOrderRatio()</b>
+&nbsp;                ),
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendValue(</b>
+&nbsp;                source,
+&nbsp;                &quot;Configured self-reliance&quot;,
+<b class="nc">&nbsp;                format(</b>
+<b class="nc">&nbsp;                        report.configuredSelfReliancePoints()</b>
+&nbsp;                )
+&nbsp;                        + &quot; points&quot;,
+&nbsp;                ChatFormatting.WHITE
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        sendHeader(</b>
+&nbsp;                source,
+&nbsp;                &quot;Checks&quot;,
+&nbsp;                ChatFormatting.GOLD
+&nbsp;        );
+&nbsp;
+&nbsp;        for (RecognitionReleaseValidationHarness.Check check :
+<b class="nc">&nbsp;                report.checks()) {</b>
+&nbsp;            MutableComponent line =
+<b class="nc">&nbsp;                    Component.literal(</b>
+<b class="nc">&nbsp;                                    check.passed()</b>
+<b class="nc">&nbsp;                                            ? &quot;[PASS] &quot;</b>
+<b class="nc">&nbsp;                                            : &quot;[FAIL] &quot;</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(</b>
+<b class="nc">&nbsp;                                    check.passed()</b>
+<b class="nc">&nbsp;                                            ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                            : ChatFormatting.RED</b>
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;            line.append(</b>
+<b class="nc">&nbsp;                    Component.literal(</b>
+<b class="nc">&nbsp;                                    check.name()</b>
+&nbsp;                                            + &quot; — &quot;
+<b class="nc">&nbsp;                                            + check.detail()</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.WHITE)</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            source.sendSuccess(</b>
+<b class="nc">&nbsp;                    () -&gt; line,</b>
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!report.warnings().isEmpty()) {</b>
+<b class="nc">&nbsp;            sendHeader(</b>
+&nbsp;                    source,
+&nbsp;                    &quot;Audit notes&quot;,
+&nbsp;                    ChatFormatting.GOLD
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            for (String warning : report.warnings()) {</b>
+<b class="nc">&nbsp;                source.sendSuccess(</b>
+<b class="nc">&nbsp;                        () -&gt; Component.literal(</b>
+&nbsp;                                        &quot;- &quot; + warning
+&nbsp;                                )
+<b class="nc">&nbsp;                                .withStyle(ChatFormatting.YELLOW),</b>
+&nbsp;                        false
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; Component.literal(</b>
+<b class="nc">&nbsp;                                report.passed()</b>
+<b class="nc">&nbsp;                                        ? &quot;Recognition release validation PASS.&quot;</b>
+<b class="nc">&nbsp;                                        : &quot;Recognition release validation FAIL. Review the failed checks before release.&quot;</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withStyle(</b>
+<b class="nc">&nbsp;                                report.passed()</b>
+<b class="nc">&nbsp;                                        ? ChatFormatting.GREEN</b>
+<b class="nc">&nbsp;                                        : ChatFormatting.RED,</b>
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        ),
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return report.passed()</b>
+<b class="nc">&nbsp;                ? 1</b>
+<b class="nc">&nbsp;                : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendHeader(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String text,
+&nbsp;            ChatFormatting color
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent header =</b>
+<b class="nc">&nbsp;                Component.literal(text)</b>
+<b class="nc">&nbsp;                        .withStyle(</b>
+&nbsp;                                color,
+&nbsp;                                ChatFormatting.BOLD
+&nbsp;                        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; header,</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendValue(
+&nbsp;            CommandSourceStack source,
+&nbsp;            String label,
+&nbsp;            String value,
+&nbsp;            ChatFormatting valueColor
+&nbsp;    ) {
+<b class="nc">&nbsp;        MutableComponent line =</b>
+<b class="nc">&nbsp;                Component.literal(label + &quot;: &quot;)</b>
+<b class="nc">&nbsp;                        .withStyle(ChatFormatting.GRAY);</b>
+&nbsp;
+<b class="nc">&nbsp;        line.append(</b>
+<b class="nc">&nbsp;                Component.literal(value)</b>
+<b class="nc">&nbsp;                        .withStyle(valueColor)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        source.sendSuccess(</b>
+<b class="nc">&nbsp;                () -&gt; line,</b>
+&nbsp;                false
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String yesNo(
+&nbsp;            boolean value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return value</b>
+<b class="nc">&nbsp;                ? &quot;yes&quot;</b>
+<b class="nc">&nbsp;                : &quot;no&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String format(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.2f&quot;,
+<b class="nc">&nbsp;                Double.isFinite(value)</b>
+<b class="nc">&nbsp;                        ? value</b>
+<b class="nc">&nbsp;                        : 0.0D</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String formatPercent(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.US,
+&nbsp;                &quot;%.1f%%&quot;,
+<b class="nc">&nbsp;                Double.isFinite(value)</b>
+<b class="nc">&nbsp;                        ? value * 100.0D</b>
+<b class="nc">&nbsp;                        : 0.0D</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

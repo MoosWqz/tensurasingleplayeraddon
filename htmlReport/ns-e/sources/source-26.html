@@ -1,0 +1,450 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionNameColorService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionNameColorService (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionNameColorService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (4/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.3%
+  </span>
+  <span class="absValue">
+    (2/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    29.8%
+  </span>
+  <span class="absValue">
+    (28/94)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.network.chat.MutableComponent;
+&nbsp;
+&nbsp;import java.util.EnumMap;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;public final class RecognitionNameColorService {
+&nbsp;
+&nbsp;    public static final double PRIMARY_COLOR_WEIGHT =
+&nbsp;            0.70D;
+&nbsp;
+&nbsp;    public static final double SECONDARY_COLOR_WEIGHT =
+&nbsp;            0.30D;
+&nbsp;
+&nbsp;    private static final Map&lt;RecognitionPath, Integer&gt;
+&nbsp;            BASE_COLORS =
+<b class="fc">&nbsp;            createBaseColors();</b>
+&nbsp;
+&nbsp;    private RecognitionNameColorService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int getBaseColor(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return 0x5DD9E8;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return BASE_COLORS.getOrDefault(</b>
+&nbsp;                path,
+<b class="fc">&nbsp;                0x5DD9E8</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pure recognitions use the exact primary color.
+&nbsp;     *
+&nbsp;     * Crossed recognitions blend 70% primary with 30% secondary, making the
+&nbsp;     * order of the paths visually meaningful.
+&nbsp;     */
+&nbsp;    public static int getRecognitionColor(
+&nbsp;            RecognitionPath primaryPath,
+&nbsp;            RecognitionPath secondaryPath,
+&nbsp;            boolean pure
+&nbsp;    ) {
+<b class="fc">&nbsp;        int primaryColor =</b>
+<b class="fc">&nbsp;                getBaseColor(primaryPath);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (pure</b>
+&nbsp;                || secondaryPath == null
+&nbsp;                || secondaryPath == primaryPath) {
+&nbsp;
+<b class="fc">&nbsp;            return primaryColor;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int secondaryColor =</b>
+<b class="nc">&nbsp;                getBaseColor(secondaryPath);</b>
+&nbsp;
+<b class="nc">&nbsp;        return blendRgb(</b>
+&nbsp;                primaryColor,
+&nbsp;                secondaryColor,
+&nbsp;                PRIMARY_COLOR_WEIGHT
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static MutableComponent createBasePreview(
+&nbsp;            RecognitionPath path,
+&nbsp;            boolean pure
+&nbsp;    ) {
+<b class="nc">&nbsp;        int color =</b>
+<b class="nc">&nbsp;                getRecognitionColor(</b>
+&nbsp;                        path,
+&nbsp;                        null,
+&nbsp;                        pure
+&nbsp;                );
+&nbsp;
+&nbsp;        String prefix =
+<b class="nc">&nbsp;                pure</b>
+<b class="nc">&nbsp;                        ? &quot;Pure &quot;</b>
+<b class="nc">&nbsp;                        : &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        MutableComponent component =</b>
+<b class="nc">&nbsp;                Component.literal(</b>
+&nbsp;                                prefix
+<b class="nc">&nbsp;                                        + getDisplayName(path)</b>
+&nbsp;                                        + &quot;  &quot;
+<b class="nc">&nbsp;                                        + formatHex(color)</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        .withColor(color);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (pure) {</b>
+<b class="nc">&nbsp;            component.withStyle(</b>
+&nbsp;                    ChatFormatting.BOLD
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return component;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static MutableComponent createCrossingPreview(
+&nbsp;            RecognitionPath primaryPath,
+&nbsp;            RecognitionPath secondaryPath
+&nbsp;    ) {
+<b class="nc">&nbsp;        int color =</b>
+<b class="nc">&nbsp;                getRecognitionColor(</b>
+&nbsp;                        primaryPath,
+&nbsp;                        secondaryPath,
+&nbsp;                        false
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return Component.literal(</b>
+<b class="nc">&nbsp;                        getDisplayName(primaryPath)</b>
+&nbsp;                                + &quot; + &quot;
+<b class="nc">&nbsp;                                + getDisplayName(secondaryPath)</b>
+&nbsp;                                + &quot;  &quot;
+<b class="nc">&nbsp;                                + formatHex(color)</b>
+&nbsp;                )
+<b class="nc">&nbsp;                .withColor(color);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getDisplayName(
+&nbsp;            RecognitionPath path
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return &quot;Unknown&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String[] parts =</b>
+<b class="nc">&nbsp;                path.getId()</b>
+<b class="nc">&nbsp;                        .split(&quot;_&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder result =</b>
+&nbsp;                new StringBuilder();
+&nbsp;
+<b class="nc">&nbsp;        for (String part : parts) {</b>
+<b class="nc">&nbsp;            if (part == null || part.isBlank()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!result.isEmpty()) {</b>
+<b class="nc">&nbsp;                result.append(&#39; &#39;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            result.append(</b>
+<b class="nc">&nbsp;                    Character.toUpperCase(</b>
+<b class="nc">&nbsp;                            part.charAt(0)</b>
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            if (part.length() &gt; 1) {</b>
+<b class="nc">&nbsp;                result.append(</b>
+<b class="nc">&nbsp;                        part.substring(1)</b>
+<b class="nc">&nbsp;                                .toLowerCase(</b>
+&nbsp;                                        Locale.ROOT
+&nbsp;                                )
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String formatHex(
+&nbsp;            int rgb
+&nbsp;    ) {
+<b class="nc">&nbsp;        return String.format(</b>
+&nbsp;                Locale.ROOT,
+&nbsp;                &quot;#%06X&quot;,
+<b class="nc">&nbsp;                rgb &amp; 0xFFFFFF</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int blendRgb(
+&nbsp;            int primaryColor,
+&nbsp;            int secondaryColor,
+&nbsp;            double primaryWeight
+&nbsp;    ) {
+<b class="nc">&nbsp;        double safePrimaryWeight =</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        0.0D,
+<b class="nc">&nbsp;                        Math.min(</b>
+&nbsp;                                1.0D,
+&nbsp;                                primaryWeight
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double secondaryWeight =</b>
+&nbsp;                1.0D
+&nbsp;                        - safePrimaryWeight;
+&nbsp;
+<b class="nc">&nbsp;        int primaryRed =</b>
+&nbsp;                primaryColor &gt;&gt; 16
+&nbsp;                        &amp; 0xFF;
+&nbsp;
+<b class="nc">&nbsp;        int primaryGreen =</b>
+&nbsp;                primaryColor &gt;&gt; 8
+&nbsp;                        &amp; 0xFF;
+&nbsp;
+<b class="nc">&nbsp;        int primaryBlue =</b>
+&nbsp;                primaryColor
+&nbsp;                        &amp; 0xFF;
+&nbsp;
+<b class="nc">&nbsp;        int secondaryRed =</b>
+&nbsp;                secondaryColor &gt;&gt; 16
+&nbsp;                        &amp; 0xFF;
+&nbsp;
+<b class="nc">&nbsp;        int secondaryGreen =</b>
+&nbsp;                secondaryColor &gt;&gt; 8
+&nbsp;                        &amp; 0xFF;
+&nbsp;
+<b class="nc">&nbsp;        int secondaryBlue =</b>
+&nbsp;                secondaryColor
+&nbsp;                        &amp; 0xFF;
+&nbsp;
+<b class="nc">&nbsp;        int red =</b>
+<b class="nc">&nbsp;                clampChannel(</b>
+<b class="nc">&nbsp;                        (int) Math.round(</b>
+&nbsp;                                primaryRed
+&nbsp;                                        * safePrimaryWeight
+&nbsp;                                        + secondaryRed
+&nbsp;                                        * secondaryWeight
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        int green =</b>
+<b class="nc">&nbsp;                clampChannel(</b>
+<b class="nc">&nbsp;                        (int) Math.round(</b>
+&nbsp;                                primaryGreen
+&nbsp;                                        * safePrimaryWeight
+&nbsp;                                        + secondaryGreen
+&nbsp;                                        * secondaryWeight
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        int blue =</b>
+<b class="nc">&nbsp;                clampChannel(</b>
+<b class="nc">&nbsp;                        (int) Math.round(</b>
+&nbsp;                                primaryBlue
+&nbsp;                                        * safePrimaryWeight
+&nbsp;                                        + secondaryBlue
+&nbsp;                                        * secondaryWeight
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return red &lt;&lt; 16</b>
+&nbsp;                | green &lt;&lt; 8
+&nbsp;                | blue;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int clampChannel(
+&nbsp;            int value
+&nbsp;    ) {
+<b class="nc">&nbsp;        return Math.max(</b>
+&nbsp;                0,
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        255,
+&nbsp;                        value
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;RecognitionPath, Integer&gt;
+&nbsp;    createBaseColors() {
+<b class="fc">&nbsp;        EnumMap&lt;RecognitionPath, Integer&gt; colors =</b>
+&nbsp;                new EnumMap&lt;&gt;(
+&nbsp;                        RecognitionPath.class
+&nbsp;                );
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Palette logic:
+&nbsp;         *
+&nbsp;         * Columns:
+&nbsp;         * - Lawful  -&gt; green-based
+&nbsp;         * - Neutral -&gt; blue / aqua based
+&nbsp;         * - Chaotic -&gt; purple-based
+&nbsp;         *
+&nbsp;         * Rows:
+&nbsp;         * - Good    -&gt; brighter / cleaner
+&nbsp;         * - Neutral -&gt; calmer / cooler
+&nbsp;         * - Evil    -&gt; red / crimson leaning
+&nbsp;         */
+&nbsp;
+<b class="fc">&nbsp;        colors.put(</b>
+&nbsp;                RecognitionPath.LAWFUL_GOOD,
+<b class="fc">&nbsp;                0xBFF57A</b>
+&nbsp;        ); // bright light green
+&nbsp;
+<b class="fc">&nbsp;        colors.put(</b>
+&nbsp;                RecognitionPath.NEUTRAL_GOOD,
+<b class="fc">&nbsp;                0x71E0B8</b>
+&nbsp;        ); // calm aqua-green
+&nbsp;
+<b class="fc">&nbsp;        colors.put(</b>
+&nbsp;                RecognitionPath.CHAOTIC_GOOD,
+<b class="fc">&nbsp;                0xA98CFF</b>
+&nbsp;        ); // lighter purple for chaotic good
+&nbsp;
+<b class="fc">&nbsp;        colors.put(</b>
+&nbsp;                RecognitionPath.LAWFUL_NEUTRAL,
+<b class="fc">&nbsp;                0x73D66E</b>
+&nbsp;        ); // stable green
+&nbsp;
+<b class="fc">&nbsp;        colors.put(</b>
+&nbsp;                RecognitionPath.TRUE_NEUTRAL,
+<b class="fc">&nbsp;                0x5DD9E8</b>
+&nbsp;        ); // aqua instead of grey
+&nbsp;
+<b class="fc">&nbsp;        colors.put(</b>
+&nbsp;                RecognitionPath.CHAOTIC_NEUTRAL,
+<b class="fc">&nbsp;                0x7F86FF</b>
+&nbsp;        ); // blue-purple
+&nbsp;
+<b class="fc">&nbsp;        colors.put(</b>
+&nbsp;                RecognitionPath.LAWFUL_EVIL,
+<b class="fc">&nbsp;                0xD9644F</b>
+&nbsp;        ); // disciplined ember red
+&nbsp;
+<b class="fc">&nbsp;        colors.put(</b>
+&nbsp;                RecognitionPath.NEUTRAL_EVIL,
+<b class="fc">&nbsp;                0xE05276</b>
+&nbsp;        ); // ruby-magenta
+&nbsp;
+<b class="fc">&nbsp;        colors.put(</b>
+&nbsp;                RecognitionPath.CHAOTIC_EVIL,
+<b class="fc">&nbsp;                0xC03E86</b>
+&nbsp;        ); // crimson-purple
+&nbsp;
+<b class="fc">&nbsp;        return Map.copyOf(colors);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

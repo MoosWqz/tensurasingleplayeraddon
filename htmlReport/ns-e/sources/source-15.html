@@ -1,0 +1,829 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionEndowmentEffortRewardService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionEndowmentEffortRewardService (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionEndowmentEffortRewardService</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.8%
+  </span>
+  <span class="absValue">
+    (7/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.1%
+  </span>
+  <span class="absValue">
+    (16/106)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.3%
+  </span>
+  <span class="absValue">
+    (56/205)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionEndowmentEffortRewardService$ModifierChange</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionEndowmentEffortRewardService$ReconcileResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (9/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.7%
+  </span>
+  <span class="absValue">
+    (17/108)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.8%
+  </span>
+  <span class="absValue">
+    (62/215)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.AttachmentRegistry;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;import com.mooswqz.moostensuraaddon.util.TensuraPlayerStateHelper;
+&nbsp;import io.github.manasmods.tensura.registry.attribute.TensuraAttributes;
+&nbsp;import io.github.manasmods.tensura.storage.TensuraStorages;
+&nbsp;import io.github.manasmods.tensura.storage.ep.IExistence;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+&nbsp;import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Applies the frozen effort extension without changing Tensura&#39;s naming code.
+&nbsp; *
+&nbsp; * &lt;p&gt;Two stable permanent modifiers expand maximum magicules and aura. Current
+&nbsp; * energy receives only the positive modifier delta when capacity is first
+&nbsp; * added or repaired. An unchanged synchronization performs no energy write,
+&nbsp; * so this service can never act as a passive refill.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionEndowmentEffortRewardService {
+&nbsp;
+<b class="fc">&nbsp;    public static final ResourceLocation MAX_MAGICULE_MODIFIER_ID =</b>
+<b class="fc">&nbsp;            id(&quot;recognition_effort_max_magicule&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final ResourceLocation MAX_AURA_MODIFIER_ID =</b>
+<b class="fc">&nbsp;            id(&quot;recognition_effort_max_aura&quot;);</b>
+&nbsp;
+&nbsp;    private static final double EPSILON =
+&nbsp;            0.000_000_1D;
+&nbsp;
+&nbsp;    private RecognitionEndowmentEffortRewardService() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ReconcileResult reconcile(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return ReconcileResult.rejected(</b>
+&nbsp;                    &quot;A server player is required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionData data =</b>
+<b class="fc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (data.isWriteBlockedByFutureVersion()) {</b>
+<b class="nc">&nbsp;            return new ReconcileResult(</b>
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    0.0D,
+&nbsp;                    &quot;Future recognition version preserved without mutation.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionCommittedResult committed =</b>
+<b class="fc">&nbsp;                data.getCommittedResult();</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean futureProfile =</b>
+<b class="fc">&nbsp;                data.isWriteBlockedByFutureVersion();</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean metadataInitialized =</b>
+<b class="fc">&nbsp;                data.getFlag(</b>
+&nbsp;                        RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        boolean nativeNamed =</b>
+<b class="fc">&nbsp;                TensuraPlayerStateHelper.isNamedOrEndowed(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        boolean shouldApply =</b>
+<b class="pc">&nbsp;                data.isNamingCommitted()</b>
+<b class="pc">&nbsp;                        &amp;&amp; committed.valid()</b>
+&nbsp;                        &amp;&amp; metadataInitialized
+&nbsp;                        &amp;&amp; !futureProfile
+&nbsp;                        &amp;&amp; nativeNamed;
+&nbsp;
+<b class="pc">&nbsp;        if (!shouldApply) {</b>
+&nbsp;            boolean removed =
+<b class="nc">&nbsp;                    futureProfile</b>
+<b class="nc">&nbsp;                            ? false</b>
+<b class="nc">&nbsp;                            : removeAllModifiers(player);</b>
+&nbsp;
+<b class="nc">&nbsp;            return new ReconcileResult(</b>
+&nbsp;                    true,
+&nbsp;                    removed,
+&nbsp;                    false,
+&nbsp;                    0.0D,
+<b class="nc">&nbsp;                    futureProfile</b>
+<b class="nc">&nbsp;                            ? &quot;Future reward profile preserved without mutation.&quot;</b>
+<b class="nc">&nbsp;                            : &quot;No eligible Soul Recognition endowment; effort modifiers removed.&quot;</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        IExistence existence =</b>
+<b class="fc">&nbsp;                TensuraStorages.getExistenceFrom(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        AttributeInstance maximumMagicule =</b>
+<b class="fc">&nbsp;                player.getAttribute(</b>
+&nbsp;                        TensuraAttributes.MAX_MAGICULE
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        AttributeInstance maximumAura =</b>
+<b class="fc">&nbsp;                player.getAttribute(</b>
+&nbsp;                        TensuraAttributes.MAX_AURA
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (existence == null</b>
+&nbsp;                || maximumMagicule == null
+&nbsp;                || maximumAura == null) {
+<b class="nc">&nbsp;            return ReconcileResult.rejected(</b>
+&nbsp;                    &quot;Tensura energy storage or attributes are unavailable.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionEndowmentEffortRewardFormula.Reward reward =</b>
+<b class="fc">&nbsp;                rewardFromStoredData(data);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (reward.energyIncreasePerPool()</b>
+&nbsp;                &lt;= EPSILON) {
+<b class="fc">&nbsp;            boolean removed =</b>
+<b class="fc">&nbsp;                    removeAllModifiers(player);</b>
+&nbsp;
+<b class="fc">&nbsp;            return new ReconcileResult(</b>
+&nbsp;                    true,
+&nbsp;                    removed,
+&nbsp;                    true,
+&nbsp;                    0.0D,
+&nbsp;                    &quot;Frozen effort grants no additional endowment capacity.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ModifierChange magiculeChange =</b>
+<b class="nc">&nbsp;                reconcileModifier(</b>
+&nbsp;                        maximumMagicule,
+&nbsp;                        MAX_MAGICULE_MODIFIER_ID,
+<b class="nc">&nbsp;                        reward.energyIncreasePerPool()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        ModifierChange auraChange =</b>
+<b class="nc">&nbsp;                reconcileModifier(</b>
+&nbsp;                        maximumAura,
+&nbsp;                        MAX_AURA_MODIFIER_ID,
+<b class="nc">&nbsp;                        reward.energyIncreasePerPool()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        double energyGranted =</b>
+<b class="nc">&nbsp;                applyOnlyNewEnergyCapacity(</b>
+&nbsp;                        existence,
+&nbsp;                        maximumMagicule,
+&nbsp;                        maximumAura,
+<b class="nc">&nbsp;                        magiculeChange.positiveDelta(),</b>
+<b class="nc">&nbsp;                        auraChange.positiveDelta()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        boolean changed =</b>
+<b class="nc">&nbsp;                magiculeChange.changed()</b>
+<b class="nc">&nbsp;                        || auraChange.changed()</b>
+&nbsp;                        || energyGranted &gt; 0.0D;
+&nbsp;
+<b class="nc">&nbsp;        return new ReconcileResult(</b>
+&nbsp;                true,
+&nbsp;                changed,
+&nbsp;                true,
+&nbsp;                energyGranted,
+<b class="nc">&nbsp;                changed</b>
+<b class="nc">&nbsp;                        ? &quot;Effort-scaled endowment capacity reconciled.&quot;</b>
+<b class="nc">&nbsp;                        : &quot;Effort-scaled endowment capacity already current.&quot;</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Read-only inspection; this never changes attributes or current energy. */
+&nbsp;    public static RecognitionEndowmentEffortRewardSnapshot inspect(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return emptySnapshot();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionData data =</b>
+<b class="nc">&nbsp;                player.getData(</b>
+&nbsp;                        AttachmentRegistry.RECOGNITION_DATA
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        RecognitionCommittedResult committed =</b>
+<b class="nc">&nbsp;                data.getCommittedResult();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean futureProfile =</b>
+<b class="nc">&nbsp;                data.isWriteBlockedByFutureVersion();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean initialized =</b>
+<b class="nc">&nbsp;                data.getFlag(</b>
+&nbsp;                        RecognitionStatKeys.RECOGNITION_REWARD_INITIALIZED
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        boolean nativeNamed =</b>
+<b class="nc">&nbsp;                TensuraPlayerStateHelper.isNamedOrEndowed(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        boolean active =</b>
+<b class="nc">&nbsp;                data.isNamingCommitted()</b>
+<b class="nc">&nbsp;                        &amp;&amp; committed.valid()</b>
+&nbsp;                        &amp;&amp; initialized
+&nbsp;                        &amp;&amp; !futureProfile
+&nbsp;                        &amp;&amp; nativeNamed;
+&nbsp;
+&nbsp;        RecognitionEndowmentEffortRewardFormula.Reward reward =
+<b class="nc">&nbsp;                active</b>
+<b class="nc">&nbsp;                        ? rewardFromStoredData(data)</b>
+<b class="nc">&nbsp;                        : zeroReward();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; mismatches =</b>
+<b class="nc">&nbsp;                findMismatches(</b>
+&nbsp;                        player,
+&nbsp;                        active,
+<b class="nc">&nbsp;                        reward.energyIncreasePerPool()</b>
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        return new RecognitionEndowmentEffortRewardSnapshot(</b>
+<b class="nc">&nbsp;                data.isNamingCommitted(),</b>
+<b class="nc">&nbsp;                committed.valid(),</b>
+&nbsp;                nativeNamed,
+&nbsp;                initialized,
+&nbsp;                futureProfile,
+<b class="nc">&nbsp;                mismatches.isEmpty(),</b>
+&nbsp;                mismatches,
+&nbsp;                reward
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean removeAllModifiers(
+&nbsp;            ServerPlayer player
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (player == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        AttributeInstance maximumMagicule =</b>
+<b class="fc">&nbsp;                player.getAttribute(</b>
+&nbsp;                        TensuraAttributes.MAX_MAGICULE
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        AttributeInstance maximumAura =</b>
+<b class="fc">&nbsp;                player.getAttribute(</b>
+&nbsp;                        TensuraAttributes.MAX_AURA
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        boolean changed = false;</b>
+<b class="fc">&nbsp;        changed |= remove(</b>
+&nbsp;                maximumMagicule,
+&nbsp;                MAX_MAGICULE_MODIFIER_ID
+&nbsp;        );
+<b class="fc">&nbsp;        changed |= remove(</b>
+&nbsp;                maximumAura,
+&nbsp;                MAX_AURA_MODIFIER_ID
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (changed) {</b>
+<b class="nc">&nbsp;            clampCurrentEnergy(</b>
+&nbsp;                    player,
+&nbsp;                    maximumMagicule,
+&nbsp;                    maximumAura
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionEndowmentEffortRewardFormula.Reward
+&nbsp;    rewardFromStoredData(
+&nbsp;            RecognitionData data
+&nbsp;    ) {
+<b class="fc">&nbsp;        double maximumExtraEp =</b>
+&nbsp;                RecognitionEndowmentEffortRewardFormula
+<b class="fc">&nbsp;                        .resolveFrozenMaximumExtraEp(</b>
+<b class="fc">&nbsp;                                data.getFlag(</b>
+&nbsp;                                        RecognitionStatKeys
+&nbsp;                                                .ENDOWMENT_REWARD_SNAPSHOT_INITIALIZED
+&nbsp;                                ),
+<b class="fc">&nbsp;                                data.getMeasurement(</b>
+&nbsp;                                        RecognitionStatKeys
+&nbsp;                                                .ENDOWMENT_MAXIMUM_EXTRA_EP_AT_COMMIT
+&nbsp;                                )
+&nbsp;                        );
+&nbsp;
+<b class="fc">&nbsp;        return RecognitionEndowmentEffortRewardFormula.calculate(</b>
+<b class="fc">&nbsp;                data.getMeasurement(</b>
+&nbsp;                        RecognitionStatKeys.IDENTITY_STRENGTH_AT_COMMIT
+&nbsp;                ),
+<b class="fc">&nbsp;                data.getMeasurement(</b>
+&nbsp;                        RecognitionStatKeys.IDENTITY_STRENGTH_MAXIMUM_AT_COMMIT
+&nbsp;                ),
+&nbsp;                maximumExtraEp
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ModifierChange reconcileModifier(
+&nbsp;            AttributeInstance instance,
+&nbsp;            ResourceLocation id,
+&nbsp;            double expectedAmount
+&nbsp;    ) {
+<b class="nc">&nbsp;        AttributeModifier existing =</b>
+<b class="nc">&nbsp;                instance.getModifier(id);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (existing != null</b>
+<b class="nc">&nbsp;                &amp;&amp; existing.operation()</b>
+&nbsp;                == AttributeModifier.Operation.ADD_VALUE
+<b class="nc">&nbsp;                &amp;&amp; approximately(</b>
+<b class="nc">&nbsp;                        existing.amount(),</b>
+&nbsp;                        expectedAmount
+&nbsp;                )) {
+<b class="nc">&nbsp;            return ModifierChange.unchanged();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        double previousCapacity =
+&nbsp;                existing != null
+<b class="nc">&nbsp;                        &amp;&amp; existing.operation()</b>
+&nbsp;                        == AttributeModifier.Operation.ADD_VALUE
+<b class="nc">&nbsp;                        ? Math.max(</b>
+&nbsp;                                0.0D,
+<b class="nc">&nbsp;                                existing.amount()</b>
+&nbsp;                        )
+<b class="nc">&nbsp;                        : 0.0D;</b>
+&nbsp;
+<b class="nc">&nbsp;        instance.addOrReplacePermanentModifier(</b>
+&nbsp;                new AttributeModifier(
+&nbsp;                        id,
+&nbsp;                        expectedAmount,
+&nbsp;                        AttributeModifier.Operation.ADD_VALUE
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return new ModifierChange(</b>
+&nbsp;                true,
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        0.0D,
+&nbsp;                        expectedAmount - previousCapacity
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Grants only capacity that was newly added during this reconciliation.
+&nbsp;     * With unchanged modifiers both deltas are zero and no setter is called.
+&nbsp;     */
+&nbsp;    private static double applyOnlyNewEnergyCapacity(
+&nbsp;            IExistence existence,
+&nbsp;            AttributeInstance maximumMagicule,
+&nbsp;            AttributeInstance maximumAura,
+&nbsp;            double newMagiculeCapacity,
+&nbsp;            double newAuraCapacity
+&nbsp;    ) {
+<b class="nc">&nbsp;        double totalGranted = 0.0D;</b>
+<b class="nc">&nbsp;        boolean changed = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (newMagiculeCapacity &gt; EPSILON) {</b>
+<b class="nc">&nbsp;            double oldValue =</b>
+<b class="nc">&nbsp;                    sanitizeEnergy(</b>
+<b class="nc">&nbsp;                            existence.getMagicule()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            double newValue =</b>
+<b class="nc">&nbsp;                    Math.min(</b>
+<b class="nc">&nbsp;                            maximumMagicule.getValue(),</b>
+&nbsp;                            oldValue + newMagiculeCapacity
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (!approximately(oldValue, newValue)) {</b>
+<b class="nc">&nbsp;                existence.setMagicule(newValue);</b>
+<b class="nc">&nbsp;                totalGranted +=</b>
+<b class="nc">&nbsp;                        Math.max(</b>
+&nbsp;                                0.0D,
+&nbsp;                                newValue - oldValue
+&nbsp;                        );
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (newAuraCapacity &gt; EPSILON) {</b>
+<b class="nc">&nbsp;            double oldValue =</b>
+<b class="nc">&nbsp;                    sanitizeEnergy(</b>
+<b class="nc">&nbsp;                            existence.getAura()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            double newValue =</b>
+<b class="nc">&nbsp;                    Math.min(</b>
+<b class="nc">&nbsp;                            maximumAura.getValue(),</b>
+&nbsp;                            oldValue + newAuraCapacity
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (!approximately(oldValue, newValue)) {</b>
+<b class="nc">&nbsp;                existence.setAura(newValue);</b>
+<b class="nc">&nbsp;                totalGranted +=</b>
+<b class="nc">&nbsp;                        Math.max(</b>
+&nbsp;                                0.0D,
+&nbsp;                                newValue - oldValue
+&nbsp;                        );
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (changed) {</b>
+<b class="nc">&nbsp;            existence.markDirty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return totalGranted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void clampCurrentEnergy(
+&nbsp;            ServerPlayer player,
+&nbsp;            AttributeInstance maximumMagicule,
+&nbsp;            AttributeInstance maximumAura
+&nbsp;    ) {
+<b class="nc">&nbsp;        IExistence existence =</b>
+<b class="nc">&nbsp;                TensuraStorages.getExistenceFrom(</b>
+&nbsp;                        player
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (existence == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean changed = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (maximumMagicule != null) {</b>
+<b class="nc">&nbsp;            double oldValue =</b>
+<b class="nc">&nbsp;                    sanitizeEnergy(</b>
+<b class="nc">&nbsp;                            existence.getMagicule()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            double newValue =</b>
+<b class="nc">&nbsp;                    Math.min(</b>
+&nbsp;                            oldValue,
+<b class="nc">&nbsp;                            maximumMagicule.getValue()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (!approximately(oldValue, newValue)) {</b>
+<b class="nc">&nbsp;                existence.setMagicule(newValue);</b>
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (maximumAura != null) {</b>
+<b class="nc">&nbsp;            double oldValue =</b>
+<b class="nc">&nbsp;                    sanitizeEnergy(</b>
+<b class="nc">&nbsp;                            existence.getAura()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            double newValue =</b>
+<b class="nc">&nbsp;                    Math.min(</b>
+&nbsp;                            oldValue,
+<b class="nc">&nbsp;                            maximumAura.getValue()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            if (!approximately(oldValue, newValue)) {</b>
+<b class="nc">&nbsp;                existence.setAura(newValue);</b>
+<b class="nc">&nbsp;                changed = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (changed) {</b>
+<b class="nc">&nbsp;            existence.markDirty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; findMismatches(
+&nbsp;            ServerPlayer player,
+&nbsp;            boolean active,
+&nbsp;            double expectedAmount
+&nbsp;    ) {
+<b class="nc">&nbsp;        List&lt;String&gt; result =</b>
+&nbsp;                new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                result,
+&nbsp;                &quot;max_magicule&quot;,
+<b class="nc">&nbsp;                player.getAttribute(</b>
+&nbsp;                        TensuraAttributes.MAX_MAGICULE
+&nbsp;                ),
+&nbsp;                MAX_MAGICULE_MODIFIER_ID,
+&nbsp;                active,
+&nbsp;                expectedAmount
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        check(</b>
+&nbsp;                result,
+&nbsp;                &quot;max_aura&quot;,
+<b class="nc">&nbsp;                player.getAttribute(</b>
+&nbsp;                        TensuraAttributes.MAX_AURA
+&nbsp;                ),
+&nbsp;                MAX_AURA_MODIFIER_ID,
+&nbsp;                active,
+&nbsp;                expectedAmount
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return List.copyOf(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void check(
+&nbsp;            List&lt;String&gt; result,
+&nbsp;            String name,
+&nbsp;            AttributeInstance instance,
+&nbsp;            ResourceLocation id,
+&nbsp;            boolean active,
+&nbsp;            double expectedAmount
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (instance == null) {</b>
+<b class="nc">&nbsp;            result.add(name + &quot; attribute unavailable&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AttributeModifier modifier =</b>
+<b class="nc">&nbsp;                instance.getModifier(id);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean modifierExpected =</b>
+&nbsp;                active
+&nbsp;                        &amp;&amp; expectedAmount &gt; EPSILON;
+&nbsp;
+<b class="nc">&nbsp;        if (!modifierExpected) {</b>
+<b class="nc">&nbsp;            if (modifier != null) {</b>
+<b class="nc">&nbsp;                result.add(name + &quot; modifier remains while inactive&quot;);</b>
+&nbsp;            }
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (modifier == null) {</b>
+<b class="nc">&nbsp;            result.add(name + &quot; modifier missing&quot;);</b>
+<b class="nc">&nbsp;        } else if (modifier.operation()</b>
+&nbsp;                != AttributeModifier.Operation.ADD_VALUE
+<b class="nc">&nbsp;                || !approximately(</b>
+<b class="nc">&nbsp;                        modifier.amount(),</b>
+&nbsp;                        expectedAmount
+&nbsp;                )) {
+<b class="nc">&nbsp;            result.add(name + &quot; modifier differs&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean remove(
+&nbsp;            AttributeInstance instance,
+&nbsp;            ResourceLocation id
+&nbsp;    ) {
+<b class="pc">&nbsp;        return instance != null</b>
+<b class="fc">&nbsp;                &amp;&amp; instance.removeModifier(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeEnergy(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="pc">&nbsp;        return Double.isFinite(value)</b>
+<b class="fc">&nbsp;                &amp;&amp; value &gt; 0.0D</b>
+<b class="nc">&nbsp;                ? value</b>
+<b class="fc">&nbsp;                : 0.0D;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean approximately(
+&nbsp;            double first,
+&nbsp;            double second
+&nbsp;    ) {
+<b class="nc">&nbsp;        return Math.abs(first - second)</b>
+&nbsp;                &lt;= EPSILON;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ResourceLocation id(
+&nbsp;            String path
+&nbsp;    ) {
+<b class="fc">&nbsp;        return ResourceLocation.fromNamespaceAndPath(</b>
+&nbsp;                MoosTensuraAddon.MODID,
+&nbsp;                path
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionEndowmentEffortRewardSnapshot
+&nbsp;    emptySnapshot() {
+<b class="nc">&nbsp;        return new RecognitionEndowmentEffortRewardSnapshot(</b>
+&nbsp;                false,
+&nbsp;                false,
+&nbsp;                false,
+&nbsp;                false,
+&nbsp;                false,
+&nbsp;                true,
+<b class="nc">&nbsp;                List.of(),</b>
+<b class="nc">&nbsp;                zeroReward()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionEndowmentEffortRewardFormula.Reward
+&nbsp;    zeroReward() {
+<b class="nc">&nbsp;        return new RecognitionEndowmentEffortRewardFormula.Reward(</b>
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D,
+&nbsp;                0.0D
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record ModifierChange(</b>
+&nbsp;            boolean changed,
+&nbsp;            double positiveDelta
+&nbsp;    ) {
+&nbsp;        private static ModifierChange unchanged() {
+<b class="nc">&nbsp;            return new ModifierChange(</b>
+&nbsp;                    false,
+&nbsp;                    0.0D
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public record ReconcileResult(</b>
+&nbsp;            boolean supported,
+&nbsp;            boolean changed,
+&nbsp;            boolean active,
+&nbsp;            double currentEnergyGranted,
+&nbsp;            String message
+&nbsp;    ) {
+<b class="fc">&nbsp;        public ReconcileResult {</b>
+<b class="fc">&nbsp;            currentEnergyGranted =</b>
+<b class="fc">&nbsp;                    sanitizeEnergy(</b>
+&nbsp;                            currentEnergyGranted
+&nbsp;                    );
+&nbsp;            message =
+<b class="pc">&nbsp;                    message == null</b>
+<b class="nc">&nbsp;                            ? &quot;&quot;</b>
+<b class="fc">&nbsp;                            : message.trim();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static ReconcileResult rejected(
+&nbsp;                String message
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new ReconcileResult(</b>
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    false,
+&nbsp;                    0.0D,
+&nbsp;                    message
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

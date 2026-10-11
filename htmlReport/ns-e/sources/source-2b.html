@@ -1,0 +1,406 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionPath</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionPath (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionPath</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.3%
+  </span>
+  <span class="absValue">
+    (9/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.2%
+  </span>
+  <span class="absValue">
+    (9/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75.4%
+  </span>
+  <span class="absValue">
+    (43/57)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionPath$Morality</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionPath$Temperament</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    72.2%
+  </span>
+  <span class="absValue">
+    (13/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.2%
+  </span>
+  <span class="absValue">
+    (9/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.5%
+  </span>
+  <span class="absValue">
+    (51/65)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+<b class="fc">&nbsp;public enum RecognitionPath {</b>
+&nbsp;
+<b class="fc">&nbsp;    LAWFUL_GOOD(</b>
+&nbsp;            &quot;lawful_good&quot;,
+&nbsp;            Temperament.LAWFUL,
+&nbsp;            Morality.GOOD
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    NEUTRAL_GOOD(</b>
+&nbsp;            &quot;neutral_good&quot;,
+&nbsp;            Temperament.NEUTRAL,
+&nbsp;            Morality.GOOD
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    CHAOTIC_GOOD(</b>
+&nbsp;            &quot;chaotic_good&quot;,
+&nbsp;            Temperament.CHAOTIC,
+&nbsp;            Morality.GOOD
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    LAWFUL_NEUTRAL(</b>
+&nbsp;            &quot;lawful_neutral&quot;,
+&nbsp;            Temperament.LAWFUL,
+&nbsp;            Morality.NEUTRAL
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    TRUE_NEUTRAL(</b>
+&nbsp;            &quot;true_neutral&quot;,
+&nbsp;            Temperament.NEUTRAL,
+&nbsp;            Morality.NEUTRAL
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    CHAOTIC_NEUTRAL(</b>
+&nbsp;            &quot;chaotic_neutral&quot;,
+&nbsp;            Temperament.CHAOTIC,
+&nbsp;            Morality.NEUTRAL
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    LAWFUL_EVIL(</b>
+&nbsp;            &quot;lawful_evil&quot;,
+&nbsp;            Temperament.LAWFUL,
+&nbsp;            Morality.EVIL
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    NEUTRAL_EVIL(</b>
+&nbsp;            &quot;neutral_evil&quot;,
+&nbsp;            Temperament.NEUTRAL,
+&nbsp;            Morality.EVIL
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    CHAOTIC_EVIL(</b>
+&nbsp;            &quot;chaotic_evil&quot;,
+&nbsp;            Temperament.CHAOTIC,
+&nbsp;            Morality.EVIL
+&nbsp;    );
+&nbsp;
+&nbsp;    private static final Map&lt;String, RecognitionPath&gt;
+<b class="fc">&nbsp;            CANONICAL_PATHS = createCanonicalPaths();</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Deliberately empty for now.
+&nbsp;     *
+&nbsp;     * Future path-ID renames must add explicit old -&gt; new entries here before
+&nbsp;     * the old identifier disappears from released code. We do not guess
+&nbsp;     * historical meanings such as &quot;true_good&quot;.
+&nbsp;     */
+&nbsp;    private static final Map&lt;String, RecognitionPath&gt;
+<b class="fc">&nbsp;            LEGACY_ALIASES = createLegacyAliases();</b>
+&nbsp;
+&nbsp;    private final String id;
+&nbsp;    private final Temperament temperament;
+&nbsp;    private final Morality morality;
+&nbsp;
+&nbsp;    RecognitionPath(
+&nbsp;            String id,
+&nbsp;            Temperament temperament,
+&nbsp;            Morality morality
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        this.id = id;</b>
+<b class="fc">&nbsp;        this.temperament = temperament;</b>
+<b class="fc">&nbsp;        this.morality = morality;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getId() {
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Temperament getTemperament() {
+<b class="nc">&nbsp;        return temperament;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Morality getMorality() {
+<b class="nc">&nbsp;        return morality;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTranslationKey() {
+<b class="nc">&nbsp;        return &quot;recognition_path.moostensuraaddon.&quot; + id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resolves canonical IDs and explicitly registered legacy aliases.
+&nbsp;     */
+&nbsp;    public static Optional&lt;RecognitionPath&gt; byId(
+&nbsp;            String rawId
+&nbsp;    ) {
+<b class="fc">&nbsp;        String normalized =</b>
+<b class="fc">&nbsp;                normalizeStoredId(rawId);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (normalized.isBlank()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionPath canonical =</b>
+<b class="fc">&nbsp;                CANONICAL_PATHS.get(normalized);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (canonical != null) {</b>
+<b class="fc">&nbsp;            return Optional.of(canonical);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.ofNullable(</b>
+<b class="nc">&nbsp;                LEGACY_ALIASES.get(normalized)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the current canonical ID when the supplied value is recognized.
+&nbsp;     *
+&nbsp;     * Unknown values are preserved instead of being replaced with a live
+&nbsp;     * evaluator result. This is important for forward-compatible save
+&nbsp;     * handling.
+&nbsp;     */
+&nbsp;    public static String canonicalizeStoredId(
+&nbsp;            String rawId
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (rawId == null || rawId.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return byId(rawId)</b>
+<b class="fc">&nbsp;                .map(RecognitionPath::getId)</b>
+<b class="fc">&nbsp;                .orElse(</b>
+<b class="fc">&nbsp;                        rawId.trim()</b>
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isCanonicalId(
+&nbsp;            String rawId
+&nbsp;    ) {
+<b class="nc">&nbsp;        String normalized =</b>
+<b class="nc">&nbsp;                normalizeStoredId(rawId);</b>
+&nbsp;
+<b class="nc">&nbsp;        return CANONICAL_PATHS.containsKey(</b>
+&nbsp;                normalized
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isKnownStoredId(
+&nbsp;            String rawId
+&nbsp;    ) {
+<b class="nc">&nbsp;        return byId(rawId).isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String normalizeStoredId(
+&nbsp;            String rawId
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (rawId == null || rawId.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String normalized =</b>
+<b class="fc">&nbsp;                rawId.trim()</b>
+<b class="fc">&nbsp;                        .toLowerCase(Locale.ROOT)</b>
+<b class="fc">&nbsp;                        .replace(&#39;-&#39;, &#39;_&#39;)</b>
+<b class="fc">&nbsp;                        .replace(&#39; &#39;, &#39;_&#39;);</b>
+&nbsp;
+<b class="pc">&nbsp;        while (normalized.contains(&quot;__&quot;)) {</b>
+<b class="nc">&nbsp;            normalized =</b>
+<b class="nc">&nbsp;                    normalized.replace(</b>
+&nbsp;                            &quot;__&quot;,
+&nbsp;                            &quot;_&quot;
+&nbsp;                    );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return normalized;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, RecognitionPath&gt;
+&nbsp;    createCanonicalPaths() {
+<b class="fc">&nbsp;        Map&lt;String, RecognitionPath&gt; result =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+<b class="fc">&nbsp;        for (RecognitionPath path : values()) {</b>
+<b class="fc">&nbsp;            result.put(</b>
+&nbsp;                    path.id,
+&nbsp;                    path
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return Map.copyOf(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, RecognitionPath&gt;
+&nbsp;    createLegacyAliases() {
+<b class="fc">&nbsp;        Map&lt;String, RecognitionPath&gt; aliases =</b>
+&nbsp;                new LinkedHashMap&lt;&gt;();
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Example for a future deliberate migration:
+&nbsp;         *
+&nbsp;         * aliases.put(
+&nbsp;         *         &quot;old_path_id&quot;,
+&nbsp;         *         RecognitionPath.NEW_PATH
+&nbsp;         * );
+&nbsp;         */
+&nbsp;
+<b class="fc">&nbsp;        return Map.copyOf(aliases);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum Temperament {</b>
+<b class="fc">&nbsp;        LAWFUL,</b>
+<b class="fc">&nbsp;        NEUTRAL,</b>
+<b class="fc">&nbsp;        CHAOTIC</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum Morality {</b>
+<b class="fc">&nbsp;        GOOD,</b>
+<b class="fc">&nbsp;        NEUTRAL,</b>
+<b class="fc">&nbsp;        EVIL</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

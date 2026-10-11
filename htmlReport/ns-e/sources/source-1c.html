@@ -1,0 +1,1168 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecognitionIdentityHistoryIntegration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.recognition</a>
+</div>
+
+<h1>Coverage Summary for Class: RecognitionIdentityHistoryIntegration (com.mooswqz.moostensuraaddon.recognition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecognitionIdentityHistoryIntegration</td>
+<td class="coverageStat">
+  <span class="percent">
+    30.8%
+  </span>
+  <span class="absValue">
+    (4/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.1%
+  </span>
+  <span class="absValue">
+    (8/66)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.9%
+  </span>
+  <span class="absValue">
+    (43/154)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryIntegration$AuthoritySyncResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryIntegration$Axis</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryIntegration$EventResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (2/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RecognitionIdentityHistoryIntegration$TrackedDeed</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (3/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.5%
+  </span>
+  <span class="absValue">
+    (38/42)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    45.2%
+  </span>
+  <span class="absValue">
+    (14/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.2%
+  </span>
+  <span class="absValue">
+    (10/76)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.7%
+  </span>
+  <span class="absValue">
+    (107/229)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.recognition;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.attachment.RecognitionData;
+&nbsp;
+&nbsp;/**
+&nbsp; * Converts already-confirmed gameplay deeds into the versioned identity
+&nbsp; * history maintained by the recognition identity-history system.
+&nbsp; *
+&nbsp; * &lt;p&gt;This class never changes normal recognition scores and never rewrites a
+&nbsp; * frozen committed contradiction modifier. It applies semantic momentum,
+&nbsp; * registers genuine reversals and then asks the separate history resolver to
+&nbsp; * update the evolving history modifier after the qualifying deed.&lt;/p&gt;
+&nbsp; */
+&nbsp;public final class RecognitionIdentityHistoryIntegration {
+&nbsp;
+&nbsp;    private RecognitionIdentityHistoryIntegration() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static EventResult record(
+&nbsp;            RecognitionData data,
+&nbsp;            TrackedDeed deed,
+&nbsp;            long overworldGameTime
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (deed == null) {</b>
+<b class="nc">&nbsp;            return EventResult.rejected(</b>
+&nbsp;                    &quot;A tracked deed is required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return recordWeighted(</b>
+&nbsp;                data,
+<b class="nc">&nbsp;                deed.id(),</b>
+<b class="nc">&nbsp;                deed.axis(),</b>
+<b class="nc">&nbsp;                deed.directionId(),</b>
+<b class="nc">&nbsp;                deed.weight(),</b>
+&nbsp;                overworldGameTime
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static EventResult recordOccurrences(
+&nbsp;            RecognitionData data,
+&nbsp;            TrackedDeed deed,
+&nbsp;            int occurrences,
+&nbsp;            long overworldGameTime
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (deed == null) {</b>
+<b class="nc">&nbsp;            return EventResult.rejected(</b>
+&nbsp;                    &quot;A tracked deed is required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int safeOccurrences = Math.max(</b>
+&nbsp;                0,
+&nbsp;                occurrences
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (safeOccurrences &lt;= 0) {</b>
+<b class="nc">&nbsp;            return EventResult.rejected(</b>
+&nbsp;                    &quot;At least one deed occurrence is required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double totalWeight = deed.weight()</b>
+&nbsp;                * (double) safeOccurrences;
+&nbsp;
+<b class="nc">&nbsp;        return recordWeighted(</b>
+&nbsp;                data,
+<b class="nc">&nbsp;                deed.id(),</b>
+<b class="nc">&nbsp;                deed.axis(),</b>
+<b class="nc">&nbsp;                deed.directionId(),</b>
+&nbsp;                totalWeight,
+&nbsp;                overworldGameTime
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Uses the active datapack milestone value as the Freedom-history weight.
+&nbsp;     * Backfilled advancements deliberately do not call this method because
+&nbsp;     * their chronological order is unknown.
+&nbsp;     */
+&nbsp;    public static EventResult recordIndependenceMilestone(
+&nbsp;            RecognitionData data,
+&nbsp;            double configuredPoints,
+&nbsp;            long overworldGameTime
+&nbsp;    ) {
+<b class="nc">&nbsp;        return recordWeighted(</b>
+&nbsp;                data,
+&nbsp;                &quot;independence_milestone&quot;,
+&nbsp;                Axis.TEMPERAMENT,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="nc">&nbsp;                        .id(),</b>
+&nbsp;                configuredPoints,
+&nbsp;                overworldGameTime
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static EventResult recordWeighted(
+&nbsp;            RecognitionData data,
+&nbsp;            String deedId,
+&nbsp;            Axis axis,
+&nbsp;            String directionId,
+&nbsp;            double weight,
+&nbsp;            long overworldGameTime
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null) {</b>
+<b class="nc">&nbsp;            return EventResult.rejected(</b>
+&nbsp;                    &quot;Recognition data is required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (axis == null) {</b>
+<b class="nc">&nbsp;            return EventResult.rejected(</b>
+&nbsp;                    &quot;A contradiction axis is required.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String safeDeedId = clean(</b>
+&nbsp;                deedId
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        String safeDirectionId = clean(</b>
+&nbsp;                directionId
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (safeDeedId.isBlank()</b>
+<b class="nc">&nbsp;                || !axis.supports(</b>
+&nbsp;                safeDirectionId
+&nbsp;        )) {
+<b class="nc">&nbsp;            return EventResult.rejected(</b>
+&nbsp;                    &quot;The deed direction is invalid for its axis.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot before =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(</b>
+&nbsp;                        data
+&nbsp;                );
+&nbsp;
+&nbsp;        RecognitionIdentityHistoryService.MutationResult mutation =
+<b class="nc">&nbsp;                axis == Axis.MORAL</b>
+<b class="nc">&nbsp;                        ? recordMoralMutation(</b>
+&nbsp;                        data,
+&nbsp;                        safeDirectionId,
+&nbsp;                        weight,
+&nbsp;                        overworldGameTime
+&nbsp;                )
+<b class="nc">&nbsp;                        : recordTemperamentMutation(</b>
+&nbsp;                        data,
+&nbsp;                        safeDirectionId,
+&nbsp;                        weight,
+&nbsp;                        overworldGameTime
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!mutation.applied()) {</b>
+<b class="nc">&nbsp;            return new EventResult(</b>
+&nbsp;                    false,
+&nbsp;                    safeDeedId,
+&nbsp;                    axis,
+&nbsp;                    safeDirectionId,
+&nbsp;                    0.0D,
+&nbsp;                    false,
+<b class="nc">&nbsp;                    currentReversalCount(</b>
+&nbsp;                            data,
+&nbsp;                            axis
+&nbsp;                    ),
+<b class="nc">&nbsp;                    mutation.rejectionReason()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        RecognitionIdentityHistorySnapshot after =</b>
+<b class="nc">&nbsp;                RecognitionIdentityHistoryService.inspect(</b>
+&nbsp;                        data
+&nbsp;                );
+&nbsp;
+&nbsp;        String establishedKey =
+<b class="nc">&nbsp;                axis == Axis.MORAL</b>
+&nbsp;                        ? RecognitionStatKeys
+<b class="nc">&nbsp;                          .MORAL_ESTABLISHED_DIRECTION</b>
+&nbsp;                        : RecognitionStatKeys
+<b class="nc">&nbsp;                          .TEMPERAMENT_ESTABLISHED_DIRECTION;</b>
+&nbsp;
+<b class="nc">&nbsp;        String storedEstablished = normalizeDirection(</b>
+<b class="nc">&nbsp;                data.getString(</b>
+&nbsp;                        establishedKey
+&nbsp;                ),
+&nbsp;                axis
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (storedEstablished.isBlank()) {</b>
+<b class="nc">&nbsp;            storedEstablished = establishedDirection(</b>
+&nbsp;                    before,
+&nbsp;                    axis
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String newlyEstablished = establishedDirection(</b>
+&nbsp;                after,
+&nbsp;                axis
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean reversalRegistered = false;</b>
+<b class="nc">&nbsp;        int reversalCount = currentReversalCount(</b>
+&nbsp;                data,
+&nbsp;                axis
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!newlyEstablished.isBlank()) {</b>
+<b class="nc">&nbsp;            if (storedEstablished.isBlank()) {</b>
+<b class="nc">&nbsp;                data.setString(</b>
+&nbsp;                        establishedKey,
+&nbsp;                        newlyEstablished
+&nbsp;                );
+<b class="nc">&nbsp;            } else if (!storedEstablished.equals(</b>
+&nbsp;                    newlyEstablished
+&nbsp;            )) {
+&nbsp;                reversalCount =
+<b class="nc">&nbsp;                        axis == Axis.MORAL</b>
+&nbsp;                                ? RecognitionIdentityHistoryService
+<b class="nc">&nbsp;                                .registerMoralReversal(</b>
+&nbsp;                                        data
+&nbsp;                                )
+&nbsp;                                : RecognitionIdentityHistoryService
+<b class="nc">&nbsp;                                .registerTemperamentReversal(</b>
+&nbsp;                                        data
+&nbsp;                                );
+&nbsp;
+<b class="nc">&nbsp;                data.setString(</b>
+&nbsp;                        establishedKey,
+&nbsp;                        newlyEstablished
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;                reversalRegistered = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * Modifier resolution is deliberately event-driven. Passive GUI
+&nbsp;         * inspection, login and the passage of time never call this write
+&nbsp;         * path, so lazy decay alone cannot create or change a modifier.
+&nbsp;         */
+<b class="nc">&nbsp;        RecognitionIdentityHistoryResolver</b>
+<b class="nc">&nbsp;                .resolveAndStoreAfterDeed(data);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new EventResult(</b>
+&nbsp;                true,
+&nbsp;                safeDeedId,
+&nbsp;                axis,
+&nbsp;                safeDirectionId,
+<b class="nc">&nbsp;                mutation.appliedWeight(),</b>
+&nbsp;                reversalRegistered,
+&nbsp;                reversalCount,
+&nbsp;                &quot;&quot;
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts deltas from the existing authority counters into history deeds.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;The first call only installs persisted baselines through
+&nbsp;     * {@link RecognitionIdentityHistoryService#ensureCurrent(RecognitionData)}.
+&nbsp;     * Existing worlds therefore do not receive fabricated retroactive
+&nbsp;     * chronology. Later positive deltas are consumed exactly once.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static AuthoritySyncResult synchronizeAuthorityCounters(
+&nbsp;            RecognitionData data,
+&nbsp;            long overworldGameTime
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (data == null) {</b>
+<b class="nc">&nbsp;            return AuthoritySyncResult.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        RecognitionIdentityHistoryService.MigrationResult migration =</b>
+<b class="fc">&nbsp;                RecognitionIdentityHistoryService.ensureCurrent(</b>
+&nbsp;                        data
+&nbsp;                );
+&nbsp;
+<b class="pc">&nbsp;        if (!migration.writable()) {</b>
+<b class="nc">&nbsp;            return AuthoritySyncResult.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        int empoweredCurrent =</b>
+<b class="fc">&nbsp;                data.getUniqueValueCount(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .UNIQUE_SUBORDINATES_EMPOWERED
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        int massGrantsCurrent =</b>
+<b class="fc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .MASS_GRANTS_PERFORMED
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        int takeBacksCurrent =</b>
+<b class="fc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .GLOBAL_TAKE_BACKS_PERFORMED
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        int seizedCurrent =</b>
+<b class="fc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .SKILLS_SEIZED
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        int empoweredDelta = positiveDelta(</b>
+&nbsp;                empoweredCurrent,
+<b class="fc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .HISTORY_OBSERVED_UNIQUE_SUBORDINATES_EMPOWERED
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        int massGrantDelta = positiveDelta(</b>
+&nbsp;                massGrantsCurrent,
+<b class="fc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .HISTORY_OBSERVED_MASS_GRANTS_PERFORMED
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        int takeBackDelta = positiveDelta(</b>
+&nbsp;                takeBacksCurrent,
+<b class="fc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .HISTORY_OBSERVED_GLOBAL_TAKE_BACKS_PERFORMED
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        int seizedDelta = positiveDelta(</b>
+&nbsp;                seizedCurrent,
+<b class="fc">&nbsp;                data.getCounter(</b>
+&nbsp;                        RecognitionStatKeys
+&nbsp;                                .HISTORY_OBSERVED_SKILLS_SEIZED
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        int appliedGroups = 0;</b>
+<b class="fc">&nbsp;        boolean moralReversal = false;</b>
+<b class="fc">&nbsp;        boolean temperamentReversal = false;</b>
+&nbsp;
+<b class="fc">&nbsp;        EventResult empoweredResult = recordDelta(</b>
+&nbsp;                data,
+&nbsp;                TrackedDeed.UNIQUE_SUBORDINATE_EMPOWERED,
+&nbsp;                empoweredDelta,
+&nbsp;                overworldGameTime
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (empoweredResult.applied()) {</b>
+<b class="nc">&nbsp;            appliedGroups++;</b>
+<b class="nc">&nbsp;            temperamentReversal |=</b>
+<b class="nc">&nbsp;                    empoweredResult.reversalRegistered();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        EventResult massGrantResult = recordDelta(</b>
+&nbsp;                data,
+&nbsp;                TrackedDeed.MASS_GRANT_PERFORMED,
+&nbsp;                massGrantDelta,
+&nbsp;                overworldGameTime
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (massGrantResult.applied()) {</b>
+<b class="nc">&nbsp;            appliedGroups++;</b>
+<b class="nc">&nbsp;            temperamentReversal |=</b>
+<b class="nc">&nbsp;                    massGrantResult.reversalRegistered();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        EventResult takeBackResult = recordDelta(</b>
+&nbsp;                data,
+&nbsp;                TrackedDeed.GLOBAL_TAKE_BACK_PERFORMED,
+&nbsp;                takeBackDelta,
+&nbsp;                overworldGameTime
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (takeBackResult.applied()) {</b>
+<b class="nc">&nbsp;            appliedGroups++;</b>
+<b class="nc">&nbsp;            temperamentReversal |=</b>
+<b class="nc">&nbsp;                    takeBackResult.reversalRegistered();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        EventResult seizedResult = recordDelta(</b>
+&nbsp;                data,
+&nbsp;                TrackedDeed.SKILL_SEIZED,
+&nbsp;                seizedDelta,
+&nbsp;                overworldGameTime
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (seizedResult.applied()) {</b>
+<b class="nc">&nbsp;            appliedGroups++;</b>
+<b class="nc">&nbsp;            moralReversal |=</b>
+<b class="nc">&nbsp;                    seizedResult.reversalRegistered();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .HISTORY_OBSERVED_UNIQUE_SUBORDINATES_EMPOWERED,
+&nbsp;                empoweredCurrent
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .HISTORY_OBSERVED_MASS_GRANTS_PERFORMED,
+&nbsp;                massGrantsCurrent
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .HISTORY_OBSERVED_GLOBAL_TAKE_BACKS_PERFORMED,
+&nbsp;                takeBacksCurrent
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        data.setCounter(</b>
+&nbsp;                RecognitionStatKeys
+&nbsp;                        .HISTORY_OBSERVED_SKILLS_SEIZED,
+&nbsp;                seizedCurrent
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return new AuthoritySyncResult(</b>
+&nbsp;                empoweredDelta,
+&nbsp;                massGrantDelta,
+&nbsp;                takeBackDelta,
+&nbsp;                seizedDelta,
+&nbsp;                appliedGroups,
+&nbsp;                moralReversal,
+&nbsp;                temperamentReversal
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static EventResult recordDelta(
+&nbsp;            RecognitionData data,
+&nbsp;            TrackedDeed deed,
+&nbsp;            int delta,
+&nbsp;            long overworldGameTime
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (delta &lt;= 0) {</b>
+<b class="fc">&nbsp;            return EventResult.rejected(</b>
+&nbsp;                    &quot;No positive counter delta.&quot;
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return recordOccurrences(</b>
+&nbsp;                data,
+&nbsp;                deed,
+&nbsp;                delta,
+&nbsp;                overworldGameTime
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int positiveDelta(
+&nbsp;            int current,
+&nbsp;            int observed
+&nbsp;    ) {
+<b class="fc">&nbsp;        return Math.max(</b>
+&nbsp;                0,
+<b class="fc">&nbsp;                Math.max(</b>
+&nbsp;                        0,
+&nbsp;                        current
+<b class="fc">&nbsp;                ) - Math.max(</b>
+&nbsp;                        0,
+&nbsp;                        observed
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String establishedDirection(
+&nbsp;            RecognitionIdentityHistorySnapshot snapshot,
+&nbsp;            Axis axis
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (snapshot == null || axis == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return axis == Axis.MORAL</b>
+&nbsp;                ? RecognitionIdentityHistoryService
+<b class="nc">&nbsp;                .inferEstablishedDirection(</b>
+<b class="nc">&nbsp;                        snapshot.goodMomentum(),</b>
+<b class="nc">&nbsp;                        snapshot.evilMomentum(),</b>
+&nbsp;                        RecognitionIdentityHistoryService
+&nbsp;                                .MoralDirection
+&nbsp;                                .GOOD
+<b class="nc">&nbsp;                                .id(),</b>
+&nbsp;                        RecognitionIdentityHistoryService
+&nbsp;                                .MoralDirection
+&nbsp;                                .EVIL
+<b class="nc">&nbsp;                                .id()</b>
+&nbsp;                )
+&nbsp;                : RecognitionIdentityHistoryService
+<b class="nc">&nbsp;                .inferEstablishedDirection(</b>
+<b class="nc">&nbsp;                        snapshot.orderMomentum(),</b>
+<b class="nc">&nbsp;                        snapshot.freedomMomentum(),</b>
+&nbsp;                        RecognitionIdentityHistoryService
+&nbsp;                                .TemperamentDirection
+&nbsp;                                .ORDER
+<b class="nc">&nbsp;                                .id(),</b>
+&nbsp;                        RecognitionIdentityHistoryService
+&nbsp;                                .TemperamentDirection
+&nbsp;                                .FREEDOM
+<b class="nc">&nbsp;                                .id()</b>
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionIdentityHistoryService.MutationResult
+&nbsp;    recordMoralMutation(
+&nbsp;            RecognitionData data,
+&nbsp;            String directionId,
+&nbsp;            double weight,
+&nbsp;            long overworldGameTime
+&nbsp;    ) {
+&nbsp;        RecognitionIdentityHistoryService.MoralDirection direction =
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="nc">&nbsp;                        .id()</b>
+<b class="nc">&nbsp;                        .equals(</b>
+&nbsp;                                directionId
+&nbsp;                        )
+&nbsp;                        ? RecognitionIdentityHistoryService
+&nbsp;                          .MoralDirection
+<b class="nc">&nbsp;                          .GOOD</b>
+&nbsp;                        : RecognitionIdentityHistoryService
+&nbsp;                          .MoralDirection
+<b class="nc">&nbsp;                          .EVIL;</b>
+&nbsp;
+<b class="nc">&nbsp;        return RecognitionIdentityHistoryService.recordMoralDeed(</b>
+&nbsp;                data,
+&nbsp;                direction,
+&nbsp;                weight,
+&nbsp;                overworldGameTime
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RecognitionIdentityHistoryService.MutationResult
+&nbsp;    recordTemperamentMutation(
+&nbsp;            RecognitionData data,
+&nbsp;            String directionId,
+&nbsp;            double weight,
+&nbsp;            long overworldGameTime
+&nbsp;    ) {
+&nbsp;        RecognitionIdentityHistoryService.TemperamentDirection direction =
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .ORDER
+<b class="nc">&nbsp;                        .id()</b>
+<b class="nc">&nbsp;                        .equals(</b>
+&nbsp;                                directionId
+&nbsp;                        )
+&nbsp;                        ? RecognitionIdentityHistoryService
+&nbsp;                          .TemperamentDirection
+<b class="nc">&nbsp;                          .ORDER</b>
+&nbsp;                        : RecognitionIdentityHistoryService
+&nbsp;                          .TemperamentDirection
+<b class="nc">&nbsp;                          .FREEDOM;</b>
+&nbsp;
+<b class="nc">&nbsp;        return RecognitionIdentityHistoryService.recordTemperamentDeed(</b>
+&nbsp;                data,
+&nbsp;                direction,
+&nbsp;                weight,
+&nbsp;                overworldGameTime
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int currentReversalCount(
+&nbsp;            RecognitionData data,
+&nbsp;            Axis axis
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (data == null || axis == null) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return data.getCounter(</b>
+<b class="nc">&nbsp;                axis == Axis.MORAL</b>
+&nbsp;                        ? RecognitionStatKeys
+<b class="nc">&nbsp;                          .MORAL_REVERSAL_COUNT</b>
+&nbsp;                        : RecognitionStatKeys
+<b class="nc">&nbsp;                          .TEMPERAMENT_REVERSAL_COUNT</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String normalizeDirection(
+&nbsp;            String rawDirection,
+&nbsp;            Axis axis
+&nbsp;    ) {
+<b class="nc">&nbsp;        String cleaned = clean(</b>
+&nbsp;                rawDirection
+&nbsp;        );
+&nbsp;
+&nbsp;        return axis != null
+<b class="nc">&nbsp;                &amp;&amp; axis.supports(</b>
+&nbsp;                cleaned
+&nbsp;        )
+<b class="nc">&nbsp;                ? cleaned</b>
+<b class="nc">&nbsp;                : &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String clean(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="pc">&nbsp;        return value == null</b>
+<b class="nc">&nbsp;                ? &quot;&quot;</b>
+<b class="fc">&nbsp;                : value.trim();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum Axis {</b>
+<b class="fc">&nbsp;        MORAL(</b>
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="fc">&nbsp;                        .id()</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        TEMPERAMENT(</b>
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .ORDER
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="fc">&nbsp;                        .id()</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        private final String firstDirectionId;
+&nbsp;        private final String secondDirectionId;
+&nbsp;
+&nbsp;        Axis(
+&nbsp;                String firstDirectionId,
+&nbsp;                String secondDirectionId
+<b class="fc">&nbsp;        ) {</b>
+<b class="fc">&nbsp;            this.firstDirectionId = firstDirectionId;</b>
+<b class="fc">&nbsp;            this.secondDirectionId = secondDirectionId;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean supports(
+&nbsp;                String directionId
+&nbsp;        ) {
+<b class="nc">&nbsp;            return firstDirectionId.equals(</b>
+&nbsp;                    directionId
+<b class="nc">&nbsp;            ) || secondDirectionId.equals(</b>
+&nbsp;                    directionId
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum TrackedDeed {</b>
+<b class="fc">&nbsp;        RAID_VICTORY(</b>
+&nbsp;                &quot;raid_victory&quot;,
+&nbsp;                Axis.MORAL,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                8.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        VILLAGER_CURED(</b>
+&nbsp;                &quot;villager_cured&quot;,
+&nbsp;                Axis.MORAL,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                6.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        CIVILIAN_DEFENDED(</b>
+&nbsp;                &quot;civilian_defended&quot;,
+&nbsp;                Axis.MORAL,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                5.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        MALEVOLENT_BOSS_DEFEATED(</b>
+&nbsp;                &quot;malevolent_boss_defeated&quot;,
+&nbsp;                Axis.MORAL,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .GOOD
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                10.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        OWNED_SUBORDINATE_KILLED(</b>
+&nbsp;                &quot;owned_subordinate_killed&quot;,
+&nbsp;                Axis.MORAL,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                12.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        OWNED_COMPANION_KILLED(</b>
+&nbsp;                &quot;owned_companion_killed&quot;,
+&nbsp;                Axis.MORAL,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                10.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        CIVILIAN_KILLED(</b>
+&nbsp;                &quot;civilian_killed&quot;,
+&nbsp;                Axis.MORAL,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                7.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        BENEVOLENT_BOSS_KILLED(</b>
+&nbsp;                &quot;benevolent_boss_killed&quot;,
+&nbsp;                Axis.MORAL,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                12.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        PASSIVE_BABY_KILLED(</b>
+&nbsp;                &quot;passive_baby_killed&quot;,
+&nbsp;                Axis.MORAL,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                2.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        UNIQUE_SUBORDINATE_EMPOWERED(</b>
+&nbsp;                &quot;unique_subordinate_empowered&quot;,
+&nbsp;                Axis.TEMPERAMENT,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .ORDER
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                4.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        MASS_GRANT_PERFORMED(</b>
+&nbsp;                &quot;mass_grant_performed&quot;,
+&nbsp;                Axis.TEMPERAMENT,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .ORDER
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                6.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        GLOBAL_TAKE_BACK_PERFORMED(</b>
+&nbsp;                &quot;global_take_back_performed&quot;,
+&nbsp;                Axis.TEMPERAMENT,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .ORDER
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                5.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        SKILL_SEIZED(</b>
+&nbsp;                &quot;skill_seized&quot;,
+&nbsp;                Axis.MORAL,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .MoralDirection
+&nbsp;                        .EVIL
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                8.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        SUBORDINATE_ASSISTED_MAJOR_VICTORY(</b>
+&nbsp;                &quot;subordinate_assisted_major_victory&quot;,
+&nbsp;                Axis.TEMPERAMENT,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .ORDER
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                6.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        SOLO_MAJOR_VICTORY(</b>
+&nbsp;                &quot;solo_major_victory&quot;,
+&nbsp;                Axis.TEMPERAMENT,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                8.0D
+&nbsp;        ),
+<b class="fc">&nbsp;        DISCOVERY_MILESTONE(</b>
+&nbsp;                &quot;discovery_milestone&quot;,
+&nbsp;                Axis.TEMPERAMENT,
+&nbsp;                RecognitionIdentityHistoryService
+&nbsp;                        .TemperamentDirection
+&nbsp;                        .FREEDOM
+<b class="fc">&nbsp;                        .id(),</b>
+&nbsp;                2.0D
+&nbsp;        );
+&nbsp;
+&nbsp;        private final String id;
+&nbsp;        private final Axis axis;
+&nbsp;        private final String directionId;
+&nbsp;        private final double weight;
+&nbsp;
+&nbsp;        TrackedDeed(
+&nbsp;                String id,
+&nbsp;                Axis axis,
+&nbsp;                String directionId,
+&nbsp;                double weight
+<b class="fc">&nbsp;        ) {</b>
+<b class="fc">&nbsp;            this.id = id;</b>
+<b class="fc">&nbsp;            this.axis = axis;</b>
+<b class="fc">&nbsp;            this.directionId = directionId;</b>
+<b class="fc">&nbsp;            this.weight = weight;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String id() {
+<b class="nc">&nbsp;            return id;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Axis axis() {
+<b class="nc">&nbsp;            return axis;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String directionId() {
+<b class="nc">&nbsp;            return directionId;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public double weight() {
+<b class="nc">&nbsp;            return weight;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record AuthoritySyncResult(</b>
+&nbsp;            int empoweredSubordinateDelta,
+&nbsp;            int massGrantDelta,
+&nbsp;            int globalTakeBackDelta,
+&nbsp;            int skillSeizedDelta,
+&nbsp;            int appliedDeedGroups,
+&nbsp;            boolean moralReversalRegistered,
+&nbsp;            boolean temperamentReversalRegistered
+&nbsp;    ) {
+&nbsp;
+<b class="fc">&nbsp;        public AuthoritySyncResult {</b>
+<b class="fc">&nbsp;            empoweredSubordinateDelta = Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    empoweredSubordinateDelta
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            massGrantDelta = Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    massGrantDelta
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            globalTakeBackDelta = Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    globalTakeBackDelta
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            skillSeizedDelta = Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    skillSeizedDelta
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            appliedDeedGroups = Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    appliedDeedGroups
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        public static AuthoritySyncResult empty() {
+<b class="nc">&nbsp;            return new AuthoritySyncResult(</b>
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    0,
+&nbsp;                    false,
+&nbsp;                    false
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean changed() {
+<b class="nc">&nbsp;            return appliedDeedGroups &gt; 0;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public record EventResult(</b>
+&nbsp;            boolean applied,
+&nbsp;            String deedId,
+&nbsp;            Axis axis,
+&nbsp;            String directionId,
+&nbsp;            double appliedWeight,
+&nbsp;            boolean reversalRegistered,
+&nbsp;            int reversalCount,
+&nbsp;            String rejectionReason
+&nbsp;    ) {
+&nbsp;
+<b class="fc">&nbsp;        public EventResult {</b>
+<b class="fc">&nbsp;            deedId = clean(</b>
+&nbsp;                    deedId
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            directionId = clean(</b>
+&nbsp;                    directionId
+&nbsp;            );
+&nbsp;
+&nbsp;            appliedWeight = applied
+<b class="pc">&nbsp;                    &amp;&amp; Double.isFinite(</b>
+&nbsp;                    appliedWeight
+&nbsp;            )
+<b class="nc">&nbsp;                    ? Math.max(</b>
+&nbsp;                    0.0D,
+&nbsp;                    appliedWeight
+&nbsp;            )
+<b class="fc">&nbsp;                    : 0.0D;</b>
+&nbsp;
+<b class="fc">&nbsp;            reversalCount = Math.max(</b>
+&nbsp;                    0,
+&nbsp;                    reversalCount
+&nbsp;            );
+&nbsp;
+<b class="pc">&nbsp;            rejectionReason = rejectionReason == null</b>
+<b class="nc">&nbsp;                    ? &quot;&quot;</b>
+<b class="fc">&nbsp;                    : rejectionReason;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static EventResult rejected(
+&nbsp;                String reason
+&nbsp;        ) {
+<b class="fc">&nbsp;            return new EventResult(</b>
+&nbsp;                    false,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    null,
+&nbsp;                    &quot;&quot;,
+&nbsp;                    0.0D,
+&nbsp;                    false,
+&nbsp;                    0,
+&nbsp;                    reason
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

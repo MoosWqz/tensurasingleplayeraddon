@@ -1,0 +1,722 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SkillListWidget</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.client.screen.skillui</a>
+</div>
+
+<h1>Coverage Summary for Class: SkillListWidget (com.mooswqz.moostensuraaddon.client.screen.skillui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SkillListWidget</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/103)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/216)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.client.screen.skillui;
+&nbsp;
+&nbsp;import net.minecraft.client.Minecraft;
+&nbsp;import net.minecraft.client.gui.Font;
+&nbsp;import net.minecraft.client.gui.GuiGraphics;
+&nbsp;import net.minecraft.client.gui.components.AbstractWidget;
+&nbsp;import net.minecraft.client.gui.narration.NarratedElementType;
+&nbsp;import net.minecraft.client.gui.narration.NarrationElementOutput;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import org.lwjgl.glfw.GLFW;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Shared grouped skill list with bounded scrolling and keyboard navigation.
+&nbsp; */
+&nbsp;public final class SkillListWidget extends AbstractWidget {
+&nbsp;
+&nbsp;    private static final int INNER_PADDING = 2;
+&nbsp;    private static final int SCROLLBAR_WIDTH = 7;
+&nbsp;
+&nbsp;    private final Font font;
+&nbsp;    private final SkillUiTheme theme;
+&nbsp;    private final SkillUiListModel listModel;
+&nbsp;    private final SkillUiSelectionModel selectionModel;
+&nbsp;
+<b class="nc">&nbsp;    private Consumer&lt;SkillUiEntry&gt; focusListener =</b>
+&nbsp;            entry -&gt; {
+<b class="nc">&nbsp;            };</b>
+<b class="nc">&nbsp;    private BiConsumer&lt;</b>
+&nbsp;            SkillUiEntry,
+&nbsp;            SkillUiSelectionModel.ToggleResult
+&nbsp;            &gt; selectionListener =
+&nbsp;            (entry, result) -&gt; {
+<b class="nc">&nbsp;            };</b>
+&nbsp;
+&nbsp;    private SkillUiEntry hoveredEntry;
+&nbsp;
+&nbsp;    public SkillListWidget(
+&nbsp;            int x,
+&nbsp;            int y,
+&nbsp;            int width,
+&nbsp;            int height,
+&nbsp;            Font font,
+&nbsp;            SkillUiTheme theme,
+&nbsp;            SkillUiListModel listModel,
+&nbsp;            SkillUiSelectionModel selectionModel
+&nbsp;    ) {
+<b class="nc">&nbsp;        super(</b>
+&nbsp;                x,
+&nbsp;                y,
+<b class="nc">&nbsp;                Math.max(1, width),</b>
+<b class="nc">&nbsp;                Math.max(1, height),</b>
+<b class="nc">&nbsp;                SkillUiText.component(&quot;narration.skill_list&quot;)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        this.font = font == null</b>
+<b class="nc">&nbsp;                ? Minecraft.getInstance().font</b>
+<b class="nc">&nbsp;                : font;</b>
+<b class="nc">&nbsp;        this.theme = theme == null</b>
+<b class="nc">&nbsp;                ? SkillUiTheme.GRANTER</b>
+<b class="nc">&nbsp;                : theme;</b>
+<b class="nc">&nbsp;        this.listModel = listModel == null</b>
+<b class="nc">&nbsp;                ? new SkillUiListModel(</b>
+&nbsp;                new SkillUiFilterState()
+&nbsp;        )
+<b class="nc">&nbsp;                : listModel;</b>
+<b class="nc">&nbsp;        this.selectionModel = selectionModel == null</b>
+<b class="nc">&nbsp;                ? new SkillUiSelectionModel(</b>
+&nbsp;                SkillUiSelectionMode.READ_ONLY
+&nbsp;        )
+<b class="nc">&nbsp;                : selectionModel;</b>
+&nbsp;
+<b class="nc">&nbsp;        updateViewportHeight();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SkillUiListModel listModel() {
+<b class="nc">&nbsp;        return listModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SkillUiSelectionModel selectionModel() {
+<b class="nc">&nbsp;        return selectionModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEntries(
+&nbsp;            List&lt;SkillUiEntry&gt; entries
+&nbsp;    ) {
+<b class="nc">&nbsp;        listModel.setEntries(entries);</b>
+<b class="nc">&nbsp;        selectionModel.retainAvailable(</b>
+<b class="nc">&nbsp;                listModel.allEntries()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public void rebuildFilter() {
+<b class="nc">&nbsp;        listModel.rebuild();</b>
+<b class="nc">&nbsp;        selectionModel.retainAvailable(</b>
+<b class="nc">&nbsp;                listModel.allEntries()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFocusListener(
+&nbsp;            Consumer&lt;SkillUiEntry&gt; focusListener
+&nbsp;    ) {
+<b class="nc">&nbsp;        this.focusListener = focusListener == null</b>
+<b class="nc">&nbsp;                ? entry -&gt; {</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;                : focusListener;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelectionListener(
+&nbsp;            BiConsumer&lt;
+&nbsp;                    SkillUiEntry,
+&nbsp;                    SkillUiSelectionModel.ToggleResult
+&nbsp;                    &gt; selectionListener
+&nbsp;    ) {
+<b class="nc">&nbsp;        this.selectionListener = selectionListener == null</b>
+<b class="nc">&nbsp;                ? (entry, result) -&gt; {</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;                : selectionListener;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;SkillUiEntry&gt; hoveredEntry() {
+<b class="nc">&nbsp;        return Optional.ofNullable(</b>
+&nbsp;                hoveredEntry
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;SkillUiEntry&gt; focusedEntry() {
+<b class="nc">&nbsp;        return listModel.focusedEntry();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void renderWidget(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            int mouseX,
+&nbsp;            int mouseY,
+&nbsp;            float partialTick
+&nbsp;    ) {
+<b class="nc">&nbsp;        updateViewportHeight();</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiLayout.Rect bounds = new SkillUiLayout.Rect(</b>
+<b class="nc">&nbsp;                getX(),</b>
+<b class="nc">&nbsp;                getY(),</b>
+<b class="nc">&nbsp;                getWidth(),</b>
+<b class="nc">&nbsp;                getHeight()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+&nbsp;                bounds,
+<b class="nc">&nbsp;                isFocused()</b>
+<b class="nc">&nbsp;                        ? theme.accentColor()</b>
+<b class="nc">&nbsp;                        : theme.panelBorderColor(),</b>
+<b class="nc">&nbsp;                theme.panelFillColor(),</b>
+<b class="nc">&nbsp;                isFocused()</b>
+<b class="nc">&nbsp;                        ? 2</b>
+<b class="nc">&nbsp;                        : 1</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int contentLeft = getX()</b>
+&nbsp;                + INNER_PADDING;
+<b class="nc">&nbsp;        int contentTop = getY()</b>
+&nbsp;                + INNER_PADDING;
+<b class="nc">&nbsp;        int contentRight = getX()</b>
+<b class="nc">&nbsp;                + getWidth()</b>
+&nbsp;                - INNER_PADDING;
+<b class="nc">&nbsp;        int contentBottom = getY()</b>
+<b class="nc">&nbsp;                + getHeight()</b>
+&nbsp;                - INNER_PADDING;
+&nbsp;
+<b class="nc">&nbsp;        hoveredEntry = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (listModel.rows().isEmpty()) {</b>
+<b class="nc">&nbsp;            SkillUiRenderHelper.drawCenteredText(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    font,
+<b class="nc">&nbsp;                    SkillUiText.component(</b>
+&nbsp;                            &quot;empty.no_matching_skills&quot;
+&nbsp;                    ),
+<b class="nc">&nbsp;                    getX() + getWidth() / 2,</b>
+<b class="nc">&nbsp;                    getY() + getHeight() / 2 - 4,</b>
+<b class="nc">&nbsp;                    theme.mutedTextColor()</b>
+&nbsp;            );
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.enableScissor(</b>
+&nbsp;                contentLeft,
+&nbsp;                contentTop,
+&nbsp;                contentRight,
+&nbsp;                contentBottom
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        boolean pointerInsideRows = mouseX &gt;= contentLeft</b>
+&nbsp;                &amp;&amp; mouseX &lt; contentRight
+&nbsp;                - SCROLLBAR_WIDTH
+&nbsp;                &amp;&amp; mouseY &gt;= contentTop
+&nbsp;                &amp;&amp; mouseY &lt; contentBottom;
+&nbsp;
+&nbsp;        for (SkillUiListModel.PositionedRow positioned :
+<b class="nc">&nbsp;                listModel.visibleRows()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            int rowTop = contentTop</b>
+<b class="nc">&nbsp;                    + positioned.y();</b>
+<b class="nc">&nbsp;            SkillUiListModel.Row row = positioned.row();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (row.categoryHeader()) {</b>
+<b class="nc">&nbsp;                renderCategoryHeader(</b>
+&nbsp;                        guiGraphics,
+&nbsp;                        row,
+&nbsp;                        contentLeft,
+&nbsp;                        rowTop,
+&nbsp;                        contentRight
+&nbsp;                );
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            boolean hovered = pointerInsideRows</b>
+&nbsp;                    &amp;&amp; mouseY &gt;= rowTop
+<b class="nc">&nbsp;                    &amp;&amp; mouseY &lt; rowTop + row.height();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (hovered) {</b>
+<b class="nc">&nbsp;                hoveredEntry = row.entry();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            renderSkillRow(</b>
+&nbsp;                    guiGraphics,
+<b class="nc">&nbsp;                    row.entry(),</b>
+<b class="nc">&nbsp;                    positioned.rowIndex(),</b>
+&nbsp;                    contentLeft,
+&nbsp;                    rowTop,
+&nbsp;                    contentRight - SCROLLBAR_WIDTH,
+&nbsp;                    hovered
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        guiGraphics.disableScissor();</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawScrollbar(</b>
+&nbsp;                guiGraphics,
+<b class="nc">&nbsp;                bounds.inset(INNER_PADDING),</b>
+<b class="nc">&nbsp;                listModel.scrollOffset(),</b>
+<b class="nc">&nbsp;                listModel.maximumScroll(),</b>
+<b class="nc">&nbsp;                listModel.contentHeight(),</b>
+&nbsp;                theme
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderCategoryHeader(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            SkillUiListModel.Row row,
+&nbsp;            int left,
+&nbsp;            int top,
+&nbsp;            int right
+&nbsp;    ) {
+<b class="nc">&nbsp;        guiGraphics.fill(</b>
+&nbsp;                left,
+&nbsp;                top,
+&nbsp;                right - SCROLLBAR_WIDTH,
+<b class="nc">&nbsp;                top + row.height(),</b>
+<b class="nc">&nbsp;                theme.categoryFillColor()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                row.category().displayName(),</b>
+&nbsp;                left + 5,
+&nbsp;                top + 5,
+<b class="nc">&nbsp;                row.category().defaultAccentColor()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renderSkillRow(
+&nbsp;            GuiGraphics guiGraphics,
+&nbsp;            SkillUiEntry entry,
+&nbsp;            int rowIndex,
+&nbsp;            int left,
+&nbsp;            int top,
+&nbsp;            int right,
+&nbsp;            boolean hovered
+&nbsp;    ) {
+<b class="nc">&nbsp;        boolean selected = selectionModel.isSelected(</b>
+<b class="nc">&nbsp;                entry.skillId()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        boolean focused = rowIndex</b>
+<b class="nc">&nbsp;                == listModel.focusedRowIndex();</b>
+&nbsp;
+<b class="nc">&nbsp;        int fillColor = selected</b>
+<b class="nc">&nbsp;                ? theme.selectedRowFillColor()</b>
+<b class="nc">&nbsp;                : hovered</b>
+<b class="nc">&nbsp;                  ? theme.hoveredRowFillColor()</b>
+<b class="nc">&nbsp;                  : theme.rowFillColor();</b>
+&nbsp;
+&nbsp;        int borderColor = selected
+<b class="nc">&nbsp;                || focused</b>
+<b class="nc">&nbsp;                ? SkillUiTheme.opaque(</b>
+<b class="nc">&nbsp;                entry.accentColor()</b>
+&nbsp;        )
+<b class="nc">&nbsp;                : theme.panelBorderColor();</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawBorderedPanel(</b>
+&nbsp;                guiGraphics,
+&nbsp;                new SkillUiLayout.Rect(
+&nbsp;                        left,
+&nbsp;                        top,
+<b class="nc">&nbsp;                        Math.max(1, right - left),</b>
+&nbsp;                        SkillUiListModel.SKILL_ROW_HEIGHT - 1
+&nbsp;                ),
+&nbsp;                borderColor,
+&nbsp;                fillColor,
+<b class="nc">&nbsp;                focused</b>
+<b class="nc">&nbsp;                        ? 2</b>
+<b class="nc">&nbsp;                        : 1</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int textLeft = left + 6;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selectionModel.mode()</b>
+&nbsp;                != SkillUiSelectionMode.READ_ONLY) {
+<b class="nc">&nbsp;            if (selectionModel.mode()</b>
+&nbsp;                    == SkillUiSelectionMode.SINGLE) {
+<b class="nc">&nbsp;                SkillUiRenderHelper.drawRadioIndicator(</b>
+&nbsp;                        guiGraphics,
+&nbsp;                        left + 5,
+&nbsp;                        top + 7,
+&nbsp;                        selected,
+<b class="nc">&nbsp;                        entry.selectable(),</b>
+&nbsp;                        theme
+&nbsp;                );
+&nbsp;            } else {
+<b class="nc">&nbsp;                SkillUiRenderHelper.drawCheckbox(</b>
+&nbsp;                        guiGraphics,
+&nbsp;                        left + 5,
+&nbsp;                        top + 7,
+&nbsp;                        selected,
+<b class="nc">&nbsp;                        entry.selectable(),</b>
+&nbsp;                        theme
+&nbsp;                );
+&nbsp;            }
+<b class="nc">&nbsp;            textLeft += 16;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int rightPadding = 8;</b>
+<b class="nc">&nbsp;        boolean showMasteredBadge = entry.mastered()</b>
+&nbsp;                &amp;&amp; right - left &gt;= 150;
+<b class="nc">&nbsp;        int badgeWidth = showMasteredBadge</b>
+<b class="nc">&nbsp;                ? 42</b>
+<b class="nc">&nbsp;                : 0;</b>
+<b class="nc">&nbsp;        int maximumNameWidth = Math.max(</b>
+&nbsp;                1,
+&nbsp;                right
+&nbsp;                        - rightPadding
+&nbsp;                        - badgeWidth
+&nbsp;                        - textLeft
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        int nameColor = entry.selectable()</b>
+<b class="nc">&nbsp;                ? entry.accentColor()</b>
+<b class="nc">&nbsp;                : theme.disabledTextColor();</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+<b class="nc">&nbsp;                entry.displayName(),</b>
+&nbsp;                textLeft,
+&nbsp;                top + 4,
+&nbsp;                maximumNameWidth,
+&nbsp;                nameColor
+&nbsp;        );
+&nbsp;
+&nbsp;        Component secondaryLine;
+&nbsp;        int secondaryColor;
+&nbsp;
+<b class="nc">&nbsp;        if (!entry.selectable()</b>
+<b class="nc">&nbsp;                &amp;&amp; entry.hasDisabledReason()) {</b>
+<b class="nc">&nbsp;            secondaryLine = entry.disabledReason();</b>
+<b class="nc">&nbsp;            secondaryColor = theme.warningColor();</b>
+<b class="nc">&nbsp;        } else if (entry.hasSourceName()) {</b>
+<b class="nc">&nbsp;            secondaryLine = entry.sourceName();</b>
+<b class="nc">&nbsp;            secondaryColor = theme.secondaryTextColor();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            secondaryLine = Component.literal(</b>
+<b class="nc">&nbsp;                    entry.skillId()</b>
+&nbsp;            );
+<b class="nc">&nbsp;            secondaryColor = theme.mutedTextColor();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiRenderHelper.drawClippedText(</b>
+&nbsp;                guiGraphics,
+&nbsp;                font,
+&nbsp;                secondaryLine,
+&nbsp;                textLeft,
+&nbsp;                top + 15,
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        1,
+&nbsp;                        right - rightPadding - textLeft
+&nbsp;                ),
+&nbsp;                secondaryColor
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (showMasteredBadge) {</b>
+<b class="nc">&nbsp;            SkillUiRenderHelper.drawText(</b>
+&nbsp;                    guiGraphics,
+&nbsp;                    font,
+<b class="nc">&nbsp;                    SkillUiText.component(&quot;state.mastered&quot;),</b>
+&nbsp;                    right - 45,
+&nbsp;                    top + 4,
+<b class="nc">&nbsp;                    theme.successColor()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean mouseClicked(
+&nbsp;            double mouseX,
+&nbsp;            double mouseY,
+&nbsp;            int button
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!active</b>
+&nbsp;                || !visible
+&nbsp;                || button != GLFW.GLFW_MOUSE_BUTTON_LEFT
+<b class="nc">&nbsp;                || !isMouseOver(mouseX, mouseY)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int localY = (int) Math.floor(mouseY)</b>
+<b class="nc">&nbsp;                - getY()</b>
+&nbsp;                - INNER_PADDING;
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;SkillUiEntry&gt; clickedEntry =</b>
+<b class="nc">&nbsp;                listModel.entryAt(localY);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (clickedEntry.isEmpty()) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        setFocused(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiEntry entry = clickedEntry.get();</b>
+<b class="nc">&nbsp;        listModel.focusEntry(</b>
+<b class="nc">&nbsp;                entry.skillId()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        focusListener.accept(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        SkillUiSelectionModel.ToggleResult result =</b>
+<b class="nc">&nbsp;                selectionModel.toggle(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        selectionListener.accept(</b>
+&nbsp;                entry,
+&nbsp;                result
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean mouseScrolled(
+&nbsp;            double mouseX,
+&nbsp;            double mouseY,
+&nbsp;            double scrollX,
+&nbsp;            double scrollY
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!visible</b>
+<b class="nc">&nbsp;                || !isMouseOver(mouseX, mouseY)</b>
+<b class="nc">&nbsp;                || !listModel.canScroll()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        listModel.scrollRows(</b>
+&nbsp;                -scrollY * 2.5D
+&nbsp;        );
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean keyPressed(
+&nbsp;            int keyCode,
+&nbsp;            int scanCode,
+&nbsp;            int modifiers
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!active</b>
+&nbsp;                || !visible
+<b class="nc">&nbsp;                || !isFocused()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        switch (keyCode) {</b>
+&nbsp;            case GLFW.GLFW_KEY_UP -&gt; {
+<b class="nc">&nbsp;                notifyFocus(</b>
+<b class="nc">&nbsp;                        listModel.moveFocus(-1)</b>
+&nbsp;                );
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case GLFW.GLFW_KEY_DOWN -&gt; {
+<b class="nc">&nbsp;                notifyFocus(</b>
+<b class="nc">&nbsp;                        listModel.moveFocus(1)</b>
+&nbsp;                );
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case GLFW.GLFW_KEY_HOME -&gt; {
+<b class="nc">&nbsp;                notifyFocus(</b>
+<b class="nc">&nbsp;                        listModel.focusFirst()</b>
+&nbsp;                );
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case GLFW.GLFW_KEY_END -&gt; {
+<b class="nc">&nbsp;                notifyFocus(</b>
+<b class="nc">&nbsp;                        listModel.focusLast()</b>
+&nbsp;                );
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case GLFW.GLFW_KEY_PAGE_UP -&gt; {
+<b class="nc">&nbsp;                listModel.scrollBy(</b>
+<b class="nc">&nbsp;                        -Math.max(</b>
+&nbsp;                                1,
+<b class="nc">&nbsp;                                listModel.viewportHeight() - 24</b>
+&nbsp;                        )
+&nbsp;                );
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case GLFW.GLFW_KEY_PAGE_DOWN -&gt; {
+<b class="nc">&nbsp;                listModel.scrollBy(</b>
+<b class="nc">&nbsp;                        Math.max(</b>
+&nbsp;                                1,
+<b class="nc">&nbsp;                                listModel.viewportHeight() - 24</b>
+&nbsp;                        )
+&nbsp;                );
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case GLFW.GLFW_KEY_ENTER,
+&nbsp;                 GLFW.GLFW_KEY_KP_ENTER,
+&nbsp;                 GLFW.GLFW_KEY_SPACE -&gt; {
+<b class="nc">&nbsp;                toggleFocusedEntry();</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            default -&gt; {
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void toggleFocusedEntry() {
+<b class="nc">&nbsp;        Optional&lt;SkillUiEntry&gt; focused =</b>
+<b class="nc">&nbsp;                listModel.focusedEntry();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (focused.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SkillUiEntry entry = focused.get();</b>
+<b class="nc">&nbsp;        SkillUiSelectionModel.ToggleResult result =</b>
+<b class="nc">&nbsp;                selectionModel.toggle(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        selectionListener.accept(</b>
+&nbsp;                entry,
+&nbsp;                result
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void notifyFocus(
+&nbsp;            Optional&lt;SkillUiEntry&gt; entry
+&nbsp;    ) {
+<b class="nc">&nbsp;        entry.ifPresent(</b>
+&nbsp;                focusListener
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateViewportHeight() {
+<b class="nc">&nbsp;        listModel.setViewportHeight(</b>
+<b class="nc">&nbsp;                Math.max(</b>
+&nbsp;                        0,
+<b class="nc">&nbsp;                        getHeight()</b>
+&nbsp;                                - INNER_PADDING * 2
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void updateWidgetNarration(
+&nbsp;            NarrationElementOutput narrationElementOutput
+&nbsp;    ) {
+<b class="nc">&nbsp;        narrationElementOutput.add(</b>
+&nbsp;                NarratedElementType.TITLE,
+<b class="nc">&nbsp;                getMessage()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        listModel.focusedEntry()</b>
+<b class="nc">&nbsp;                .ifPresent(entry -&gt;</b>
+<b class="nc">&nbsp;                        narrationElementOutput.add(</b>
+&nbsp;                                NarratedElementType.POSITION,
+<b class="nc">&nbsp;                                entry.displayName()</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        narrationElementOutput.add(</b>
+&nbsp;                NarratedElementType.USAGE,
+<b class="nc">&nbsp;                SkillUiText.component(</b>
+&nbsp;                        &quot;narration.skill_list_usage&quot;
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

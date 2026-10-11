@@ -1,0 +1,383 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SoulResonatorItem</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.item</a>
+</div>
+
+<h1>Coverage Summary for Class: SoulResonatorItem (com.mooswqz.moostensuraaddon.item)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SoulResonatorItem</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.7%
+  </span>
+  <span class="absValue">
+    (5/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.5%
+  </span>
+  <span class="absValue">
+    (3/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    19%
+  </span>
+  <span class="absValue">
+    (20/105)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.item;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import io.github.manasmods.manascore.skill.api.ManasSkillInstance;
+&nbsp;import io.github.manasmods.manascore.skill.api.SkillAPI;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.advancements.AdvancementHolder;
+&nbsp;import net.minecraft.core.BlockPos;
+&nbsp;import net.minecraft.core.GlobalPos;
+&nbsp;import net.minecraft.core.component.DataComponents;
+&nbsp;import net.minecraft.core.registries.Registries;
+&nbsp;import net.minecraft.nbt.CompoundTag;
+&nbsp;import net.minecraft.nbt.Tag;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.resources.ResourceKey;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;import net.minecraft.server.MinecraftServer;
+&nbsp;import net.minecraft.server.level.ServerLevel;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.minecraft.tags.TagKey;
+&nbsp;import net.minecraft.world.InteractionHand;
+&nbsp;import net.minecraft.world.InteractionResultHolder;
+&nbsp;import net.minecraft.world.entity.Entity;
+&nbsp;import net.minecraft.world.entity.player.Player;
+&nbsp;import net.minecraft.world.item.Item;
+&nbsp;import net.minecraft.world.item.ItemStack;
+&nbsp;import net.minecraft.world.item.TooltipFlag;
+&nbsp;import net.minecraft.world.item.component.CustomData;
+&nbsp;import net.minecraft.world.level.Level;
+&nbsp;import net.minecraft.world.level.levelgen.structure.Structure;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public class SoulResonatorItem extends Item {
+&nbsp;    private static final String TARGET_TAG = &quot;SoulResonatorTarget&quot;;
+&nbsp;    private static final String TARGET_DIMENSION_TAG = &quot;Dimension&quot;;
+&nbsp;    private static final String TARGET_X_TAG = &quot;X&quot;;
+&nbsp;    private static final String TARGET_Y_TAG = &quot;Y&quot;;
+&nbsp;    private static final String TARGET_Z_TAG = &quot;Z&quot;;
+&nbsp;
+&nbsp;    private static final int SEARCH_RADIUS_CHUNKS = 96;
+&nbsp;    private static final int COOLDOWN_TICKS = 20 * 5;
+&nbsp;
+<b class="fc">&nbsp;    private static final ResourceLocation SOUL_RESONANCE_ADVANCEMENT = ResourceLocation.fromNamespaceAndPath(</b>
+&nbsp;            MoosTensuraAddon.MODID,
+&nbsp;            &quot;soul_resonance&quot;
+&nbsp;    );
+&nbsp;
+<b class="fc">&nbsp;    public static final TagKey&lt;Structure&gt; GREAT_CRYSTAL_SHRINES = TagKey.create(</b>
+&nbsp;            Registries.STRUCTURE,
+<b class="fc">&nbsp;            ResourceLocation.fromNamespaceAndPath(MoosTensuraAddon.MODID, &quot;great_crystal_shrines&quot;)</b>
+&nbsp;    );
+&nbsp;
+&nbsp;    public SoulResonatorItem(Properties properties) {
+<b class="fc">&nbsp;        super(properties);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public InteractionResultHolder&lt;ItemStack&gt; use(Level level, Player player, InteractionHand hand) {
+<b class="nc">&nbsp;        ItemStack stack = player.getItemInHand(hand);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (level.isClientSide()) {</b>
+<b class="nc">&nbsp;            return InteractionResultHolder.success(stack);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!(level instanceof ServerLevel serverLevel) || !(player instanceof ServerPlayer serverPlayer)) {</b>
+<b class="nc">&nbsp;            return InteractionResultHolder.pass(stack);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (serverPlayer.getCooldowns().isOnCooldown(this)) {</b>
+<b class="nc">&nbsp;            return InteractionResultHolder.success(stack);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!hasSageOrGreatSage(serverPlayer)) {</b>
+<b class="nc">&nbsp;            serverPlayer.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.translatable(&quot;item.moostensuraaddon.soul_resonator.message.no_sage&quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            serverPlayer.getCooldowns().addCooldown(this, COOLDOWN_TICKS);</b>
+<b class="nc">&nbsp;            return InteractionResultHolder.success(stack);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BlockPos targetPos = serverLevel.findNearestMapStructure(</b>
+&nbsp;                GREAT_CRYSTAL_SHRINES,
+<b class="nc">&nbsp;                serverPlayer.blockPosition(),</b>
+&nbsp;                SEARCH_RADIUS_CHUNKS,
+&nbsp;                false
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (targetPos == null) {</b>
+<b class="nc">&nbsp;            serverPlayer.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.translatable(&quot;item.moostensuraaddon.soul_resonator.message.no_shrine&quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.GRAY),</b>
+&nbsp;                    true
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            serverPlayer.getCooldowns().addCooldown(this, COOLDOWN_TICKS);</b>
+<b class="nc">&nbsp;            return InteractionResultHolder.success(stack);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        setTarget(stack, serverLevel, targetPos);</b>
+<b class="nc">&nbsp;        awardSoulResonanceAdvancement(serverPlayer);</b>
+&nbsp;
+<b class="nc">&nbsp;        int distance = Math.round((float) Math.sqrt(targetPos.distSqr(serverPlayer.blockPosition())));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (distance &lt;= 8) {</b>
+<b class="nc">&nbsp;            serverPlayer.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.translatable(&quot;item.moostensuraaddon.soul_resonator.message.shrine_here&quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                    true
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            serverPlayer.displayClientMessage(</b>
+<b class="nc">&nbsp;                    Component.translatable(&quot;item.moostensuraaddon.soul_resonator.message.locked&quot;, distance)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.AQUA),</b>
+&nbsp;                    true
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        serverPlayer.getCooldowns().addCooldown(this, COOLDOWN_TICKS);</b>
+<b class="nc">&nbsp;        return InteractionResultHolder.success(stack);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List&lt;Component&gt; tooltip, TooltipFlag tooltipFlag) {
+<b class="fc">&nbsp;        super.appendHoverText(stack, context, tooltip, tooltipFlag);</b>
+&nbsp;
+<b class="fc">&nbsp;        tooltip.add(</b>
+<b class="fc">&nbsp;                Component.translatable(&quot;item.moostensuraaddon.soul_resonator.tooltip_requires_sage&quot;)</b>
+<b class="fc">&nbsp;                        .withStyle(ChatFormatting.DARK_PURPLE)</b>
+&nbsp;        );
+&nbsp;
+<b class="pc">&nbsp;        if (hasTarget(stack)) {</b>
+<b class="nc">&nbsp;            tooltip.add(</b>
+<b class="nc">&nbsp;                    Component.translatable(&quot;item.moostensuraaddon.soul_resonator.tooltip_attuned&quot;)</b>
+<b class="nc">&nbsp;                            .withStyle(ChatFormatting.AQUA)</b>
+&nbsp;            );
+&nbsp;        } else {
+<b class="fc">&nbsp;            tooltip.add(</b>
+<b class="fc">&nbsp;                    Component.translatable(&quot;item.moostensuraaddon.soul_resonator.tooltip_use&quot;)</b>
+<b class="fc">&nbsp;                            .withStyle(ChatFormatting.GRAY)</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        tooltip.add(</b>
+<b class="fc">&nbsp;                Component.translatable(&quot;item.moostensuraaddon.soul_resonator.tooltip_hint&quot;)</b>
+<b class="fc">&nbsp;                        .withStyle(ChatFormatting.DARK_AQUA)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void setTarget(ItemStack stack, ServerLevel level, BlockPos targetPos) {
+<b class="nc">&nbsp;        CompoundTag rootTag = getOrCreateCustomTag(stack);</b>
+&nbsp;
+<b class="nc">&nbsp;        CompoundTag targetTag = new CompoundTag();</b>
+<b class="nc">&nbsp;        targetTag.putString(TARGET_DIMENSION_TAG, level.dimension().location().toString());</b>
+<b class="nc">&nbsp;        targetTag.putInt(TARGET_X_TAG, targetPos.getX());</b>
+<b class="nc">&nbsp;        targetTag.putInt(TARGET_Y_TAG, targetPos.getY());</b>
+<b class="nc">&nbsp;        targetTag.putInt(TARGET_Z_TAG, targetPos.getZ());</b>
+&nbsp;
+<b class="nc">&nbsp;        rootTag.put(TARGET_TAG, targetTag);</b>
+<b class="nc">&nbsp;        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(rootTag));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static GlobalPos getCompassTarget(Level level, ItemStack stack, Entity entity) {
+<b class="nc">&nbsp;        CompoundTag rootTag = getCustomTag(stack);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (rootTag == null || !rootTag.contains(TARGET_TAG, Tag.TAG_COMPOUND)) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CompoundTag targetTag = rootTag.getCompound(TARGET_TAG);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!targetTag.contains(TARGET_DIMENSION_TAG, Tag.TAG_STRING)) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String dimensionId = targetTag.getString(TARGET_DIMENSION_TAG);</b>
+<b class="nc">&nbsp;        ResourceLocation dimensionLocation = ResourceLocation.tryParse(dimensionId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (dimensionLocation == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ResourceKey&lt;Level&gt; dimensionKey = ResourceKey.create(Registries.DIMENSION, dimensionLocation);</b>
+&nbsp;
+<b class="nc">&nbsp;        BlockPos targetPos = new BlockPos(</b>
+<b class="nc">&nbsp;                targetTag.getInt(TARGET_X_TAG),</b>
+<b class="nc">&nbsp;                targetTag.getInt(TARGET_Y_TAG),</b>
+<b class="nc">&nbsp;                targetTag.getInt(TARGET_Z_TAG)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return GlobalPos.of(dimensionKey, targetPos);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasTarget(ItemStack stack) {
+<b class="fc">&nbsp;        CompoundTag rootTag = getCustomTag(stack);</b>
+&nbsp;
+<b class="pc">&nbsp;        return rootTag != null &amp;&amp; rootTag.contains(TARGET_TAG, Tag.TAG_COMPOUND);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasSageOrGreatSage(ServerPlayer player) {
+<b class="nc">&nbsp;        return SkillAPI.getSkillsFrom(player)</b>
+<b class="nc">&nbsp;                .getLearnedSkills()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .anyMatch(SoulResonatorItem::isSageOrGreatSageSkill);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isSageOrGreatSageSkill(ManasSkillInstance instance) {
+<b class="nc">&nbsp;        if (instance == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ResourceLocation skillId = instance.getSkillId();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (skillId != null) {</b>
+<b class="nc">&nbsp;            String id = skillId.toString();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (id.equals(&quot;tensura:sage&quot;) || id.equals(&quot;tensura:great_sage&quot;)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String displayName = instance.getDisplayName().getString();</b>
+&nbsp;
+<b class="nc">&nbsp;        return displayName.equalsIgnoreCase(&quot;Sage&quot;)</b>
+<b class="nc">&nbsp;                || displayName.equalsIgnoreCase(&quot;Great Sage&quot;)</b>
+<b class="nc">&nbsp;                || displayName.equalsIgnoreCase(&quot;The Great Sage&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void awardSoulResonanceAdvancement(ServerPlayer player) {
+<b class="nc">&nbsp;        MinecraftServer server = player.getServer();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (server == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        AdvancementHolder advancement = server.getAdvancements().get(SOUL_RESONANCE_ADVANCEMENT);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (advancement == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        player.getAdvancements().award(advancement, &quot;resonated&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static CompoundTag getOrCreateCustomTag(ItemStack stack) {
+<b class="nc">&nbsp;        CompoundTag existingTag = getCustomTag(stack);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (existingTag != null) {</b>
+<b class="nc">&nbsp;            return existingTag;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new CompoundTag();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static CompoundTag getCustomTag(ItemStack stack) {
+<b class="fc">&nbsp;        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (customData == null) {</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return customData.copyTag();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,161 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UltimateBorrowEvents</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.event</a>
+</div>
+
+<h1>Coverage Summary for Class: UltimateBorrowEvents (com.mooswqz.moostensuraaddon.event)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UltimateBorrowEvents</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (8/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.6%
+  </span>
+  <span class="absValue">
+    (7/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.event;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import com.mooswqz.moostensuraaddon.util.ActionbarHelper;
+&nbsp;import com.mooswqz.moostensuraaddon.util.AddonDataCleaner;
+&nbsp;import net.minecraft.ChatFormatting;
+&nbsp;import net.minecraft.network.chat.Component;
+&nbsp;import net.minecraft.server.level.ServerPlayer;
+&nbsp;import net.neoforged.bus.api.SubscribeEvent;
+&nbsp;import net.neoforged.fml.common.EventBusSubscriber;
+&nbsp;import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+&nbsp;
+&nbsp;@EventBusSubscriber(modid = MoosTensuraAddon.MODID)
+<b class="nc">&nbsp;public class UltimateBorrowEvents {</b>
+&nbsp;    private static final int BORROWED_SKILL_CHECK_INTERVAL_TICKS = 20;
+&nbsp;    private static final int FULL_DATA_CLEANUP_INTERVAL_TICKS = 200;
+&nbsp;
+&nbsp;    @SubscribeEvent
+&nbsp;    public static void onPlayerTick(PlayerTickEvent.Post event) {
+<b class="fc">&nbsp;        if (!(event.getEntity() instanceof ServerPlayer player)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (player.level().isClientSide()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (player.tickCount % BORROWED_SKILL_CHECK_INTERVAL_TICKS != 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        AddonDataCleaner.CleanupResult result = AddonDataCleaner.cleanupPlayer(player);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (result.expiredBorrowedSkills() &gt; 0) {</b>
+<b class="nc">&nbsp;            ActionbarHelper.send(player, Component.translatable(</b>
+&nbsp;                    &quot;moostensuraaddon.ultimate.benevolent.borrow.expired_chat&quot;,
+<b class="nc">&nbsp;                    result.expiredBorrowedSkills()</b>
+<b class="nc">&nbsp;            ).withStyle(ChatFormatting.YELLOW));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (player.tickCount % FULL_DATA_CLEANUP_INTERVAL_TICKS == 0) {</b>
+<b class="fc">&nbsp;            AddonDataCleaner.cleanupNearbyGrantedData(player);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>

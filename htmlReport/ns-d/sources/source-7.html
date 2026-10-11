@@ -1,0 +1,928 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OpenRecognitionProgressScreenPayload</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.mooswqz.moostensuraaddon.network</a>
+</div>
+
+<h1>Coverage Summary for Class: OpenRecognitionProgressScreenPayload (com.mooswqz.moostensuraaddon.network)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OpenRecognitionProgressScreenPayload</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.7%
+  </span>
+  <span class="absValue">
+    (1/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.5%
+  </span>
+  <span class="absValue">
+    (3/119)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OpenRecognitionProgressScreenPayload$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.9%
+  </span>
+  <span class="absValue">
+    (1/114)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OpenRecognitionProgressScreenPayload$GuidanceEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OpenRecognitionProgressScreenPayload$PathEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    7.7%
+  </span>
+  <span class="absValue">
+    (2/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/76)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.4%
+  </span>
+  <span class="absValue">
+    (4/288)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.mooswqz.moostensuraaddon.network;
+&nbsp;
+&nbsp;import com.mooswqz.moostensuraaddon.MoosTensuraAddon;
+&nbsp;import net.minecraft.network.RegistryFriendlyByteBuf;
+&nbsp;import net.minecraft.network.codec.StreamCodec;
+&nbsp;import net.minecraft.network.protocol.common.custom
+&nbsp;        .CustomPacketPayload;
+&nbsp;import net.minecraft.resources.ResourceLocation;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+<b class="nc">&nbsp;public record OpenRecognitionProgressScreenPayload(</b>
+&nbsp;        String accountName,
+&nbsp;        String identityLine,
+&nbsp;        String bestowedTitle,
+&nbsp;        String pathSummary,
+&nbsp;        String eligibilityStatusId,
+&nbsp;        String statusHeading,
+&nbsp;        String statusDetail,
+&nbsp;        String levelLine,
+&nbsp;        int currentLevel,
+&nbsp;        int requiredLevel,
+&nbsp;        boolean nativeNamed,
+&nbsp;        boolean recognitionCommitted,
+&nbsp;        boolean revealPending,
+&nbsp;        boolean pureRecognition,
+&nbsp;        String primaryPathId,
+&nbsp;        String secondaryPathId,
+&nbsp;        int recognitionColor,
+&nbsp;        boolean recognitionBold,
+&nbsp;        boolean debugDetailsAvailable,
+&nbsp;        double establishedThreshold,
+&nbsp;        double pureThreshold,
+&nbsp;        double rawPureThreshold,
+&nbsp;        List&lt;PathEntry&gt; paths,
+&nbsp;        List&lt;GuidanceEntry&gt; guidanceEntries
+&nbsp;) implements CustomPacketPayload {
+&nbsp;
+&nbsp;    private static final int MAX_TEXT_LENGTH = 256;
+&nbsp;    private static final int MAX_PATH_ENTRIES = 9;
+&nbsp;    /*
+&nbsp;     * The Overview currently publishes eleven cards. Keep one bounded spare
+&nbsp;     * slot so the codec does not silently discard the final five entries.
+&nbsp;     */
+&nbsp;    private static final int MAX_GUIDANCE_ENTRIES = 12;
+&nbsp;
+&nbsp;    public static final CustomPacketPayload.Type&lt;
+&nbsp;            OpenRecognitionProgressScreenPayload
+<b class="fc">&nbsp;            &gt; TYPE =</b>
+&nbsp;            new CustomPacketPayload.Type&lt;&gt;(
+<b class="fc">&nbsp;                    ResourceLocation.fromNamespaceAndPath(</b>
+&nbsp;                            MoosTensuraAddon.MODID,
+&nbsp;                            &quot;open_recognition_progress_screen&quot;
+&nbsp;                    )
+&nbsp;            );
+&nbsp;
+&nbsp;    public static final StreamCodec&lt;
+&nbsp;            RegistryFriendlyByteBuf,
+&nbsp;            OpenRecognitionProgressScreenPayload
+<b class="fc">&nbsp;            &gt; STREAM_CODEC =</b>
+<b class="fc">&nbsp;            new StreamCodec&lt;&gt;() {</b>
+&nbsp;                @Override
+&nbsp;                public OpenRecognitionProgressScreenPayload decode(
+&nbsp;                        RegistryFriendlyByteBuf buffer
+&nbsp;                ) {
+<b class="nc">&nbsp;                    String accountName =</b>
+<b class="nc">&nbsp;                            readText(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                    String identityLine =</b>
+<b class="nc">&nbsp;                            readText(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                    String bestowedTitle =</b>
+<b class="nc">&nbsp;                            readText(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                    String pathSummary =</b>
+<b class="nc">&nbsp;                            readText(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                    String eligibilityStatusId =</b>
+<b class="nc">&nbsp;                            readText(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                    String statusHeading =</b>
+<b class="nc">&nbsp;                            readText(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                    String statusDetail =</b>
+<b class="nc">&nbsp;                            readText(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                    String levelLine =</b>
+<b class="nc">&nbsp;                            readText(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                    int currentLevel =</b>
+<b class="nc">&nbsp;                            buffer.readVarInt();</b>
+&nbsp;
+<b class="nc">&nbsp;                    int requiredLevel =</b>
+<b class="nc">&nbsp;                            buffer.readVarInt();</b>
+&nbsp;
+<b class="nc">&nbsp;                    boolean nativeNamed =</b>
+<b class="nc">&nbsp;                            buffer.readBoolean();</b>
+&nbsp;
+<b class="nc">&nbsp;                    boolean recognitionCommitted =</b>
+<b class="nc">&nbsp;                            buffer.readBoolean();</b>
+&nbsp;
+<b class="nc">&nbsp;                    boolean revealPending =</b>
+<b class="nc">&nbsp;                            buffer.readBoolean();</b>
+&nbsp;
+<b class="nc">&nbsp;                    boolean pureRecognition =</b>
+<b class="nc">&nbsp;                            buffer.readBoolean();</b>
+&nbsp;
+<b class="nc">&nbsp;                    String primaryPathId =</b>
+<b class="nc">&nbsp;                            readText(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                    String secondaryPathId =</b>
+<b class="nc">&nbsp;                            readText(buffer);</b>
+&nbsp;
+<b class="nc">&nbsp;                    int recognitionColor =</b>
+<b class="nc">&nbsp;                            buffer.readInt();</b>
+&nbsp;
+<b class="nc">&nbsp;                    boolean recognitionBold =</b>
+<b class="nc">&nbsp;                            buffer.readBoolean();</b>
+&nbsp;
+<b class="nc">&nbsp;                    boolean debugDetailsAvailable =</b>
+<b class="nc">&nbsp;                            buffer.readBoolean();</b>
+&nbsp;
+<b class="nc">&nbsp;                    double establishedThreshold =</b>
+<b class="nc">&nbsp;                            buffer.readDouble();</b>
+&nbsp;
+<b class="nc">&nbsp;                    double pureThreshold =</b>
+<b class="nc">&nbsp;                            buffer.readDouble();</b>
+&nbsp;
+<b class="nc">&nbsp;                    double rawPureThreshold =</b>
+<b class="nc">&nbsp;                            buffer.readDouble();</b>
+&nbsp;
+<b class="nc">&nbsp;                    int pathCount =</b>
+<b class="nc">&nbsp;                            readBoundedCount(</b>
+&nbsp;                                    buffer,
+&nbsp;                                    MAX_PATH_ENTRIES,
+&nbsp;                                    &quot;recognition path&quot;
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;                    List&lt;PathEntry&gt; paths =</b>
+&nbsp;                            new ArrayList&lt;&gt;(pathCount);
+&nbsp;
+<b class="nc">&nbsp;                    for (int index = 0;</b>
+<b class="nc">&nbsp;                         index &lt; pathCount;</b>
+<b class="nc">&nbsp;                         index++) {</b>
+&nbsp;
+<b class="nc">&nbsp;                        paths.add(</b>
+<b class="nc">&nbsp;                                PathEntry.decode(buffer)</b>
+&nbsp;                        );
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    int guidanceCount =</b>
+<b class="nc">&nbsp;                            readBoundedCount(</b>
+&nbsp;                                    buffer,
+&nbsp;                                    MAX_GUIDANCE_ENTRIES,
+&nbsp;                                    &quot;recognition guidance&quot;
+&nbsp;                            );
+&nbsp;
+<b class="nc">&nbsp;                    List&lt;GuidanceEntry&gt; guidanceEntries =</b>
+&nbsp;                            new ArrayList&lt;&gt;(guidanceCount);
+&nbsp;
+<b class="nc">&nbsp;                    for (int index = 0;</b>
+<b class="nc">&nbsp;                         index &lt; guidanceCount;</b>
+<b class="nc">&nbsp;                         index++) {</b>
+&nbsp;
+<b class="nc">&nbsp;                        guidanceEntries.add(</b>
+<b class="nc">&nbsp;                                GuidanceEntry.decode(buffer)</b>
+&nbsp;                        );
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    return new OpenRecognitionProgressScreenPayload(</b>
+&nbsp;                            accountName,
+&nbsp;                            identityLine,
+&nbsp;                            bestowedTitle,
+&nbsp;                            pathSummary,
+&nbsp;                            eligibilityStatusId,
+&nbsp;                            statusHeading,
+&nbsp;                            statusDetail,
+&nbsp;                            levelLine,
+&nbsp;                            currentLevel,
+&nbsp;                            requiredLevel,
+&nbsp;                            nativeNamed,
+&nbsp;                            recognitionCommitted,
+&nbsp;                            revealPending,
+&nbsp;                            pureRecognition,
+&nbsp;                            primaryPathId,
+&nbsp;                            secondaryPathId,
+&nbsp;                            recognitionColor,
+&nbsp;                            recognitionBold,
+&nbsp;                            debugDetailsAvailable,
+&nbsp;                            establishedThreshold,
+&nbsp;                            pureThreshold,
+&nbsp;                            rawPureThreshold,
+&nbsp;                            paths,
+&nbsp;                            guidanceEntries
+&nbsp;                    );
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void encode(
+&nbsp;                        RegistryFriendlyByteBuf buffer,
+&nbsp;                        OpenRecognitionProgressScreenPayload payload
+&nbsp;                ) {
+<b class="nc">&nbsp;                    writeText(</b>
+&nbsp;                            buffer,
+<b class="nc">&nbsp;                            payload.accountName()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    writeText(</b>
+&nbsp;                            buffer,
+<b class="nc">&nbsp;                            payload.identityLine()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    writeText(</b>
+&nbsp;                            buffer,
+<b class="nc">&nbsp;                            payload.bestowedTitle()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    writeText(</b>
+&nbsp;                            buffer,
+<b class="nc">&nbsp;                            payload.pathSummary()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    writeText(</b>
+&nbsp;                            buffer,
+<b class="nc">&nbsp;                            payload.eligibilityStatusId()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    writeText(</b>
+&nbsp;                            buffer,
+<b class="nc">&nbsp;                            payload.statusHeading()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    writeText(</b>
+&nbsp;                            buffer,
+<b class="nc">&nbsp;                            payload.statusDetail()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    writeText(</b>
+&nbsp;                            buffer,
+<b class="nc">&nbsp;                            payload.levelLine()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeVarInt(</b>
+<b class="nc">&nbsp;                            payload.currentLevel()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeVarInt(</b>
+<b class="nc">&nbsp;                            payload.requiredLevel()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeBoolean(</b>
+<b class="nc">&nbsp;                            payload.nativeNamed()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeBoolean(</b>
+<b class="nc">&nbsp;                            payload.recognitionCommitted()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeBoolean(</b>
+<b class="nc">&nbsp;                            payload.revealPending()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeBoolean(</b>
+<b class="nc">&nbsp;                            payload.pureRecognition()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    writeText(</b>
+&nbsp;                            buffer,
+<b class="nc">&nbsp;                            payload.primaryPathId()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    writeText(</b>
+&nbsp;                            buffer,
+<b class="nc">&nbsp;                            payload.secondaryPathId()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeInt(</b>
+<b class="nc">&nbsp;                            payload.recognitionColor()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeBoolean(</b>
+<b class="nc">&nbsp;                            payload.recognitionBold()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeBoolean(</b>
+<b class="nc">&nbsp;                            payload.debugDetailsAvailable()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeDouble(</b>
+<b class="nc">&nbsp;                            payload.establishedThreshold()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeDouble(</b>
+<b class="nc">&nbsp;                            payload.pureThreshold()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeDouble(</b>
+<b class="nc">&nbsp;                            payload.rawPureThreshold()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeVarInt(</b>
+<b class="nc">&nbsp;                            payload.paths().size()</b>
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;                    for (PathEntry path : payload.paths()) {</b>
+<b class="nc">&nbsp;                        path.encode(buffer);</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    buffer.writeVarInt(</b>
+<b class="nc">&nbsp;                            payload.guidanceEntries().size()</b>
+&nbsp;                    );
+&nbsp;
+&nbsp;                    for (GuidanceEntry guidanceEntry :
+<b class="nc">&nbsp;                            payload.guidanceEntries()) {</b>
+&nbsp;
+<b class="nc">&nbsp;                        guidanceEntry.encode(buffer);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            };
+&nbsp;
+<b class="nc">&nbsp;    public OpenRecognitionProgressScreenPayload {</b>
+<b class="nc">&nbsp;        accountName = sanitizeText(accountName);</b>
+<b class="nc">&nbsp;        identityLine = sanitizeText(identityLine);</b>
+<b class="nc">&nbsp;        bestowedTitle = sanitizeText(bestowedTitle);</b>
+<b class="nc">&nbsp;        pathSummary = sanitizeText(pathSummary);</b>
+<b class="nc">&nbsp;        eligibilityStatusId = sanitizeText(</b>
+&nbsp;                eligibilityStatusId
+&nbsp;        );
+<b class="nc">&nbsp;        statusHeading = sanitizeText(statusHeading);</b>
+<b class="nc">&nbsp;        statusDetail = sanitizeText(statusDetail);</b>
+<b class="nc">&nbsp;        levelLine = sanitizeText(levelLine);</b>
+&nbsp;
+<b class="nc">&nbsp;        currentLevel = Math.max(0, currentLevel);</b>
+<b class="nc">&nbsp;        requiredLevel = Math.max(0, requiredLevel);</b>
+<b class="nc">&nbsp;        recognitionColor &amp;= 0xFFFFFF;</b>
+&nbsp;
+<b class="nc">&nbsp;        primaryPathId = sanitizeText(primaryPathId);</b>
+<b class="nc">&nbsp;        secondaryPathId = sanitizeText(</b>
+&nbsp;                secondaryPathId
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        establishedThreshold =</b>
+<b class="nc">&nbsp;                sanitizeNonNegative(</b>
+&nbsp;                        establishedThreshold
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        pureThreshold =</b>
+<b class="nc">&nbsp;                sanitizeNonNegative(</b>
+&nbsp;                        pureThreshold
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        rawPureThreshold =</b>
+<b class="nc">&nbsp;                sanitizeNonNegative(</b>
+&nbsp;                        rawPureThreshold
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        if (!debugDetailsAvailable) {</b>
+<b class="nc">&nbsp;            establishedThreshold = 0.0D;</b>
+<b class="nc">&nbsp;            pureThreshold = 0.0D;</b>
+<b class="nc">&nbsp;            rawPureThreshold = 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        paths = sanitizePaths(paths);</b>
+<b class="nc">&nbsp;        guidanceEntries = sanitizeGuidanceEntries(</b>
+&nbsp;                guidanceEntries
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (!debugDetailsAvailable) {</b>
+<b class="nc">&nbsp;            paths = stripPathDebugValues(paths);</b>
+<b class="nc">&nbsp;            guidanceEntries = stripGuidanceDebugValues(</b>
+&nbsp;                    guidanceEntries
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public CustomPacketPayload.Type&lt;
+&nbsp;            ? extends CustomPacketPayload
+&nbsp;            &gt; type() {
+<b class="nc">&nbsp;        return TYPE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public PathEntry findPath(
+&nbsp;            String pathId
+&nbsp;    ) {
+<b class="nc">&nbsp;        String safePathId = sanitizeText(pathId);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (PathEntry path : paths) {</b>
+<b class="nc">&nbsp;            if (path.pathId().equals(safePathId)) {</b>
+<b class="nc">&nbsp;                return path;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;PathEntry&gt; stripPathDebugValues(
+&nbsp;            List&lt;PathEntry&gt; paths
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (paths == null || paths.isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;PathEntry&gt; stripped =</b>
+<b class="nc">&nbsp;                new ArrayList&lt;&gt;(paths.size());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (PathEntry path : paths) {</b>
+<b class="nc">&nbsp;            stripped.add(</b>
+&nbsp;                    new PathEntry(
+<b class="nc">&nbsp;                            path.pathId(),</b>
+<b class="nc">&nbsp;                            path.displayName(),</b>
+<b class="nc">&nbsp;                            path.stageLabel(),</b>
+<b class="nc">&nbsp;                            path.progress(),</b>
+<b class="nc">&nbsp;                            path.color(),</b>
+<b class="nc">&nbsp;                            path.primary(),</b>
+<b class="nc">&nbsp;                            path.secondary(),</b>
+&nbsp;                            0.0D,
+&nbsp;                            0.0D,
+&nbsp;                            0.0D
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return List.copyOf(stripped);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;GuidanceEntry&gt;
+&nbsp;    stripGuidanceDebugValues(
+&nbsp;            List&lt;GuidanceEntry&gt; entries
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (entries == null || entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;GuidanceEntry&gt; stripped =</b>
+<b class="nc">&nbsp;                new ArrayList&lt;&gt;(entries.size());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (GuidanceEntry entry : entries) {</b>
+<b class="nc">&nbsp;            stripped.add(</b>
+&nbsp;                    new GuidanceEntry(
+<b class="nc">&nbsp;                            entry.categoryId(),</b>
+<b class="nc">&nbsp;                            entry.displayName(),</b>
+<b class="nc">&nbsp;                            entry.stageLabel(),</b>
+<b class="nc">&nbsp;                            entry.guidanceText(),</b>
+<b class="nc">&nbsp;                            entry.progress(),</b>
+<b class="nc">&nbsp;                            entry.color(),</b>
+&nbsp;                            0.0D
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return List.copyOf(stripped);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;PathEntry&gt; sanitizePaths(
+&nbsp;            List&lt;PathEntry&gt; rawPaths
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (rawPaths == null || rawPaths.isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;PathEntry&gt; safePaths =</b>
+&nbsp;                new ArrayList&lt;&gt;(
+<b class="nc">&nbsp;                        Math.min(</b>
+&nbsp;                                MAX_PATH_ENTRIES,
+<b class="nc">&nbsp;                                rawPaths.size()</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        for (PathEntry path : rawPaths) {</b>
+<b class="nc">&nbsp;            if (path == null) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            safePaths.add(path);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (safePaths.size()</b>
+&nbsp;                    &gt;= MAX_PATH_ENTRIES) {
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return List.copyOf(safePaths);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;GuidanceEntry&gt;
+&nbsp;    sanitizeGuidanceEntries(
+&nbsp;            List&lt;GuidanceEntry&gt; rawEntries
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (rawEntries == null || rawEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;GuidanceEntry&gt; safeEntries =</b>
+&nbsp;                new ArrayList&lt;&gt;(
+<b class="nc">&nbsp;                        Math.min(</b>
+&nbsp;                                MAX_GUIDANCE_ENTRIES,
+<b class="nc">&nbsp;                                rawEntries.size()</b>
+&nbsp;                        )
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        for (GuidanceEntry entry : rawEntries) {</b>
+<b class="nc">&nbsp;            if (entry == null) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            safeEntries.add(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (safeEntries.size()</b>
+&nbsp;                    &gt;= MAX_GUIDANCE_ENTRIES) {
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return List.copyOf(safeEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int readBoundedCount(
+&nbsp;            RegistryFriendlyByteBuf buffer,
+&nbsp;            int maximum,
+&nbsp;            String label
+&nbsp;    ) {
+<b class="nc">&nbsp;        int count = buffer.readVarInt();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (count &lt; 0 || count &gt; maximum) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;Invalid &quot;
+&nbsp;                            + label
+&nbsp;                            + &quot; entry count: &quot;
+&nbsp;                            + count
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return count;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String readText(
+&nbsp;            RegistryFriendlyByteBuf buffer
+&nbsp;    ) {
+<b class="nc">&nbsp;        return buffer.readUtf(MAX_TEXT_LENGTH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void writeText(
+&nbsp;            RegistryFriendlyByteBuf buffer,
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        buffer.writeUtf(</b>
+<b class="nc">&nbsp;                sanitizeText(value),</b>
+&nbsp;                MAX_TEXT_LENGTH
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String sanitizeText(
+&nbsp;            String value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (value == null || value.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder result =</b>
+&nbsp;                new StringBuilder();
+&nbsp;
+<b class="nc">&nbsp;        boolean previousWhitespace = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0;</b>
+<b class="nc">&nbsp;             index &lt; value.length();</b>
+<b class="nc">&nbsp;             index++) {</b>
+&nbsp;
+<b class="nc">&nbsp;            char character = value.charAt(index);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (character == &#39;\u00A7&#39;</b>
+<b class="nc">&nbsp;                    || Character.isISOControl(character)) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (Character.isWhitespace(character)) {</b>
+<b class="nc">&nbsp;                if (!previousWhitespace</b>
+<b class="nc">&nbsp;                        &amp;&amp; !result.isEmpty()) {</b>
+<b class="nc">&nbsp;                    result.append(&#39; &#39;);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                previousWhitespace = true;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            result.append(character);</b>
+<b class="nc">&nbsp;            previousWhitespace = false;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (result.length() &gt;= MAX_TEXT_LENGTH) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result.toString().trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double sanitizeNonNegative(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(value) || value &lt; 0.0D) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static double clampProgress(
+&nbsp;            double value
+&nbsp;    ) {
+<b class="nc">&nbsp;        if (!Double.isFinite(value)) {</b>
+<b class="nc">&nbsp;            return 0.0D;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Math.max(</b>
+&nbsp;                0.0D,
+<b class="nc">&nbsp;                Math.min(</b>
+&nbsp;                        1.0D,
+&nbsp;                        value
+&nbsp;                )
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record PathEntry(</b>
+&nbsp;            String pathId,
+&nbsp;            String displayName,
+&nbsp;            String stageLabel,
+&nbsp;            double progress,
+&nbsp;            int color,
+&nbsp;            boolean primary,
+&nbsp;            boolean secondary,
+&nbsp;            double finalScore,
+&nbsp;            double rawScore,
+&nbsp;            double identityBoost
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public PathEntry {</b>
+<b class="nc">&nbsp;            pathId = sanitizeText(pathId);</b>
+<b class="nc">&nbsp;            displayName = sanitizeText(displayName);</b>
+<b class="nc">&nbsp;            stageLabel = sanitizeText(stageLabel);</b>
+&nbsp;
+<b class="nc">&nbsp;            progress = clampProgress(progress);</b>
+<b class="nc">&nbsp;            color &amp;= 0xFFFFFF;</b>
+&nbsp;
+<b class="nc">&nbsp;            finalScore = sanitizeNonNegative(finalScore);</b>
+<b class="nc">&nbsp;            rawScore = sanitizeNonNegative(rawScore);</b>
+<b class="nc">&nbsp;            identityBoost = sanitizeNonNegative(</b>
+&nbsp;                    identityBoost
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private static PathEntry decode(
+&nbsp;                RegistryFriendlyByteBuf buffer
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new PathEntry(</b>
+<b class="nc">&nbsp;                    readText(buffer),</b>
+<b class="nc">&nbsp;                    readText(buffer),</b>
+<b class="nc">&nbsp;                    readText(buffer),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readInt(),</b>
+<b class="nc">&nbsp;                    buffer.readBoolean(),</b>
+<b class="nc">&nbsp;                    buffer.readBoolean(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private void encode(
+&nbsp;                RegistryFriendlyByteBuf buffer
+&nbsp;        ) {
+<b class="nc">&nbsp;            writeText(buffer, pathId);</b>
+<b class="nc">&nbsp;            writeText(buffer, displayName);</b>
+<b class="nc">&nbsp;            writeText(buffer, stageLabel);</b>
+<b class="nc">&nbsp;            buffer.writeDouble(progress);</b>
+<b class="nc">&nbsp;            buffer.writeInt(color);</b>
+<b class="nc">&nbsp;            buffer.writeBoolean(primary);</b>
+<b class="nc">&nbsp;            buffer.writeBoolean(secondary);</b>
+<b class="nc">&nbsp;            buffer.writeDouble(finalScore);</b>
+<b class="nc">&nbsp;            buffer.writeDouble(rawScore);</b>
+<b class="nc">&nbsp;            buffer.writeDouble(identityBoost);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record GuidanceEntry(</b>
+&nbsp;            String categoryId,
+&nbsp;            String displayName,
+&nbsp;            String stageLabel,
+&nbsp;            String guidanceText,
+&nbsp;            double progress,
+&nbsp;            int color,
+&nbsp;            double debugValue
+&nbsp;    ) {
+&nbsp;
+<b class="nc">&nbsp;        public GuidanceEntry {</b>
+<b class="nc">&nbsp;            categoryId = sanitizeText(categoryId);</b>
+<b class="nc">&nbsp;            displayName = sanitizeText(displayName);</b>
+<b class="nc">&nbsp;            stageLabel = sanitizeText(stageLabel);</b>
+<b class="nc">&nbsp;            guidanceText = sanitizeText(guidanceText);</b>
+&nbsp;
+<b class="nc">&nbsp;            progress = clampProgress(progress);</b>
+<b class="nc">&nbsp;            color &amp;= 0xFFFFFF;</b>
+<b class="nc">&nbsp;            debugValue = sanitizeNonNegative(debugValue);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static GuidanceEntry decode(
+&nbsp;                RegistryFriendlyByteBuf buffer
+&nbsp;        ) {
+<b class="nc">&nbsp;            return new GuidanceEntry(</b>
+<b class="nc">&nbsp;                    readText(buffer),</b>
+<b class="nc">&nbsp;                    readText(buffer),</b>
+<b class="nc">&nbsp;                    readText(buffer),</b>
+<b class="nc">&nbsp;                    readText(buffer),</b>
+<b class="nc">&nbsp;                    buffer.readDouble(),</b>
+<b class="nc">&nbsp;                    buffer.readInt(),</b>
+<b class="nc">&nbsp;                    buffer.readDouble()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private void encode(
+&nbsp;                RegistryFriendlyByteBuf buffer
+&nbsp;        ) {
+<b class="nc">&nbsp;            writeText(buffer, categoryId);</b>
+<b class="nc">&nbsp;            writeText(buffer, displayName);</b>
+<b class="nc">&nbsp;            writeText(buffer, stageLabel);</b>
+<b class="nc">&nbsp;            writeText(buffer, guidanceText);</b>
+<b class="nc">&nbsp;            buffer.writeDouble(progress);</b>
+<b class="nc">&nbsp;            buffer.writeInt(color);</b>
+<b class="nc">&nbsp;            buffer.writeDouble(debugValue);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-10-07 23:47</div>
+</div>
+</body>
+</html>
